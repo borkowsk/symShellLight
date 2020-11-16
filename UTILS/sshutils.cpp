@@ -10,10 +10,9 @@
 #include <string.h>
 #include <stdarg.h>
 #include <math.h>
-#include "INCLUDE/wbminmax.hpp"
-#include "../../symshell.h"
-#include "../../sshutils.hpp"
-//#include "graphs.hpp"
+//#include "INCLUDE/wbminmax.hpp"
+#include "symshell.h"
+#include "sshutils.hpp"
 
 //Drukuje w obszarze nie wiekszym niz max_width. Zwraca width albo 0
 //wewnetrzny bufor ma nie wiecej niz 1024 znaki
@@ -200,6 +199,11 @@ void ver_scale(int x1,int y1,int width,wb_color start,wb_color end)
 
 double def_arrow_size=15;
 double def_arrow_theta=M_PI/6.0+M_PI;//3.6651914291881
+
+inline int sqr(int x)
+{
+    return x*x;
+}
 
 void arrow(int x1,int y1,int x2,int y2,wb_color color,double size,double theta)
 {	

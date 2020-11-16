@@ -6,9 +6,9 @@
 /* SVG IMPLEMENTATION in file symshsvg.cpp                              */
 /* File changed masively: 21.10.2020                                    */
 
-#include "SYMSHELL/symshell.h"
+#include "symshell.h"
 #define HIDE_WB_PTR_IO	1     //I/O NIEPOTRZEBNY
-#include "INCLUDE/wb_ptr.hpp"
+#include "wb_ptr.hpp"
 #include <iostream>
 #include <fstream>
 #include <cassert>

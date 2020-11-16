@@ -8,7 +8,7 @@
 extern "C" {
 #endif
 
-int WB_error_enter_before_clean=0;
+int WB_error_enter_before_clean=1;
 
 #ifdef  __cplusplus
 }

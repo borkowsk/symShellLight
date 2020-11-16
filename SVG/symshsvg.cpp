@@ -1131,10 +1131,10 @@ int  set_char(ssh_msg c)
 	if (GrCharMessage < -1)
 	{
         GrCharMessage = c;
-		return 1; //uda�o si�
+        return 1; //udało się
 	}
 	else
-		return 0;//Nie uda�o si� bo poprzednie nie zosta�o odczytane
+        return 0;//Nie udało się bo poprzednie nie zostało odczytane
 }
 
 int  get_mouse_event(ssh_coordinate *xpos, ssh_coordinate *ypos, ssh_coordinate *click)
@@ -1243,7 +1243,7 @@ if(UseGrayScale)//Uzywa skali szarosci tam gdzie normalnie sa kolory
 	set_rgb(255,255,255,255); //Zazwyczaj oczekuje �e kolor 255 to bia�y, albo chocia� jasny
 }
 
-//NAJWA�NIEJSZE FUNKCJE - ZAPIS INFORMACJI DO PLIKU W FORMACIE WEKTOROWYM
+//NAJWAŻNIEJSZE FUNKCJE - ZAPIS INFORMACJI DO PLIKU W FORMACIE WEKTOROWYM
 ////////////////////////////////////////////////////////////////////////////////
 extern const char* GrFileOutputByExtension;// = "str";//Tym mo�na sterowa� format pliku wyj�ciwego. Jak format nieznany to wyrzuca strumie� obiektowy .str
 int writeSTR(ostream& o)

@@ -87,10 +87,10 @@ ssh_natural line_width(ssh_natural width);                     /* Ustala szeroko
 ssh_mode    line_style(ssh_mode Style);                        /* Ustala styl rysowania lini: SSH_LINE_SOLID, SSH_LINE_DOTTED, SSH_LINE_DASHED */
 ssh_mode    put_style(ssh_mode Style);                         /* Ustala stosunek nowego rysowania do starej zawartosci ekranu: SSH_SOLID_PUT,SSH_XOR_PUT */
 
-void set_pen(ssh_color c,ssh_natural width,ssh_mode Style);    /* Ustala aktualny kolor linii i konturów za pomoca typu ssh_color oraz styl i grubość */
+void set_pen(ssh_color c, ssh_natural width, ssh_mode style);    /* Ustala aktualny kolor linii i konturów za pomoca typu ssh_color oraz styl i grubość */
 void set_brush(ssh_color c);                                   /* Ustala aktualny kolor wypelnien za pomoca typu ssh_color */
-void set_pen_rgb(ssh_intensity r,ssh_intensity g,ssh_intensity b,/* Ustala aktualny kolor linii za pomoca skladowych RGB */
-                    ssh_natural width,ssh_mode Style);         /*  oraz styl i grubość */
+void set_pen_rgb(ssh_intensity r, ssh_intensity g, ssh_intensity b, /* Ustala aktualny kolor linii za pomoca skladowych RGB */
+                    ssh_natural width, ssh_mode style);         /*  oraz styl i grubość */
 void set_brush_rgb(ssh_intensity r,ssh_intensity g,ssh_intensity b); /* Ustala aktualny kolor wypelnien za pomoca skladowych RGB */
 
 /* ODCZYTYWYWANIE AKTUALNYCH USTAWIEN OKNA GRAFICZNEGO*/

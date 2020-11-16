@@ -29,7 +29,7 @@
 
 /* For close_plot() */
 static int opened=0; /* Dla close plot. Zerowane tez gdy "broken-pipe" */
-static char trace=1; /* Domyslny poziom logowania zdarzeń X11 */
+static char trace=0; /* Domyslny poziom logowania zdarzeń X11 */
 extern int WB_error_enter_before_clean;
 
 
@@ -220,7 +220,8 @@ if(trace)
 	fprintf(stderr,"%s\n","SetScale completed");
 }
 
-void set_rgb(ssh_color color,int r,int g,int b)
+void set_rgb(ssh_color color,                                  /* - indeks koloru */
+             ssh_intensity r,ssh_intensity g,ssh_intensity b) /*- wartości składowych */
 /* Zmienia definicja koloru. Indeksy 0..255 */
 {
 XColor pom;
@@ -324,10 +325,7 @@ static void ResizeBuffer(unsigned int nwidth,unsigned int nheight)
 }
 
 
-static void TooSmall(win, gc, font_info)
-Window win;
-GC gc;
-XFontStruct *font_info;
+static void TooSmall(Window win,GC  gc,XFontStruct * font_info)
 {
  char *string1 = "Too Small";
  int y_offset, x_offset;
@@ -355,10 +353,8 @@ static int ErrorHandler(Display *xDisplay, XErrorEvent *event)
     return 0;
 }
 
-static void load_font(font_info,gc)
- XFontStruct **font_info;
- GC *gc;
- {
+static void load_font(XFontStruct **font_info,GC * gc)
+{
     char fontname[128];
     XFontStruct* l_font_info;
 
@@ -710,24 +706,24 @@ if(pipe_break)	/* Musi zwrocic EOF */
         fprintf(stderr,"\nColormap of %d colors allocated\n",NumberOfColors);
  }
 
-int screen_height()
+ssh_natural  screen_height()
 {
 return ini_b+(ini_cb*font_height)/muly;/* Window size */
 }
 
-int  screen_width()
+ssh_natural  screen_width()
 {
 return ini_a+(ini_ca*font_width)/mulx;/* Window size */
 }
 
-int  char_height(char znak)
+ssh_natural  char_height(char znak)
 {
 int pom=(font_height+muly)/muly;
 /*if(pom<1)pom=1;*/
 return pom;
 }
 
-int  char_width(char znak)
+ssh_natural  char_width(char znak)
 {
 int width;
 char pom[2];
@@ -737,14 +733,14 @@ if(width<1)width=1;
 return width;
 }
 
-int  string_height(const char* str)
+ssh_natural  string_height(const char* str)
 /* BARDZO PRYMITYWNIE! */
 /* Aktualne rozmiary lancucha */
 {
 return char_height(*str);
 }
 
-int  string_width(const char* str)
+ssh_natural  string_width(const char* str)
 /* ...potrzebne do jego pozycjonowania */
 {
 int pom=XTextWidth(font_info,str,strlen(str))/mulx;
@@ -950,8 +946,8 @@ int buildColor(unsigned char red, unsigned char green, unsigned char blue)
            ( (int)(blue) ) ;
 }
 
-void plot_rgb(int x,int y,
-				int r,int g,int b)
+void plot_rgb(ssh_coordinate x,ssh_coordinate y,                       /* Współrzędne */
+              ssh_intensity r,ssh_intensity g,ssh_intensity b)        /*- składowe koloru */
 {
 	x*=mulx; /* Multiplicaton of coordinates */
 	y*=muly; /* if window is bigger */
@@ -1112,7 +1108,7 @@ if(is_buffered)
 	}
 }
 
-void circle(int x,int y,int r,ssh_color c)
+void circle(ssh_coordinate x,ssh_coordinate y,ssh_natural r,ssh_color c)/* Wyswietlenie okregu w kolorze c */
 /* Wyswietlenie okregu w kolorze c */
 {
 int angle2=360*64,r1,r2;
@@ -1129,7 +1125,8 @@ if(is_buffered)
 	XDrawArc(display, cont_pixmap , gc, x-r1, y-r2, r1*2, r2*2, 0, angle2);
 }
 
-void fill_circle(int x,int y,int r,ssh_color c)
+void fill_circle(ssh_coordinate x,ssh_coordinate y,ssh_natural r,
+                 ssh_color c)                                         /* Wypełnienie kola w kolorze c */
 /* KOlo w kolorze c */
 {
 int angle2=360*64,r1,r2;
@@ -1147,7 +1144,10 @@ if(is_buffered)
 }
 
 
-int repaint_area(int* x,int* y,int* width,int* height)
+int  repaint_area(ssh_coordinate* x,ssh_coordinate* y, /* Podaje obszar ktory ma byc odnowiony i zwraca 0 */
+                  ssh_natural* width,ssh_natural* height)
+                                                     /* Jesli zwraca -1 to brak danych lub brak implementacji ! Odrysowac calosc. */
+                                                     /* Jesli zwraca -2 to znaczy ze dane juz zostaly odczytane. Nalezy zignorowac. */
 {
 if(repaint_flag==1)
 	{
@@ -1159,9 +1159,9 @@ if(repaint_flag==1)
 	if(*y<0) *y=0;
 	if(*y>org_height) *y=org_height;
 
-	*width=last_repaint_data.width/mulx;
-	if(*x+*width<0) *width=0;
-	if(*x+*width>org_width) *width=org_width-*x;
+    *width=last_repaint_data.width/mulx;
+    if(*x+*width<0) *width=0;
+    if(*x+*width>org_width) *width=org_width-*x;
 
 	*height=last_repaint_data.height/muly;
 	if(*y+*height <0) *height =0;
@@ -1202,7 +1202,7 @@ if(opened)
 		{
 		char* kom="(Press ANY KEY to close graphix)";
 		/* width,height of Window at this moment */
-		print(screen_width()/2-(strlen(kom)*char_width('X'))/2,screen_height()/2,kom);
+        printbw(screen_width()/2-(strlen(kom)*char_width('X'))/2,screen_height()/2,kom);
 		flush_plot();
 		fprintf(stderr,"(See at window %s )\n",window_name);
 		fflush(stderr);
@@ -1220,16 +1220,19 @@ if(opened)
     }
 }
 
-int init_plot(int a,int b,int ca,int cb)
-/* typowa dla platformy inicjacja grafiki/semigrafik
- a,b to wymagane rozmiary ekranu */
+/* inicjacja grafiki/semigrafiki */
+int  init_plot(ssh_natural  a,ssh_natural   b,  /* ile pikseli mam mieć okno */
+               ssh_natural ca, ssh_natural cb) /* ile dodatkowo lini i kolumn tekstu na dole i po bokach przy domyślnej czcionce */
+/* typowa dla platformy inicjacja grafiki/semigrafiki */
 {
-int* disp_depht;
-int  disp_depht_num=0,i;
-ini_a=a;
-ini_b=b;
-ini_ca=ca;
-ini_cb=cb;
+    int* disp_depht;
+    int  disp_depht_num=0;
+    int  i;
+
+    ini_a=a;
+    ini_b=b;
+    ini_ca=ca;
+    ini_cb=cb;
 
     if (!(size_hints = XAllocSizeHints())) {
        fprintf(stderr, "%s: failure allocating memory", progname);
@@ -1274,6 +1277,7 @@ ini_cb=cb;
     		default_deph=disp_depht[i];/*Pierwszy >= wymaganemu */
     		break;
     		}
+
   if(trace)
    	fprintf(stderr,"Selected depth %d\n",default_deph);
 
@@ -1485,11 +1489,6 @@ int		dump_screen(const char* Filename)
 /* Zapisuje zawartosc ekranu do pliku graficznego
  * w naturalnym formacie platformy: BMP, XBM itp */
 {
-	fprintf(stderr,"'dump_screen()' not implemented jet\n");
+    fprintf(stderr,"'dump_screen()' not implemented in this version\n");
 	return 0;
 }
-
-
-
-
-

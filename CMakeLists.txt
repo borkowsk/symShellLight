@@ -8,6 +8,7 @@ if(true) # SVG SYMSHELL LIB
 add_library( wbsyshSVG STATIC
     "SVG/errorent.c"
     "SVG/symshsvg.cpp"
+    "UTILS/wb_pchar.cpp" #Używane wewnątrz modułu
     "UTILS/sshdefs.c"
     "UTILS/sshutils.cpp"
     "UTILS/sshmenufdummy.c" #zamienia funkcje obslugi menu na puste wywołania
@@ -41,6 +42,60 @@ endif()
 ## PROGRAMY TESTOWE ##
 ######################
 
+if(true) #X11 tests
+add_executable("TestmousX11" "TESTS/Testmous.cpp"
+    )
+add_executable("TestpaleX11" "TESTS/Testpale.cpp"
+    )
+add_executable("TestpolyX11" "TESTS/Testpoly.cpp"
+    )
+add_executable("TestrandX11"
+        "TESTS/Testrand.cpp"
+        "UTILS/wb_randg.c"
+        "UTILS/wb_rand.cpp"
+    )
+add_executable("TestsymsX11" "TESTS/Testsyms.cpp"
+    )
+add_executable("TestsyshX11" "TESTS/Testsysh.cpp"
+    )
 
+target_link_libraries("TestmousX11" wbsyshX11 X11 Xpm rt)
+target_link_libraries("TestpaleX11" wbsyshX11 X11 Xpm rt)
+target_link_libraries("TestpolyX11" wbsyshX11 X11 Xpm rt)
+target_link_libraries("TestrandX11" wbsyshX11 X11 Xpm rt)
+target_link_libraries("TestsymsX11" wbsyshX11 X11 Xpm rt)
+target_link_libraries("TestsyshX11" wbsyshX11 X11 Xpm rt)
+
+#add_executable("LinktestX11" "TESTS/Linktest.cpp"    )
+#target_link_libraries("LinktestX11" wbsyshX11 X11 Xpm rt)
+endif()
+
+if(true) #SVG tests
+add_executable("TestmousSVG" "TESTS/Testmous.cpp"
+    )
+add_executable("TestpaleSVG" "TESTS/Testpale.cpp"
+    )
+add_executable("TestpolySVG" "TESTS/Testpoly.cpp"
+    )
+add_executable("TestrandSVG"
+        "TESTS/Testrand.cpp"
+        "UTILS/wb_randg.c"
+        "UTILS/wb_rand.cpp"
+    )
+add_executable("TestsymsSVG" "TESTS/Testsyms.cpp"
+    )
+add_executable("TestsyshSVG" "TESTS/Testsysh.cpp"
+    )
+
+target_link_libraries("TestmousSVG" wbsyshSVG  rt)
+target_link_libraries("TestpaleSVG" wbsyshSVG  rt)
+target_link_libraries("TestpolySVG" wbsyshSVG  rt)
+target_link_libraries("TestrandSVG" wbsyshSVG  rt)
+target_link_libraries("TestsymsSVG" wbsyshSVG  rt)
+target_link_libraries("TestsyshSVG" wbsyshSVG  rt)
+
+add_executable("LinktestSVG" "TESTS/Linktest.cpp"    )
+target_link_libraries("LinktestSVG" wbsyshSVG rt)
+endif()
 
 #KONIEC

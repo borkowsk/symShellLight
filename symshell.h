@@ -145,8 +145,8 @@ void line(ssh_coordinate x1,ssh_coordinate y1,                         /* Wyswie
           ssh_color c);                                                /* - kolor dla linii */
 
 /* RYSOWANIE KÓŁ, ELIPS i ŁUKÓW */
-void circle_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r);        /* Wyswietlenie okregu w kolorze domyslnym */
 void circle(ssh_coordinate x,ssh_coordinate y,ssh_natural r,ssh_color c);/* Wyswietlenie okregu w kolorze c */
+void circle_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r);        /* Wyswietlenie okregu w kolorze domyslnym */
 
 void ellipse_d(ssh_coordinate x,ssh_coordinate y,                      /* Wyswietlenie elipsy w kolorze domyslnym */
                ssh_natural a,ssh_natural b);                           /* o PÓŁOSIACH dlugości a i b */
@@ -207,7 +207,8 @@ int  set_char(ssh_msg c);/* Odeslanie znaku na wejscie - zwraca 0 jesli nie ma m
                          /* Pewne jest tylko odeslanie jednego znaku. */
 
 int  get_mouse_event(ssh_coordinate* xpos,ssh_coordinate* ypos,ssh_coordinate* click);/* Funkcja odczytujaca ostatnie zdazenie myszy */
-int  repaint_area(ssh_coordinate* x,ssh_coordinate* y,ssh_natural* w,ssh_natural* h); /* Podaje obszar ktory ma byc odnowiony i zwraca 0 */
+int  repaint_area(ssh_coordinate* x, ssh_coordinate* y,
+                  ssh_natural* width, ssh_natural* height); /* Podaje obszar ktory ma byc odnowiony i zwraca 0 */
                                                         /* Jesli zwraca -1 to brak danych lub brak implementacji ! Odrysowac calosc. */
                                                         /* Jesli zwraca -2 to znaczy ze dane juz zostaly odczytane. Nalezy zignorowac. */
 

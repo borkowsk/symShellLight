@@ -6,22 +6,19 @@
 // i poligony. Petla obslugi podobna do tej w testsyms.cxx ale oczekuje na zdazenia
 // i nie umozliwia pracy w tle (nie uzywa input_ready() )
 ///////////////////////////////////////////////////////////////////////////////////////////
-#define USES_ASSERT
-#define USES_STDIO
-#define USES_STDLIB
-#define USES_STRING
-#define USES_SYMULATION_SHELL
-#include "wb_uses.h"
+#include "symshell.h"
+#include <cstdio>
+#include <cstdlib>
 
 //int x,y,vx,vy;
 /* For close_plot() */
 int WB_error_enter_before_clean=1;
 
 //BAR3D
-const a=10;
-const b=10;
-const c=6;
-const WHITE=255;
+const int a=10;
+const int b=10;
+const int c=6;
+const int WHITE=255;
 
 void slupek(int x,int y,int h,unsigned char col1,unsigned char col2)
 {
@@ -57,10 +54,8 @@ line(romb[2].x,romb[2].y,romb[3].x,romb[3].y,WHITE);
 } /* end  slupek */
 
 
-
-
 //Table for point list
-const numi=100;
+const int numi=100;
 struct polydata{
 		ssh_point p;
       unsigned char color;
@@ -84,10 +79,10 @@ for(i=0;i<16;i++)
 	{
 	slupek(i*12,255,i*10+10,i*16,i*16-8);
 	}
-print(0,screen_height()-char_height('X'),"%s","ST:");
+printbw(0,screen_height()-char_height('X'),"%s","ST:");
 printc(char_width('X')*3,screen_height()-char_height('X'),1,140,"POLYGON & BAR3D TEST");
 
-print(screen_width()-char_width('X'),screen_height()-char_height('X'),"X");
+printbw(screen_width()-char_width('X'),screen_height()-char_height('X'),"X");
 flush_plot();
 mouse_activity(old);
 }
@@ -95,7 +90,7 @@ mouse_activity(old);
 /*  OGOLNA FUNKCJA MAIN */
 /************************/
 
-main(int argc,char* argv[])
+int main(int argc,const char* argv[])
 {
 int i=0,xpos=0,ypos=0,click=0;//Myszowate
 int cont=1;//flaga kontynuacji

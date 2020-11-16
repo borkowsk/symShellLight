@@ -30,12 +30,12 @@ istream& operator >> (istream& i,point& p)
 
 wb_dynarray< point >  table(max_points);
 
-int index=-1;//Poczatkowy stan indeksu
+int click_index=-1;//Poczatkowy stan indeksu
 
 void replot()
 {
 int i;
-for(i=0;i<index;i++)
+for(i=0;i<click_index;i++)
 	{
 	plot(table[i].x,table[i].y,KOLOR);
 	}
@@ -48,20 +48,20 @@ int xpos,ypos,click;
 /* Odczytuje ostatnie zdazenie myszy */
 if(get_mouse_event(&xpos,&ypos,&click)!=-1)
 	{
-	if(index<max_points-1)
+    if(click_index<max_points-1)
 	{
-		index++;
-		printf(" Punkt %d ",index);
+        click_index++;
+        printf(" Punkt %d ",click_index);
     }
-	table[index].x=xpos;
-	table[index].y=ypos;
+    table[click_index].x=xpos;
+    table[click_index].y=ypos;
 	plot(xpos,ypos,KOLOR-100);
 	}
 }
 
 /*  +- OGOLNA FUNKCJA MAIN */
 /************************/
-main(int argc,char* argv[])
+int main(int argc,const char* argv[])
 {
 unsigned step=0;
 unsigned xsize=320;
@@ -88,14 +88,14 @@ if(input_ready())
   case EOF:
   case 'q':goto END;
   default:
-	print(0,100,"What??? %c  ",pom);break;
+    printbw(0,100,"What??? %c  ",pom);break;
   }
 }
 
-switch(step%WAIT)
+switch(step % WAIT)
 {
-case 0:	printc(0,0,128,255,"Czekam!");break;
-case (WAIT/2):printc(0,0,255,28,"Czekam!");break;
+case 0:	printc(0,0,128,255,"Klikaj!");break;
+case (WAIT/2):printc(0,0,255,28,"Klikaj!");break;
 }
 
 step++;

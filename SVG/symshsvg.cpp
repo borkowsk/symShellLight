@@ -196,7 +196,8 @@ static bool GrClosed = true; //Czy grafika juz/jeszcze ZAMKNIĘTA?
 
 static void SetScale(void);  //Gdzieś tam jest funkcja ustalająca domyślną paletę kolorów indeksowanych
 
-int  init_plot(int a, int b, int ca, int cb)
+int  init_plot(ssh_natural  a, ssh_natural   b,                 /* ile pikseli mam mieć okno */
+               ssh_natural ca, ssh_natural  cb)
 /* inicjacja grafiki/semigrafiki */
 {
 
@@ -763,7 +764,7 @@ void line(int x1,int y1,int x2,int y2,ssh_color c)
 	Op.line.b = palette[c].b;
 }
 
-void circle_d(int x, int y, int r)
+void circle_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r)
 /* Wyswietlenie okregu w kolorze domyslnym - także rgb */
 {
     if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP;//circle_d
@@ -783,7 +784,7 @@ void circle_d(int x, int y, int r)
 	Op.circle.ry = r;
 }
 
-void ellipse_d(int x,int y,int a,int b)
+void ellipse_d(ssh_coordinate x,ssh_coordinate y, ssh_natural a, ssh_natural b)
 /* Wyswietlenie elipsy w kolorze domyslnym - także rgb */
 {
     if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP;//circle_d
@@ -823,7 +824,7 @@ void ellipse(ssh_coordinate x,ssh_coordinate y, ssh_natural a, ssh_natural b, ss
     Op.circle.ry = b;
 }
 
-void circle(int x,int y,int r,ssh_color c)
+void circle(ssh_coordinate x,ssh_coordinate y,ssh_natural r,ssh_color c)
 /* Wyswietlenie okregu w kolorze c  z palety*/
 {
     if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP<< SEP;//circle
@@ -893,7 +894,8 @@ void fill_ellipse_d(int x,int y,int a,int b)
     Op.circle.bf = GrBrushColor.b;
 }
 
-void fill_circle(int x,int y,int r,ssh_color c)
+void fill_circle(ssh_coordinate x,ssh_coordinate y,ssh_natural r,
+                  ssh_color c)
 /* Wyswietlenie kola w kolorze c  z palety*/
 {
     if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP;//fill_circle
@@ -1152,7 +1154,7 @@ int  get_mouse_event(ssh_coordinate *xpos, ssh_coordinate *ypos, ssh_coordinate 
 }
 
 
-int  repaint_area(int* x,int* y,int* width,int* height)
+int  repaint_area(int* x,int* y,unsigned* width,unsigned* height)
 /* Podaje obszar ktory ma byc odnowiony i zwraca 0 */
 /* Jesli zwraca -1 to brak danych lub brak implementacji ! Odrysowac trzeba calosc. */
 /* Jesli zwraca -2 to znaczy ze dane juz by�y wcze�niej odczytane. Nalezy zignorowac. */
@@ -1182,7 +1184,6 @@ static void SetScale(void)
 #ifndef M_PI
 const double M_PI=3.141595;
 #endif
-extern void set_rgb(ssh_color color,int r,int g,int b);
 
 if(ssh_trace_level>1) cout << _FUNCTION_NAME_ << endl;
 

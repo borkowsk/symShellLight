@@ -4,12 +4,9 @@
 // Zawiera funkcje replot odrysowujaca glowny wzorek oraz symulacje symulacji w postaci
 // rysowania rosnacych kolek przerywanego akcjami uzytkownika.
 ///////////////////////////////////////////////////////////////////////////////////////////
-#define USES_ASSERT
-#define USES_STDIO
-#define USES_STDLIB
-#define USES_STRING
-#define USES_SYMULATION_SHELL /* rownowazne #include "symshell.h" */
-#include "wb_uses.h"
+#include "symshell.h"
+#include <cstdlib>
+#include <cstdio>
 
 int x,y,vx,vy;
 
@@ -32,14 +29,14 @@ for(i=0;i<256U; i++)
 	  }
 
 //Odrysowywanie reszty
-print(0,screen_height()-char_height('X'),"%s","ST:");
+printbw(0,screen_height()-char_height('X'),"%s","ST:");
 printc(char_width('X')*3,screen_height()-char_height('X'),1,140,"TEST ONLY");
 fill_circle(screen_width(),0,10,240);
 fill_circle(0,screen_height(),10,240);
 line(screen_width(),0,0,screen_height(),251);
 circle(screen_width()/2,0,25,200);
 fill_circle(128,128,30,140);
-print(screen_width()-char_width('X'),screen_height()-char_height('X'),"X");
+printbw(screen_width()-char_width('X'),screen_height()-char_height('X'),"X");
 
 flush_plot();		//Koniec rysowania
 mouse_activity(old);//Ewentualna aktywacja myszy
@@ -48,7 +45,7 @@ mouse_activity(old);//Ewentualna aktywacja myszy
 /*  OGOLNA FUNKCJA MAIN */
 /************************/
 
-main(int argc,char* argv[])
+int main(int argc,const char* argv[])
 {
 int i=0,xpos=0,ypos=0,click=0;//Myszowate
 int cont=1;//flaga kontynuacji
@@ -65,10 +62,10 @@ printf("COLORS= 256 q-quit s-swich stdout on/off\n"
 	" + for enable\n - for disable\n ! - for check\n");
 
 if(!init_plot(256,256,0,1))
-		{
-      printf("%s\n","Can't initialize graphics");
-      exit(1);
-      }
+{
+   printf("%s\n","Can't initialize graphics");
+   exit(1);
+}
 
 //PETLA GLOWNA
 while(cont)

@@ -7,7 +7,7 @@
 #include "../symshell.h"
 #include <stdio.h>
 
-main(int argc,char* argv[])
+int main(int argc,const char* argv[])
 {
 buffering_setup(1);/* Pamieta w bitmapie zawartosc ekranu */
 shell_setup("VERY SIMPLE TEST",argc,argv);
@@ -19,7 +19,7 @@ for(int i=0;i<16;i++)
 	{
 	plot(j,i,i*16+j);
 	char c=i*16+j;
-	print(16+j*char_width('W'),16+i*char_height('W'),"%c",c);
+    printbw(16+j*char_width('W'),16+i*char_height('W'),"%c",c);
 	}
 
 flush_plot();	/* Bitmapa gotowa */

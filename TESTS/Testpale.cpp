@@ -4,12 +4,9 @@
 //Demonstruje skalowanie okna niezalezne od aplikacyjnej strony programu
 //i robione w funkcjach symshella. Petla oblsugi zdarzen bez pracy w tle
 ///////////////////////////////////////////////////////////////////////////////////////////
-#define USES_ASSERT
-#define USES_STDIO
-#define USES_STDLIB
-#define USES_STRING
-#define USES_SYMULATION_SHELL
-#include "wb_uses.h"
+#include "symshell.h"
+#include <cstdio>
+#include <cstdlib>
 
 int x,y,vx,vy;
 
@@ -28,7 +25,7 @@ for(i=0;i<16U; i++)
           pom=(unsigned char)(16*i+j);
           plot(j,i,pom);
 	  }
-print(0,16,"%s","PALETA");
+printbw(0,16,"%s","PALETA");
 flush_plot();
 mouse_activity(old);
 }
@@ -36,7 +33,7 @@ mouse_activity(old);
 /*  OGOLNA FUNKCJA MAIN */
 /************************/
 
-main(int argc,char* argv[])
+int main(int argc,const char* argv[])
 {
 int i=0,xpos=0,ypos=0,click=0;//Myszowate
 int cont=1;//flaga kontynuacji

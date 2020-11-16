@@ -4,18 +4,16 @@
 //Demonstruje skalowanie okna niezalezne od aplikacyjnej strony programu
 //i robione w funkcjach symshella. Petla oblsugi zdarzen bez pracy w tle
 ///////////////////////////////////////////////////////////////////////////////////////////
-#define USES_ASSERT
-#define USES_STDIO
-#define USES_STDLIB
-#define USES_STRING
-#define USES_SYMULATION_SHELL
-#include "wb_uses.h"
+#include "symshell.h"
+#include <cstdio>
+#include <cstdlib>
+#include <cfloat>
 #define USES_STDC_RAND
-#include "randoms.h"
+//#include "randoms.h"
 #include "wb_rand.hpp"
 #include "wb_cpucl.hpp"
 
-const BOK=128;
+const int BOK=128;
 int x,y,vx,vy;
 
 double counters[BOK][BOK];
@@ -55,14 +53,14 @@ for(i=0;i<BOK; i++)
           plot(j,i,pom);
 	  }
 
-print(0,BOK,"%lu:<%g,%g> T:%g",counter,MinCount,MaxCount,double(Clock));
+printbw(0,BOK,"%lu:<%g,%g> T:%g",counter,MinCount,MaxCount,double(Clock));
 flush_plot();
 }
 
 /*  OGOLNA FUNKCJA MAIN */
 /************************/
 
-main(int argc,char* argv[])
+int main(int argc,const char* argv[])
 {
 int i=0,xpos=0,ypos=0,click=0;//Myszowate
 int cont=1;//flaga kontynuacji
@@ -73,8 +71,6 @@ set_background(128);
 buffering_setup(1);/* Wlaczona animacja - tu potrzebna */
 shell_setup("SYMSHELL - RANDS ",argc,argv);
 printf("COLORS= 256 q-quit s-swich stdout on/off\n");
-	   
-RANDOMIZE();
 
 if(!init_plot(BOK,BOK,1,1))
 		{

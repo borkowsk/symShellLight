@@ -10,7 +10,7 @@
 void test()
 {
  unsigned char r=100,g=200,b=150;
- shell_setup("Just a linking test",0,NULL);/* Przekazanie parametrow wywolania */
+ shell_setup("Just a linking test",0,nullptr);/* Przekazanie parametrow wywolania */
  buffering_setup(1);			/* Przelaczanie buforowanie okna - moze nie dzialac po inicjacji*/
  fix_size(0);					/* Czy symulowa� niezmiennosc rozmiarow okna */
  set_background(128);		    /* Ustala index koloru do czyszczenia - moze nie dzialac po inicjacji*/
@@ -23,21 +23,21 @@ void test()
  print_transparently(1);	/* Wlacza drukowanie tekstu bez zamazywania t�a. Zwraca stan poprzedni */
  line_width(2);		/* Ustala szerokosc lini - moze byc kosztowne. Zwraca stan poprzedni */
  line_style(SSH_LINE_SOLID);          /* Ustala styl rysowania lini: SSH_LINE_SOLID, SSH_LINE_DOTTED, SSH_LINE_DASHED */
- put_style(SSH_SOLID_PUT);           /* Ustala stosunek nowego rysowania do starej zawartosci ekranu: SSH_SOLID_PUT,SSH_XOR_PUT */
- set_pen(254,1,SSH_SOLID_PUT/*?*/);			/* Ustala aktualny kolor linii za pomoca typu ssh_color */
- set_brush(ssh_color c);			/* Ustala aktualny kolor wypelnien za pomoca typu ssh_color */
- set_pen_rgb(r,g,b,2,SSH_SOLID_PUT); /* Ustala aktualny kolor linii za pomoca skladowych RGB */
+ put_style(SSH_SOLID_PUT);            /* Ustala stosunek nowego rysowania do starej zawartosci ekranu: SSH_SOLID_PUT,SSH_XOR_PUT */
+ set_pen(254,1,SSH_SOLID_PUT/*?*/);	  /* Ustala aktualny kolor linii za pomoca typu ssh_color */
+ set_brush(128);                        /* Ustala aktualny kolor wypelnien za pomoca typu ssh_color */
+ set_pen_rgb(r,g,b,2,SSH_SOLID_PUT);  /* Ustala aktualny kolor linii za pomoca skladowych RGB */
  set_brush_rgb(r,g,b);/* Ustala aktualny kolor wypelnien za pomoca skladowych RGB */
 
 /* ODCZYTYWYWANIE AKTUALNYCH USTAWIEN OKNA GRAFICZNEGO*/
  int ret=buffered();				    /* Zwraca 1 jesli buforowane */
  ret=fixed();					        /* Czy okno ma zafiksowana wielkosc */
  ssh_color bcg=background();		    /* Aktualny kolor tla... */
- ret=get_line_width(void);				/* Aktualna grubosc linii */
- ssh_color pn=get_pen(void);			/* Aktualny kolor linii jako ssh_color */
- ssh_color br=get_brush(void);			/* Aktualny kolor wypelnien jako ssh_color */
- ret=screen_height(void);  				/* Aktualne rozmiary okna po przeliczeniach z init_plot*/
- ret=screen_width(void);   				/*  ...i ewentualnych zmianach uczynionych "recznie" przez operatora */
+ ret=get_line_width();				/* Aktualna grubosc linii */
+ ssh_color pn=get_pen();			/* Aktualny kolor linii jako ssh_color */
+ ssh_color br=get_brush();			/* Aktualny kolor wypelnien jako ssh_color */
+ ret=screen_height();  				/* Aktualne rozmiary okna po przeliczeniach z init_plot*/
+ ret=screen_width();   				/*  ...i ewentualnych zmianach uczynionych "recznie" przez operatora */
  ret=char_height('X');			    /* Aktualne rozmiary znaku  */
  ret=char_width('X');				/* ...potrzebne do pozycjonowania tekstu */
  ret=string_height("Blablably");	/* Aktualne rozmiary lancucha */
@@ -45,10 +45,8 @@ void test()
 
 /* WYPROWADZANIE TEKSTU */
 
-void printbw(int x,int y,const char* format,...);/* Drukuje w kolorach domyslnych*/
-void printc(int x,int y,
-			ssh_color fore,ssh_color back,
-					   const char* format,...);/* Drukuje w kolorach uzytkownika*/
+ printbw(10,10,"%s","...");/* Drukuje w kolorach domyslnych*/
+ printc(10,24,255,200,"%s","...");/* Drukuje w kolorach uzytkownika*/
 
 /* PUNKTOWANIE  */
 void plot(int x,int y,
@@ -97,11 +95,14 @@ if(input_ready()) 	/* Funkcja sprawdzajaca czy jest cos do wziecia z wejscia */
 						/* Pewne jest tylko odeslanie jednego znaku. */
  if(c=='\b')
  {
-	 get_mouse_event(int* xpos,int* ypos,int* click);/* Funkcja odczytujaca ostatnie zdazenie myszy */
+     int xpos,ypos,click;
+     get_mouse_event(xpos,ypos,click);/* Funkcja odczytujaca ostatnie zdazenie myszy */
  }
  else if(c=='\r')
  {
-	 repaint_area(int* x,int* y,int* width,int* height);/* Podaje obszar ktory ma byc odnowiony i zwraca 0 */
+     int x,y;
+     unsigned width,height;
+     repaint_area(&x,&y,&width,&height);/* Podaje obszar ktory ma byc odnowiony i zwraca 0 */
 						/* Jesli zwraca -1 to brak danych lub brak implementacji ! Odrysowac calosc. */
 						/* Jesli zwraca -2 to znaczy ze dane juz zostaly odczytane. Nalezy zignorowac. */
  }
@@ -114,6 +115,12 @@ close_plot(); 					/* zamkniecie grafiki/semigrafiki */
 										/* Automatycznie instalowana w atexit - stad durne (void) */
 										/* zeby uniknac warningu          */
 
+}
+
+int main()
+{
+
+    return 0;
 }
 
 /********************************************************************/

@@ -1,21 +1,19 @@
-static char* Copyright=	"SYMSHELL LIBRARY(c)1997-2007 ;\n"
+static char* Copyright=	"SYMSHELL LIBRARY(c)1997-2014 ;\n"
 						"By Wojciech Borkowski, Warsaw University\n("
 						__DATE__" - compilation timestamp)\n";
 //Partially based on Borland and Microsoft examples
 /*****************************************************************************************
 * Implementacja najprostrzego interface'u wizualizacyjnego dla MS Windows 32.
-* U¿ywano w: Borland 5.0, MS Visual C++ 4.0 , 5.0, 6.0 i nowszych
-*
-* Wersja dla Borland Developer Studio 2006
-*
-* Ostatnia modyfikacja/Last modification: 28.03.2008
-UWAGA ProcessMsg u¿ywa teraz zamiast NULL uchwytu okna pobierajac komunikat - to powinno 
+* U¿ywano w of 1997 roku w ró¿nych kompilatorach C++ Borland i Microsoftu oraz w GCC na Windows
+* Ostatnia modyfikacja/Last modification: 28.10.2014
+UWAGA ProcessMsg u¿ywa teraz zamiast NULL uchwytu okna pobierajac komunikat - to powinno
 dzia³aæ lepiej, ale pewnoœci nie ma.
 ******************************************************************************************/
 //Define EXTERN_WB_ABOUT and function of following prototype for redefine usage of ShellAbout
 //int wb_about(const char* window_name);//Z biblioteki albo dostarczona z programem
 
-extern int WB_error_enter_before_clean;/* For controling closing graphics window on error*/   
+extern int WB_error_enter_before_clean;/* For controling closing graphics window on error*/
+#include "INCLUDE/platform.h"
 
 #include <windows.h>
 #include <windowsx.h>
@@ -28,15 +26,21 @@ extern int WB_error_enter_before_clean;/* For controling closing graphics window
 #include <errno.h>
 #include <setjmp.h>
 
-//#ifdef __MSVC__
-//#pragma warning(disable:4068)
-//#endif
+#include "SYMSHELL/symshell.h"		// prototypes of symshell graphix primitives
 
+#include <process.h>
+#include "_sig_msg.h"			// for compatibility with wb_posix.
 #include "symshwin.h"			// prototypes specific to this application
 
-#include "_sig_msg.h"			// for compatibility with wb_posix.
+#define OLD_COLOUR_SCALE (0)   //Skala kolorów jak na mapie fizycznej
 
-#include "symshell.h"
+#ifdef __MSVC__
+//#pragma warning(disable:4068)
+#pragma warning(disable : 4996) //deprecated functions
+//TYMCZASEM - OSTRZE¯ENIA O "conversion from 'A' to 'B', possible loss of data"
+#pragma warning(disable : 4267)
+#pragma warning(disable : 4244)
+#endif
 
 #define MY_WIN_STYLE		      (WS_OVERLAPPEDWINDOW/* | WS_HSCROLL | WS_VSCROLL*/)
 #define MAXWRITE		0xfff0	  //Bezpieczny rozmiar bufora
@@ -49,12 +53,12 @@ HWND		WB_Hwnd=0;					//???
 HWND		MyHwnd=0;						//Main window handle.
 
 static const char* progname="WB SYMSHELL APPLICATION "__DATE__;
-static const char* window_name="Windows WB SYMSHELL interface "__DATE__;
-static const char* icon_name="Windows SYMSHELL "__DATE__;
-static char szAppName[128]="SYMSHELL";   // The name of this application, if not in resources
-static char szClassName[128]="CLASS_SYMSHELL";//The name of window class
+static char window_name[1024]="Windows WB SYMSHELL interface "__DATE__;//TODO - z jakiegoœ powodu MessageBox traktuje to niepoprawnie
+static char icon_name[1024]="Windows SYMSHELL "__DATE__;
+char szAppName[128]="SYMSHELL";   // The name of this application, if not in resources
+char szClassName[128]="CLASS_SYMSHELL";//The name of window class
 
-static	HANDLE	hAccelTable;		// For read from resources
+static	HACCEL	hAccelTable;		// For read from resources
 static	HDC	MyHdc=0;				//Current HDC
 static	HDC	WnHdc=0;				//Window HDC
 static	HDC	MbHdc=0;				//Memory bitmap HDC
@@ -65,19 +69,12 @@ static	TEXTMETRIC	font_info;		//Struktura na in formacje o aktualnym foncie
 static	MSG	msg;					//Struktura na aktualny komunikat
 
 
-typedef struct 
+typedef struct
 {
 	HPEN handle;
 	int  size;	//Grubosci zaalokowanych piór
 	int  style;	//Style dla zaalokowanych piór
 }	piora;
-
-#ifdef cplusplus
-const unsigned PALETE_LENGHT=512;
-#else
-#define PALETE_LENGHT (512)
-#endif
-
 
 static COLORREF curent_pen_rgb=RGB(0,0,0);
 //static COLORREF curent_brush_rgb=RGB(0,0,0);
@@ -89,17 +86,15 @@ static HBRUSH brushes[PALETE_LENGHT];		//Tablice uchwytow do pedzli
 
 static HPEN curent_pen=NULL;				//Aktualny uchwyt do pióra
 static HPEN free_style_pen=NULL;			//Alokowane dowolne pióro
-static piora	pens[PALETE_LENGHT];		//Tablice uchwytow do piór. 
+static piora	pens[PALETE_LENGHT];		//Tablice uchwytow do piór.
 
-static int trace_level=0;			//Maska poziomów œledzenia 1-msgs 2-grafika 4-alokacje/zwalnianie
-//np:
-//if(trace_level & 4)
-//		fprintf(stderr," FREE RESORCES.\n");
+
 static int NoResources=1;			// No resources attached to exe file
 static int WindowClosed=1;			// Window destroyed/notopen flag for close_plot
-static int curr_color=-1;
-static int curr_fill=-1;
-static int Background=0;
+static int curr_color=-1;			// indeks koloru w aktualnym pisaku
+static int curr_fill=-1;			// indeks koloru w aktualnym pêdzlu
+static int Background=0;			// indeks koloru t³a
+
 static int is_mouse=0;
 static int animate=0;
 static int is_buffered=0;
@@ -120,6 +115,7 @@ static int ini_col;			//Ile kolumn tekstu dodatkowo
 static int ini_row;			//Ile wierszy tekstu dodatkowo
 static int Is_finfo=0;
 static const char* UserFontStr=NULL;
+
 static int CharToGet=0;
 static int UseGrayScale=0;	//Flaga uzycia skali szarosci
 
@@ -129,18 +125,34 @@ static HFONT MyCreateFont( const char* fontstr );
 static HDC GetVirtualScreen(void);
 static HDC GetRealScreen(void);
 
+//Wewnêtrzne œledzenie wywo³añ
+//////////////////////////////////////////////////
+static  int trace_level=0;			//Maska poziomów œledzenia 1-msgs 2-grafika 4-alokacje/zwalnianie
+#define _TRACE(__LL__)   if(trace_level & __LL__) { fprintf(stderr,"SYMSHWIN:::%s ",__FUNCTION__);
+#define _TREND        fprintf(stderr,"\n"); }
+
+	
+//np:
+//if(trace_level & 4)
+//		fprintf(stderr," FREE RESORCES.\n");
+// ALBO
+//_TRACE(4)
+//		fprintf(stderr," FREE RESORCES.\n");
+//_TREND
+#define LOCAL static
+
 #ifdef EXTERN_WB_ABOUT
 extern int wb_about(const char* window_name);//Z biblioteki albo dostarczona z programem
 #else
 static int wb_about(const char* window_name)
 {
-char bufor[256];
+char dummy[256];//Trochê pustych bajtów dla zmy³y (???)
 extern HINSTANCE WB_Instance;
 extern HWND		 WB_Hwnd;
 HICON hIcon=0;
 
 hIcon=LoadIcon(WB_Instance, MAKEINTRESOURCE(IDI_APPICON));
-ShellAbout(WB_Hwnd,window_name,Copyright ,hIcon);
+ShellAbout(WB_Hwnd,window_name,Copyright ,hIcon); // Powinno byæ LPCWSTR?
 
 DeleteObject(hIcon);
 return 0;
@@ -157,13 +169,13 @@ static int error_proc(void)
 DWORD code=GetLastError();
 char  bufor[1024];
 sprintf(bufor,"Windows code of error: GetLastError()==%ul",code);
-MessageBox(MyHwnd,bufor,"SYMSHELL GRAPHICS ERROR",MB_ICONSTOP);
+MessageBoxA(MyHwnd,bufor,"SYMSHELL GRAPHICS ERROR",MB_ICONSTOP);
 return 'A';// abort();
 }
 
 static HDC GetRealScreen(void)
 {
-if(MyHdc==0)	
+if(MyHdc==0)
 	{
 	MyHdc=GetDC(MyHwnd);
 	//Gdyby mialy byc inne fonty niz domyslny
@@ -179,7 +191,7 @@ return MyHdc;
 
 
 static HDC GetVirtualScreen(void)
-{	
+{
 if(MbHdc==0)
 	{
 	RECT rc;
@@ -202,24 +214,24 @@ if(MbHdc==0)
 return MbHdc;
 }
 
-int ReadFontSettings(const char* fontsettingsfile,LOGFONT* LogFont)
+static int ReadFontSettings(const char* fontsettingsfile,LOGFONT* LogFont)
 {
     if(LogFont==NULL) goto CATCHERROR;//Blad
     if(fontsettingsfile==NULL)  goto CATCHERROR;//Blad
 
     LogFont->lfHeight=GetPrivateProfileInt("FONT","lfHeight",0,fontsettingsfile);
-    LogFont->lfWidth=GetPrivateProfileInt("FONT","lfWidth",0,fontsettingsfile); 
-    LogFont->lfEscapement=GetPrivateProfileInt("FONT","lfEscapement",0,fontsettingsfile);; 
-    LogFont->lfOrientation=GetPrivateProfileInt("FONT","lfOrientation",0,fontsettingsfile);; 
-    LogFont->lfWeight=GetPrivateProfileInt("FONT","lfWeight",0,fontsettingsfile);; 
-    LogFont->lfItalic=GetPrivateProfileInt("FONT","lfItalic",0,fontsettingsfile);; 
-    LogFont->lfUnderline=GetPrivateProfileInt("FONT","lfUnderline",0,fontsettingsfile);; 
-    LogFont->lfStrikeOut=GetPrivateProfileInt("FONT","lfStrikeOut",0,fontsettingsfile);; 
-    LogFont->lfCharSet=GetPrivateProfileInt("FONT","lfCharSet",0,fontsettingsfile);; 
-    LogFont->lfOutPrecision=GetPrivateProfileInt("FONT","lfOutPrecision",0,fontsettingsfile);; 
-    LogFont->lfClipPrecision=GetPrivateProfileInt("FONT","lfClipPrecision",0,fontsettingsfile);; 
-    LogFont->lfQuality=GetPrivateProfileInt("FONT","lfQuality",0,fontsettingsfile);; 
-    LogFont->lfPitchAndFamily=GetPrivateProfileInt("FONT","lfPitchAndFamily",0,fontsettingsfile);; 
+    LogFont->lfWidth=GetPrivateProfileInt("FONT","lfWidth",0,fontsettingsfile);
+    LogFont->lfEscapement=GetPrivateProfileInt("FONT","lfEscapement",0,fontsettingsfile);;
+    LogFont->lfOrientation=GetPrivateProfileInt("FONT","lfOrientation",0,fontsettingsfile);;
+    LogFont->lfWeight=GetPrivateProfileInt("FONT","lfWeight",0,fontsettingsfile);;
+    LogFont->lfItalic=GetPrivateProfileInt("FONT","lfItalic",0,fontsettingsfile);;
+    LogFont->lfUnderline=GetPrivateProfileInt("FONT","lfUnderline",0,fontsettingsfile);;
+    LogFont->lfStrikeOut=GetPrivateProfileInt("FONT","lfStrikeOut",0,fontsettingsfile);;
+    LogFont->lfCharSet=GetPrivateProfileInt("FONT","lfCharSet",0,fontsettingsfile);;
+    LogFont->lfOutPrecision=GetPrivateProfileInt("FONT","lfOutPrecision",0,fontsettingsfile);;
+    LogFont->lfClipPrecision=GetPrivateProfileInt("FONT","lfClipPrecision",0,fontsettingsfile);;
+    LogFont->lfQuality=GetPrivateProfileInt("FONT","lfQuality",0,fontsettingsfile);;
+    LogFont->lfPitchAndFamily=GetPrivateProfileInt("FONT","lfPitchAndFamily",0,fontsettingsfile);;
     GetPrivateProfileString(
         "FONT",         //LPCTSTR lpAppName,        // points to section name
         "lfFaceName",   //LPCTSTR lpKeyName,        // points to key name
@@ -233,7 +245,7 @@ CATCHERROR:
    return 0;
 }
 
-void WriteFontSettings(const char* fontsettingsfile,LOGFONT* LogFont)
+static void WriteFontSettings(const char* fontsettingsfile,LOGFONT* LogFont)
 {
     char buf[1024];
                             //pointer to section name, pointer to key name, pointer to string to add, pointer to initialization filename
@@ -253,35 +265,36 @@ void WriteFontSettings(const char* fontsettingsfile,LOGFONT* LogFont)
     WritePrivateProfileString("FONT","lfFaceName",LogFont->lfFaceName,fontsettingsfile);
 }
 
-static HFONT MyCreateFont( const char* fontstr ) 
+static HFONT MyCreateFont( const char* fontstr )
 {
-	CHOOSEFONT cf;     
+	CHOOSEFONT cf;
 	LOGFONT lf;
-	HFONT hfont;      // Initialize members of the CHOOSEFONT structure.  
+	HFONT hfont;      // Initialize members of the CHOOSEFONT structure.
 	int req_font_size=atoi(fontstr);//Jesli nie liczba to wychodzi i tak 0
 
-	if(trace_level & 4)
+	_TRACE(4) //if(trace_level & 4)
 		fprintf(stderr,"Create font %s.\n",fontstr);
+	_TREND
 
 	cf.lStructSize = sizeof(CHOOSEFONT);
-	
-    cf.hInstance = (HINSTANCE) WB_Instance; 
-	cf.hwndOwner = MyHwnd; 
-	cf.hDC = (HDC)NULL;     
-	
-	cf.lpLogFont = &lf;     
-	cf.iPointSize = 0; 
-	cf.Flags = CF_SCREENFONTS;     
-	cf.rgbColors = RGB(0,0,0); 
-	cf.lCustData = 0L;     
-	cf.lpfnHook = (LPCFHOOKPROC)NULL; 
-	cf.lpTemplateName = (LPSTR)NULL;     
-	
-	cf.lpszStyle = (LPSTR)NULL;     
-	cf.nFontType = SCREEN_FONTTYPE; 
-	cf.nSizeMin = 0;     
-	cf.nSizeMax = req_font_size;  
-	
+
+    cf.hInstance = (HINSTANCE) WB_Instance;
+	cf.hwndOwner = MyHwnd;
+	cf.hDC = (HDC)NULL;
+
+	cf.lpLogFont = &lf;
+	cf.iPointSize = 0;
+	cf.Flags = CF_SCREENFONTS;
+	cf.rgbColors = RGB(0,0,0);
+	cf.lCustData = 0L;
+	cf.lpfnHook = (LPCFHOOKPROC)NULL;
+	cf.lpTemplateName = (LPSTR)NULL;
+
+	cf.lpszStyle = (LPSTR)NULL;
+	cf.nFontType = SCREEN_FONTTYPE;
+	cf.nSizeMin = 0;
+	cf.nSizeMax = req_font_size;
+
 	// Display the CHOOSEFONT common-dialog box.
     if(fontstr!=NULL && *fontstr=='!')
     {
@@ -291,7 +304,7 @@ static HFONT MyCreateFont( const char* fontstr )
     else
     if(fontstr==NULL || *fontstr=='?' ||  strlen(fontstr)<3)
     {
-	    ChooseFont(&cf);  
+	    ChooseFont(&cf);
         WriteFontSettings("./SYMSHELL.INI",cf.lpLogFont);
     }
     else
@@ -299,12 +312,12 @@ static HFONT MyCreateFont( const char* fontstr )
         if( ReadFontSettings(fontstr,cf.lpLogFont)==0)  //Czytanie z ustalonego pliku
             ChooseFont(&cf); //Awaryjnie, jesli nie uda sie wczytac
     }
-	
-    // Create a logical font based on the user's 
-	// selection and return a handle identifying     // that font.  
-	hfont = CreateFontIndirect(cf.lpLogFont);     
-	return (hfont); 
-} 
+
+    // Create a logical font based on the user's
+	// selection and return a handle identifying     // that font.
+	hfont = CreateFontIndirect(cf.lpLogFont);
+	return (hfont);
+}
 
 static HDC GetMyHdc(void)
 /* DC caching */
@@ -315,12 +328,12 @@ if(!UserFont && UserFontStr) //If NULL but need not be, then create
 	UserFont=MyCreateFont(UserFontStr);
 	if(!UserFont)
 		{
-		MessageBox(MyHwnd,UserFontStr,"Font allocation failed",MB_ICONSTOP);
+		MessageBoxA(MyHwnd,UserFontStr,"Font allocation failed",MB_ICONSTOP);
 		return 0;
 		}
 	}
-	
-if(MyHdc==0)	
+
+if(MyHdc==0)
 	{
 	if(animate || is_buffered)
 		{
@@ -341,7 +354,7 @@ static HBRUSH GetMyBrush(ssh_color color)
     assert(color<PALETE_LENGHT);
 
     if(brushes[color]==0)//Trzeba alokowac pedzel
-	{ 
+	{
 		DeleteObject(brushes[color]);//???
         brushes[color]=CreateSolidBrush(colors[color]);
 	}
@@ -360,7 +373,7 @@ void	set_brush(ssh_color c)
 void	set_brush_rgb(int r,int g,int b)
 /* Ustala aktualny kolor wypelnien za pomoca skladowych RGB */
 {
-	COLORREF color=RGB(r,g,b);    
+	COLORREF color=RGB(r,g,b);
 	if(free_style_brush!=NULL)
 		DeleteObject(free_style_brush);
 	free_style_brush=curent_brush=CreateSolidBrush(color);
@@ -372,28 +385,29 @@ static HPEN GetMyPen(ssh_color color,int size,int style)
 {
     assert(color<PALETE_LENGHT);
 
-	if(size<=0) 
+	if(size<=0)
 		size=1; // conajmniej grubosc 1
-	
+
 	if( pens[color].handle==0 ||
-		pens[color].size!=size || 
+		pens[color].size!=size ||
 		pens[color].style!=style)//Trzeba alokowac pedzel gdy zmienia sie rozmiar lub styl
 	{
-		if(pens[color].handle!=0) 
+		if(pens[color].handle!=0)
 		{
-			DeleteObject(pens[color].handle);//Wymaga usuwania 
+			DeleteObject(pens[color].handle);//Wymaga usuwania
 			pens[color].handle=0;
 		}
-		
-		if(trace_level & 4)
+
+		_TRACE(4)
 			fprintf(stderr,"Pen allocation c:%x s:%d style:%d.\n",color,size,style);
-		
+		_TREND
+
 		{	//WLASCIWA ALOKACJA
 			int sX=mulx*size;
 			int sY=muly*size;
 			int pom=sX<sY?sX:sY;
 			int win_style=0;
-		
+
 			switch(style)
 			{
 			case SSH_LINE_SOLID :win_style=PS_SOLID;break;
@@ -421,7 +435,7 @@ void	set_pen(ssh_color c,int size,int style)
 /* Ustala aktualny kolor linii za pomoca typu ssh_color */
 {
 	HDC hdc=GetMyHdc();
-	
+
 	curent_pen=GetMyPen(c,size,style);
     SelectObject(hdc,curent_pen);
 	curr_color=-1;/* Funcje same ustawiajace pen sa zmuszone to zrobic po uzyciu set_pen */
@@ -434,9 +448,11 @@ void	set_pen_rgb(int r,int g,int b,int size,int style)
 {
 	if(free_style_pen)
 		DeleteObject(free_style_pen);
-	
-	if(trace_level & 4)
+
+	_TRACE( 4)
 			fprintf(stderr,"Free style pen allocation rgb:%x%x%x s:%d style:%d.\n",r,g,b,size,style);
+	_TREND
+
 	//Tworzenie nowego piora
 	{
 		int sX=mulx*size;
@@ -461,12 +477,12 @@ void	set_pen_rgb(int r,int g,int b,int size,int style)
 }
 
 void set_rgb(ssh_color color,int r,int g,int b)
-/* Zmienia definicja koloru. Indeksy 0..255 */
+/* Zmienia definicje koloru w palecie kolorow. Indeksy 0..255 */
 {
     assert(color<PALETE_LENGHT);
 
 	colors[color]=RGB(r,g,b);
-	
+
 	if(brushes[color]!=0)
 	{
 		if(curr_fill==color)
@@ -487,7 +503,7 @@ void set_rgb(ssh_color color,int r,int g,int b)
             if(MyHdc!=0)
 				SelectObject(MyHdc,GetStockObject(NULL_PEN));/*Wymiata z kontekstu */
 		}
-	
+
 		DeleteObject(pens[color].handle);/* Teraz mozna juz zwolnic */
 		pens[color].handle=0;
 		pens[color].size=0;
@@ -495,8 +511,18 @@ void set_rgb(ssh_color color,int r,int g,int b)
 	}
 }
 
+ssh_rgb   get_rgb_from(ssh_color c)
+	/* Jakie s¹ ustawienia RGB konkretnego kolorku w palecie */
+{
+	ssh_rgb pom;
+	pom.r=GetRValue(colors[c]);
+	pom.g=GetGValue(colors[c]);
+	pom.b=GetBValue(colors[c]);
+	return pom;
+}
+
 void set_gray(ssh_color shade,int intensity)
-/* Zmiania definicje odcienia szarosci. Indeksy 256..511 */
+/* Zmiania definicje odcienia szarosci w palecie szarosci. Indeksy 256..511 */
 {
     assert(255<shade && shade<PALETE_LENGHT);
     set_rgb(shade,intensity,intensity,intensity);
@@ -518,32 +544,33 @@ static void FreeResources(void)
 {
 	int k;
 	curr_color=curr_fill=-1;
-	
-	if(trace_level & 4)
+
+	_TRACE( 4 )
 		fprintf(stderr," FREE RESORCES.\n");
-	
+	_TREND
+
 	if(MbHdc)		  //Zwalnia wirtualny kontekst jesli jest
-	{ 
-		if(MbHdc==MyHdc) 
-			MyHdc=0; 
-		DeleteDC(MbHdc); 
+	{
+		if(MbHdc==MyHdc)
+			MyHdc=0;
+		DeleteDC(MbHdc);
 		MbHdc=0;
 	}
-	
+
 	if(VirtualScreen!=0) //Zwalnia ekran wirtualny jesli jest
-	{ 
-		DeleteObject(VirtualScreen); 
-		VirtualScreen=0; 
+	{
+		DeleteObject(VirtualScreen);
+		VirtualScreen=0;
 	}
-	
+
 	if(MyHdc!=0)		//Zwalnia kontekst okna jesli jest
-	{ 
+	{
 		int ret=ReleaseDC(MyHwnd,MyHdc);            //Czy to aby dziala
                                                     assert(ret==1);
-		MyHdc=0;   
+		MyHdc=0;
 	}
-	
-	for(k=0;k<PALETE_LENGHT;k++)
+
+	for(k=0;k<PALETE_LENGHT;k++) //Zwalnia wszystkie cache'owane pêdzle
 	{
 		if(pens[k].handle!=0)
 		{
@@ -552,16 +579,130 @@ static void FreeResources(void)
 			pens[k].size=0;
 			pens[k].style=0;
 		}
-		
+
 		if(brushes[k]!=0)
 		{
 			DeleteObject(brushes[k]);
-			brushes[k]=0; 
+			brushes[k]=0;
 		}
 	}
 }
 
+/*
+   Return a RGB colour value given a scalar v in the range [vmin,vmax]
+   In this case each colour component ranges from 0 (no contribution) to
+   1 (fully saturated), modifications for other ranges is trivial.
+   The colour is clipped at the end of the scales if v is outside
+   the range [vmin,vmax]
+
+
+   from http://paulbourke.net/texture_colour/colourspace/
+*/
+
+typedef struct {
+	  double r,g,b;
+   } D_COLOUR;
+
+D_COLOUR GetColour(double v,double vmin,double vmax)
+{
+   D_COLOUR c = {1.0,1.0,1.0}; // white
+   double dv;
+
+   if (v < vmin)
+	  v = vmin;
+   if (v > vmax)
+      v = vmax;
+   dv = vmax - vmin;
+
+   if (v < (vmin + 0.25 * dv)) {
+      c.r = 0;
+      c.g = 4 * (v - vmin) / dv;
+   } else if (v < (vmin + 0.5 * dv)) {
+      c.r = 0;
+      c.b = 1 + 4 * (vmin + 0.25 * dv - v) / dv;
+   } else if (v < (vmin + 0.75 * dv)) {
+      c.r = 4 * (v - vmin - 0.5 * dv) / dv;
+      c.b = 0;
+   } else {
+	  c.g = 1 + 4 * (vmin + 0.75 * dv - v) / dv;
+      c.b = 0;
+   }
+
+   return(c);
+}
+
+
+ /**
+     * Computes the color gradiant
+     * color: the output vector
+     * x: the gradiant (beetween 0 and 360)
+	 * min and max: variation of the RGB channels (Move3D 0 -> 1)
+	 http://stackoverflow.com/questions/7139825/colormap-library-for-c-which-converts-a-given-value-into-red-green-and-blue-v
+	 */
+ /* To siê bezpoœrednio nie nadaje bo ma 360 wartoœci!
+void GroundColorMix(double* color, double x, double min, double max)
+{
+   // Red = 0 Green = 1 Blue = 2
+
+	double posSlope = (max-min)/60;
+    double negSlope = (min-max)/60;
+
+    if( x < 60 )
+    {
+        color[0] = max;
+        color[1] = posSlope*x+min;
+        color[2] = min;
+        return;
+    }
+	else if ( x < 120 )
+    {
+        color[0] = negSlope*x+2*max+min;
+        color[1] = max;
+        color[2] = min;
+        return;
+    }
+    else if ( x < 180  )
+    {
+        color[0] = min;
+        color[1] = max;
+        color[2] = posSlope*x-2*max+min;
+        return;
+    }
+    else if ( x < 240  )
+    {
+        color[0] = min;
+        color[1] = negSlope*x+4*max+min;
+        color[2] = max;
+        return;
+    }
+    else if ( x < 300  )
+    {
+        color[0] = posSlope*x-4*max+min;
+        color[1] = min;
+        color[2] = max;
+        return;
+    }
+    else
+    {
+        color[0] = max;
+        color[1] = min;
+        color[2] = negSlope*x+6*max;
+        return;
+    }
+}
+
+		  double rgb[3];
+		  GroundColorMix(rgb,(double)k,(double)0,(double)255);
+		  set_rgb(k,rgb[0]*255,rgb[1]*255,rgb[2]*255);
+*/
+
+/* DO UWZGLÊDNIENIA TE¯
+http://www.cs.uml.edu/~haim/ColorCenter/ColorCenterColormaps.htm
+*/
+
+
 static void SetScale(void)
+//Wewnetrzna implementacja termicznej skali kolorów 
 {
 #ifndef M_PI
 const double M_PI=3.141595;
@@ -578,67 +719,103 @@ if(UseGrayScale)//Uzywa skali szarosci tam gdzie normalnie sa kolory
 		set_rgb(k,wal,wal,wal); //Color part
 		set_rgb(256+k,wal,wal,wal);//Gray scale part
 	}
-	if(trace_level & 4)
+	_TRACE( 4 )
 		fprintf(stderr,"%s\n","SetScale (0-255 Gray) completed");
+	_TREND
   }
   else
   {
   int k;
   for(k=0;k<255;k++)
-	{
-		  long wal1,wal2,wal3;
+	{      /* VERY_OLD_SCALE
+		   long wal1,wal2,wal3;
 		  double kat=(M_PI*2)*k/255.;
-		  
-		  wal1=(long)(255*sin(kat*1.22));
-		  if(wal1<0) wal1=0;
-		  
-		  wal2=(long)(255*(-cos(kat*0.46)));
-		  if(wal2<0) wal2=0;
-		  
-		  wal3=(long)(255*(-cos(kat*0.9)));
-		  if(wal3<0) wal3=0;
-		  
-		  set_rgb(k,wal1,wal2,wal3);
-		  
-		  /*
 		  wal1=(long)(255*sin(kat*1.25));
-		  
+
 		   if(wal1<0) wal1=0;
 		   wal2=(long)(255*(-sin(kat*0.85)));
 		   if(wal2<0) wal2=0;
 		   wal3=(long)(255*(-cos(kat*1.1)));
 		   if(wal3<0) wal3=0;
 		  */
+#if OLD_COLOUR_SCALE != 1
+		  long wal1,wal2,wal3;
+		  double kat=(M_PI*2)*k/255.;
+
+		  //  LONG USED SCALE
+		  wal1=(long)(255*sin(kat*1.22));
+		  if(wal1<0) wal1=0;
+
+		  wal2=(long)(255*(-cos(kat*0.46)));
+		  if(wal2<0) wal2=0;
+
+		  wal3=(long)(255*(-cos(kat*0.9)));
+		  if(wal3<0) wal3=0;
+
+		  set_rgb(k,wal1,wal2,wal3);
+/*
+		  wal1=(long)(255*sin(kat*1.2)*0.9);
+		  if(wal1<0) wal1=0;
+
+		  wal2=(long)(255*(-cos(kat*0.38+1.25)));
+		  if(wal2<0) wal2=0;
+
+		  wal3=(long)(255*(-cos(kat*0.9)*0.9));
+		  if(wal3<0) wal3=0;
+
+		  set_rgb(k,wal1,wal2,wal3);  */
+
+/*
+		  wal1=(long)(255*sin(kat*1.2));
+		  if(wal1<0) wal1=0;
+
+		  wal2=(long)(255*(-cos(kat*0.38+1.25)));
+		  if(wal2<0) wal2=0;
+
+		  wal3=(long)(255*(-cos(kat*0.9)));
+		  if(wal3<0) wal3=0;
+
+		  set_rgb(k,wal1,wal2,wal3);
+*/
+#else
+
+		  D_COLOUR pom = GetColour( (double)k,(double)0,(double)255);
+		  set_rgb(k,pom.r*255,pom.g*255,pom.b*255);
+#endif
+		  
 	  }
-	  //ALTERNATYWNIE?
+	  //POWYZEJ 255 - SKALA SZAROŒCI
 	  {
 	  unsigned k;
 	  for(k=256;k<PALETE_LENGHT; k++)
 			set_rgb(k,(unsigned char)k,(unsigned char)k,(unsigned char)k );
-	  if(trace_level & 4)
+
+	 _TRACE( 4)
 		fprintf(stderr,"%s\n","SetScale (Colors: 0-255; Gray: 256--> %d) completed",PALETE_LENGHT);
+	  _TREND
 	  }
   }
-
+	set_rgb(0,0,0,0);
 	set_rgb(255,255,255,255);
-
 }
 
 
 
 static int InitWindowClass(void)
 {
-// Other instances of app running?	
+// Other instances of app running?
 if (!WB_PrevInstance)
     {
 		// Initialize shared things
-		if(trace_level & 4)
+		_TRACE( 4)
 			fprintf(stderr,"%s\n","Init Window Class");
-			
+		_TREND
+
 		if (!InitApplication(WB_Instance))
 		{
-			if(trace_level & 4)
+			_TRACE( 4)
 				fprintf(stderr,"%s\n","  FAILED!!!");
+			_TREND
 			return FALSE;               // Exits if unable to initialize
 		}
 	}
@@ -648,8 +825,10 @@ return TRUE;
 static int InitMainWindow(void)
 {
 // Perform initializations that apply to a specific instance
-if(trace_level & 4)
+_TRACE( 4)
 	fprintf(stderr,"%s\n","Init Main Window");
+_TREND
+
 if(!InitInstance(WB_Instance))
 	{
         return FALSE;
@@ -669,7 +848,7 @@ void fix_size(int yes)
 	Flexible=!yes;
 }
 
-int fixed()				
+int fixed()
 /* Czy okno ma zafiksowana wielkosc */
 {
 	return !Flexible;
@@ -704,7 +883,7 @@ int		put_style(int S)
 {//SSH_SOLID_PUT,SSH_XOR_PUT
 	HDC hdc=GetMyHdc();
 	int old=GetROP2(hdc);
-	
+
 	if(S==SSH_SOLID_PUT)
 	{
 		if(old!=R2_COPYPEN)
@@ -795,14 +974,18 @@ return  font_info.tmMaxCharWidth;
 int  char_height(char znak)
 /* Aktualne rozmiary znaku  */
 {
-int pom=raw_char_height()/muly;
+int pom=raw_char_height();
+pom/=muly;
+if(pom%muly>0) pom++;
 return pom;
 }
 
 int  char_width(char znak)
 /* potrzebne do pozycjonowania tekstu */
 {
-int pom=raw_char_width()/mulx;
+int pom=raw_char_width();
+pom/=mulx;
+if(pom%mulx>0) pom++;
 return pom;
 }
 
@@ -826,7 +1009,7 @@ if(GetTextExtentPoint32(GetMyHdc(),str,strlen(str),&sizes))
 		return -1;
 }
 
-static void __cdecl special_close_plot() 
+static void __cdecl special_close_plot(void)
 //¯eby mo¿na by³o swobodnie manipulowaæ sposobem wywo³ania iinnych funkcji
 {
 	close_plot();
@@ -910,7 +1093,7 @@ if(real_W_height<=ScreenRealH && real_W_width<=ScreenRealW)
     GetClientRect(MyHwnd,&rect);
     cur_Cl_height=abs(rect.top-rect.bottom);
     cur_Cl_width=abs(rect.left-rect.right);
-  
+
     if(cur_Cl_height<W_height || cur_Cl_width<W_width)
     {
         real_W_height+=W_height-cur_Cl_height;
@@ -948,21 +1131,24 @@ return /*TRUE*/1;
 void flush_plot()
 /* uzgodnienie zawartosci ekranu  */
 {
-	if(trace_level & 2)
+	_TRACE( 2 )
 		fprintf(stderr," FLUSH PLOT ");
-	
+	_TREND
+
     if(MyHdc!=0)//Byl uzywany. Zwalnia tylko RelaseResources
     {
         if(animate && VirtualScreen && MyHdc==MbHdc )//Animujemy i jest juz bitmapa
         {
 			HDC ScreenDc=GetDC(MyHwnd);
-			if(trace_level & 2)
+			_TRACE(2)
                 fprintf(stderr,"-> BITBLT ");
+			_TREND
             BitBlt(ScreenDc,0,0,W_width*mulx,W_height*muly,MyHdc,0,0,SRCCOPY);
             ReleaseDC(MyHwnd,ScreenDc);
         }
-		if(trace_level & 2)
+		_TRACE( 2)
             fprintf(stderr,"-> RELEASE DC ");
+		_TREND
         ReleaseDC(MyHwnd,MyHdc);
 		curr_color=curr_fill=-1;
         MyHdc=0;//!!!
@@ -971,8 +1157,9 @@ void flush_plot()
 	if(DelayTime>0)
 		Sleep(DelayTime);//Uœpiene programu na pewien czas
 
-    if(trace_level & 2)
+    _TRACE(2)
 		fprintf(stderr," * \n");
+	_TREND
 }
 
 void	delay_ms(unsigned ms)
@@ -993,102 +1180,118 @@ static int ProcessMsg(int peek)
 //Przerabia wejscie i zwraca znak:
 // EOF jesli koniec, 0 jesli nic do wziecia lub inny
 {
-BOOL msg_avail=0;
-int ret;
+	BOOL msg_avail=0;
+	int ret;
 
-if(trace_level & 1)
-	fprintf(stderr,"* PrcsMsg(p=%d) ",peek);
+	_TRACE(1)
+		fprintf(stderr,"* PrcsMsg(p=%d) ",peek);
+	_TREND
 
-InputChar='\0';
-// Acquire and dispatch messages until a WM_QUIT message is received.
+	InputChar='\0';
+	// Acquire and dispatch messages until a WM_QUIT message is received.
 JESZCZE_RAZ:
-if(peek)
-{
-	if(trace_level & 1)
-		fprintf(stderr,"[");
-		
-	msg_avail=PeekMessage(&msg,/*NULL*/MyHwnd,0,0,PM_REMOVE);
-		
-	if(trace_level & 1)
-		fprintf(stderr,"%d]",msg_avail);
-}
-else
-{
-	if(trace_level & 1)
-		fprintf(stderr,"{");
-		
-	msg_avail=GetMessage(&msg,/*NULL*/MyHwnd, 0, 0);
-		
-	if(trace_level & 1)
-		fprintf(stderr,"%d}",msg_avail);
-		
-	if(msg_avail==FALSE && msg.hwnd==MyHwnd)
+	if(peek)
 	{
-		if(trace_level & 1)
-			fprintf(stderr,"msg_avail=%d!",msg_avail);
-		WindowClosed=1;// WIndow destroyed?
+		_TRACE( 1)
+			fprintf(stderr,"[");
+		_TREND
+
+			msg_avail=PeekMessage(&msg,/*NULL*/MyHwnd,0,0,PM_REMOVE);
+
+		_TRACE( 1)
+			fprintf(stderr,"%d]",msg_avail);
+		_TREND
+	}
+	else
+	{
+		_TRACE(1)
+			fprintf(stderr,"{");
+		_TREND
+
+			msg_avail=GetMessage(&msg,/*NULL*/MyHwnd, 0, 0);
+
+		_TRACE( 1)
+			fprintf(stderr,"%d}",msg_avail);
+		_TREND
+
+			if(msg_avail==FALSE && msg.hwnd==MyHwnd)
+			{
+				_TRACE( 1)
+					fprintf(stderr,"msg_avail=%d!",msg_avail);
+				_TREND
+
+					WindowClosed=1;// WIndow destroyed?
+				InputChar='\0';
+				return EOF;
+			}
+	}
+
+	if(msg_avail==-1) /* ??? BOOL i -1 ???? */
+	{
+		_TRACE( 1)
+			fprintf(stderr,"msg_avail=%d",msg_avail);
+		_TREND
+
+			if(error_proc()=='A')
+				abort();
+	}
+
+	if(msg.hwnd!=MyHwnd)
+	{
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+
+		_TRACE( 1)
+			fprintf(stderr,"* PrcsMsg GOTO \"ONES MORE\" ");
+		_TREND
+
+			goto JESZCZE_RAZ;         //!!!!!!!!!!!!!!!!!!!!!
+	}
+
+	if(msg_avail==TRUE)
+		if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
+		{
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+
+		ret=InputChar;
 		InputChar='\0';
-		return EOF;
-	}
+		return ret;
 }
 
-if(msg_avail==-1) /* ??? BOOL i -1 ???? */
-{
-	if(trace_level & 1)
-		fprintf(stderr,"msg_avail=%d",msg_avail);
-	if(error_proc()=='A') 
-		abort();
- }
- 
-if(msg.hwnd!=MyHwnd)
-	{	
-	TranslateMessage(&msg);
-	DispatchMessage(&msg);
-	if(trace_level & 1)
-		fprintf(stderr,"* PrcsMsg GOTO \"ONES MORE\" ");
-	goto JESZCZE_RAZ;         //!!!!!!!!!!!!!!!!!!!!!
-	}
-
-if(msg_avail==TRUE)
-  if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
-   {
-   TranslateMessage(&msg);
-   DispatchMessage(&msg);
-   }
-
-ret=InputChar;
-InputChar='\0';
-return ret;
-}
-
-static int first_to_read=0;
+LOCAL 
+int first_to_read=0;
 
 int  input_ready()
 /* (nie)zalezna od platformy funkcja sprawdzajaca czy jest wejscie */
 {
 	int input;
-	if(trace_level & 1)
+	_TRACE(1)
 		fprintf(stderr,"* input_ready() ");
-	
+	_TREND
+
 	if(CharToGet!=0||first_to_read!=0)//Nieodebrano
 		return TRUE;
 
 	input=ProcessMsg(1);//PEEK! Trzeba sprawdzic nowe komunikaty
-	
+
 	if(input!='\0')
 	{CharToGet=input;return TRUE;}
 	else
 	{CharToGet='\0';return FALSE;}
 }
 
-int  set_char(int c)	
+int  set_char(int c)
 /* Odeslanie znaku na wejscie - zwraca 0 jesli nie ma miejsca */
 {
-	if(trace_level & 1)
+	_TRACE( 1)
 		fprintf(stderr,"* set_char(%c) ",c);
-		
+	_TREND
+
 	if(first_to_read!=0)//Jeszcze nieodebrano
 		return 0;
+
 	first_to_read=c;
 	return 1;
 }
@@ -1097,34 +1300,42 @@ int  get_char()
 /* odczytywanie znakow sterowania, z oczekiwaniem jesli brak */
 {
 	int input;
-	if(trace_level & 1)
+
+	_TRACE(1)
 		fprintf(stderr,"* get_char() ");
-		
-    if(first_to_read!=0) //Sprawdza czy nie ma zwrotow
+	_TREND
+    
+	if(first_to_read!=0) //Sprawdza czy nie ma zwrotow
     {
         input=first_to_read;
         first_to_read=0;
-        return input;
+        goto READY_TO_USE;//return input;
     }
-    
+
     if(CharToGet!=0)//Zwraca znak odczytany przez input_ready()
     {
         input=CharToGet;
         CharToGet='\0';
-		return input;
+		goto READY_TO_USE;//return input;
     }
 
     while((input=ProcessMsg(0))=='\0');//sam musi poczekac na znak
-    
+
+READY_TO_USE:
+	_TRACE(1)
+		fprintf(stderr,"---> %u %c ",input,input);
+	_TREND
+
 	return input;
 }
 
 int  get_mouse_event(int* xpos,int* ypos,int* click)
 /* Odczytuje ostatnie zdazenie myszy */
 {
-	if(trace_level & 1)
+	_TRACE(1)
 		fprintf(stderr,"* get_mouse_event() ");
-		
+	_TREND
+
 	if(MouseInput!=0)
 	{
 		*xpos=InputXpos/mulx;
@@ -1142,9 +1353,10 @@ void close_plot(void)
 /* zamkniecie grafiki/semigrafiki */
 {
 	int ret=0;//Dla GetMessage
-	
-	if(trace_level & 2)
+
+	_TRACE( 2)
 		fprintf(stderr," CLOSE PLOT ");
+	_TREND
 
 	if(!WindowClosed) // Jeszcze nie zamkniete wczeœniej & Valid HANDLE?
 		{
@@ -1159,11 +1371,11 @@ void close_plot(void)
 			//fprintf(stderr,"(See at window: %s )",window_name);
 			if(IsWindow(MyHwnd)!=0) //IsWindow
 				{
-				if(MessageBox(MyHwnd,kom,window_name,MB_ICONQUESTION)==0)
-					MessageBox(NULL,"Your window is probably closed",window_name,MB_ICONQUESTION);;
+				if(MessageBoxA(MyHwnd,kom,window_name,MB_ICONQUESTION)==0)
+					MessageBoxA(NULL,"Your window is probably closed",window_name,MB_ICONQUESTION);;
 				}
 				else
-				MessageBox(NULL,"Your window already closed",window_name,MB_ICONQUESTION);
+				MessageBoxA(NULL,"Your window already closed",window_name,MB_ICONQUESTION);
 			//get_char();
 			WB_error_enter_before_clean=0;
 			}
@@ -1173,11 +1385,11 @@ void close_plot(void)
 			{//Alokowane raz na program
 				DeleteObject(UserFont);
 				UserFont=0;
-			}		
+			}
 
 		if(IsWindow(MyHwnd)!=0) //Jeœli IsWindow to trzeba je zamkn¹æ
 			{
-			DestroyWindow(MyHwnd);		
+			DestroyWindow(MyHwnd);
 			// Message loop for ending meesages - should be?(WB)
 			while((ret=GetMessage(&msg,MyHwnd, 0, 0))!=0)     //Zamiast MyHwnd by³o NULL...
 				{
@@ -1210,7 +1422,8 @@ static int ox,oy;
 void printbw(int x,int y,const char* format,...)       // int x,int y,const char* format,...
 /* ---//--- wyprowadzenie tekstu na ekran */
 {
-HDC MyHdc;
+static double MyHdc;
+HDC LocalMyHdc;
 RECT rc;
 size_t len;//Bedzie przypisane dlugoscia bufora
 unsigned font_height=0;
@@ -1235,7 +1448,7 @@ unsigned font_width=0;
     len = strlen(bufor);
 
     /* Get string widths & hight */
-    MyHdc=GetMyHdc();
+    LocalMyHdc=GetMyHdc();
     font_height = font_info.tmHeight;
     font_width = font_info.tmAveCharWidth;
 
@@ -1250,11 +1463,63 @@ unsigned font_width=0;
 	rc.bottom=y+font_height;
 	//FillRect (MyHdc, &rc, GetMyBrush(255));
 
-    SetTextColor(MyHdc,colors[0]);
-    SetBkColor(MyHdc,colors[255]);
+    SetTextColor(LocalMyHdc,colors[0]);
+    SetBkColor(LocalMyHdc,colors[255]);
 
 //if(!animate)
-    TextOut(MyHdc,x,y,bufor,len);
+    TextOut(LocalMyHdc,x,y,bufor,len);
+//if(is_buffered)
+//    TextOut(MyBtmHdc,x,y,bufor,len);
+}
+
+void print_rgb(int x,int y,
+    unsigned r,unsigned g,unsigned b,
+	ssh_color back,
+    const char* format,...)
+{
+static double MyHdc;
+HDC LocalMyHdc;
+//RECT rc;
+size_t len;//Bedzie przypisane dlugoscia bufora
+//unsigned font_height=0;
+//unsigned font_width=0;
+
+   va_list argptr;
+
+   va_start(argptr, format);
+
+   vsprintf(bufor, format, argptr);
+
+   va_end(argptr);
+
+   if(straznik1!=0x77 || straznik2!=0x77)
+		{
+		fprintf(stderr,"FATAL: symshell.print(...) - bufor exced 1024b!");
+		abort();
+		}
+
+  /* Need length for FillRect*/
+    len = strlen(bufor);
+
+    /* Get string widths & hight */
+                assert(back<PALETE_LENGHT);
+    LocalMyHdc=GetMyHdc();
+	//font_height = font_info.tmHeight;
+	//font_width = font_info.tmAveCharWidth;
+	x*=mulx; /* Multiplicaton of coordinates */
+	y*=muly; /* if window is bigger */
+
+	/* Output text, centered on each line */
+	//rc.left=x;
+	//rc.top=y;
+	//rc.right=x+font_width*(len+1);
+	//rc.bottom=y+font_height;
+	//FillRect (LocalMyHdc, &rc, GetMyBrush(back));
+
+	SetTextColor(LocalMyHdc,RGB(r,g,b)); 
+    SetBkColor(LocalMyHdc,colors[back]);
+//if(!animate) ???
+    TextOut(LocalMyHdc,x,y,bufor,len); // SetBkMode(hdc, TRANSPARENT)???
 //if(is_buffered)
 //    TextOut(MyBtmHdc,x,y,bufor,len);
 }
@@ -1263,12 +1528,13 @@ void printc(int x,int y,
     ssh_color fore,ssh_color back,
     const char* format,...)
 {
-HDC MyHdc;
+static double MyHdc;
+HDC LocalMyHdc;
 //RECT rc;
 size_t len;//Bedzie przypisane dlugoscia bufora
 //unsigned font_height=0;
 //unsigned font_width=0;
-			  
+
    va_list argptr;
 
    va_start(argptr, format);
@@ -1289,7 +1555,7 @@ size_t len;//Bedzie przypisane dlugoscia bufora
     /* Get string widths & hight */
                 assert(fore<PALETE_LENGHT);
                 assert(back<PALETE_LENGHT);
-    MyHdc=GetMyHdc();
+    LocalMyHdc=GetMyHdc();
 	//font_height = font_info.tmHeight;
 	//font_width = font_info.tmAveCharWidth;
 	x*=mulx; /* Multiplicaton of coordinates */
@@ -1300,12 +1566,12 @@ size_t len;//Bedzie przypisane dlugoscia bufora
 	//rc.top=y;
 	//rc.right=x+font_width*(len+1);
 	//rc.bottom=y+font_height;
-	//FillRect (MyHdc, &rc, GetMyBrush(back));
+	//FillRect (LocalMyHdc, &rc, GetMyBrush(back));
 
-	SetTextColor(MyHdc,colors[fore]);
-    SetBkColor(MyHdc,colors[back]);
-//if(!animate)
-    TextOut(MyHdc,x,y,bufor,len); // SetBkMode(hdc, TRANSPARENT)???
+	SetTextColor(LocalMyHdc,colors[fore]);
+    SetBkColor(LocalMyHdc,colors[back]);
+//if(!animate) ???
+    TextOut(LocalMyHdc,x,y,bufor,len); // SetBkMode(hdc, TRANSPARENT)???
 //if(is_buffered)
 //    TextOut(MyBtmHdc,x,y,bufor,len);
 }
@@ -1328,8 +1594,8 @@ int  print_transparently(int yes)
 void plot(int x,int y,ssh_color color)
 /* wyswietlenie punktu na ekranie */
 {
-    assert(color<PALETE_LENGHT);    
-
+//	if(color>=PALETE_LENGHT) //DEBUG
+				assert(color<PALETE_LENGHT);
 x*=mulx; /* Multiplicaton of coordinates */
 y*=muly; /* if window is bigger */
 if(mulx>1 || muly>1)
@@ -1363,7 +1629,7 @@ if(mulx>1 || muly>1)
    rc.bottom=y+muly;
    hbrush=CreateSolidBrush(color);
    FillRect (GetMyHdc(), &rc, hbrush);
-   DeleteObject(hbrush);	
+   DeleteObject(hbrush);
    }
    else
    {
@@ -1371,12 +1637,12 @@ if(mulx>1 || muly>1)
    }
 }
 
-static 
+static
 void _fill_seed(HDC hdc,int x,int y,COLORREF R_fill,COLORREF R_border)
 {
 	COLORREF what;
 	what=GetPixel(hdc,x,y);
-	if(what==R_border || what==CLR_INVALID || what==R_fill) 
+	if(what==R_border || what==CLR_INVALID || what==R_fill)
 			return;//granica, albo poza dozwolonym obszarem ekranu
 	SetPixelV(hdc,x,y,R_fill);
 	//Seeding
@@ -1393,7 +1659,7 @@ void fill_flood(int x,int y,ssh_color fill,ssh_color border)
 
                     assert(fill<PALETE_LENGHT);
                     assert(border<PALETE_LENGHT);
-	 
+
     R_fill=colors[fill];
     R_border=colors[border];
 	x*=mulx; /* Multiplicaton of coordinates */
@@ -1405,8 +1671,8 @@ void fill_flood_rgb(int x,int y,
 				int rf,int gf,int bf,int rb,int gb,int bb)
 //Wypelnia powodziowo lub algorytmem siania
 {
-    COLORREF R_fill,R_border;              
-	 
+    COLORREF R_fill,R_border;
+
     R_fill=RGB(rf,gf,gf);
     R_border=RGB(rb,gb,gb);
 	x*=mulx; /* Multiplicaton of coordinates */
@@ -1417,8 +1683,11 @@ void fill_flood_rgb(int x,int y,
 void fill_rect(int x1,int y1,int x2,int y2,ssh_color color)
 {
 RECT rc;
-            assert(color<PALETE_LENGHT);
-
+            //assert(color<PALETE_LENGHT);
+			if(color>=PALETE_LENGHT)//Postêpowanie awaryjne
+			{
+				color=PALETE_LENGHT-1;
+			}
 x1*=mulx;x2*=mulx; /* Multiplicaton of coordinates */
 y1*=muly;y2*=muly;  /* if window is bigger */
 rc.left=x1;rc.top=y1;
@@ -1431,7 +1700,7 @@ FillRect (GetMyHdc(), &rc, GetMyBrush(color));/* Bez dolnego wiersza i prawej ko
 void fill_rect_d(int x1,int y1,int x2,int y2)
 /* Wyswietla prostokat w kolorach domyslnych*/
 {
-RECT rc;          
+RECT rc;
 x1*=mulx;x2*=mulx; /* Multiplicaton of coordinates */
 y1*=muly;y2*=muly;  /* if window is bigger */
 rc.left=x1;rc.top=y1;
@@ -1446,16 +1715,16 @@ void line(int x1,int y1,int x2,int y2,ssh_color color)
     POINT points[2];        assert(color<PALETE_LENGHT);
     plot(x2,y2,color);
     plot(x1,y1,color);
-    
+
     x1*=mulx;x2*=mulx; /* Multiplicaton of coordinates */
     y1*=muly;y2*=muly;  /* if window is bigger */
-    
+
 	if(curr_color!=color /*???*/)
     {
         HPEN MyPen=GetMyPen(color,LineWidth,LineStyle);
         SelectObject(GetMyHdc(),MyPen);
     }
-    
+
     points[0].x=x1;points[0].y=y1;
     points[1].x=x2;points[1].y=y2;
     Polyline(GetMyHdc(),points,2);
@@ -1464,23 +1733,36 @@ void line(int x1,int y1,int x2,int y2,ssh_color color)
 void line_d(int x1,int y1,int x2,int y2)
 /* Wyswietlenie lini w kolorze domyslnym */
 {
-    POINT points[2];       
-    plot_rgb(x2,y2,GetRValue(curent_pen_rgb),GetGValue(curent_pen_rgb),GetBValue(curent_pen_rgb));
-    plot_rgb(x1,y1,GetRValue(curent_pen_rgb),GetGValue(curent_pen_rgb),GetBValue(curent_pen_rgb));
-    
-    x1*=mulx;x2*=mulx; /* Multiplicaton of coordinates */
-    y1*=muly;y2*=muly;  /* if window is bigger */
-      
+    POINT points[2];
+
+	x1*=mulx;x2*=mulx; /* Multiplicaton of coordinates */
+	y1*=muly;y2*=muly;  /* if window is bigger */
+
     points[0].x=x1;points[0].y=y1;
-    points[1].x=x2;points[1].y=y2;
-    Polyline(GetMyHdc(),points,2);
+	points[1].x=x2;points[1].y=y2;
+	Polyline(GetMyHdc(),points,2);
+
+	//CHyba nieporzebne
+  // plot_rgb(x2,y2,GetRValue(curent_pen_rgb),GetGValue(curent_pen_rgb),GetBValue(curent_pen_rgb));
+  // plot_rgb(x1,y1,GetRValue(curent_pen_rgb),GetGValue(curent_pen_rgb),GetBValue(curent_pen_rgb));
+}
+
+void circle_d(int x,int y,int r)
+/* Wyswietlenie okregu w kolorze domyslnym */
+{
+    int r1,r2;
+
+    x*=mulx;y*=muly;   /* Multiplicaton of coordinates */
+    r1=r*mulx;r2=r*muly;  /* if window is bigger */
+
+    Arc(GetMyHdc(),x-r1,y-r2,x+r1,y+r2,x,y+r1,x,y+r1);
 }
 
 void circle(int x,int y,int r,ssh_color color)
 /* Wyswietlenie okregu w kolorze c */
 {
     int r1,r2;      assert(color<PALETE_LENGHT);
-    
+
     x*=mulx;y*=muly;   /* Multiplicaton of coordinates */
     r1=r*mulx;r2=r*muly;  /* if window is bigger */
 	if(curr_color!=color /*???*/)
@@ -1491,22 +1773,12 @@ void circle(int x,int y,int r,ssh_color color)
     Arc(GetMyHdc(),x-r1,y-r2,x+r1,y+r2,x,y+r1,x,y+r1);
 }
 
-void circle_d(int x,int y,int r)
-/* Wyswietlenie okregu w kolorze domyslnym */
-{
-    int r1,r2;    
-    
-    x*=mulx;y*=muly;   /* Multiplicaton of coordinates */
-    r1=r*mulx;r2=r*muly;  /* if window is bigger */
-   
-    Arc(GetMyHdc(),x-r1,y-r2,x+r1,y+r2,x,y+r1,x,y+r1);
-}
-
 void fill_circle(int x,int y,int r,ssh_color color)
 /* KOlo w kolorze color */
 {
     int r1,r2;      assert(color<PALETE_LENGHT);
-    
+					if(color>=PALETE_LENGHT) color=PALETE_LENGHT-1;
+
     x*=mulx;y*=muly;   /* Multiplicaton of coordinates */
     r1=r*mulx;r2=r*muly;  /* if window is bigger */
 	if(curr_color!=color /*???*/)
@@ -1523,13 +1795,13 @@ void fill_circle(int x,int y,int r,ssh_color color)
 }
 
 void fill_circle_d(int x,int y,int r)
-/* Wyswietlenie kola w kolorach domyslnych*/				
+/* Wyswietlenie kola w kolorach domyslnych*/
 {
-    int r1,r2;     
-    
+    int r1,r2;
+
     x*=mulx;y*=muly;   /* Multiplicaton of coordinates */
     r1=r*mulx;r2=r*muly;  /* if window is bigger */
-    
+
     Ellipse(GetMyHdc(),x-r1,y-r2,x+r1,y+r2);
 }
 
@@ -1546,7 +1818,7 @@ if(number<=2)
 		return; //Nie da sie rysowac wielokata o dwu punktach lub mniej
 
 if(number>10) //Jest za duzy.Alokacja
-	LocalPoints=calloc(number,sizeof(POINT));
+	LocalPoints=(POINT*)calloc(number,sizeof(POINT));
 
 if(LocalPoints==NULL)
 		 {assert("Memory for polygon");return;}
@@ -1612,8 +1884,9 @@ void clear_screen()
 /* Czysci ekran przed zmiana zawartosci */
 {
 RECT rc;
-if(trace_level & 2)
+_TRACE( 2)
 	fprintf(stderr,"CLEAR SCREEN\n");
+_TREND
 GetClientRect(MyHwnd, &rc);
 rc.right++; //Niweluje dziwny sposob wypelniania FillRect
 rc.bottom++;//pomijajacy dolny wiersz i skrajnie prawa kolumne
@@ -1622,6 +1895,7 @@ FillRect (GetMyHdc(), &rc, GetMyBrush(Background));
 
 
 // MESSAGE SUPPORT COPIED FROM BORLAND SAMPLE
+LOCAL
 LRESULT DispDefault(EDWP, HWND, UINT, WPARAM, LPARAM);
 
 //
@@ -1647,11 +1921,11 @@ LRESULT DispDefault(EDWP, HWND, UINT, WPARAM, LPARAM);
 //    structure.  In either case, return the value recieved from the
 //    message or default function.
 //
-
-static LRESULT DispMessage(LPMSDI lpmsdi,
-                    HWND   hwnd, 
+LOCAL 
+LRESULT DispMessage(LPMSDI lpmsdi,
+                    HWND   hwnd,
                     UINT   uMessage,
-                    WPARAM wparam, 
+                    WPARAM wparam,
                     LPARAM lparam)
 {
     int  imsd;
@@ -1689,8 +1963,8 @@ static LRESULT DispMessage(LPMSDI lpmsdi,
 //    Calls the default procedure associated with edwp using the specified
 //    parameters.
 //
-
-static LRESULT DispDefault(EDWP   edwp,
+LOCAL
+LRESULT DispDefault(EDWP   edwp,
                     HWND   hwnd,
                     UINT   uMessage,
                     WPARAM wparam,
@@ -1712,9 +1986,8 @@ static LRESULT DispDefault(EDWP   edwp,
     return 0;
 }
 
-
-
-static BOOL InitApplication(HINSTANCE hInstance)
+LOCAL
+BOOL InitApplication(HINSTANCE hInstance)
 {
     #ifdef __WIN16__
     WNDCLASS  wc;
@@ -1726,14 +1999,14 @@ static BOOL InitApplication(HINSTANCE hInstance)
 		return TRUE; //Juz zostala zainicjalizowana
 
     // Load the application name  strings.
-    if(LoadString(hInstance, IDS_APPNAME, szAppName, sizeof(szAppName))==0)		
+    if(LoadString(hInstance, IDS_APPNAME, szAppName, sizeof(szAppName))==0)
 		NoResources=1;//Nie podlaczono zasobow
 		else
         {
 		    NoResources=0;//Sa zasoby podlaczono zasobow
             MainMenu=LoadMenu(hInstance,szAppName);
         }
-	
+
     // Fill in window class structure with parameters that describe the
     // main window.
 
@@ -1747,7 +2020,7 @@ static BOOL InitApplication(HINSTANCE hInstance)
 	                             16, 16,
 	                             0);
 	#endif
-	wc.style         = CS_OWNDC | CS_HREDRAW | CS_VREDRAW; // Class style(s).
+	wc.style         = CS_OWNDC | CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS; // Class style(s).
 	wc.lpfnWndProc   = (WNDPROC)WndProc;        // Window Procedure
 	wc.cbClsExtra    = 0;                       // No per-class extra data.
 	wc.cbWndExtra    = 0;                       // No per-window extra data.
@@ -1765,7 +2038,7 @@ static BOOL InitApplication(HINSTANCE hInstance)
 	if(NoResources)
 		{
 			assert(hInstance!=NULL);
-			sprintf(szClassName,"SSHx%xCLASS",hInstance);
+			sprintf(szClassName,"SSH_%p_CLASS",hInstance);
 		}
 		else
 		{
@@ -1801,13 +2074,13 @@ FAIL:
 	DWORD err=GetLastError();
 	char buf[1024];
 	sprintf(buf,"Can't registry window class! code:%ld",err);
-	MessageBox(0,buf,"Unexpected error",MB_ICONSTOP);
-    return FALSE; 
+	MessageBoxA(0,buf,"Unexpected error",MB_ICONSTOP);
+    return FALSE;
 	}
 }
 
-
-static BOOL InitInstance(HINSTANCE hInstance)
+LOCAL
+BOOL InitInstance(HINSTANCE hInstance)
 {
 
     // Create a main window for this application instance.
@@ -1828,7 +2101,7 @@ static BOOL InitInstance(HINSTANCE hInstance)
 	WB_Hwnd=MyHwnd; //Save to global variable
 
     //
-    // **TODO** Call module specific instance initialization functions here.
+	// Call module specific instance initialization functions here.
     //
 
     // **INPUT** Initialize the input module.
@@ -1891,38 +2164,7 @@ static int  nTimerCount = 0;        //  current timer count
 
 #define TIMERID ((UINT) 't')
 
-// Main window message table definition.
-static MSD rgmsd[] =
-{
-    {WM_COMMAND,        MsgCommand},
-    {WM_SYSCOMMAND,		MsgSysCommand},
-    {WM_CREATE,         MsgCreate},
-    {WM_CLOSE,				MsgClose},    //Send EOF to symshell
-//    {WM_GETMINMAXINFO, MsgGetMinMaxInfo},
-    {WM_SIZE,				MsgSize},	  //resize client area
-    {WM_DESTROY,        MsgDestroy},
-//    {WM_MOUSEMOVE,      MsgMouseMove},
-    {WM_LBUTTONDOWN,    MsgLButtonDown},
-//    {WM_LBUTTONUP,      MsgLButtonUp},
-//    {WM_LBUTTONDBLCLK,  MsgLButtonDoubleClick},
-    {WM_RBUTTONDOWN,    MsgRButtonDown},
-//    {WM_RBUTTONUP,      MsgRButtonUp},
-//    {WM_RBUTTONDBLCLK,  MsgRButtonDoubleClick},
-//    {WM_KEYDOWN,        MsgKeyDown},
-//    {WM_KEYUP,          MsgKeyUp},
-    {WM_CHAR,           MsgChar},
-//    {WM_TIMER,          MsgTimer},
-//    {WM_HSCROLL,        MsgScroll},
-//    {WM_VSCROLL,        MsgScroll},
-    {WM_PAINT,          MsgPaint}
-};
 
-static MSDI msdiMain =
-{
-    sizeof(rgmsd) / sizeof(MSD),
-    rgmsd,
-    edwpWindow
-};
 
 
 //
@@ -1946,8 +2188,8 @@ static MSDI msdiMain =
 //    Call the DispMessage() function with the main window's message dispatch
 //    information (msdiMain) and the message specific information.
 //
-
-static LRESULT CALLBACK WndProc
+LOCAL
+LRESULT CALLBACK WndProc
     (HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
 {
     return DispMessage(&msdiMain, hwnd, uMessage, wparam, lparam);
@@ -1970,8 +2212,8 @@ static LRESULT CALLBACK WndProc
 //  COMMENTS:
 //
 //
-
-static LRESULT MsgCommand(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
+LOCAL
+LRESULT MsgCommand(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
 {
 	LRESULT lRet = 0;
 	// Processing WM_COMMAND
@@ -1979,9 +2221,10 @@ static LRESULT MsgCommand(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam
     // so use the GET_WM_COMMAND macro to unpack the command
 	WORD cmd=GET_WM_COMMAND_ID(wparam,lparam);
 
-	if(trace_level & 1)
+	_TRACE( 1)
 		fprintf(stderr,"WM_COMMAND MSG\n");
-	
+	_TREND
+
 	if(cmd==IDM_SIGNAL_COMMAND)//signals symulation
 		{
 		raise(lparam);//Not HWND in this case!
@@ -2002,24 +2245,27 @@ static LRESULT MsgCommand(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam
 }
 
 // Handler for WM_SYSCOMMAND
-static LRESULT MsgSysCommand(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
+LOCAL
+LRESULT MsgSysCommand(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
 {
     LRESULT lRet = 0;
 
     // Message packing of wparam and lparam have changed for Win32,
 	// so use the GET_WM_COMMAND macro to unpack the commnad
-	if(trace_level & 1)
+	_TRACE(1)
 		fprintf(stderr,"WM_SYSCOMMAND MSG\n");
+	_TREND
 
 	switch (GET_WM_COMMAND_ID(wparam,lparam))
     {
         //
-        // **TODO** Add cases here for application specific command messages.
+		// Add cases here for application specific command messages.
         //
 
 		case SC_CLOSE:
-			if(trace_level & 1)
+			_TRACE( 1)
 				fprintf(stderr,"   SC_CLOSE SYS COMMAND\n");
+			_TREND
 			InputChar=EOF; //Send EOF to symshell
 			break;
 //      case SC_SIZE:
@@ -2051,22 +2297,25 @@ static LRESULT MsgSysCommand(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lpa
 //  COMMENTS:
 //
 //
-
-static LRESULT MsgCreate(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
+LOCAL
+LRESULT MsgCreate(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
 {
     // Set the timer for five-second intervals
 //    idTimer =  SetTimer(hwnd, TIMERID, 5000, NULL);
-	 if(trace_level & 1)
+	 _TRACE( 1)
 		fprintf(stderr,"CREATE MSG\n");
+	 _TREND
+
 	 return 0;
 }
 
-
-
-static LRESULT MsgClose(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
+LOCAL
+LRESULT MsgClose(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
 {
-	 if(trace_level & 1)
+	 _TRACE( 1)
 		fprintf(stderr,"CLOSE WND. MSG\n");
+	_TREND
+
 	InputChar=EOF; //Send EOF to symshell
 	 return 0;
 }
@@ -2090,18 +2339,19 @@ static LRESULT MsgClose(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
 //  COMMENTS:
 //
 //
-
-
-static LRESULT MsgGetMinMaxInfo(HWND   hwnd,
+LOCAL
+LRESULT MsgGetMinMaxInfo(HWND   hwnd,
 						 UINT   uMessage,
                          WPARAM wparam,
                          LPARAM lparam)
 {
-if(trace_level & 1)
+_TRACE(1)
 	fprintf(stderr,
 		  "MsgGetMinMaxInfo: %x, %d, %d\n",
 		  wparam, LOWORD(lparam), HIWORD(lparam)
 			);
+_TREND
+
 /*
     static int     cxMin=0;
     static int     cyMin=0;
@@ -2156,12 +2406,12 @@ if(trace_level & 1)
 //  COMMENTS:
 //
 //
-
-
-static LRESULT MsgDestroy(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
+LOCAL
+LRESULT MsgDestroy(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
 {
-	if(trace_level & 1)
+	_TRACE( 1)
 		fprintf(stderr,"DESTROY MSG\n");
+	_TREND
 //    KillTimer(hwnd, idTimer);       // Stops the timer
     PostQuitMessage(0);
 
@@ -2188,23 +2438,66 @@ static LRESULT MsgDestroy(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam
 //  COMMENTS:
 //
 //
-
-
-static LRESULT MsgLButtonDown(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
+LOCAL
+LRESULT MsgLButtonDown(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
 {
 WORD xPos = LOWORD(lparam);  // horizontal position of cursor
 WORD yPos = HIWORD(lparam);  // vertical position of cursor
 
 if(is_mouse)
 	{
-   if(trace_level & 1)
+   _TRACE(1)
 	fprintf(stderr,
 		  "WM_LBUTTONDOWN: %x, %d, %d\n",
 		  wparam, LOWORD(lparam), HIWORD(lparam)
 			);
+   _TREND
 	   InputXpos=xPos;
 		InputYpos=yPos;
 		InputClick=1;
+		MouseInput=1;
+	   InputChar='\b';
+    }
+    return 0;
+}
+
+//WM_XBUTTONDOWN?
+//
+//  FUNCTION: MsgXButtonDown(HWND, UINT, WPARAM, LPARAM)
+//
+//  PURPOSE: Display left mouse button down message and its parameters.
+//
+//  PARAMETERS:
+//    hwnd      - Window handle
+//    uMessage  - WM_XBUTTONDOWN (Unused)
+//    wparam    - Key flags
+//    lparam    -
+//      LOWORD - x position of cursor
+//      HIWORD - y position of cursor
+//
+//  RETURN VALUE:
+//    Always returns 0 - Message handled
+//
+//  COMMENTS:
+//
+//
+LOCAL
+LRESULT MsgXButtonDown(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
+{
+WORD xPos = LOWORD(lparam);  // horizontal position of cursor
+WORD yPos = HIWORD(lparam);  // vertical position of cursor
+
+if(is_mouse)
+	{
+   _TRACE( 1)
+	fprintf(stderr,
+		  "WM_XBUTTONDOWN: %x, %d, %d\n",
+		  wparam, LOWORD(lparam), HIWORD(lparam)
+			);
+   _TREND
+	   InputXpos=xPos;
+		InputYpos=yPos;
+		InputClick=4;
 		MouseInput=1;
 	   InputChar='\b';
     }
@@ -2230,17 +2523,27 @@ if(is_mouse)
 //  COMMENTS:
 //
 //
-
-
-static LRESULT MsgLButtonDoubleClick
-	 (HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
+LOCAL
+LRESULT MsgLButtonDoubleClick(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
 {
-if(trace_level & 1)
+WORD xPos = LOWORD(lparam);  // horizontal position of cursor
+WORD yPos = HIWORD(lparam);  // vertical position of cursor
+	//InputChar='\xff';
+if(is_mouse)
+	{
+_TRACE( 1)
 	 fprintf(stderr,
 		  "WM_LBUTTONDBLCLK: %x, %d, %d\n",
 		  wparam, LOWORD(lparam), HIWORD(lparam)
-	);
-	//InputChar='\xff';
+			);
+_TREND
+	   InputXpos=xPos;
+	   InputYpos=yPos;
+	   InputClick=4;
+	   MouseInput=101;
+	   InputChar='\b';
+    }
+
     return 0;
 }
 
@@ -2264,20 +2567,19 @@ if(trace_level & 1)
 //  COMMENTS:
 //
 //
-
-
-static LRESULT MsgRButtonDown(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
+LOCAL
+LRESULT MsgRButtonDown(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
 {
 WORD xPos = LOWORD(lparam);  // horizontal position of cursor
 WORD yPos = HIWORD(lparam);  // vertical position of cursor
 if(is_mouse)
 	{
-		if(trace_level & 1)
+		_TRACE( 1)
 			fprintf(stderr,
 			  "WM_RBUTTONDOWN: %x, %d, %d\n",
 			wparam, LOWORD(lparam), HIWORD(lparam)
 			);
-
+		_TREND
 		InputXpos=xPos;
 		InputYpos=yPos;
 		InputClick=2;
@@ -2307,16 +2609,15 @@ if(is_mouse)
 //  COMMENTS:
 //
 //
-
-
-static LRESULT MsgRButtonDoubleClick
-	 (HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
+LOCAL
+LRESULT MsgRButtonDoubleClick(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
 {
-if(trace_level & 1)
+_TRACE( 1)
 	 fprintf(stderr,
         "WM_RBUTTONDBLCLK: %x, %d, %d\n",
         wparam, LOWORD(lparam), HIWORD(lparam)
     );
+_TREND
     return 0;
 }
 
@@ -2338,15 +2639,15 @@ if(trace_level & 1)
 //  COMMENTS:
 //
 //
-
-
-static LRESULT MsgKeyDown(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
+LOCAL
+LRESULT MsgKeyDown(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
 {
-if(trace_level & 1)
+_TRACE(1)
     fprintf(stderr,
         "WM_KEYDOWN: %x, %x, %x\n",
         wparam, LOWORD(lparam), HIWORD(lparam)
     );
+_TREND
 
     return 0;
 }
@@ -2369,15 +2670,15 @@ if(trace_level & 1)
 //  COMMENTS:
 //
 //
-
-
-static LRESULT MsgKeyUp(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
+LOCAL
+LRESULT MsgKeyUp(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
 {
-if(trace_level & 1)
+_TRACE( 1)
     fprintf(stderr,
         "WM_KEYUP: %x, %x, %x\n",
         wparam, LOWORD(lparam), HIWORD(lparam)
     );
+_TREND
 //	 InputChar='\0';
     return 0;
 }
@@ -2400,15 +2701,15 @@ if(trace_level & 1)
 //  COMMENTS:
 //
 //
-
-
-static LRESULT MsgChar(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
+LOCAL
+LRESULT MsgChar(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
 {
-if(trace_level & 1)
+_TRACE( 1)
 	fprintf(stderr,
 		"WM_CHAR: %c, %x, %x\n",
 		wparam, LOWORD(lparam), HIWORD(lparam)
 			);
+_TREND
     InputChar=wparam;
     return 0;
 }
@@ -2431,9 +2732,8 @@ if(trace_level & 1)
 //  COMMENTS:
 //
 //
-
-
-static LRESULT MsgTimer(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
+LOCAL
+LRESULT MsgTimer(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
 {
 /*
     if ( wparam == TIMERID ) {
@@ -2444,11 +2744,12 @@ static LRESULT MsgTimer(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
         );
     }
 */
-if(trace_level & 1)
+_TRACE( 1)
 	fprintf(stderr,
 		"WM_TIMER: %c, %x, %x\n",
 		wparam, LOWORD(lparam), HIWORD(lparam)
 			);
+_TREND
     return 0;
 }
 
@@ -2472,26 +2773,27 @@ if(trace_level & 1)
 static struct {LONG left,top,right,bottom;} forrepaint;
 static int repaint_flag=0;
 
-
-static LRESULT MsgPaint(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
+LOCAL
+LRESULT MsgPaint(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
 {
 	PAINTSTRUCT ps;
  //   RECT rect;
 	HDC  TempHdc;
 	LONG left,top,right,bottom;
 
-	if(trace_level & 1)
+_TRACE( 1)
 		fprintf(stderr," REPAINT MSG ");
+_TREND
 
 	TempHdc = BeginPaint(hwnd, &ps);
-	
+
 	left=ps.rcPaint.left;
 	top=ps.rcPaint.top;
-	right=ps.rcPaint.right; 
+	right=ps.rcPaint.right;
 	bottom=ps.rcPaint.bottom;
 
 	if(animate && VirtualScreen && MbHdc )//Animujemy i jest juz bitmapa
-		{	
+		{
 		BitBlt(	TempHdc,
 				left,top,
 				right-left,//W_width*mulx,
@@ -2499,15 +2801,17 @@ static LRESULT MsgPaint(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
 				MbHdc,
 				left,top,
 				SRCCOPY);
-		
-		if(trace_level & 1)
+
+		_TRACE(1)
 			fprintf(stderr,"-> BITBLT ");
+		_TREND
 		}
 		else   //Nie ma tej treœci na bitmapie
 		{
-			if(trace_level & 1)
-				fprintf(stderr,"-> FORCE REPAINT ");	
-		
+			_TRACE(1)
+				fprintf(stderr,"-> FORCE REPAINT ");
+			_TREND
+
 			if(repaint_flag==1)//Jeszcze aplikacja nie odczytala
 			{
 				if(forrepaint.left>left) forrepaint.left=left;
@@ -2520,26 +2824,26 @@ static LRESULT MsgPaint(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
 				forrepaint.left=left;
 				forrepaint.top=top;
 				forrepaint.right=right;
-				forrepaint.bottom=bottom;			
+				forrepaint.bottom=bottom;
 				repaint_flag=1;
 			}
-		
-			InputChar='\r';//Tylko udaje ze cos wypelnia. 
-				//Naprawde zleca aplikacji odbudowanie 
 
-			if(trace_level & 1)
-			{
+			InputChar='\r';//Tylko udaje ze cos wypelnia.
+				//Naprawde zleca aplikacji odbudowanie
+
+			_TRACE( 1)
 				fprintf(stderr," %ld %ld %ld %ld ",
 					forrepaint.left,
 					forrepaint.top,
 					forrepaint.right,
 					forrepaint.bottom);
-			}
+			_TREND
 		}
 
 	EndPaint(hwnd, &ps);
-	if(trace_level & 1)
+	_TRACE(1)
 		fprintf(stderr," * \n");
+	_TREND
 	return 0;
 }
 
@@ -2547,9 +2851,10 @@ int repaint_area(int* x,int* y,int* width,int* height)
 {
 if(repaint_flag==1)
 	{
-	if(trace_level & 2)
-		fprintf(stderr," Repaint_area() from %d,%d - %dx%d pixels\n",x,y,width,height);
-		
+	_TRACE(2)
+		fprintf(stderr," Repaint_area() from %d,%d - %dx%d pixels\n",*x,*y,*width,*height);
+	_TREND
+
 	*x=forrepaint.left/mulx;
 	*y=forrepaint.top/muly;
 	if(mulx>1)
@@ -2568,17 +2873,15 @@ if(repaint_flag==1)
 	return -1;//Nie bylo nic odczytania (?)
 }
 
-
-static LRESULT MsgSize(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
+LOCAL
+LRESULT MsgSize(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
 {
   //WORD	fwSizeType = wparam;      // resizing flag
   WORD	nWidth = LOWORD(lparam);  // width of client area
   WORD	nHeight = HIWORD(lparam); // height of client area
-  WORD  n_mulx=0,n_muly=0;
+  WORD  n_mulx;//=0,  //Assigned in next if instruction!
+  WORD  n_muly;//=0;  //Assigned in next if instruction!
 
-  if((trace_level & 1)||(trace_level & 2))
-	fprintf(stderr,"MSG RESIZE to %u %u \n",nWidth,nHeight);
-  
   if(!Flexible)
 		{
 		n_mulx=(nWidth-ini_col*raw_char_width())/ini_width;
@@ -2591,6 +2894,9 @@ static LRESULT MsgSize(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
 		n_mulx=1;n_muly=1;
 		}
 
+ _TRACE(3)//trace_level & 1)||(trace_level & 2))
+	fprintf(stderr,"MSG RESIZE to %u %u \n",nWidth,nHeight);
+ _TREND
 
   if(Flexible || n_mulx!=mulx || n_muly!=muly)// Rozmiar faktycznie sie zmienil
   	  {
@@ -2598,37 +2904,73 @@ static LRESULT MsgSize(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
 		{
 		W_width=ini_width+(ini_col*raw_char_width())/n_mulx;
 		W_height=ini_height+(ini_row*raw_char_height())/n_muly;
-		mulx=n_mulx;muly=n_muly; 
-		if(trace_level & 2)
+		mulx=n_mulx;muly=n_muly;
+		_TRACE(2)
 			fprintf(stderr,"RES. MULT. X=%u Y=%u ",mulx,muly);
+		_TREND
 		}
 		else
 		{
 		W_width=nWidth;
 		W_height=nHeight;
-		mulx=n_mulx;muly=n_muly; 
-		if(trace_level & 2)
+		mulx=n_mulx;muly=n_muly;
+		_TRACE(2)
 			fprintf(stderr,"RES. FLEXIBLE ");
+		_TREND
 		}
-	  
+
 	  FreeResources();//DC , Pens , Brushes
 	  assert(MbHdc==0);
 	  assert(VirtualScreen==NULL);
 	  if(animate)
 			{
-			if(trace_level & 2)
+			_TRACE( 2)
 				fprintf(stderr,"-->FORCE REPAINT");
+			_TREND
 			InputChar='\r';
 			}
 	  }
 
-  if(trace_level & 2)
-	fprintf(stderr,"\n");
+  _TRACE( 2)
+	fprintf(stderr,"* \n");
+  _TREND
 
   return 0;
 }
 
+// Main window message table definition.
+static MSD rgmsd[] =
+{
+    {WM_COMMAND,        MsgCommand},
+    {WM_SYSCOMMAND,		MsgSysCommand},
+    {WM_CREATE,         MsgCreate},
+    {WM_CLOSE,				MsgClose},    //Send EOF to symshell
+//    {WM_GETMINMAXINFO, MsgGetMinMaxInfo},
+    {WM_SIZE,				MsgSize},	  //resize client area
+    {WM_DESTROY,        MsgDestroy},
+//    {WM_MOUSEMOVE,      MsgMouseMove},
+    {WM_LBUTTONDOWN,    MsgLButtonDown},
+//    {WM_LBUTTONUP,      MsgLButtonUp},
+    {WM_LBUTTONDBLCLK,  MsgLButtonDoubleClick},   
+    {WM_RBUTTONDOWN,    MsgRButtonDown},
+//    {WM_RBUTTONUP,      MsgRButtonUp},
+    {WM_RBUTTONDBLCLK,  MsgRButtonDoubleClick},
+	{WM_XBUTTONDOWN,  MsgXButtonDown},
+//    {WM_KEYDOWN,        MsgKeyDown},
+//    {WM_KEYUP,          MsgKeyUp},
+    {WM_CHAR,           MsgChar},
+//    {WM_TIMER,          MsgTimer},
+//    {WM_HSCROLL,        MsgScroll},
+//    {WM_VSCROLL,        MsgScroll},
+    {WM_PAINT,          MsgPaint}
+};
 
+MSDI msdiMain =
+{
+    sizeof(rgmsd) / sizeof(MSD),
+    rgmsd,
+    edwpWindow
+};
 
 //
 //  FUNCTION: InitInput(HWND)
@@ -2644,17 +2986,18 @@ static LRESULT MsgSize(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
 //  COMMENTS:
 //
 //
-
-static BOOL InitInput(HWND hwnd)
+LOCAL
+BOOL InitInput(HWND hwnd)
 {
     /*HDC hdc;
     TEXTMETRIC tm;
     RECT rect;
     int  dyLine;
 */
-	if(trace_level & 1)
+	_TRACE(1)
 		fprintf(stderr," InitInput() ");
-		
+	_TREND
+
    return TRUE;
 }
 
@@ -2666,7 +3009,7 @@ static jmp_buf dump_jumper;/* JUMP bufor na wypadek bledu */
 
 void errhandler(const char* text,HWND hwnd,int Errnum)
 {
-MessageBox(hwnd,text,"Window capture error",MB_ICONERROR);
+MessageBoxA(hwnd,text,"Window capture error",MB_ICONERROR);
 if(errno==0 && Errnum>0)//Ma ustawic Errno
 	errno=Errnum;
 longjmp(dump_jumper,Errnum);
@@ -2674,193 +3017,203 @@ longjmp(dump_jumper,Errnum);
 exit(Errnum);//Debug
 }
 
-PBITMAPINFO CreateBitmapInfoStruct(HWND hwnd, HBITMAP hBmp) { 
-    BITMAP bmp; 
-    PBITMAPINFO pbmi; 
-    WORD    cClrBits; 
- 
-    /* Retrieve the bitmap's color format, width, and height. */ 
- 
-    if (!GetObject(hBmp, sizeof(BITMAP), (LPSTR)&bmp)) 
-        errhandler("GetObject", hwnd, EINVAL ); 
- 
- 
-    /* Convert the color format to a count of bits. */ 
- 
-    cClrBits = (WORD)(bmp.bmPlanes * bmp.bmBitsPixel); 
- 
-    if (cClrBits == 1) 
-        cClrBits = 1; 
-    else if (cClrBits <= 4) 
-        cClrBits = 4; 
-    else if (cClrBits <= 8) 
-        cClrBits = 8; 
-    else if (cClrBits <= 16) 
-        cClrBits = 16; 
-    else if (cClrBits <= 24) 
-        cClrBits = 24; 
-    else 
-        cClrBits = 32; 
- 
-    /* 
-     * Allocate memory for the BITMAPINFO structure. (This structure 
-     * contains a BITMAPINFOHEADER structure and an array of RGBQUAD data 
-     * structures.) 
-     */ 
- 
-    if (cClrBits != 24) 
-         pbmi = (PBITMAPINFO) LocalAlloc(LPTR, 
-                    sizeof(BITMAPINFOHEADER) + 
-                    sizeof(RGBQUAD) * (2^cClrBits)); 
- 
-    /* 
-     * There is no RGBQUAD array for the 24-bit-per-pixel format. 
-     */ 
- 
-    else 
-         pbmi = (PBITMAPINFO) LocalAlloc(LPTR, 
-                    sizeof(BITMAPINFOHEADER)); 
- 
- 
- 
-    /* Initialize the fields in the BITMAPINFO structure. */ 
- 
-    pbmi->bmiHeader.biSize = sizeof(BITMAPINFOHEADER); 
-    pbmi->bmiHeader.biWidth = bmp.bmWidth; 
-    pbmi->bmiHeader.biHeight = bmp.bmHeight; 
-    pbmi->bmiHeader.biPlanes = bmp.bmPlanes; 
-    pbmi->bmiHeader.biBitCount = bmp.bmBitsPixel; 
-    if (cClrBits < 24) 
-        pbmi->bmiHeader.biClrUsed = 2^cClrBits; 
- 
- 
-    /* If the bitmap is not compressed, set the BI_RGB flag. */ 
- 
-    pbmi->bmiHeader.biCompression = BI_RGB; 
- 
-    /* 
-     * Compute the number of bytes in the array of color 
-     * indices and store the result in biSizeImage. 
-     */ 
- 
-    pbmi->bmiHeader.biSizeImage = (pbmi->bmiHeader.biWidth + 7) /8 
-                                  * pbmi->bmiHeader.biHeight 
-                                  * cClrBits; 
- 
-    /* 
-     * Set biClrImportant to 0, indicating that all of the 
-     * device colors are important. 
-     */ 
- 
-    pbmi->bmiHeader.biClrImportant = 0; 
- 
-    return pbmi; 
- 
-} 
- 
+LOCAL
+PBITMAPINFO CreateBitmapInfoStruct(HWND hwnd, HBITMAP hBmp) {
+    BITMAP bmp;
+    PBITMAPINFO pbmi;
+    WORD    cClrBits;
+
+    /* Retrieve the bitmap's color format, width, and height. */
+
+    if (!GetObject(hBmp, sizeof(BITMAP), (LPSTR)&bmp))
+        errhandler("GetObject", hwnd, EINVAL );
+
+
+    /* Convert the color format to a count of bits. */
+
+    cClrBits = (WORD)(bmp.bmPlanes * bmp.bmBitsPixel);
+
+    if (cClrBits == 1)
+        cClrBits = 1;
+    else if (cClrBits <= 4)
+        cClrBits = 4;
+    else if (cClrBits <= 8)
+        cClrBits = 8;
+    else if (cClrBits <= 16)
+        cClrBits = 16;
+    else if (cClrBits <= 24)
+        cClrBits = 24;
+    else
+        cClrBits = 32;
+
+    /*
+     * Allocate memory for the BITMAPINFO structure. (This structure
+     * contains a BITMAPINFOHEADER structure and an array of RGBQUAD data
+     * structures.)
+     */
+
+    if (cClrBits != 24)
+         pbmi = (PBITMAPINFO) LocalAlloc(LPTR,
+                    sizeof(BITMAPINFOHEADER) +
+                    sizeof(RGBQUAD) * (2^cClrBits));
+
+    /*
+     * There is no RGBQUAD array for the 24-bit-per-pixel format.
+     */
+
+    else
+         pbmi = (PBITMAPINFO) LocalAlloc(LPTR,
+                    sizeof(BITMAPINFOHEADER));
 
 
 
+    /* Initialize the fields in the BITMAPINFO structure. */
 
-//The following example code defines a function that initializes the remaining structures, retrieves the array of palette indices, opens the file, copies the data, and closes the file. 
-static LPBYTE lpBits=NULL;              /* memory pointer */ 
-void CreateBMPFile(HWND hwnd, LPTSTR pszFile, PBITMAPINFO pbi, 
-                  HBITMAP hBMP, HDC hDC) 
- { 
- 
-    HANDLE hf;                  /* file handle */ 
-    BITMAPFILEHEADER hdr;       /* bitmap file-header */ 
-    PBITMAPINFOHEADER pbih;     /* bitmap info-header */ 
+    pbmi->bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+    pbmi->bmiHeader.biWidth = bmp.bmWidth;
+    pbmi->bmiHeader.biHeight = bmp.bmHeight;
+    pbmi->bmiHeader.biPlanes = bmp.bmPlanes;
+    pbmi->bmiHeader.biBitCount = bmp.bmBitsPixel;
+    if (cClrBits < 24)
+        pbmi->bmiHeader.biClrUsed = 2^cClrBits;
+
+
+    /* If the bitmap is not compressed, set the BI_RGB flag. */
+
+    pbmi->bmiHeader.biCompression = BI_RGB;
+
+    /*
+     * Compute the number of bytes in the array of color
+     * indices and store the result in biSizeImage.
+     */
+
+    pbmi->bmiHeader.biSizeImage = (pbmi->bmiHeader.biWidth + 7) /8
+                                  * pbmi->bmiHeader.biHeight
+                                  * cClrBits;
+
+    /*
+     * Set biClrImportant to 0, indicating that all of the
+     * device colors are important.
+     */
+
+    pbmi->bmiHeader.biClrImportant = 0;
+
+    return pbmi;
+
+}
+
+
+
+//The following example code defines a function that initializes the remaining structures, retrieves the array of palette indices, opens the file, copies the data, and closes the file.
+static LPBYTE lpBits=NULL;              /* memory pointer */
+LOCAL
+void CreateBMPFile(HWND hwnd, LPTSTR pszFile, PBITMAPINFO pbi,
+                  HBITMAP hBMP, HDC hDC)
+ {
+
+    HANDLE hf;                  /* file handle */
+    BITMAPFILEHEADER hdr;       /* bitmap file-header */
+    PBITMAPINFOHEADER pbih;     /* bitmap info-header */
  //   DWORD dwTotal;              /* total count of bytes */
-    DWORD cb;                   /* incremental count of bytes */ 
-    BYTE *hp;                   /* byte pointer */ 
-    DWORD dwTmp; 
- 
- 
-    pbih = (PBITMAPINFOHEADER) pbi; 
+    DWORD cb;                   /* incremental count of bytes */
+    BYTE *hp;                   /* byte pointer */
+    DWORD dwTmp;
+
+
+    pbih = (PBITMAPINFOHEADER) pbi;
     lpBits = (LPBYTE) GlobalAlloc(GMEM_FIXED, pbih->biSizeImage);
-    if (!lpBits) 
-         errhandler("GlobalAlloc", hwnd, ENOMEM); 
- 
-    /* 
-     * Retrieve the color table (RGBQUAD array) and the bits 
-     * (array of palette indices) from the DIB. 
-     */ 
- 
-    if (!GetDIBits(hDC, hBMP, 0, (WORD) pbih->biHeight, 
-                   lpBits, pbi, DIB_RGB_COLORS)) 
-        errhandler("GetDIBits", hwnd , EINVAL );//errno 
- 
-    /* Create the .BMP file. */ 
- 
-    hf = CreateFile(pszFile, 
-                   GENERIC_READ | GENERIC_WRITE, 
-                   (DWORD) 0, 
-                   (LPSECURITY_ATTRIBUTES) NULL, 
-                   CREATE_ALWAYS, 
-                   FILE_ATTRIBUTE_NORMAL, 
-                   (HANDLE) NULL); 
- 
-    if (hf == INVALID_HANDLE_VALUE) 
-        errhandler("CreateFile", hwnd , EBADF ); 
- 
-    hdr.bfType = 0x4d42;        /* 0x42 = "B" 0x4d = "M" */ 
- 
-    /* Compute the size of the entire file. */ 
- 
-    hdr.bfSize = (DWORD) (sizeof(BITMAPFILEHEADER) + 
-                 pbih->biSize + pbih->biClrUsed 
-                 * sizeof(RGBQUAD) + pbih->biSizeImage); 
- 
-    hdr.bfReserved1 = 0; 
-    hdr.bfReserved2 = 0; 
- 
-    /* Compute the offset to the array of color indices. */ 
- 
-    hdr.bfOffBits = (DWORD) sizeof(BITMAPFILEHEADER) + 
-                    pbih->biSize + pbih->biClrUsed 
-                    * sizeof (RGBQUAD); 
- 
-    /* Copy the BITMAPFILEHEADER into the .BMP file. */ 
- 
-    if (!WriteFile(hf, (LPVOID) &hdr, sizeof(BITMAPFILEHEADER), 
-       (LPDWORD) &dwTmp, (LPOVERLAPPED) NULL)) 
-       errhandler("WriteFile", hwnd , EBADF ); 
- 
-    /* Copy the BITMAPINFOHEADER and RGBQUAD array into the file. */ 
- 
-    if (!WriteFile(hf, (LPVOID) pbih, sizeof(BITMAPINFOHEADER) 
-                  + pbih->biClrUsed * sizeof (RGBQUAD), 
-                  (LPDWORD) &dwTmp, (LPOVERLAPPED) NULL)) 
-       errhandler("WriteFile", hwnd , EBADF ); 
- 
-    /* Copy the array of color indices into the .BMP file. */ 
+    if (!lpBits)	
+	{
+		 fprintf(stderr,"GlobalAlloc ENOMEM");
+         errhandler("GlobalAlloc", hwnd, ENOMEM);
+	}
+    /*
+     * Retrieve the color table (RGBQUAD array) and the bits
+     * (array of palette indices) from the DIB.
+     */
+
+    if (!GetDIBits(hDC, hBMP, 0, (WORD) pbih->biHeight,
+                   lpBits, pbi, DIB_RGB_COLORS))
+	{
+        fprintf(stderr,"GetDIBits EINVAL");
+		errhandler("GetDIBits", hwnd , EINVAL );//errno
+	}
+
+    /* Create the .BMP file. */
+
+    hf = CreateFile(pszFile,
+                   GENERIC_READ | GENERIC_WRITE,
+                   (DWORD) 0,
+                   (LPSECURITY_ATTRIBUTES) NULL,
+                   CREATE_ALWAYS,
+                   FILE_ATTRIBUTE_NORMAL,
+                   (HANDLE) NULL);
+
+    if (hf == INVALID_HANDLE_VALUE)
+	{
+		fprintf(stderr,"CreateFile EBADF");
+        errhandler("CreateFile", hwnd , EBADF );
+	}
+
+    hdr.bfType = 0x4d42;        /* 0x42 = "B" 0x4d = "M" */
+
+    /* Compute the size of the entire file. */
+
+    hdr.bfSize = (DWORD) (sizeof(BITMAPFILEHEADER) +
+                 pbih->biSize + pbih->biClrUsed
+                 * sizeof(RGBQUAD) + pbih->biSizeImage);
+
+    hdr.bfReserved1 = 0;
+    hdr.bfReserved2 = 0;
+
+    /* Compute the offset to the array of color indices. */
+
+    hdr.bfOffBits = (DWORD) sizeof(BITMAPFILEHEADER) +
+                    pbih->biSize + pbih->biClrUsed
+                    * sizeof (RGBQUAD);
+
+    /* Copy the BITMAPFILEHEADER into the .BMP file. */
+
+    if (!WriteFile(hf, (LPVOID) &hdr, sizeof(BITMAPFILEHEADER),
+       (LPDWORD) &dwTmp, (LPOVERLAPPED) NULL))
+       errhandler("WriteFile", hwnd , EBADF );
+
+    /* Copy the BITMAPINFOHEADER and RGBQUAD array into the file. */
+
+    if (!WriteFile(hf, (LPVOID) pbih, sizeof(BITMAPINFOHEADER)
+                  + pbih->biClrUsed * sizeof (RGBQUAD),
+                  (LPDWORD) &dwTmp, (LPOVERLAPPED) NULL))
+       errhandler("WriteFile", hwnd , EBADF );
+
+    /* Copy the array of color indices into the .BMP file. */
 	cb = pbih->biSizeImage;
 	//dwTotal = cb
 
-    hp = lpBits; 
-    while (cb > MAXWRITE)  { 
-            if (!WriteFile(hf, (LPSTR) hp, (int) MAXWRITE, 
-                          (LPDWORD) &dwTmp, (LPOVERLAPPED) NULL)) 
-                errhandler("WriteFile", hwnd , EBADF ); 
-            cb-= MAXWRITE; 
-            hp += MAXWRITE; 
-    } 
-    if (!WriteFile(hf, (LPSTR) hp, (int) cb, 
-         (LPDWORD) &dwTmp, (LPOVERLAPPED) NULL)) 
-           errhandler("WriteFile", hwnd , EBADF ); 
- 
-    /* Close the .BMP file. */ 
- 
-    if (!CloseHandle(hf)) 
-           errhandler("CloseHandle", hwnd, EINVAL ); 
- 
+    hp = lpBits;
+    while (cb > MAXWRITE)  {
+            if (!WriteFile(hf, (LPSTR) hp, (int) MAXWRITE,
+                          (LPDWORD) &dwTmp, (LPOVERLAPPED) NULL))
+                errhandler("WriteFile", hwnd , EBADF );
+            cb-= MAXWRITE;
+            hp += MAXWRITE;
+    }
+    if (!WriteFile(hf, (LPSTR) hp, (int) cb,
+         (LPDWORD) &dwTmp, (LPOVERLAPPED) NULL))
+           errhandler("WriteFile", hwnd , EBADF );
+
+    /* Close the .BMP file. */
+
+    if (!CloseHandle(hf))
+	{
+		fprintf(stderr,"CloseHandle EINVAL");
+        errhandler("CloseHandle", hwnd, EINVAL );
+	}
     /* Free memory. */
 
     GlobalFree((HGLOBAL)lpBits);
 	lpBits=NULL;
 }
- 
+
 
 int  dump_screen(const char* Filename)
 /* Zrzuca ekran na plik o extensji zaleznej od platformy. -1 jesli sie nie uda. */
@@ -2869,14 +3222,20 @@ int  dump_screen(const char* Filename)
     HBITMAP hbmScreen=0;
     HDC hdcCompatible=0;
     PBITMAPINFO info;
-    char bufor[1024];
-    
-    assert(strlen(Filename)+5<1024);
+    char bufor[2048];
+	//TODO - problemy z za ma³ym rozmiarem obrazka!
+    if(strlen(Filename)+6 > 2048)
+	{
+		fprintf(stderr,"Filename \"%s\" is to long!!!",Filename);
+		return -1;
+	}
+
     sprintf(bufor,"%s.BMP",Filename);
-    
-	if((trace_level & 2))
+
+	_TRACE( 2 )
         fprintf(stderr,"DUMP SCREEN TO FILE %s ", bufor);
-    
+	_TREND
+
     errno=0; /* Kasowanie smieci */
     if(setjmp(dump_jumper)!=0) //Awaria
 	{
@@ -2891,62 +3250,69 @@ int  dump_screen(const char* Filename)
 		}
         if(errno==0)
 			errno=ENOEXEC;
-		if(trace_level & 2)
+
+		_TRACE(2)
 			fprintf(stderr,"WRITE FAILED \n");
+		_TREND
 		return -1;//B£¥D!
     }
-    
+
     /* GRABBING WINDOW */
-	hdcCompatible = CreateCompatibleDC(hdcScreen); 
-    
-    /* Create a compatible bitmap for hdcScreen. */ 
-    
-    hbmScreen = CreateCompatibleBitmap(hdcScreen, W_width, W_height );
-    // GetDeviceCaps(hdcScreen, HORZRES), 
-    // GetDeviceCaps(hdcScreen, VERTRES)); 
-    
-    if (hbmScreen == 0) 
-        errhandler("Create Compatible Bitmap (hdcScreen)", MyHwnd, ENOMEM ); 
-    
-    /* Select the bitmaps into the compatible DC. */ 
-    
-    if (!SelectObject(hdcCompatible, hbmScreen)) 
-        errhandler("Compatible Bitmap Selection", MyHwnd , -1); 
-    
-        /* 
-        * Copy color data for the entire display into a 
-        * bitmap that is selected into a compatible DC. 
-    */ 
-    
-    if (!BitBlt(hdcCompatible, 
-        0,0, 
-        W_width, W_height, 
-        hdcScreen, 
-        0,0, 
-        SRCCOPY))  
+	hdcCompatible = CreateCompatibleDC(hdcScreen);
+
+    /* Create a compatible bitmap for hdcScreen. */
+
+    hbmScreen = CreateCompatibleBitmap(hdcScreen, W_width*mulx, W_height*muly );
+    // GetDeviceCaps(hdcScreen, HORZRES),
+    // GetDeviceCaps(hdcScreen, VERTRES));
+
+    if (hbmScreen == 0)
+        errhandler("Create Compatible Bitmap (hdcScreen)", MyHwnd, ENOMEM );
+
+    /* Select the bitmaps into the compatible DC. */
+
+    if (!SelectObject(hdcCompatible, hbmScreen))
+        errhandler("Compatible Bitmap Selection", MyHwnd , -1);
+
+        /*
+        * Copy color data for the entire display into a
+        * bitmap that is selected into a compatible DC.
+    */
+
+    if (!BitBlt(hdcCompatible,
+        0,0,
+        W_width*mulx, W_height*muly ,
+        hdcScreen,
+        0,0,
+        SRCCOPY))
         errhandler("Screen to Compat Blt Failed", MyHwnd, -1);
-    
+
     /* SAVING */
     info=CreateBitmapInfoStruct(MyHwnd,hbmScreen);
     CreateBMPFile(MyHwnd,bufor,info,hbmScreen,hdcCompatible);
-    
+
     /* FREEING */
     if(hbmScreen)
         DeleteObject(hbmScreen);
     if(hdcCompatible )
         DeleteDC( hdcCompatible );
 	errno=ENOEXEC;
-	if(trace_level & 2)
+
+	_TRACE( 2)
 		fprintf(stderr,"Write OK \n");
+	_TREND
+
 	return 0; //Czy blad?
 }
 
-void shell_setup(const char* title,int iargc,char* iargv[])
+int title_with_pid=1;
+
+void shell_setup(const char* title,int iargc,const char* iargv[])
 /* Przekazanie parametrow wywolania */
 {
 int i;
 int largc=iargc;
-char** largv=iargv;
+const char** largv=iargv;
 if(largv && largv[0])
 	progname=largv[0];
 	else
@@ -2973,6 +3339,7 @@ for(i=1;i<largc;i++)
 			   "\t -delay=[ms]\n"
 			   "\t -width=[pix]\n"
 			   "\t -height=[pix]\n"
+			   "\t -pid\n"
 			   "\t -help\n"
 			   "\t -logo\n"
 			   );
@@ -3005,7 +3372,13 @@ for(i=1;i<largc;i++)
 	if(strncmp(largv[i],"-flex",5)==0)
 		{
 		Flexible=(largv[i][5]=='+')?1:0;
-			printf("Window sizing is %s\n",(Flexible?"FLEXIBLE":"DISCRETE"));
+		printf("Window sizing is %s\n",(Flexible?"FLEXIBLE":"DISCRETE"));
+		}
+		else
+	if(strncmp(largv[i],"-pid",4)==0)
+		{
+		title_with_pid=(largv[i][4]=='+')?1:0;
+		printf("PID in Window title is %s\n",(title_with_pid?"ON":"OFF"));
 		}
 	else
 	if(strncmp(largv[i],"-font=",6)==0)
@@ -3031,7 +3404,7 @@ for(i=1;i<largc;i++)
 	if(strncmp(largv[i],"-buffered",9)==0)
 		{
 		animate=(largv[i][9]=='+')?1:0;
-			printf("Buffered is %s\n",(is_buffered?"ON":"OFF"));
+			printf("Buffered is %s\n",(animate?"ON":"OFF"));
 		//if(animate)	/* Musi byc wlaczona bitmapa buforujaca */
 		//	is_buffered=1;/* zeby mozna bylo na nia pisac */
 			is_buffered=animate;/*Albo,albo.NIe jak w Xwindow */
@@ -3054,27 +3427,39 @@ for(i=1;i<largc;i++)
 	if(strcmp(largv[i],"-ogol")==0)
 	{
 		symshell_about(title);
+		fflush(stdout);
 	}
-	fflush(stdout);
 }
 
 if(animate)	/* Musi byc wlaczona bitmapa buforujaca */
 	is_buffered=1;/* zeby mozna bylo na nia pisac */
 
-window_name = title;
-icon_name = title;
+#ifdef __MSVC__
+#define snprintf _snprintf
+#define getpid   _getpid
+#endif
+
+if(title_with_pid)
+	snprintf(window_name,sizeof(window_name),"%u: %s", getpid() ,title);
+else
+	strncpy(window_name,title,sizeof(window_name));// (window_name = title;
+
+strncpy(icon_name,title,sizeof(icon_name));//icon_name = title;
+
+//fprintf(stdout,"\n");
 fflush(stdout);
 }
 
 /********************************************************************/
-/*			          WBRTM  light version 2009                     */
-/********************************************************************/
+/*                                                   2014-05-20     */
 /*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
 /*            W O J C I E C H   B O R K O W S K I                   */
-/*    Instytut Studiow Spolecznych Uniwersytetu Warszawskiego       */
-/*        WWW:  http://wwww.iss.uw.edu.pl/borkowski/                */
+/*                                                                  */
+/*      Instytut Studiow Spolecznych Uniwersytetu Warszawskiego     */
+/*                                                                  */
+/*        WWW:  http://borkowsk.iss.uw.edu.pl                       */
+/*        MAIL: wborkowski@uw.edu.pl                                */
 /*                                                                  */
 /*                               (Don't change or remove this note) */
 /********************************************************************/
-
 

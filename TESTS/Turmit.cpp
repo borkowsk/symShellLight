@@ -75,7 +75,7 @@ void stats()
 //Do wizualizacji obsługi zdarzeń
 const int DELA=0;//Jak długie oczekiwanie w obrębie pętli zdarzeń
 const int VISUAL=1000;//Co ile kroków symulacji odrysowywać widok
-const char* CZEKAM="Klikaj lub patrz! "; //Monit w pętli zdarzeń
+const char* CZEKAM="Tylko patrz! "; //Monit w pętli zdarzeń
 int xmouse=10,ymouse=10;//Pozycja ostatniego "kliku" myszy 
 
 //Kilka deklaracja zapowiadających inne funkcje obsługujące model

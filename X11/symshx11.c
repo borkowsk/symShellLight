@@ -1,14 +1,15 @@
 /* SYMSHELL.H - SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++    */
 /************************************************************************/
+/* Najprostrzy interface wizualizacyjny zaimplementowany pod X-windows  */
+/* za pomoca biblioteki X11                                             */
+/*                                                                      */
 /* designed by W.Borkowski from University of Warsaw                    */
 /* https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI              */
 /* https://github.com/borkowsk                                          */
 /* File changed masively: 21.10.2020                                    */
 /*                                                                      */
-/* Najprostrzy interface wizualizacyjny zaimplementowany pod X-windows  */
-/* za pomoca biblioteki X11                                             */
 /* FILE: symshx11.c                                                     */
-/* Wersja: 16.11.2020                                                   */
+/* Wersja: 17.11.2020                                                   */
 /*                                                                      */
 /* UWAGA!                                                               */
 /* WCIĄŻ Z BLEDEM NA EXPOSE TODO , choc raz go juz gdzies usunalem :-/  */
@@ -40,622 +41,645 @@
 #define NODATA '\0'
 
 /* For close_plot() */
-static int opened=0; /* Dla close plot. Zerowane tez gdy "broken-pipe" */
-extern int WB_error_enter_before_clean;
-
-
-/* These are used as arguments to nearly every Xlib routine, so it
-  * saves routine arguments to declare them global; if there were
-  * additional source files, they would be declared extern there */
- static Display *display=0;
- static int screen_num;
+ extern int             WB_error_enter_before_clean;/* Czy zamykać okno od razu czy dawać "enter"? */
+ int                    trace=0;  /* Sterowanie komunikatami modułu na standardoqe wyjście */
+ static int             opened=0; /* Dla close plot. Zerowane tez gdy "broken-pipe" */
 
  /* progname is the string by which this program was invoked; this
   * is global because it is needed in most application functions */
- static char progname[1024]="WB SYMULATION NAME NOT SET";
- static char window_name[1024] = "WB X-window symulation shell";
- static char icon_name[1024] = "WB-sym-shell";
+ static char            progname[1024]="WB SYMULATION NAME NOT SET";
+ static char            window_name[1024] = "WB X-window symulation shell";
+ static char            icon_name[1024] = "WB-sym-shell";
 
- static size_t largc=0;		/* Do zapamietania przekazanych przez funkcje setup*/
+ static size_t  largc=0;    /* Do zapamietania przekazanych przez funkcje setup*/
  static const char**  largv=NULL;
 
- static int 	isbuffered=0;       /* Czy okno jest buforowane pixmapa */
- static int     animate=0;	  /* Czy odswierznaie tylko gdy flush czy na biezaco */
- static unsigned int mulx=1,muly=1;       /* Multiplication of x & y */
- static unsigned int org_width,org_height;/* Starting Window size */
- static int ini_a,ini_b,ini_ca,ini_cb;	 /* Konieczne do dzialania
-						screen_width() i screen_heiht() i zmiany rozmiaru*/
- static int ScreenClip=1;/* Czy przycinak okno do wielkości ekranu? */
+ /* Parametry z inicjalizacji modułu (shell setup) */
+ static int             isbuffered=0;       /* Czy okno jest buforowane pixmapa */
+ static int             animate=0;          /* Czy odswierznaie tylko gdy flush czy na biezaco */
+ static int             ScreenClip=1;       /* Czy przycinać okno do wielkości ekranu? */
+ static int             UseGrayScale=0;
 
- static Window win;
- static unsigned int width,height;      /* Window size */
- static int x, y;                       /* Window position */
- static unsigned int default_deph = 8;  /* Window deph. 8=>256 colors */ /*TODO ! CURENTLY 32 ONLY IS SUPPOIRTED*/
- static unsigned int border_width = 4;  /* Four pixels */
- static unsigned int display_width, display_height;
- static unsigned int icon_width, icon_height;
- static Pixmap icon_pixmap;
- static unsigned short alloc_cont=0; /* Sygnalizuje ze pixmapa zaostala zaalokowana */
- static Pixmap cont_pixmap=0;
- static XSizeHints *size_hints;
- static XIconSize *size_list;
- static XWMHints *wm_hints;
- static XClassHint *class_hints;
- static XTextProperty windowName, iconName;
+ /* These are used as arguments to nearly every Xlib routine, so it
+   * saves routine arguments to declare them global; if there were
+   * additional source files, they would be declared extern there */
+ static Display         *display=0; /* HANDLER TO Display */
 
- static int count;
- static KeySym thekey;		/* ??? */
- static GC gc=0;  		/* Kontekst graficzny */
- static int ResizeFont=0;	/* Czy probuje zmieniac rozmiar fontu */
- static XFontStruct *font_info=NULL;   /* Aktualny font */
- static unsigned ori_font_width = 8;
- static unsigned ori_font_height = 16;
- static unsigned font_width = 0;
- static unsigned font_height = 0;
- static char *display_name = NULL; /* Nazwa wyswietlacza - do odczytania */
- static int window_size = TOO_SMALL; /* BIG_ENOUGH or TOO_SMALL to display contents */
+ static int             screen_num;
+ static char            *display_name = NULL;        /* Nazwa wyswietlacza - do odczytania */
+ static unsigned int    display_width=0;   /* Will be filled during initialisation */
+ static unsigned int    display_height=0;  /* Will be filled during initialisation */
 
+ static unsigned int    mulx=1,muly=1;      /* Multiplication of x & y */
+ static unsigned int    org_width,org_height;  /* Starting Window size */
+ static int             ini_a,ini_b,ini_ca,ini_cb;      /* Konieczne do dzialania
+                                               screen_width() i screen_heiht() i zmiany rozmiaru*/
+
+ static Window          win;               /* HANDLER TO MAIN WINDOW */
+
+ static unsigned int    width,height;      /* Window size */
+ static int             iniX, iniY;        /* Window position */
+ static unsigned int    default_deph = 8;  /* Window deph. 8=>256 colors */ /*TODO ! CURENTLY 32 ONLY IS SUPPOIRTED*/
+ static unsigned int    border_width = 4;  /* Four pixels */
+ static int             window_size = TOO_SMALL;     /* BIG_ENOUGH or TOO_SMALL to display contents */
+
+ static unsigned int    icon_width, icon_height;/* Rozmiary ikony */
+ static Pixmap          icon_pixmap;
+ static unsigned short  alloc_cont=0;      /* Sygnalizuje ze pixmapa zaostala zaalokowana */
+
+ static Pixmap          cont_pixmap=0;     /* ??? TODO ? */
+
+ static XSizeHints      *size_hints;
+ static XIconSize       *size_list;
+ static XWMHints        *wm_hints;
+ static XClassHint      *class_hints;
+
+ static XTextProperty    windowName;
+ static XTextProperty    iconName;
+
+ static GC               gc=NULL;          /* KONTEKST GRAFICZNY */
+
+ /* FONT */
+ static int              ResizeFont=0;     /* Czy probuje zmieniac rozmiar fontu */
+ static XFontStruct     *font_info=NULL;   /* Aktualny font */
+ static unsigned         ori_font_width = 8;
+ static unsigned         ori_font_height = 16;
+ static unsigned         font_width = 0;
+ static unsigned         font_height = 0;
+
+ /* REPAINT */
  static struct XRect{
-	int x,y,width,height;
-	} last_repaint_data;
- static int repaint_flag=0;
+     int x,y,width,height;
+ } last_repaint_data;
 
- static unsigned long Black,White;
- static Colormap colormap=0;
- static int CurrForeground=-1;      /* Index to last set color */
- static unsigned  bacground=0;      /* Index koloru tla */
+ static int             repaint_flag=0;     /* Trzeba odrysować? */
 
- static unsigned NumberOfColors=512; /* */
- static unsigned defaut_line_width=2;
- static int      transparent_print=0;
- static unsigned long Scale[514];
- static unsigned long PenColor=-1;
- static unsigned long BrushColor=-1;
- static XColor   ColorArray[512];
+ /* TŁO */
+ static unsigned long   Black,White;
+ static Colormap        colormap=0;
+ static int             CurrForeground=-1; /* Index to last set color */
+ static unsigned        bacground=0;       /* Index koloru tla */
+
+ /* PALETA */
+ static unsigned        NumberOfColors=512; /* */
+ static unsigned long   Scale[514];
+ static unsigned long   PenColor=-1;
+ static unsigned long   BrushColor=-1;
+ static XColor          ColorArray[512];
  static void SetScale(XColor RGBarray[512]);//Ustawianie kolorow
 
- static int  buforek[2]; /* Bufor na znaki z klawiatury - tylko 0 jest przekazywany */
- //static char bfirst=0;  /* Zmienne na implementacje cykliczna */
+ /* Parametry rysowania */
+ static unsigned        default_line_width=2;/* grubość lini */
+ static int             transparent_print=0; /* czy napisy transparentne */
+ static int             pieMode=-1;/* Tryb wypełniania fragmentu okręgu lib ellipsy */
+
+ /* Wejście znakowe? */
+ static int              count;      /* ??? TODO ? */
+ static KeySym           thekey;
+ static int              buforek[2]; /* Bufor na znaki z klawiatury - tylko 0 jest przekazywany */
+ //static char bfirst=0;  /* Zmienne na implementacje cykliczną bufora */
  //static char blast=0;   /* nie uzywane... */
 
- static char trace=0;
- static int mouse=0;
+ /* Wejście myszowe */
+ static int              mouse=0;
 
- static struct { int  flags, x, y;unsigned buttons;}
-					LastMouse={0, 0, 0, 0};
+ static
+ struct { int  flags, x, y;
+          unsigned buttons;}        LastMouse={0, 0, 0, 0};
 
- static int error_limit=3; /* Limit odeslanych bledow od x-serwera */
- static int error_count=3; /*antylicznik bledow - gdy 0 - wyjscie */
- static int DelayAction=0; /* Sterowanie zasypianiem jesli program czeka */
- static int UseGrayScale=0;
- static int pipe_break=0;
+ /* OBSŁUGA SYGNAŁÓW */
+ static int             error_limit=3; /* Limit odeslanych bledow od x-serwera */
+ static int             error_count=3; /*antylicznik bledow - gdy 0 - wyjscie */
 
-void SigPipe(int num)
-{
-pipe_break=1;
-opened=0;
-signal(num,SIG_IGN);
-fprintf(stderr,"SYMSHELL received a SIGNALL #%d\n",num);
-exit(num);
-}
+ static int             DelayAction=0; /* Sterowanie zasypianiem jesli program czeka */
+ static int             pipe_break=0;
 
-int MyXIOHandler(Display* d)
-/*
-int (*XSetIOErrorHandler(handler))()
-      int (*handler)(Display *);
+ void SigPipe(int num)
+ {
+     pipe_break=1;
+     opened=0;
+     signal(num,SIG_IGN);
+     fprintf(stderr,"SYMSHELL received a SIGNALL #%d\n",num);
+     exit(num);
+ }
 
-Arguments
-handler 	Specifies the program's supplied error handler.
-Description
-The XSetIOErrorHandler() sets the fatal I/O error handler. Xlib calls the program's supplied error handler if any sort of system call error occurs (for example, the connection to the server was lost). This is assumed to be a fatal condition, and the called routine should not return. If the I/O error handler does return, the client process exits.
+ int MyXIOHandler(Display* d)
+ /*
+    int (*XSetIOErrorHandler(handler))()
+          int (*handler)(Display *);
 
-Note that the previous error handler is returned.
-*/
-{
- pipe_break=1;
- fprintf(stderr,"SYMSHELL GOT A IOError\n");
- XSetIOErrorHandler(NULL);
- exit(-11);
- return -11;
- //XSetIOErrorHandler(MyXIOHandler);
-}
+    Arguments
+    handler 	Specifies the program's supplied error handler.
+    Description
+    The XSetIOErrorHandler() sets the fatal I/O error handler. Xlib calls the program's supplied error handler if any sort of system call error occurs (for example, the connection to the server was lost). This is assumed to be a fatal condition, and the called routine should not return. If the I/O error handler does return, the client process exits.
 
-int MyErrorHandler(Display *xDisplay, XErrorEvent *event)
-{
-    char buf[80];
+    Note that the previous error handler is returned.
+  */
+ {
+     pipe_break=1;
+     fprintf(stderr,"SYMSHELL GOT A IOError\n");
+     XSetIOErrorHandler(NULL);
+     exit(-11);
+     return -11;
+     //XSetIOErrorHandler(MyXIOHandler);
+ }
 
-    fprintf(stderr,"\nSYMSHELL received an X error!\n");
-    fprintf(stderr,"Ecode  : %d", event->error_code);
-    fprintf(stderr,"\tRequest: %d", event->request_code);
-    fprintf(stderr,"\tMinor: %d", event->minor_code);
-    XGetErrorText(xDisplay, event->error_code, buf, 80);
-    fprintf(stderr,"\tEtext : '%s'\n", buf);
+ int MyErrorHandler(Display *xDisplay, XErrorEvent *event)
+ {
+     char buf[80];
 
-    error_count--;
-    if(!error_count)
-    {
-        pipe_break=1;
-        exit(event->error_code);
-    }
+     fprintf(stderr,"\nSYMSHELL received an X error!\n");
+     fprintf(stderr,"Ecode  : %d", event->error_code);
+     fprintf(stderr,"\tRequest: %d", event->request_code);
+     fprintf(stderr,"\tMinor: %d", event->minor_code);
+     XGetErrorText(xDisplay, event->error_code, buf, 80);
+     fprintf(stderr,"\tEtext : '%s'\n", buf);
 
-    return 0;
-}
+     error_count--;
+     if(!error_count)
+     {
+         pipe_break=1;
+         exit(event->error_code);
+     }
+
+     return 0;
+ }
 
 
-int		print_transparently(int yes)
-/* Wlacza drukowanie tekstu bez zamazywania tla. Zwraca stan poprzedni */
-{
-    //fprintf(stderr,"print_transparently() not implemented\n");
-    int ret=transparent_print;
-    transparent_print=yes;
-    return ret;
-}
+ int	print_transparently(int yes)
+ /* Włącza drukowanie tekstu bez zamazywania tla. Zwraca stan poprzedni */
+ {
+     //fprintf(stderr,"print_transparently() not implemented\n");
+     int ret=transparent_print;
+     transparent_print=yes;
+     return ret;
+ }
 
-void fix_size(int Yes)
-/* Czy symulowac niezmiennosc rozmiarow okna */
-{
-	fprintf(stderr,"fix_size() not implemented\n");
-}
+ void fix_size(int Yes)
+ /* Czy symulowac niezmiennosc rozmiarow okna */
+ {
+     fprintf(stderr,"fix_size() not implemented\n");
+ }
 
-int mouse_activity(int yes)
-/* Ustala czy mysz ma byc obslugiwana.
-W X11 zawsze jest, ale mozna ja ignorowac */
-{
-int pom=mouse;
-mouse=yes;
-return pom;
-}
+ int mouse_activity(int yes)
+ /* Ustala czy mysz ma byc obslugiwana.
+    W X11 zawsze jest, ale można ją ignorować */
+ {
+     int pom=mouse;
+     mouse=yes;
+     return pom;
+ }
 
-ssh_color background()
-/* Aktualny kolor tla - nowa wersja */
-{
-  return bacground;
-}
+ ssh_color background()
+ /* Aktualny kolor tla - nowa wersja */
+ {
+     return bacground;
+ }
 
-unsigned get_background()
-/* Aktualny kolor tla - stara wersja */
-{
-  return bacground;
-}
+ unsigned get_background()
+ /* Aktualny kolor tla - stara wersja */
+ {
+     return bacground;
+ }
 
-void set_background(ssh_color c)
-/* Ustala index koloru do czyszczenia itp */
-{
-    /*if(c>=0 && c<=256)*/
-  bacground=c;
-}
+ void set_background(ssh_color c)
+ /* Ustala index koloru do czyszczenia itp */
+ {
+    if(c>=0 && c<=NumberOfColors)
+       bacground=c;
+    else
+       bacground=0;
+ }
 
-void buffering_setup(int _n)
-{
-if(_n)
-	animate=1;
-	else
-	animate=0;
-if(animate)	/* Musi byc wlaczona bitmapa buforujaca */
-	isbuffered=1;/* zeby mozna bylo na nia pisac */
-}
+ void buffering_setup(int _n)
+ {
+     if(_n)
+         animate=1;
+     else
+         animate=0;
+     if(animate)        /* Musi byc wlaczona bitmapa buforujaca */
+         isbuffered=1;  /* zeby mozna bylo na nia pisac */
+ }
 
-unsigned get_buffering()
-{
-  return animate;
-}
+ unsigned get_buffering()
+ {
+     return animate;
+ }
 
-static void CloseAll()
-{
- if(display==0)
-	{
-	if(trace) fprintf(stderr,"Trying to free resources of NULL display!\n");
-	return;
-	}
+ static void CloseAll()
+ {
+     if(display==0)
+     {
+         if(trace) fprintf(stderr,"Trying to free resources of NULL display!\n");
+         return;
+     }
 
- if(font_info){
- 	XUnloadFont(display, font_info->fid);
-	font_info=NULL; }
+     if(font_info){
+         XUnloadFont(display, font_info->fid);
+         font_info=NULL; }
 
- if(gc!=0){
- 	XFreeGC(display, gc);
-	gc=0; }
+     if(gc!=0){
+         XFreeGC(display, gc);
+         gc=0; }
 
 #ifndef __MSDOS__
-if(colormap!=0)
-	{
- 	XUninstallColormap(display,colormap);
- 	XFreeColormap(display,colormap);
-	colormap=0;
-	}
+     if(colormap!=0)
+     {
+         XUninstallColormap(display,colormap);
+         XFreeColormap(display,colormap);
+         colormap=0;
+     }
 #endif
 
-if(alloc_cont!=0)
- 	{
-	XFreePixmap(display,cont_pixmap);
-	if(trace)
-        fprintf(stderr,"%s %lx\n","FREE PIXMAP",cont_pixmap);//??? xl?
-	cont_pixmap=0;
-	}
+     if(alloc_cont!=0)
+     {
+         XFreePixmap(display,cont_pixmap);
+         if(trace)
+             fprintf(stderr,"%s %lx\n","FREE PIXMAP",cont_pixmap);//??? xl?
+         cont_pixmap=0;
+     }
 
-if(win!=0)
-    {
-    if(trace)
-       fprintf(stderr, "%s %lx ","DESTROY WINDOW",win);
+     if(win!=0)
+     {
+         if(trace)
+             fprintf(stderr, "%s %lx ","DESTROY WINDOW",win);
 
-    XDestroyWindow(display,win);
-    if(trace)
-       fprintf(stderr, "-OK %lx\n",win);
-    win=0;
-    }
+         XDestroyWindow(display,win);
+         if(trace)
+             fprintf(stderr, "-OK %lx\n",win);
+         win=0;
+     }
 
-if(trace)
-	   fprintf(stderr,"CLOSE DISPLAY");
-XCloseDisplay(display);
-if(trace)
-	   fprintf(stderr,"-OK\n");
-display=0;
-}
+     if(trace)
+         fprintf(stderr,"CLOSE DISPLAY");
 
-static int inside_close_plot=0;/* Zabezpiecza przed ukryta rekurencja w close_plot */
+     XCloseDisplay(display);
+
+     if(trace)
+         fprintf(stderr,"-OK\n");
+
+     display=0;
+ }
+
+static int inside_close_plot=0;/* Zabezpiecza przed ukryta rekurencją w close_plot */
 
 void close_plot()
 /* --------//---------- zamkniecie grafiki/semigrafiki */
 {
-if(inside_close_plot) return;
-if(opened)
+    if(inside_close_plot)
+        return;
+
+    if(opened)
     {
-    inside_close_plot=1;
-    XSync(display,1/*DISCARD EVENTS*/);
-    if(WB_error_enter_before_clean)
-    {
+        inside_close_plot=1;
+        XSync(display,1/*DISCARD EVENTS*/);
+        if(WB_error_enter_before_clean)
+        {
+            fflush(stdout);
+            if(!pipe_break)
+            {
+                char* kom="(Press ANY KEY to close graphix)";
+                /* width,height of Window at this moment */
+                printbw(screen_width()/2-(strlen(kom)*char_width('X'))/2,screen_height()/2,kom);
+                flush_plot();
+                XSync(display,1/*DISCARD EVENTS*/);
+                fprintf(stderr,"(See at window \"%s\" )\n",window_name);
+                fflush(stderr);
+            }
+
+            if(!pipe_break)
+                get_char();//X window
+            else
+            {
+                fprintf(stderr,"Window \"%s\" closed. PRESS ENTER\n",window_name);
+                fflush(stderr);
+                getchar();//Console
+            }
+
+
+            WB_error_enter_before_clean=0;
+        }
+
+        //CLOSE:
+        CloseAll();
+        fflush(stderr);
         fflush(stdout);
-		if(!pipe_break)
-        {
-            char* kom="(Press ANY KEY to close graphix)";
-		    /* width,height of Window at this moment */
-            printbw(screen_width()/2-(strlen(kom)*char_width('X'))/2,screen_height()/2,kom);
-            flush_plot();
-            XSync(display,1/*DISCARD EVENTS*/);
-            fprintf(stderr,"(See at window \"%s\" )\n",window_name);
-            fflush(stderr);
-        }
-
-		if(!pipe_break)
-            get_char();//X window
-        else
-        {
-            fprintf(stderr,"Window \"%s\" closed. PRESS ENTER\n",window_name);
-            fflush(stderr);
-            getchar();//Console
-        }
-
-
-		WB_error_enter_before_clean=0;
-    }
-//CLOSE:
-    CloseAll();
-    fflush(stderr);
-    fflush(stdout);
-    opened=0;
-    inside_close_plot=0;
+        opened=0;
+        inside_close_plot=0;
     }
 }
 
 static void ResizeBuffer(unsigned int nwidth,unsigned int nheight)
-/* Alokuje pixmape na zawatosc okna */
+/* Alokuje pixmape na zawartosc okna */
 {
- if(alloc_cont && cont_pixmap!=0)
- 	{
-	XFreePixmap(display,cont_pixmap);
-	alloc_cont=cont_pixmap=0;
- 	}
+    if(alloc_cont && cont_pixmap!=0)
+    {
+        XFreePixmap(display,cont_pixmap);
+        alloc_cont=cont_pixmap=0;
+    }
 
- if(trace)
-   {
-   fprintf(stderr,"%s %dx%d\n","ALLOC PIXMAP",nwidth,nheight);
-   /*getchar();*/
-   }
+    if(trace)
+    {
+        fprintf(stderr,"%s %dx%d\n","ALLOC PIXMAP",nwidth,nheight);
+        /*getchar();*/
+    }
 
- cont_pixmap=XCreatePixmap(display,win,nwidth,nheight,default_deph);
+    cont_pixmap=XCreatePixmap(display,win,nwidth,nheight,default_deph);
 
- assert(cont_pixmap);
- alloc_cont=1;
- XSetForeground(display, gc, Black);
- CurrForeground=-1;
- XFillRectangle(display,cont_pixmap , gc, 0, 0, nwidth+1, nheight+1);
- if(trace)
-	{
-	XFlush(display);
-    fprintf(stderr,"PIXMAP %lx DISPLAY %p WIN %lx %s\n",
-			cont_pixmap,
-			display,
-			win,
-			"OK?");
-	/*getchar();*/
-	}
+    assert(cont_pixmap);
+    alloc_cont=1;
+    XSetForeground(display, gc, Black);
+    CurrForeground=-1;
+    XFillRectangle(display,cont_pixmap , gc, 0, 0, nwidth+1, nheight+1);
+    if(trace)
+    {
+        XFlush(display);
+        fprintf(stderr,"PIXMAP %lx DISPLAY %p WIN %lx %s\n",
+                cont_pixmap,
+                display,
+                win,
+                "OK?");
+        /*getchar();*/
+    }
 }
 
 static void load_font(XFontStruct **font_info, GC *gc)
- {
+{
     char fontname[256];
     XFontStruct* l_font_info;
 
     sprintf(fontname,"%dx%d",ori_font_width,ori_font_height);
 
-  if(!ResizeFont && (*font_info) != NULL ) return;
+    if(!ResizeFont && (*font_info) != NULL ) return;
 
-  /* Load font and get font information structure */
-  if ((l_font_info = XLoadQueryFont(display,fontname)) == NULL)
+    /* Load font and get font information structure */
+    if ((l_font_info = XLoadQueryFont(display,fontname)) == NULL)
     {
-       (void) fprintf( stderr, "%s: Cannot open %s font\n",
-             progname,fontname);
-       if( (*font_info)== NULL )
-       		exit( -1 ); /* Nie ma zadnego fontu */
-		else
-		return ;    /* Pozostaje stary */
+        (void) fprintf( stderr, "%s: Cannot open %s font\n",
+                        progname,fontname);
+        if( (*font_info)== NULL )
+            exit( -1 ); /* Nie ma zadnego fontu */
+        else
+            return ;    /* Pozostaje stary */
     }
 
-  if( (*font_info) != NULL ) /* Usuwa stary font */
-  	XUnloadFont(display, (*font_info)->fid);
-  (*font_info)=l_font_info;   /* zapamietuje nowy do uzycia */
+    if( (*font_info) != NULL ) /* Usuwa stary font */
+        XUnloadFont(display, (*font_info)->fid);
+    (*font_info)=l_font_info;   /* zapamietuje nowy do uzycia */
 
-   /* Specify font in gc */
-   XSetFont(display, *gc, l_font_info->fid );
+    /* Specify font in gc */
+    XSetFont(display, *gc, l_font_info->fid );
 
-  /* Get string widths & hight */
+    /* Get string widths & hight */
     font_width = XTextWidth(*font_info, "X", 1);
     font_height = (*font_info)->ascent + (*font_info)->descent;
 
- if(trace)
-   fprintf(stderr,"%s:font %ux%u\n",icon_name,font_width,font_height);
- }
-
-static void TooSmall(win, gc, font_info)
-Window win;
-GC gc;
-XFontStruct *font_info;
-{
- char *string1 = "Too Small";
- int y_offset, x_offset;
- y_offset = font_info->ascent + 2;
- x_offset = 2;
- /* Output text, centered on each line */
- XDrawString(display, win, gc, x_offset, y_offset, string1,
-          strlen(string1));
+    if(trace)
+        fprintf(stderr,"%s:font %ux%u\n",icon_name,font_width,font_height);
 }
 
-
-
-static void place_graphics(win, gc,area_x,area_y,area_width, area_height)
-Window win;
-GC gc;
-int area_x,area_y;
-unsigned int area_width, area_height;
+static void TooSmall(Window win,GC gc,XFontStruct* font_info)
 {
-  XCopyArea(display, cont_pixmap, win, gc,
-           area_x/*src_x*/, area_y /*src_y*/,
-           area_width, area_height,
-           area_x/*dest_x*/, area_y/*dest_y*/);
+    char *string1 = "Too Small";
+    int y_offset, x_offset;
+    y_offset = font_info->ascent + 2;
+    x_offset = 2;
+
+    /* Output text, centered on each line */
+    XDrawString(display, win, gc, x_offset, y_offset, string1,
+                strlen(string1));
+}
+
+inline
+static void place_graphics(Window win,GC gc,
+                           int      area_x,int          area_y,
+                           unsigned area_width,unsigned area_height)
+{
+    XCopyArea(display, cont_pixmap, win, gc,
+              area_x/*src_x*/, area_y /*src_y*/,
+              area_width, area_height,
+              area_x/*dest_x*/, area_y/*dest_y*/);
 }
 
 static void Read_XInput()
 {
-static int buffer_empty=1;
+    static int buffer_empty=1;
 
-XEvent report;  /* Miejsce na odczytywane zdazenia */
+    XEvent report;  /* Miejsce na odczytywane zdazenia */
 
-if(pipe_break)	/* Musi zwrocic EOF */
-	{
-	*buforek=EOF;
-	return ;
-	}
+    if(pipe_break)	/* Musi zwrocic EOF */
+    {
+        *buforek=EOF;
+        return ;
+    }
 
- /* Get events, use first to display text and graphics */
+    /* Get events, use first to display text and graphics */
 
     XNextEvent(display, &report);
 
     switch  (report.type) {
 
     case Expose:
-       if(trace)
-         fprintf(stderr,"EXPOSE: %s #%d x=%d y=%d %dx%d\n",
-			icon_name,
-			report.xexpose.count,
-			report.xexpose.x,
-			report.xexpose.y,
-			report.xexpose.width,
-			report.xexpose.height);
+        if(trace)
+            fprintf(stderr,"EXPOSE: %s #%d x=%d y=%d %dx%d\n",
+                    icon_name,
+                    report.xexpose.count,
+                    report.xexpose.x,
+                    report.xexpose.y,
+                    report.xexpose.width,
+                    report.xexpose.height);
 
-          /* Unless this is the last contiguous expose,
+        /* Unless this is the last contiguous expose,
            * don't draw the window */
-	  /* if (!isbuffered && report.xexpose.count != 0)
-            			 break;  */
+        /* if (!isbuffered && report.xexpose.count != 0)
+                         break;  */
 
-          /* If window too small to use */
-       if(window_size == TOO_SMALL)
-             TooSmall(win, gc, font_info);
-          else
-	    {
+        /* If window too small to use */
+        if(window_size == TOO_SMALL)
+            TooSmall(win, gc, font_info);
+        else
+        {
             XSetForeground(display, gc, Scale[bacground]);
-			CurrForeground=-1;
+            CurrForeground=-1;
 
-			XFillRectangle(display,win , gc,
-			report.xexpose.x,
-			report.xexpose.y,
-			report.xexpose.width,
-			report.xexpose.height);
+            XFillRectangle(display,win , gc,
+                           report.xexpose.x,
+                           report.xexpose.y,
+                           report.xexpose.width,
+                           report.xexpose.height);
 
-	   if( repaint_flag==1 || (!isbuffered) || buffer_empty )
-		{
-		/* SUmuje z marginesem, takz zeby pokrywalo wszytkie expos'y */
-		if(last_repaint_data.x>report.xexpose.x)
-			last_repaint_data.x=report.xexpose.x;
+            if( repaint_flag==1 || (!isbuffered) || buffer_empty )
+            {
+                /* SUmuje z marginesem, takz zeby pokrywalo wszytkie expos'y */
+                if(last_repaint_data.x>report.xexpose.x)
+                    last_repaint_data.x=report.xexpose.x;
 
-		if(last_repaint_data.y>report.xexpose.y)
-			last_repaint_data.y=report.xexpose.y;
+                if(last_repaint_data.y>report.xexpose.y)
+                    last_repaint_data.y=report.xexpose.y;
 
-		/* Tu jest chyba zle */
-		if(last_repaint_data.width<report.xexpose.width)
-			last_repaint_data.width+=report.xexpose.width;
+                /* Tu jest chyba zle */
+                if(last_repaint_data.width<report.xexpose.width)
+                    last_repaint_data.width+=report.xexpose.width;
 
-		if(last_repaint_data.height<report.xexpose.height)
-			last_repaint_data.height+=report.xexpose.height;
+                if(last_repaint_data.height<report.xexpose.height)
+                    last_repaint_data.height+=report.xexpose.height;
 
-		repaint_flag=1;/* Sa juz dane dla repaint */
+                repaint_flag=1;/* Sa juz dane dla repaint */
 
-		/* Set information for main program about refresh screen */
-		if(report.xexpose.count == 0 ||  buffer_empty )
-			{
-			if(trace)
-		    		fprintf(stderr,"EXPOSE force repaint\n");
-			buforek[0]='\r';
-			buffer_empty=0;
+                /* Set information for main program about refresh screen */
+                if(report.xexpose.count == 0 ||  buffer_empty )
+                {
+                    if(trace)
+                        fprintf(stderr,"EXPOSE force repaint\n");
+                    buforek[0]='\r';
+                    buffer_empty=0;
 
-			}
-		}
-		else
-		{
-           	/* Refresh from pixmap buffer */
-		if(trace)
-		    fprintf(stderr,"EXPOSE DOING BITBLT\n");
+                }
+            }
+            else
+            {
+                /* Refresh from pixmap buffer */
+                if(trace)
+                    fprintf(stderr,"EXPOSE DOING BITBLT\n");
                 place_graphics(win, gc ,
-			report.xexpose.x,report.xexpose.y,
-			report.xexpose.width,report.xexpose.height
-			 );
-		DelayAction=0;/* Pojawila sie aktywnosc. Nie nalezy spac! */
-		}
-       }
-       break;
+                               report.xexpose.x,report.xexpose.y,
+                               report.xexpose.width,report.xexpose.height
+                               );
+                DelayAction=0;/* Pojawila sie aktywnosc. Nie nalezy spac! */
+            }
+        }
+        break;
 
-       case MappingNotify:
- 	   XRefreshKeyboardMapping((XMappingEvent *)&report );
- 	   DelayAction=0;/* Pojawila sie aktywnosc. Nie nalezy spac! */
-           break;
+    case MappingNotify:
+        XRefreshKeyboardMapping((XMappingEvent *)&report );
+        DelayAction=0;/* Pojawila sie aktywnosc. Nie nalezy spac! */
+        break;
 
-       case ConfigureNotify:
-       	   DelayAction=0;/* Pojawila sie aktywnosc. Nie nalezy spac! */
-       	   if(trace)
-          	fprintf(stderr,"CONFIGURE: %s=%dx%d scale: x=%d:1 y=%d:1 ",
-			icon_name,
-			width,height,mulx,muly);
+    case ConfigureNotify:
+        DelayAction=0;/* Pojawila sie aktywnosc. Nie nalezy spac! */
+        if(trace)
+            fprintf(stderr,"CONFIGURE: %s=%dx%d scale: x=%d:1 y=%d:1 ",
+                    icon_name,
+                    width,height,mulx,muly);
 
-          /* Window has been resized; change width
+        /* Window has been resized; change width
            * and height for next Expose */
 
-	  if( width== report.xconfigure.width &&
-              height== report.xconfigure.height)
-		{
-        	if(trace)
-			fprintf(stderr,"The same.\n");
-		break; /* Nic sie nie zmienilo */
-		}
+        if( width== report.xconfigure.width &&
+                height== report.xconfigure.height)
+        {
+            if(trace)
+                fprintf(stderr,"The same.\n");
+            break; /* Nic sie nie zmienilo */
+        }
 
-          width = report.xconfigure.width;
-          height = report.xconfigure.height;
+        width = report.xconfigure.width;
+        height = report.xconfigure.height;
 
-      if ((width < size_hints->min_width) ||
+        if ((width < size_hints->min_width) ||
                 (height < size_hints->min_height))
-	     {
-             window_size = TOO_SMALL;
-             if(trace)
-	      	fprintf(stderr,"To small!\n");
-	     }
-          else
-	     {
-             window_size = BIG_ENOUGH;
-	     /*mulx=width/org_width; STARA WERSJA
-	     muly=height/org_height;*/
+        {
+            window_size = TOO_SMALL;
+            if(trace)
+                fprintf(stderr,"To small!\n");
+        }
+        else
+        {
+            window_size = BIG_ENOUGH;
+            /*mulx=width/org_width; STARA WERSJA
+              muly=height/org_height;*/
 
-	     mulx=(width-ini_ca*font_width)/ini_a;
-	     muly=(height-ini_cb*font_height)/ini_b;
+            mulx=(width-ini_ca*font_width)/ini_a;
+            muly=(height-ini_cb*font_height)/ini_b;
 
-         if(mulx<=0) mulx=1;//Gdy ekran przymusowo zmniejszony
-         if(muly<=0) muly=1;
+            if(mulx<=0) mulx=1;//Gdy ekran przymusowo zmniejszony
+            if(muly<=0) muly=1;
 
-	     load_font(&font_info,&gc); /* New font - size changed */
+            load_font(&font_info,&gc); /* New font - size changed */
 
-	     if(isbuffered)
-		 {
-	        ResizeBuffer(width,height);
-			buffer_empty=1;
-		 }
+            if(isbuffered)
+            {
+                ResizeBuffer(width,height);
+                buffer_empty=1;
+            }
 
-	     if(trace)
-	     	fprintf(stderr,"->%dx%d scale: x=%d:1 y=%d:1 \n",width,height,mulx,muly);
-	     }
-          break;
+            if(trace)
+                fprintf(stderr,"->%dx%d scale: x=%d:1 y=%d:1 \n",width,height,mulx,muly);
+        }
+        break;
 
-       case ButtonPress:
-       	    DelayAction=0;/* Pojawila sie aktywnosc. Nie nalezy spac! */
-            if(mouse)
-		{
-		buforek[0]='\b';
-		LastMouse.flags=1;
-		LastMouse.x=report.xbutton.x;
-		LastMouse.y=report.xbutton.y;
-		LastMouse.buttons=report.xbutton.button;
-		if(trace)
-		    fprintf(stderr,"ButtonPress:x=%d y=%d b=X0%x\n",
-		    LastMouse.x,LastMouse.y,LastMouse.buttons  );
-		}
-	    break;
+    case ButtonPress:
+        DelayAction=0;/* Pojawila sie aktywnosc. Nie nalezy spac! */
+        if(mouse)
+        {
+            buforek[0]='\b';
+            LastMouse.flags=1;
+            LastMouse.x=report.xbutton.x;
+            LastMouse.y=report.xbutton.y;
+            LastMouse.buttons=report.xbutton.button;
+            if(trace)
+                fprintf(stderr,"ButtonPress:x=%d y=%d b=X0%x\n",
+                        LastMouse.x,LastMouse.y,LastMouse.buttons  );
+        }
+        break;
 
-       case KeyPress:
-	    {
-	    char Bufor[8];
-	    unsigned KeyCount=XLookupString((XKeyEvent *)&report,Bufor,sizeof(buforek),&thekey,0);
-	    DelayAction=0;/* Pojawila sie aktywnosc. Nie nalezy spac! */
+    case KeyPress:
+    {
+        char Bufor[8];
+        unsigned KeyCount=XLookupString((XKeyEvent *)&report,Bufor,sizeof(buforek),&thekey,0);
+        DelayAction=0;/* Pojawila sie aktywnosc. Nie nalezy spac! */
 
-	    *buforek=*Bufor;/* Na zewnatrz widziane w buforku */
+        *buforek=*Bufor;/* Na zewnatrz widziane w buforku */
 
-	    if(KeyCount!=1)
-		 *buforek=NODATA;
+        if(KeyCount!=1)
+            *buforek=NODATA;
 
-	    if(trace)
-		 fprintf(stderr,"KeyPress:%c %x \n ",*Bufor,(int)(*Bufor));
+        if(trace)
+            fprintf(stderr,"KeyPress:%c %x \n ",*Bufor,(int)(*Bufor));
 
-		if(*Bufor==0x3 || *Bufor==0x4)/* User przerwal w oknie X11 */
-			*buforek=EOF;
-	    } break;
+        if(*Bufor==0x3 || *Bufor==0x4)/* User przerwal w oknie X11 */
+            *buforek=EOF;
+    } break;
 
     case ClientMessage: //https://tronche.com/gui/x/xlib/events/client-communication/client-message.html
-	  {
-	  if(trace)
-		 {
-		 fprintf(stderr," Client message arrived ");
-		 switch(report.xclient.format){
-		 case 8:fprintf(stderr,"->%s\n", report.xclient.data.b);
-			 break;
-		 case 16:fprintf(stderr,"->0x%x\n", report.xclient.data.s[0]);
-			 break;
-		 case 32:fprintf(stderr,"->0x%lu\n", report.xclient.data.l[0]);
-			 break;
-		 default:fprintf(stderr,"->Invalid format field %d\n",report.xclient.format );
-			 break;}
-		 }
-         switch(report.xclient.format){
-		 case 8: break;
-		 case 16:if( report.xclient.data.s[0]==(short)0xffff)
-				{pipe_break=1;*buforek=EOF;}
-			 break;
-		 case 32:*buforek=report.xclient.data.l[0];
-			break;
-		 default: break;}
-	  } break;
+    {
+        if(trace)
+        {
+            fprintf(stderr," Client message arrived ");
+            switch(report.xclient.format){
+            case 8:fprintf(stderr,"->%s\n", report.xclient.data.b);
+                break;
+            case 16:fprintf(stderr,"->0x%x\n", report.xclient.data.s[0]);
+                break;
+            case 32:fprintf(stderr,"->0x%lu\n", report.xclient.data.l[0]);
+                break;
+            default:fprintf(stderr,"->Invalid format field %d\n",report.xclient.format );
+                break;}
+        }
+        switch(report.xclient.format){
+        case 8: break;
+        case 16:if( report.xclient.data.s[0]==(short)0xffff)
+            {pipe_break=1;*buforek=EOF;}
+            break;
+        case 32:*buforek=report.xclient.data.l[0];
+            break;
+        default: break;}
+    } break;
 
-   default:
+    default:
 #	ifdef XDEBUG
-	 if(trace)
-		fprintf(stderr,"Message %d=\"%s\" arrived but ignored \n ",
-		report.type,event_name(report.type) );
+        if(trace)
+            fprintf(stderr,"Message %d=\"%s\" arrived but ignored \n ",
+                    report.type,event_name(report.type) );
 #	endif
-     break;
-       } /* End switch */
+        break;
+    } /* End switch */
 
 }
 
- static void getGC(win, gc, font_info)
- Window win;
- GC *gc;
- XFontStruct *font_info;
- {
-    XColor pom;
+static void getGC(Window win,GC* gc,XFontStruct* font_info)
+{
+    //XColor pom;//??? TODO
     unsigned long valuemask = 0,i; /* Ignore XGCvalues and
                           * use defaults */
     XGCValues values;
@@ -663,9 +687,9 @@ if(pipe_break)	/* Musi zwrocic EOF */
     int line_style = LineOnOffDash;
     int cap_style = CapRound;
     int join_style = JoinRound;
-    int dash_offset = 0;
-    static char dash_list[] = {12, 24};
-    int list_length = 2;
+    //int dash_offset = 0;
+    //static char dash_list[] = {12, 24};
+    //int list_length = 2;
 
     /* Create default Graphics Context */
     *gc = XCreateGC(display, win, valuemask, &values);
@@ -678,11 +702,11 @@ if(pipe_break)	/* Musi zwrocic EOF */
 
     /* Set line attributes */
     XSetLineAttributes(display, *gc, line_width, line_style,
-          cap_style, join_style);
+                       cap_style, join_style);
     /* Set dashes */
 
     /*
-	XSetDashes(display, *gc, dash_offset, dash_list, list_length);
+    XSetDashes(display, *gc, dash_offset, dash_list, list_length);
      */
 
     /* Set Color scale */
@@ -691,10 +715,10 @@ if(pipe_break)	/* Musi zwrocic EOF */
     PenColor=-1;
     BrushColor=-1;
 
-// TODO (borkowsk#1#): W tej chwili działa tylko na "wyświetlaczach" TRUE COLOR.
-//Cała część na wyświetlacze o mniejszej głębi wymaga poprawienia i przetestowania,
-//choć kiedyś działała poprawnie na 256 kolorach - ale to było prze 2000 rokiem!
-/*
+    // TODO (borkowsk#1#): W tej chwili działa tylko na "wyświetlaczach" TRUE COLOR.
+    //Cała część na wyświetlacze o mniejszej głębi wymaga poprawienia i przetestowania,
+    //choć kiedyś działała poprawnie na 256 kolorach - ale to było prze 2000 rokiem!
+    /*
 #ifdef __MSDOS__
     colormap=XDefaultColormap(display,screen_num); //* W tej emulacji nie ma map
 #else
@@ -717,32 +741,34 @@ if(pipe_break)	/* Musi zwrocic EOF */
 */
 
     SetScale(ColorArray);
-/*
+    /*
     for(i=1;i<NumberOfColors;i++)
-	{
-	 pom=ColorArray[i];
+    {
+     pom=ColorArray[i];
 
-	 pom.red*=256;
+     pom.red*=256;
      pom.blue*=256;
      pom.green*=256;
 
-	 XAllocColor(display,colormap,&pom);
+     XAllocColor(display,colormap,&pom);
 
-	 Scale[i]=pom.pixel;
-	}
+     Scale[i]=pom.pixel;
+    }
 
     XInstallColormap(display,colormap);
 */
- }
+}
 
 void set_title(const char* window_name)
-{/* Change window title bar */
- /* https://tronche.com/gui/x/xlib/ICC/client-to-window-manager/XStoreName.html */
- XStoreName(display,win, window_name);
+{
+    /* Change window title bar */
+    /* https://tronche.com/gui/x/xlib/ICC/client-to-window-manager/XStoreName.html */
+    XStoreName(display,win, window_name);
 }
 
 void shell_setup(const char* title,int iargc,const char* iargv[])
-{/* Przekazanie parametrow wywolania fo konfiguracji symmshella */
+{
+    /* Przekazanie parametrow wywolania fo konfiguracji symmshella */
     int i;
     largc=iargc;
     largv=iargv;
@@ -885,7 +911,8 @@ ini_cb=cb;
        if(height>display_height)
             org_height = height = display_height;
    }
-   x=y=0;
+
+   iniX=iniY=0;
 
    fprintf(stderr,"%s=%dx%d\n",icon_name,width,height);
    fflush(stderr);
@@ -907,7 +934,7 @@ ini_cb=cb;
  #else
     win = XCreateSimpleWindow(display,
     			RootWindow(display,screen_num),
-          		x, y, width, height, border_width,
+                iniX, iniY, width, height, border_width,
           		BlackPixel(display, screen_num),
           		WhitePixel(display,screen_num)
           		);
@@ -1015,8 +1042,8 @@ ini_cb=cb;
 
 ssh_natural screen_height()
 {                                                                   assert(muly>0);
-    //return ini_b+(ini_cb*font_height)/muly;/* Window size */
-    return height/muly;
+   //return ini_b+(ini_cb*font_height)/muly;/* Window size */
+   return height/muly;
 }
 
 ssh_natural screen_width()
@@ -1025,8 +1052,8 @@ ssh_natural screen_width()
     return width/mulx;
 }
 
-ssh_natural  char_height(char znak)
-{                                                           assert(muly>0);
+ssh_natural char_height(char znak)
+{                                                                   assert(muly>0);
     int pom=(font_height+muly)/muly;
     /*if(pom<1)pom=1;*/
     return pom;
@@ -1036,9 +1063,11 @@ ssh_natural  char_width(char znak)
 {
     int width;
     char pom[2];
-    pom[0]=znak;pom[1]='\0';                assert(mulx>0);
+    pom[0]=znak; pom[1]='\0';                                       assert(mulx>0);
     width=XTextWidth(font_info,pom, 1)/mulx;
+
     if(width<1) width=1;
+
     return width;
 }
 
@@ -1046,7 +1075,7 @@ ssh_natural  string_height(const char* str)
 /* BARDZO PRYMITYWNIE! */
 /* Aktualne rozmiary lancucha */
 {
-    return char_height(*str);
+    return char_height(*str); /* Pierwszy znak! */
 }
 
 ssh_natural  string_width(const char* str)
@@ -1086,36 +1115,37 @@ void flush_plot()
 }
 
 /* GETTING INPUT */
+
 /* Za pierwszym razem zwraca '\r'
 zeby zasygnalizowac ze trzeba wyrysowac ekran */
 static int first_to_read=0;
 
 int  input_ready()
-/* zalezna od platformy funkcja sprawdzajaca czy jest wejscie */
+/* bardzo zalezna od platformy funkcja sprawdzajaca czy jest wejscie */
 {
-if(first_to_read)
-	return 1;
+    if(first_to_read)
+        return 1;
 
-if(pipe_break==1)
-	{
-	if(trace)
-		fprintf(stderr,"'pipe_break' flag detected in input_ready() in '%s'.\n",icon_name);
-	return EOF;
-	}
+    if(pipe_break==1)
+    {
+        if(trace)
+            fprintf(stderr,"'pipe_break' flag detected in input_ready() in '%s'.\n",icon_name);
+        return EOF;
+    }
 
-if(XPending(display)!=0) 	/* Sprawdzenie czy nie ma zdarzen */
-	{			/*SA JAKIES!*/
+    if(XPending(display)!=0) 	/* Sprawdzenie czy nie ma zdarzen */
+    {			/*SA JAKIES!*/
         buforek[0]=NODATA; 	/*Asekuranctwo */
         Read_XInput(); 		/* Przetwarzanie zdarzen */
         if(buforek[0]!=NODATA)	/* Jest cos do zwrocenia jako znak */
-           {
-	   first_to_read=buforek[0]; /*Zostanie przeczytane przez get_char() */
-           buforek[0]=NODATA;
-	   return 1;		/* Wiec mozna wywolac get_char() */
-	   }
-	}
+        {
+            first_to_read=buforek[0]; /*Zostanie przeczytane przez get_char() */
+            buforek[0]=NODATA;
+            return 1;		/* Wiec mozna wywolac get_char() */
+        }
+    }
 
-return 0;
+    return 0;
 }
 
 int  set_char(int c)
@@ -1123,6 +1153,7 @@ int  set_char(int c)
 {
     if(first_to_read!=0)/* Nieodebrano */
             return 0;
+
     first_to_read=c;
     return 1;
 }
@@ -1162,32 +1193,32 @@ static char bufor[1024];
 static char straznik2=0x77;
 static int ox,oy;
 
-void printbw(int x,int y,const char* format,...)
+void printbw(ssh_coordinate x,ssh_coordinate y,const char* format,...)
 /* ---//--- wyprowadzenie tekstu na ekran */
 {
     size_t len=0;
     unsigned font_height=0;
 
-   va_list argptr;
+    va_list argptr;
 
-   va_start(argptr, format);
+    va_start(argptr, format);
 
-   vsprintf(bufor, format, argptr);
+    vsprintf(bufor, format, argptr);
 
-   va_end(argptr);
+    va_end(argptr);
 
-   if(straznik1!=0x77 || straznik2!=0x77)
-		{
-		fprintf(stderr,"symshell.print(...) - line exced 1024b!");
-		abort();
-		}
+    if(straznik1!=0x77 || straznik2!=0x77)
+    {
+        fprintf(stderr,"symshell.print(...) - line exced 1024b!");
+        abort();
+    }
 
-  /* Print string in window */
-  /* Need length for both XTextWidth and XDrawString */
+    /* Print string in window */
+    /* Need length for both XTextWidth and XDrawString */
     len = strlen(bufor);
 
     /* Get string widths & hight */
-/*
+    /*
     width1 = XTextWidth(font_info, string1, len1);
 */
     font_height = font_info->ascent + font_info->descent;
@@ -1216,37 +1247,35 @@ void printbw(int x,int y,const char* format,...)
         if(isbuffered)
             XDrawImageString(display, cont_pixmap, gc, x , y+font_height ,  bufor, len);
     }
-
-
 }
 
-void printc(int x,int y,
-    ssh_color fore,ssh_color back,
-    const char* format,...)
+void printc(ssh_coordinate x,ssh_coordinate y,
+            ssh_color fore,ssh_color back,
+            const char* format,...)
 {
     size_t len=0;
     unsigned font_height=0;
 
-   va_list argptr;
+    va_list argptr;
 
-   va_start(argptr, format);
+    va_start(argptr, format);
 
-   vsprintf(bufor, format, argptr);
+    vsprintf(bufor, format, argptr);
 
-   va_end(argptr);
+    va_end(argptr);
 
-   if(straznik1!=0x77 || straznik2!=0x77)
-		{
-		fprintf(stderr,"symshell.print(...) - line exced 1024b!");
-		abort();
-		}
+    if(straznik1!=0x77 || straznik2!=0x77)
+    {
+        fprintf(stderr,"symshell.print(...) - line exced 1024b!");
+        abort();
+    }
 
-  /* Print string in window */
-  /* Need length for both XTextWidth and XDrawString */
+    /* Print string in window */
+    /* Need length for both XTextWidth and XDrawString */
     len = strlen(bufor);
 
     /* Get string widths & hight */
-/*
+    /*
     width1 = XTextWidth(font_info, string1, len1);
 */
     font_height = font_info->ascent + font_info->descent;
@@ -1277,31 +1306,31 @@ void printc(int x,int y,
     }
 }
 
-void print_d(int x,int y,const char* format,...)
+void print_d(ssh_coordinate x,ssh_coordinate y,const char* format,...)
 {
     size_t len=0;
     unsigned font_height=0;
 
-   va_list argptr;
+    va_list argptr;
 
-   va_start(argptr, format);
+    va_start(argptr, format);
 
-   vsprintf(bufor, format, argptr);
+    vsprintf(bufor, format, argptr);
 
-   va_end(argptr);
+    va_end(argptr);
 
-   if(straznik1!=0x77 || straznik2!=0x77)
-        {
+    if(straznik1!=0x77 || straznik2!=0x77)
+    {
         fprintf(stderr,"symshell.print(...) - line exced 1024b!");
         abort();
-        }
+    }
 
-  /* Print string in window */
-  /* Need length for both XTextWidth and XDrawString */
+    /* Print string in window */
+    /* Need length for both XTextWidth and XDrawString */
     len = strlen(bufor);
 
     /* Get string widths & hight */
-/*
+    /*
     width1 = XTextWidth(font_info, string1, len1);
 */
     font_height = font_info->ascent + font_info->descent;
@@ -1334,40 +1363,41 @@ void print_d(int x,int y,const char* format,...)
 }
 
 unsigned long buildColor(unsigned char red, unsigned char green, unsigned char blue)
+/* BUDOWANIE WEWNĘTRZNYCH KOLORÓW W X11 - TODO CHECK*/
 {
     return ( (unsigned long)(red) << 16) +
            ( (unsigned long)(green)<< 8) +
            ( (unsigned long)(blue) ) ;
 }
 
-void print_rgb(int x,int y,
-    unsigned r,unsigned g,unsigned b,
-	ssh_color back,const char* format,...)
+void print_rgb(ssh_coordinate x,ssh_coordinate y,
+               ssh_intensity r,ssh_intensity g,ssh_intensity b,            /*- składowe koloru tekstu */
+               ssh_color back,const char* format,...)
 /* Drukuje z mozliwoscia ustawienia tuszu poprzez RGB */
 {
-  size_t len=0;
-  unsigned font_height=0;
+    size_t len=0;
+    unsigned font_height=0;
 
-   va_list argptr;
+    va_list argptr;
 
-   va_start(argptr, format);
+    va_start(argptr, format);
 
-   vsprintf(bufor, format, argptr);
+    vsprintf(bufor, format, argptr);
 
-   va_end(argptr);
+    va_end(argptr);
 
-   if(straznik1!=0x77 || straznik2!=0x77)
-		{
-		fprintf(stderr,"symshell.print(...) - line exced 1024b!");
-		abort();
-		}
+    if(straznik1!=0x77 || straznik2!=0x77)
+    {
+        fprintf(stderr,"symshell.print(...) - line exced 1024b!");
+        abort();
+    }
 
-  /* Print string in window */
-  /* Need length for both XTextWidth and XDrawString */
+    /* Print string in window */
+    /* Need length for both XTextWidth and XDrawString */
     len = strlen(bufor);
 
     /* Get string widths & hight */
-/*
+    /*
     width1 = XTextWidth(font_info, string1, len1);
 */
     font_height = font_info->ascent + font_info->descent;
@@ -1379,7 +1409,8 @@ void print_rgb(int x,int y,
 
     ox=x;oy=y;
     CurrForeground=-1;
-	XSetForeground(display,gc,buildColor(r,g,b) );
+    XSetForeground(display,gc,buildColor(r,g,b) );
+
     if(transparent_print)
     {
         if(!animate)
@@ -1395,34 +1426,34 @@ void print_rgb(int x,int y,
         if(isbuffered)
             XDrawImageString(display, cont_pixmap, gc, x , y+font_height ,  bufor, len);
     }
-
 }
 
 void plot_rgb(ssh_coordinate x,ssh_coordinate y,
               ssh_intensity r,ssh_intensity g,ssh_intensity b)
 {
-	x*=mulx; /* Multiplication of coordinates */
-	y*=muly; /* if window is bigger */
-	CurrForeground=-1;
-	XSetForeground(display,gc,buildColor(r,g,b) );
+    x*=mulx; /* Multiplication of coordinates */
+    y*=muly; /* if window is bigger */
 
-	if(mulx>1 || muly>1)
-	   {
-	   if(!animate)
-	   	XFillRectangle(display, win, gc, x, y, mulx, muly);
-	   if(isbuffered)
-	   	XFillRectangle(display, cont_pixmap, gc, x, y, mulx, muly);
-	   }
-	   else
-	   {
-	   if(!animate)
-	   	XDrawPoint(display,win,gc,x,y);
-	   if(isbuffered)
-	   	XDrawPoint(display,cont_pixmap,gc,x,y);
-	   }
+    CurrForeground=-1;
+    XSetForeground(display,gc,buildColor(r,g,b) );
+
+    if(mulx>1 || muly>1)
+    {
+        if(!animate)
+            XFillRectangle(display, win, gc, x, y, mulx, muly);
+        if(isbuffered)
+            XFillRectangle(display, cont_pixmap, gc, x, y, mulx, muly);
+    }
+    else
+    {
+        if(!animate)
+            XDrawPoint(display,win,gc,x,y);
+        if(isbuffered)
+            XDrawPoint(display,cont_pixmap,gc,x,y);
+    }
 }
 
-void plot_d(int x,int y)
+void plot_d(ssh_coordinate x,ssh_coordinate y)
 /* ----//--- wyswietlenie punktu na ekranie w kolorze pen'a */
 {
     x*=mulx; /* Multiplication of coordinates */
@@ -1435,59 +1466,51 @@ void plot_d(int x,int y)
     }
 
     if(mulx>1 || muly>1)
-       {
-       if(!animate)
-        XFillRectangle(display, win, gc, x, y, mulx, muly);
-       if(isbuffered)
-        XFillRectangle(display, cont_pixmap, gc, x, y, mulx, muly);
-       }
-       else
-       {
-       if(!animate)
-        XDrawPoint(display,win,gc,x,y);
-       if(isbuffered)
-        XDrawPoint(display,cont_pixmap,gc,x,y);
-       }
+    {
+        if(!animate)
+            XFillRectangle(display, win, gc, x, y, mulx, muly);
+        if(isbuffered)
+            XFillRectangle(display, cont_pixmap, gc, x, y, mulx, muly);
+    }
+    else
+    {
+        if(!animate)
+            XDrawPoint(display,win,gc,x,y);
+        if(isbuffered)
+            XDrawPoint(display,cont_pixmap,gc,x,y);
+    }
 }
 
-void plot(int x,int y,ssh_color c)
+void plot(ssh_coordinate x,ssh_coordinate y,ssh_color c)
 /* ----//--- wyswietlenie punktu na ekranie */
 {
     x*=mulx; /* Multiplication of coordinates */
     y*=muly; /* if window is bigger */
+
     if(c!=CurrForeground)
-       {
-       CurrForeground=c;
-       XSetForeground(display,gc,Scale[c]);
-       }
+    {
+        CurrForeground=c;
+        XSetForeground(display,gc,Scale[c]);
+    }
 
     if(mulx>1 || muly>1)
-       {
-       if(!animate)
-        XFillRectangle(display, win, gc, x, y, mulx, muly);
-       if(isbuffered)
-        XFillRectangle(display, cont_pixmap, gc, x, y, mulx, muly);
-       }
-       else
-       {
-       if(!animate)
-        XDrawPoint(display,win,gc,x,y);
-       if(isbuffered)
-        XDrawPoint(display,cont_pixmap,gc,x,y);
-       }
+    {
+        if(!animate)
+            XFillRectangle(display, win, gc, x, y, mulx, muly);
+        if(isbuffered)
+            XFillRectangle(display, cont_pixmap, gc, x, y, mulx, muly);
+    }
+    else
+    {
+        if(!animate)
+            XDrawPoint(display,win,gc,x,y);
+        if(isbuffered)
+            XDrawPoint(display,cont_pixmap,gc,x,y);
+    }
 }
 
-void	set_pen(ssh_color c,ssh_natural size,ssh_mode style)
-/* Ustala aktualny kolor linii za pomoca typu ssh_color */
-{
-	if(PenColor!=Scale[c])
-	{
-		PenColor=Scale[c];
-		defaut_line_width=size;
-	}
-}
 
-int     line_style(int Style)
+int line_style(int Style)
 /* Ustala styl rysowania lini: SSH_LINE_SOLID, SSH_LINE_DOTTED, SSH_LINE_DASHED */
 {
     if(trace>0) fprintf(stderr,"%s %s %c", __FUNCTION__ ,"not implemented ",'\t');
@@ -1496,58 +1519,70 @@ int     line_style(int Style)
     GrLineStyle = Style;
     return  GrLineStyle;    //Zwraca poprzedni stan
     SEE: LineSolid in X.h - TODO IMPLEMENT IT!
+        XSetLineAttributes(display, gc,default_line_width,
+                           LineSolid,  CapRound, JoinRound);
     */
     return SSH_LINE_SOLID; //Nie jest zaimplementowane
 }
 
-void    set_pen_rgb(ssh_intensity r,ssh_intensity g,ssh_intensity b,ssh_natural size,ssh_mode style)
+void set_pen(ssh_color c,ssh_natural size,ssh_mode style)
+/* Ustala aktualny kolor linii za pomoca typu ssh_color */
+{
+    if(PenColor!=Scale[c])
+    {
+        PenColor=Scale[c];
+        default_line_width=size;
+    }
+}
+
+void set_pen_rgb(ssh_intensity r,ssh_intensity g,ssh_intensity b,ssh_natural size,ssh_mode style)
 /* Ustala aktualny kolor linii za pomoca skladowych RGB */
 {
     PenColor=buildColor(r,g,b);
-    defaut_line_width=size;
+    default_line_width=size;
 }
 
-ssh_natural     get_line_width()
+ssh_natural get_line_width()
 {
-    return defaut_line_width;
+    return default_line_width;
 }
 
-ssh_natural     line_width(ssh_natural width)
+ssh_natural line_width(ssh_natural width)
 /* Ustala szerokosc lini - moze byc kosztowne. Zwraca stan poprzedni */
 {
-    int old=defaut_line_width;
+    int old=default_line_width;
 
     if(old!=width)
     {
-        defaut_line_width=width;
-        XSetLineAttributes(display, gc,defaut_line_width,
-                                       LineSolid,  CapRound, JoinRound);
-        //if(trace)
-            fprintf(stderr,"Set default line width to %d\n",defaut_line_width);
+        default_line_width=width;
+        XSetLineAttributes(display, gc,default_line_width,
+                           LineSolid,  CapRound, JoinRound);
+        if(trace)
+           fprintf(stderr,"Set default line width to %d\n",default_line_width);
     }
 
     return old;
 }
 
-void    set_brush(ssh_color c)
+void set_brush(ssh_color c)
 /* Ustala aktualny kolor wypelnien za pomoca typu ssh_color */
 {
-	if(BrushColor!=Scale[c])
-	{
-		BrushColor=Scale[c];
-	}
+    if(BrushColor!=Scale[c])
+    {
+        BrushColor=Scale[c];
+    }
 }
 
-void    set_brush_rgb(ssh_intensity r,ssh_intensity g,ssh_intensity b)
+void set_brush_rgb(ssh_intensity r,ssh_intensity g,ssh_intensity b)
 /* Ustala aktualny kolor wypelnien za pomoca skladowych RGB */
 {
-	BrushColor=buildColor(r,g,b);
+    BrushColor=buildColor(r,g,b);
 }
 
-void    line_d(int x1,int y1,int x2,int y2)
-/* wyswietlenie lini */
+void line_d(int x1,int y1,int x2,int y2)
+/* wyrysowanie lini */
 {
-    unsigned line_width=defaut_line_width;
+    unsigned line_width=default_line_width;
 
     if( line_width!=(mulx>muly?muly:mulx) )
     {
@@ -1575,11 +1610,11 @@ void    line_d(int x1,int y1,int x2,int y2)
         XDrawLine(display,cont_pixmap, gc, x1, y1, x2, y2);
 }
 
-void    circle_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r)
-/* Wyswietlenie okregu w kolorze c */
+void circle_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r)
+/* wyrysowanie okregu w kolorze c */
 {
     int angle2=360*64,r1,r2;
-    unsigned line_width=defaut_line_width;
+    unsigned line_width=default_line_width;
 
     if( line_width!=(mulx>muly?muly:mulx) )
     {
@@ -1607,11 +1642,11 @@ void    circle_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r)
         XDrawArc(display, cont_pixmap , gc, x-r1, y-r2, r1*2, r2*2, 0, angle2);
 }
 
-void    ellipse_d(ssh_coordinate x,ssh_coordinate y,ssh_natural a,ssh_natural b)
-/* Wyswietlenie elipsy w kolorze c */
+void ellipse_d(ssh_coordinate x,ssh_coordinate y,ssh_natural a,ssh_natural b)
+/* wyrysowanie elipsy w kolorze c */
 {
     int angle2=360*64,r1,r2;
-    unsigned line_width=defaut_line_width;
+    unsigned line_width=default_line_width;
 
     if( line_width!=(mulx>muly?muly:mulx) )
     {
@@ -1639,11 +1674,11 @@ void    ellipse_d(ssh_coordinate x,ssh_coordinate y,ssh_natural a,ssh_natural b)
         XDrawArc(display, cont_pixmap , gc, x-r1, y-r2, r1*2, r2*2, 0, angle2);
 }
 
-void    fill_circle_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r)
-/* Wyswietlenie kola w kolorach domyslnych*/
+void fill_circle_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r)
+/* wyrysowanie kola w kolorach domyslnych*/
 {
-	int angle2=360*64,r1,r2;
-    unsigned line_width=defaut_line_width;
+    int angle2=360*64,r1,r2;
+    unsigned line_width=default_line_width;
 
     if( line_width!=(mulx>muly?muly:mulx) )
     {
@@ -1652,39 +1687,39 @@ void    fill_circle_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r)
             fprintf(stderr,"Set line width to %d\n",line_width);
 
         XSetLineAttributes(display, gc,line_width,
-             LineSolid,  CapRound, JoinRound);
+                           LineSolid,  CapRound, JoinRound);
     }
 
-	x*=mulx;y*=muly;   /* Multiplicaton of coordinates */
-	r1=r*mulx;r2=r*muly;  /* if window is bigger */
+    x*=mulx;y*=muly;      /* Multiplicaton of coordinates */
+    r1=r*mulx;r2=r*muly;  /* if window is bigger */
 
-	if(BrushColor!=-1)
+    if(BrushColor!=-1)
     {
-       CurrForeground=-1;
-       XSetForeground(display,gc,BrushColor);
+        CurrForeground=-1;
+        XSetForeground(display,gc,BrushColor);
     }
 
-	if(!animate)
-		XFillArc(display, win , gc, x-r1, y-r2, r1*2, r2*2, 0, angle2);
+    if(!animate)
+        XFillArc(display, win , gc, x-r1, y-r2, r1*2, r2*2, 0, angle2);
 
-	if(isbuffered)
-		XFillArc(display, cont_pixmap , gc, x-r1, y-r2, r1*2, r2*2, 0, angle2);
+    if(isbuffered)
+        XFillArc(display, cont_pixmap , gc, x-r1, y-r2, r1*2, r2*2, 0, angle2);
 
-	if(PenColor!=-1 && PenColor!=BrushColor) //Obrys - nie jest pewne czy toi potrzebne, ale zdaje się w Windows tak działa
-	{
-		XSetForeground(display,gc,PenColor);
-		if(!animate)
-			XDrawArc(display, win , gc, x-r1, y-r2, r1*2, r2*2, 0, angle2);
-		if(isbuffered)
-			XDrawArc(display, cont_pixmap , gc, x-r1, y-r2, r1*2, r2*2, 0, angle2);
-	}
+    if(PenColor!=-1 && PenColor!=BrushColor) //Obrys - nie jest pewne czy toi potrzebne, ale zdaje się w Windows tak działa
+    {
+        XSetForeground(display,gc,PenColor);
+        if(!animate)
+            XDrawArc(display, win , gc, x-r1, y-r2, r1*2, r2*2, 0, angle2);
+        if(isbuffered)
+            XDrawArc(display, cont_pixmap , gc, x-r1, y-r2, r1*2, r2*2, 0, angle2);
+    }
 }
 
-void    fill_ellipse_d(ssh_coordinate x, ssh_coordinate y, ssh_natural a, ssh_natural b)
+void fill_ellipse_d(ssh_coordinate x, ssh_coordinate y, ssh_natural a, ssh_natural b)
 /* Wypełnienie elipsy w kolorach domyslnych*/
 {
     int angle2=360*64,r1,r2;
-    unsigned line_width=defaut_line_width;
+    unsigned line_width=default_line_width;
 
     if( line_width!=(mulx>muly?muly:mulx) )
     {
@@ -1720,10 +1755,12 @@ void    fill_ellipse_d(ssh_coordinate x, ssh_coordinate y, ssh_natural a, ssh_na
     }
 }
 
+const double deg_mult = 180/M_PI;
+
+inline
 static float degrees(float radians)
 {
-    const double mult = 180/M_PI;
-    return radians * mult;
+    return radians * deg_mult;
     //return ( radians * 180 ) / M_PI ;
 }
 
@@ -1738,7 +1775,7 @@ void arc_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r,            /*rysuje 
     int angle1=degrees(start)*64;
     int angle2=degrees(stop)*64;
     int r1,r2;
-    unsigned line_width=defaut_line_width;
+    unsigned line_width=default_line_width;
 
     if( line_width!=(mulx>muly?muly:mulx) )
     {
@@ -1777,7 +1814,7 @@ void arc(ssh_coordinate x,ssh_coordinate y,ssh_natural r,
     int angle1=degrees(start)*64;
     int angle2=degrees(stop)*64;
     int r1,r2;
-    unsigned line_width=defaut_line_width;
+    unsigned line_width=default_line_width;
 
     if( line_width!=(mulx>muly?muly:mulx) )
     {
@@ -1817,7 +1854,7 @@ void earc_d(ssh_coordinate x,ssh_coordinate y,                         /*rysuje 
     int angle1=degrees(start)*64;
     int angle2=degrees(stop)*64;
     int r1,r2;
-    unsigned line_width=defaut_line_width;
+    unsigned line_width=default_line_width;
 
     if( line_width!=(mulx>muly?muly:mulx) )
     {
@@ -1857,7 +1894,7 @@ void earc(ssh_coordinate x,ssh_coordinate y,
     int angle1=degrees(start)*64;
     int angle2=degrees(stop)*64;
     int r1,r2;
-    unsigned line_width=defaut_line_width;
+    unsigned line_width=default_line_width;
 
     if( line_width!=(mulx>muly?muly:mulx) )
     {
@@ -1885,8 +1922,6 @@ void earc(ssh_coordinate x,ssh_coordinate y,
         XDrawArc(display, cont_pixmap , gc, x-r1, y-r2, r1*2, r2*2,angle1, angle2);
 }
 
-static int pieMode=-1;
-
 void fill_arc_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r,       /* wypełnia łuk kołowy o promieniu r*/
                 ssh_radian start,ssh_radian stop,                        /* początku i końcu */
                 ssh_bool pie)                      /* początek i koniec łuku */
@@ -1899,7 +1934,7 @@ void fill_arc_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r,       /* wypeł
     int angle1=degrees(start)*64;
     int angle2=degrees(stop)*64;
     int r1,r2;
-    unsigned line_width=defaut_line_width;
+    unsigned line_width=default_line_width;
 
     if( line_width!=(mulx>muly?muly:mulx) )
     {
@@ -1954,7 +1989,7 @@ void fill_arc(ssh_coordinate x,ssh_coordinate y,ssh_natural r,         /* wirtua
     int angle1=degrees(start)*64;
     int angle2=degrees(stop)*64;
     int r1,r2;
-    unsigned line_width=defaut_line_width;
+    unsigned line_width=default_line_width;
 
     if( line_width!=(mulx>muly?muly:mulx) )
     {
@@ -2010,7 +2045,7 @@ void fill_earc_d(ssh_coordinate x,ssh_coordinate y,                    /* wypeł
     int angle1=degrees(start)*64;
     int angle2=degrees(stop)*64;
     int r1,r2;
-    unsigned line_width=defaut_line_width;
+    unsigned line_width=default_line_width;
 
     if( line_width!=(mulx>muly?muly:mulx) )
     {
@@ -2067,7 +2102,7 @@ void fill_earc(ssh_coordinate x,ssh_coordinate y,                      /* wirtua
     int angle1=degrees(start)*64;
     int angle2=degrees(stop)*64;
     int r1,r2;
-    unsigned line_width=defaut_line_width;
+    unsigned line_width=default_line_width;
 
     if( line_width!=(mulx>muly?muly:mulx) )
     {
@@ -2105,17 +2140,17 @@ void fill_earc(ssh_coordinate x,ssh_coordinate y,                      /* wirtua
 }
 
 
-void    fill_rect_d(int x1,int y1,int x2,int y2)
+void fill_rect_d(int x1,int y1,int x2,int y2)
 {
     x1*=mulx; /* Multiplication of coordinates */
     y1*=muly; /* if window is bigger */
     x2*=mulx; /* Multiplication of 2' coordinates */
     y2*=muly; /* if window is bigger */
 
-	if(BrushColor!=-1)
+    if(BrushColor!=-1)
     {
-       CurrForeground=-1;
-	   XSetForeground(display,gc,BrushColor);
+        CurrForeground=-1;
+        XSetForeground(display,gc,BrushColor);
     }
 
     if(!animate)
@@ -2125,57 +2160,57 @@ void    fill_rect_d(int x1,int y1,int x2,int y2)
 
 }
 
-void    fill_poly_d(int vx,int vy,
-					const ssh_point points[],int number)
-/* Wypelnia wielokat przesuniety o vx,vy w kolorze c */
+void fill_poly_d(ssh_coordinate vx,ssh_coordinate vy,
+                 const ssh_point points[],int number)
+/* Wypelnia wielokat przesuniety o vx,vy w kolorach domyslnych */
 {
-static XPoint _LocalTable[10];
-XPoint* 	LocalPoints=_LocalTable;
-int i;
+    static XPoint   _LocalTable[10];
+    XPoint*          LocalPoints=_LocalTable;
+    int i;
 
-if(number<=2)
-		return; /*Nie da sie rysowac
-		wielokata o dwu punktach lub
-			mniej*/
+    if(number<=2)
+        return; /*Nie da sie rysowac
+        wielokata o dwu punktach lub
+            mniej*/
 
-if(number>10) /*Jest za duzy. Alokacja*/
-	LocalPoints=calloc(number,sizeof(XPoint));
+    if(number>10) /*Jest za duzy. Alokacja*/
+        LocalPoints=calloc(number,sizeof(XPoint));
 
-if(LocalPoints==NULL)
-		 {assert("Memory for polygon");return;}
+    if(LocalPoints==NULL)
+    {assert("No memory for polygon");return;}
 
-if(BrushColor!=-1)
+    if(BrushColor!=-1)
     {
-       CurrForeground=-1;
-	   XSetForeground(display,gc,BrushColor);
+        CurrForeground=-1;
+        XSetForeground(display,gc,BrushColor);
     }
 
-vx*=mulx;
-vy*=muly;
+    vx*=mulx;
+    vy*=muly;
 
-for(i=0;i<number;i++)
-	{
-	LocalPoints[i].x=points[i].x*mulx+vx;
-	LocalPoints[i].y=points[i].y*muly+vy;
-	}
+    for(i=0;i<number;i++)
+    {
+        LocalPoints[i].x=points[i].x*mulx+vx;
+        LocalPoints[i].y=points[i].y*muly+vy;
+    }
 
-if(!animate)
-   	XFillPolygon(display, win, gc,
-   	LocalPoints,number,Complex,CoordModeOrigin);
+    if(!animate)
+        XFillPolygon(display, win, gc,
+                     LocalPoints,number,Complex,CoordModeOrigin);
 
-if(isbuffered)
-   	XFillPolygon(display, cont_pixmap, gc,
-   	 LocalPoints,number,Complex,CoordModeOrigin);
+    if(isbuffered)
+        XFillPolygon(display, cont_pixmap, gc,
+                     LocalPoints,number,Complex,CoordModeOrigin);
 
-if(number>10) /*Byl duzy*/
-	free(LocalPoints);
+    if(number>10) /*Byl duzy*/
+        free(LocalPoints);
 }
 
-void    fill_circle(ssh_coordinate x, ssh_coordinate y, ssh_natural r, ssh_color c)
+void fill_circle(ssh_coordinate x, ssh_coordinate y, ssh_natural r, ssh_color c)
 /* Kolo w kolorze c */
 {
     int angle2=360*64,r1,r2;
-    unsigned line_width=defaut_line_width;
+    unsigned line_width=default_line_width;
 
     if( line_width!=(mulx>muly?muly:mulx) )
     {
@@ -2203,11 +2238,11 @@ void    fill_circle(ssh_coordinate x, ssh_coordinate y, ssh_natural r, ssh_color
         XFillArc(display, cont_pixmap , gc, x-r1, y-r2, r1*2, r2*2, 0, angle2);
 }
 
-void    circle(ssh_coordinate x,ssh_coordinate y,ssh_natural r,ssh_color c)
+void circle(ssh_coordinate x,ssh_coordinate y,ssh_natural r,ssh_color c)
 /* Wyswietlenie okregu w kolorze c */
 {
     int angle2=360*64,r1,r2;
-    unsigned line_width=defaut_line_width;
+    unsigned line_width=default_line_width;
 
     if( line_width!=(mulx>muly?muly:mulx) )
     {
@@ -2235,313 +2270,316 @@ void    circle(ssh_coordinate x,ssh_coordinate y,ssh_natural r,ssh_color c)
         XDrawArc(display, cont_pixmap , gc, x-r1, y-r2, r1*2, r2*2, 0, angle2);
 }
 
-void    fill_rect(int x1,int y1,int x2,int y2,ssh_color c)
+void fill_rect(int x1,int y1,int x2,int y2,ssh_color c)
 {
-x1*=mulx; /* Multiplication of coordinates */
-y1*=muly; /* if window is bigger */
-x2*=mulx; /* Multiplication of 2' coordinates */
-y2*=muly; /* if window is bigger */
+    x1*=mulx; /* Multiplication of coordinates */
+    y1*=muly; /* if window is bigger */
+    x2*=mulx; /* Multiplication of 2' coordinates */
+    y2*=muly; /* if window is bigger */
 
-if(c!=CurrForeground)
-   {
-   CurrForeground=c;
-   XSetForeground(display,gc,Scale[c]);
-   }
+    if(c!=CurrForeground)
+    {
+        CurrForeground=c;
+        XSetForeground(display,gc,Scale[c]);
+    }
 
-if(!animate)
-   	XFillRectangle(display, win, gc, x1, y1, x2-x1, y2-y1 );
-if(isbuffered)
-   	XFillRectangle(display, cont_pixmap, gc, x1, y1, x2-x1, y2-y1 );
+    if(!animate)
+        XFillRectangle(display, win, gc, x1, y1, x2-x1, y2-y1 );
+    if(isbuffered)
+        XFillRectangle(display, cont_pixmap, gc, x1, y1, x2-x1, y2-y1 );
 
 }
 
-void    fill_poly(int vx,int vy,
-					const ssh_point points[],int number,
-					ssh_color c)
+void fill_poly(ssh_coordinate vx,ssh_coordinate vy,
+               const ssh_point points[],int number,  /* - tablica wierzchołków wielokąta i jej długość */
+               ssh_color c)
 /* Wypelnia wielokat przesuniety o vx,vy w kolorze c */
 {
-static XPoint _LocalTable[10];
-XPoint* 	LocalPoints=_LocalTable;
-int i;
+    static XPoint _LocalTable[10];
+    XPoint* 	LocalPoints=_LocalTable;
+    int i;
 
-if(number<=2)
-		return; /*Nie da sie rysowac
-		wielokata o dwu punktach lub
-			mniej*/
+    if(number<=2)
+        return; /*Nie da sie rysowac
+        wielokata o dwu punktach lub
+            mniej*/
 
-if(number>10) /*Jest za duzy. Alokacja*/
-	LocalPoints=calloc(number,sizeof(XPoint));
+    if(number>10) /*Jest za duzy. Alokacja*/
+        LocalPoints=calloc(number,sizeof(XPoint));
 
-if(LocalPoints==NULL)
-		 {assert("Memory for polygon");return;}
+    if(LocalPoints==NULL)
+    {assert("Memory for polygon");return;}
 
-if(c!=CurrForeground)
-   {
-   CurrForeground=c;
-   XSetForeground(display,gc,Scale[c]);
-   }
+    if(c!=CurrForeground)
+    {
+        CurrForeground=c;
+        XSetForeground(display,gc,Scale[c]);
+    }
 
-vx*=mulx;
-vy*=muly;
+    vx*=mulx;
+    vy*=muly;
 
-for(i=0;i<number;i++)
-	{
-	LocalPoints[i].x=points[i].x*mulx+vx;
-	LocalPoints[i].y=points[i].y*muly+vy;
-	}
+    for(i=0;i<number;i++)
+    {
+        LocalPoints[i].x=points[i].x*mulx+vx;
+        LocalPoints[i].y=points[i].y*muly+vy;
+    }
 
-if(!animate)
-   	XFillPolygon(display, win, gc,
-   	LocalPoints,number,Complex,CoordModeOrigin);
-if(isbuffered)
-   	XFillPolygon(display, cont_pixmap, gc,
-   	 LocalPoints,number,Complex,CoordModeOrigin);
+    if(!animate)
+        XFillPolygon(display, win, gc,
+                     LocalPoints,number,Complex,CoordModeOrigin);
+    if(isbuffered)
+        XFillPolygon(display, cont_pixmap, gc,
+                     LocalPoints,number,Complex,CoordModeOrigin);
 
-if(number>10) /*Byl duzy*/
-	free(LocalPoints);
+    if(number>10) /*Byl duzy*/
+        free(LocalPoints);
 }
 
-void    line(int x1,int y1,int x2,int y2,ssh_color c)
-/* wyswietlenie lini */
+void line(ssh_coordinate x1,ssh_coordinate y1,
+          ssh_coordinate x2,ssh_coordinate y2,
+          ssh_color c)
+/* Wyswietlenie lini w kolorze c */
 {
-unsigned line_width=defaut_line_width;
+    unsigned line_width=default_line_width;
 
-x1*=mulx;x2*=mulx; /* Multiplicaton of coordinates */
-y1*=muly;y2*=muly;  /* if window is bigger */
+    x1*=mulx;x2*=mulx; /* Multiplicaton of coordinates */
+    y1*=muly;y2*=muly;  /* if window is bigger */
 
-if(c!=CurrForeground)
-   {
-   CurrForeground=c;
-   XSetForeground(display,gc,Scale[c]);
-   }
+    if(c!=CurrForeground)
+    {
+        CurrForeground=c;
+        XSetForeground(display,gc,Scale[c]);
+    }
 
-if( line_width!=(mulx>muly?muly:mulx) )
-	{
-	line_width=(mulx>muly?muly:mulx);
-	if(trace)
-		{
-		fprintf(stderr,"Set line width to %d\n",line_width);
-		}
-	XSetLineAttributes(display, gc,line_width,
-		 LineSolid,  CapRound, JoinRound);
-	}
+    if( line_width!=(mulx>muly?muly:mulx) )
+    {
+        line_width=(mulx>muly?muly:mulx);
+        if(trace)
+        {
+            fprintf(stderr,"Set line width to %d\n",line_width);
+        }
+        XSetLineAttributes(display, gc,line_width,
+                           LineSolid,  CapRound, JoinRound);
+    }
 
-if(!animate)
-	XDrawLine(display,win, gc, x1, y1, x2, y2);
+    if(!animate)
+        XDrawLine(display,win, gc, x1, y1, x2, y2);
 
-if(isbuffered)
-	XDrawLine(display,cont_pixmap, gc, x1, y1, x2, y2);
+    if(isbuffered)
+        XDrawLine(display,cont_pixmap, gc, x1, y1, x2, y2);
 }
 
-void    clear_screen()
+void clear_screen()
 /* Czysci ekran przed zmiana zawartosci */
 {
-//Why not https://tronche.com/gui/x/xlib/GC/convenience-functions/XSetBackground.html ???
-XSetForeground(display, gc, Scale[bacground] );
-CurrForeground=-1;
-/* Clear screen and bitmap */
-if(!animate)
-	{
-	if(trace) fprintf(stderr,"Clear window\n");
-    	XFillRectangle(display,win , gc, 0,0,width,height);
-	}
-if(isbuffered)
-	{
-	if(trace) fprintf(stderr,"Clear pixmap\n");
-	XFillRectangle(display,cont_pixmap , gc, 0,0,width,height);
-	}
+    //Why not https://tronche.com/gui/x/xlib/GC/convenience-functions/XSetBackground.html ???
+    XSetForeground(display, gc, Scale[bacground] );
+    CurrForeground=-1;
+    /* Clear screen and bitmap */
+    if(!animate)
+    {
+        if(trace) fprintf(stderr,"Clear window\n");
+        XFillRectangle(display,win , gc, 0,0,width,height);
+    }
+
+    if(isbuffered)
+    {
+        if(trace) fprintf(stderr,"Clear pixmap\n");
+        XFillRectangle(display,cont_pixmap , gc, 0,0,width,height);
+    }
 }
 
-int     repaint_area(ssh_coordinate* x,ssh_coordinate* y,ssh_natural* width,ssh_natural* height)
+int repaint_area(ssh_coordinate* x,ssh_coordinate* y,ssh_natural* width,ssh_natural* height)
 {
-if(repaint_flag==1)
-	{
-	*x=last_repaint_data.x/mulx;
-	if(*x<0) *x=0;
-	if(*x>org_width) *x=org_width;
+    if(repaint_flag==1)
+    {
+        *x=last_repaint_data.x/mulx;
+        if(*x<0) *x=0;
+        if(*x>org_width) *x=org_width;
 
-	*y=last_repaint_data.y/muly;
-	if(*y<0) *y=0;
-	if(*y>org_height) *y=org_height;
+        *y=last_repaint_data.y/muly;
+        if(*y<0) *y=0;
+        if(*y>org_height) *y=org_height;
 
-	*width=last_repaint_data.width/mulx;
-	if(*x+*width<0) *width=0;
-	if(*x+*width>org_width) *width=org_width-*x;
+        *width=last_repaint_data.width/mulx;
+        if(*x+*width<0) *width=0;
+        if(*x+*width>org_width) *width=org_width-*x;
 
-	*height=last_repaint_data.height/muly;
-	if(*y+*height <0) *height =0;
-	if(*y+*height>org_height) *height =org_height-*y;
-	repaint_flag=0;
+        *height=last_repaint_data.height/muly;
+        if(*y+*height <0) *height =0;
+        if(*y+*height>org_height) *height =org_height-*y;
+        repaint_flag=0;
 
-	return 0;
-	}
-	else
-	return -1;
+        return 0;
+    }
+    else
+        return -1;
 }
 
-int     get_mouse_event(int* xpos,int* ypos,int* click)
+int get_mouse_event(int* xpos,int* ypos,int* click)
 /* Odczytuje ostatnie zdazenie myszy */
 {
-if(LastMouse.flags!=0)
-	{
-	*xpos=LastMouse.x/mulx;
-	*ypos=LastMouse.y/muly;
-	*click=LastMouse.buttons;
-	LastMouse.flags=0;
-	return 0;
-	}
-return -1;
+    if(LastMouse.flags!=0)
+    {
+        *xpos=LastMouse.x/mulx;
+        *ypos=LastMouse.y/muly;
+        *click=LastMouse.buttons;
+        LastMouse.flags=0;
+        return 0;
+    }
+    return -1;
 }
 
 static
 void SetScaleOld(XColor RGBarray[])
 {
-unsigned k;
-XColor RGB;
+    unsigned k;
+    XColor RGB;
 
-RGB.red=0;RGB.green=0;RGB.blue=0;
+    RGB.red=0;RGB.green=0;RGB.blue=0;
 
-for(k=0;k<512;k++)
+    for(k=0;k<512;k++)
     {
-    RGBarray[k]=RGB;
+        RGBarray[k]=RGB;
     }
 
 
-if(UseGrayScale)
-  {
-  for(k=0;k<255;k++)
+    if(UseGrayScale)
     {
-    long wal=k;
-    /*fprintf(stderr,"%u %ul\n",k,wal);*/
-    RGBarray[k].red=wal;
-    RGBarray[k].green=wal;
-    RGBarray[k].blue=wal;
+        for(k=0;k<255;k++)
+        {
+            long wal=k;
+            /*fprintf(stderr,"%u %ul\n",k,wal);*/
+            RGBarray[k].red=wal;
+            RGBarray[k].green=wal;
+            RGBarray[k].blue=wal;
+        }
     }
-  }
-  else
-  {
-  for(k=0;k<255;k++)
-	{
-	long wal;
-	double kat=(M_PI*2)*k/255.;
-	wal=255*sin(kat*1.25);
-	if(wal>0)  RGBarray[k].red=wal;
-	wal=255*(-sin(kat*0.85));
-	if(wal>0)  RGBarray[k].green=wal;
-	wal=255*(-cos(kat*1.1));
-	if(wal>0)  RGBarray[k].blue=wal;
-	}
-   }
+    else
+    {
+        for(k=0;k<255;k++)
+        {
+            long wal;
+            double kat=(M_PI*2)*k/255.;
+            wal=255*sin(kat*1.25);
+            if(wal>0)  RGBarray[k].red=wal;
+            wal=255*(-sin(kat*0.85));
+            if(wal>0)  RGBarray[k].green=wal;
+            wal=255*(-cos(kat*1.1));
+            if(wal>0)  RGBarray[k].blue=wal;
+        }
+    }
 
-RGBarray[255].red=0xffff;
-RGBarray[255].green=0xffff;
-RGBarray[255].blue=0xffff;
+    RGBarray[255].red=0xffff;
+    RGBarray[255].green=0xffff;
+    RGBarray[255].blue=0xffff;
 
-if(trace)
-	fprintf(stderr,"%s\n","SetScale completed");
+    if(trace)
+        fprintf(stderr,"%s\n","SetScale completed");
 }
 
 static
 void SetScale(XColor RGBarray[])
 {
-unsigned k;
-XColor RGB;
+    unsigned k;
+    XColor RGB;
 
-RGB.red=0;RGB.green=0;RGB.blue=0;
+    RGB.red=0;RGB.green=0;RGB.blue=0;
 
-//Kolor 0 na pewno czarny
-RGBarray[0]=RGB;
+    //Kolor 0 na pewno czarny
+    RGBarray[0]=RGB;
 
-if(UseGrayScale)
-  {
-  for(k=1;k<256;k++)
+    if(UseGrayScale)
     {
-    long wal=k;
-    /*fprintf(stderr,"%u %ul\n",k,wal);*/
-    RGBarray[k]=RGBarray[0];//Inne pola struktury też moga byc wazne
-    RGBarray[k].red=wal;
-    RGBarray[k].green=wal;
-    RGBarray[k].blue=wal;
-    Scale[k]=buildColor(wal,wal,wal);
-    RGBarray[k+256].red=wal;
-    RGBarray[k+256].green=wal;
-    RGBarray[k+256].blue=wal;
-    Scale[k+256]=buildColor(wal,wal,wal);
+        for(k=1;k<256;k++)
+        {
+            long wal=k;
+            /*fprintf(stderr,"%u %ul\n",k,wal);*/
+            RGBarray[k]=RGBarray[0];//Inne pola struktury też moga byc wazne
+            RGBarray[k].red=wal;
+            RGBarray[k].green=wal;
+            RGBarray[k].blue=wal;
+            Scale[k]=buildColor(wal,wal,wal);
+            RGBarray[k+256].red=wal;
+            RGBarray[k+256].green=wal;
+            RGBarray[k+256].blue=wal;
+            Scale[k+256]=buildColor(wal,wal,wal);
+        }
     }
-  }
-  else
-  {
-  for(k=1;k<256;k++)
-	{
-	long wal;
-	double kat=(M_PI*2)*k/255.;
-	RGBarray[k]=RGBarray[0];//Inne pola struktury też moga byc wazne
-	wal=255*sin(kat*1.25);
-	if(wal>0)  RGBarray[k].red=wal;
-	wal=255*(-sin(kat*0.85));
-	if(wal>0)  RGBarray[k].green=wal;
-	wal=255*(-cos(kat*1.1));
-	if(wal>0)  RGBarray[k].blue=wal;
-	Scale[k]=buildColor(RGBarray[k].red,RGBarray[k].green,RGBarray[k].blue);
-	}
-  for(k=256;k<512;k++)
+    else
     {
-    long wal=k-256;
-    RGBarray[k]=RGBarray[0];//Inne pola struktury też moga byc wazne
-    /*fprintf(stderr,"%u %ul\n",k,wal);*/
-    Scale[k]=buildColor(wal,wal,wal);
-    RGBarray[k].red=wal;
-    RGBarray[k].green=wal;
-    RGBarray[k].blue=wal;
+        for(k=1;k<256;k++)
+        {
+            long wal;
+            double kat=(M_PI*2)*k/255.;
+            RGBarray[k]=RGBarray[0];//Inne pola struktury też moga byc wazne
+            wal=255*sin(kat*1.25);
+            if(wal>0)  RGBarray[k].red=wal;
+            wal=255*(-sin(kat*0.85));
+            if(wal>0)  RGBarray[k].green=wal;
+            wal=255*(-cos(kat*1.1));
+            if(wal>0)  RGBarray[k].blue=wal;
+            Scale[k]=buildColor(RGBarray[k].red,RGBarray[k].green,RGBarray[k].blue);
+        }
+        for(k=256;k<512;k++)
+        {
+            long wal=k-256;
+            RGBarray[k]=RGBarray[0];//Inne pola struktury też moga byc wazne
+            /*fprintf(stderr,"%u %ul\n",k,wal);*/
+            Scale[k]=buildColor(wal,wal,wal);
+            RGBarray[k].red=wal;
+            RGBarray[k].green=wal;
+            RGBarray[k].blue=wal;
+        }
     }
-  }
 
-//Kolor 255 na pewno biały!
-RGBarray[255].red=0xffff;
-RGBarray[255].green=0xffff;
-RGBarray[255].blue=0xffff;
-Scale[255]=buildColor(255,255,255);
+    //Kolor 255 na pewno biały!
+    RGBarray[255].red=0xffff;
+    RGBarray[255].green=0xffff;
+    RGBarray[255].blue=0xffff;
+    Scale[255]=buildColor(255,255,255);
 
-if(trace)
-	fprintf(stderr,"%s\n","SetScale completed");
+    if(trace)
+        fprintf(stderr,"%s\n","SetScale completed");
 }
 
 void    set_rgb(ssh_color color,ssh_intensity r,ssh_intensity g,ssh_intensity b)
 /* Zmienia definicja koloru. Indeksy 0..255 */
 {
-XColor pom;
-unsigned long pixels[1];
-pom.red=r*256;
-pom.blue=b*256;
-pom.green=g*256;
-Scale[color]=buildColor(r,g,b);
-pixels[0]=pom.pixel=Scale[color];
-pom.pixel=0;
+    XColor pom;
+    unsigned long pixels[1];
+    pom.red=r*256;
+    pom.blue=b*256;
+    pom.green=g*256;
+    Scale[color]=buildColor(r,g,b);
+    pixels[0]=pom.pixel=Scale[color];
+    pom.pixel=0;
 #if 0   // W trybie true-color to wydaje się niepotrzebne, a co ciekawsze czasem wywraca program
-if(XAllocColor(display,colormap,&pom)!=0)
+    if(XAllocColor(display,colormap,&pom)!=0)
     {
-    Scale[color]=pom.pixel;
-    /*Niepewna metoda,lub wrecz zla */
-    XFreeColors(display,colormap,pixels, 1,0);
+        Scale[color]=pom.pixel;
+        /*Niepewna metoda,lub wrecz zla */
+        XFreeColors(display,colormap,pixels, 1,0);
     }
 #endif
 }
 
-void    delay_ms(ssh_natural ms)
+void delay_ms(ssh_natural ms)
 /* Wymuszenie oczekiwania przez pewnej liczby ms */
 /* http://stackoverflow.com/questions/1157209/is-there-an-alternative-sleep-function-in-c-to-milliseconds */
- {
-      extern int usleep(useconds_t usec);/* takes microseconds, so you will have to multiply the input by 1000 in order to sleep in milliseconds. */
-      usleep(ms*1000);
- }
+{
+    extern int usleep(useconds_t usec);/* takes microseconds, so you will have to multiply the input by 1000 in order to sleep in milliseconds. */
+    usleep(ms*1000);
+}
 
-void    delay_us(ssh_natural ms)
+void delay_us(ssh_natural ms)
 /* Wymuszenie oczekiwania przez pewnej liczby ms */
 /* http://stackoverflow.com/questions/1157209/is-there-an-alternative-sleep-function-in-c-to-milliseconds */
- {
-      extern int usleep(useconds_t usec);/* takes microseconds, so you will have to multiply the input by 1000 in order to sleep in milliseconds. */
-      usleep(ms);
- }
+{
+    extern int usleep(useconds_t usec);/* takes microseconds, so you will have to multiply the input by 1000 in order to sleep in milliseconds. */
+    usleep(ms);
+}
 
 /* Event names. Used in "type" field in XEvent structures. Not to be
 confused with event masks above. They start from 2 because 0 and 1
@@ -2587,16 +2625,16 @@ static char* event_names[]={
 
 char* event_name(int code)
 {
-if(code>=0 && code<sizeof(event_names)/sizeof(event_names[0]) )
-		return event_names[code];
-		else
-		return "Undefined";
+    if(code>=0 && code<sizeof(event_names)/sizeof(event_names[0]) )
+        return event_names[code];
+    else
+        return "Undefined";
 }
 
 #include <X11/xpm.h>  /*  TAK POWINNO BYĆ - JAK JEST NORMALNIE ZAINSTALOWANE */
 //#include "SYMSHELL/Xpm/xpm.h"
 
-int     dump_screen(const char* Filename)
+int dump_screen(const char* Filename)
 /* Zapisuje zawartosc ekranu do pliku graficznego w naturalnym formacie platformy: BMP, XBM itp */
 {
     char NameBufor[2048];
@@ -2610,29 +2648,40 @@ int     dump_screen(const char* Filename)
     sprintf(NameBufor, "%s.xpm", Filename);
     XSync(display, True);
 
-    if (cont_pixmap) 
+    if (cont_pixmap)
     {
-     /*  int XpmWriteFileFromPixmap (
-     //     Display *  	display,
-     //	char *  	filename,
-     //	Pixmap  	pixmap,
-     //	Pixmap  	shapemask,   //???
-     //	XpmAttributes *  	attributes
-     // ) 	*/
-             if (XpmWriteFileFromPixmap(display, NameBufor, cont_pixmap, 0, NULL) != XpmSuccess) 
-             {
-                    fprintf(stderr, "'dump_screen(%s)' failed \n", NameBufor);
-             } 
-             else 
-             {
-                    fprintf(stderr, "'dump_screen(%s)' finished with SUCCES! \n", NameBufor);
-             }
-    } 
-    else 
-    {        
+     /* int XpmWriteFileFromPixmap (
+     //             Display *  	display,
+     //             char *  	filename,
+     //             Pixmap  	pixmap,
+     //             Pixmap  	shapemask,   //???
+     //             XpmAttributes *  	attributes
+     //         ) 	*/
+        if (XpmWriteFileFromPixmap(display, NameBufor, cont_pixmap, 0, NULL) != XpmSuccess)
+        {
+            fprintf(stderr, "'dump_screen(%s)' failed \n", NameBufor);
+        }
+        else
+        {
+            fprintf(stderr, "'dump_screen(%s)' finished with SUCCES! \n", NameBufor);
+        }
+    }
+    else
+    {
         fprintf(stderr, "'dump_screen(%s)' have no pixmap to save! \n", NameBufor);
     }
 
     return 0;
 }
 /*#pragma exit close_plot*/
+/********************************************************************/
+/*              SYMSHELLLIGHT  version 2020-11-17                   */
+/********************************************************************/
+/*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
+/*            W O J C I E C H   B O R K O W S K I                   */
+/*    Instytut Studiow Spolecznych Uniwersytetu Warszawskiego       */
+/*    WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI  */
+/*    GITHUB: https://github.com/borkowsk                           */
+/*                                                                  */
+/*                               (Don't change or remove this note) */
+/********************************************************************/

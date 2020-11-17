@@ -241,7 +241,7 @@ inline ssh_color  get_background(void){ return background(); }    // Aktualny ko
 #endif /* _SYMSHELL_H_ */
 
 /********************************************************************/
-/*                 WBRTM  version 2020-11-15                        */
+/*              SYMSHELLLIGHT  version 2020-11-16                   */
 /********************************************************************/
 /*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
 /*            W O J C I E C H   B O R K O W S K I                   */
@@ -251,6 +251,3 @@ inline ssh_color  get_background(void){ return background(); }    // Aktualny ko
 /*                                                                  */
 /*                               (Don't change or remove this note) */
 /********************************************************************/
-
-
-

@@ -8,13 +8,13 @@
 /* Najprostrzy interface wizualizacyjny zaimplementowany pod X-windows  */
 /* za pomoca biblioteki X11                                             */
 /* FILE: symshx11.c                                                     */
-/* Wersja: 15.11.2020                                                   */
+/* Wersja: 16.11.2020                                                   */
 /*                                                                      */
 /* UWAGA!                                                               */
 /* WCIĄŻ Z BLEDEM NA EXPOSE TODO , choc raz go juz gdzies usunalem :-/  */
 /*                                                                      */
 /************************************************************************/
-/*               PROCESSING2C  version 2020-11-15                       */
+/*               SYMSHELLLIGHT  version 2020-11-16                      */
 /************************************************************************/
 
 

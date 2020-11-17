@@ -58,6 +58,10 @@ add_executable("TestsymsX11" "TESTS/Testsyms.cpp"
     )
 add_executable("TestsyshX11" "TESTS/Testsysh.cpp"
     )
+add_executable("TurmitX11" "TESTS/Turmit.cpp"
+    )
+add_executable("CAGasX11" "TESTS/CAGas.cpp"
+    )
 
 target_link_libraries("TestmousX11" wbsyshX11 X11 Xpm rt)
 target_link_libraries("TestpaleX11" wbsyshX11 X11 Xpm rt)
@@ -65,6 +69,8 @@ target_link_libraries("TestpolyX11" wbsyshX11 X11 Xpm rt)
 target_link_libraries("TestrandX11" wbsyshX11 X11 Xpm rt)
 target_link_libraries("TestsymsX11" wbsyshX11 X11 Xpm rt)
 target_link_libraries("TestsyshX11" wbsyshX11 X11 Xpm rt)
+target_link_libraries("TurmitX11"   wbsyshX11 X11 Xpm rt)
+target_link_libraries("CAGasX11"    wbsyshX11 X11 Xpm pthread rt)
 
 #add_executable("LinktestX11" "TESTS/Linktest.cpp"    )
 #target_link_libraries("LinktestX11" wbsyshX11 X11 Xpm rt)
@@ -86,6 +92,10 @@ add_executable("TestsymsSVG" "TESTS/Testsyms.cpp"
     )
 add_executable("TestsyshSVG" "TESTS/Testsysh.cpp"
     )
+add_executable("TurmitSVG" "TESTS/Turmit.cpp"
+    )
+add_executable("CAGasSVG" "TESTS/CAGas.cpp"
+    )
 
 target_link_libraries("TestmousSVG" wbsyshSVG  rt)
 target_link_libraries("TestpaleSVG" wbsyshSVG  rt)
@@ -93,6 +103,8 @@ target_link_libraries("TestpolySVG" wbsyshSVG  rt)
 target_link_libraries("TestrandSVG" wbsyshSVG  rt)
 target_link_libraries("TestsymsSVG" wbsyshSVG  rt)
 target_link_libraries("TestsyshSVG" wbsyshSVG  rt)
+target_link_libraries("TurmitSVG"   wbsyshSVG  rt)
+target_link_libraries("CAGasSVG"    wbsyshSVG pthread rt)
 
 add_executable("LinktestSVG" "TESTS/Linktest.cpp"    )
 target_link_libraries("LinktestSVG" wbsyshSVG rt)

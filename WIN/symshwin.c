@@ -3343,6 +3343,7 @@ for(i=1;i<largc;i++)
 			   "\t -help\n"
 			   "\t -logo\n"
 			   );
+                exit(-1);//2020-11-17 WB
 		}
 	else
 	if(strncmp(largv[i],"-delay=",7)==0)

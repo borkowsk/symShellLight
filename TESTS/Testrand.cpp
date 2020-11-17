@@ -51,7 +51,7 @@ void replot()
             plot(j,i,pom);
         }
 
-    printbw(0,BOK,"%lu:<%g,%g> T:%g",counter,MinCount,MaxCount,double(Clock));
+    printbw(0,BOK,"%lu:%g..%g T:%g",counter,MinCount,MaxCount,double(Clock));//Nie można używać <> bo aktualnie wywalają SVG
     flush_plot();
 }
 
@@ -67,7 +67,7 @@ int main(int argc,const char* argv[])
     mouse_activity(0);/*Mysz niepotrzebna */
     set_background(128);
     buffering_setup(1);/* Wlaczona animacja - tu potrzebna */
-    shell_setup("SYMSHELL - RANDS ",argc,argv);
+    shell_setup("SYMSHELL - RANDS",argc,argv);
     printf("COLORS= 256 q-quit s-swich stdout on/off\n");
 
     if(!init_plot(BOK,BOK,1,1))

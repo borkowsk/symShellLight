@@ -743,72 +743,73 @@ void set_title(const char* window_name)
 
 void shell_setup(const char* title,int iargc,const char* iargv[])
 {/* Przekazanie parametrow wywolania fo konfiguracji symmshella */
-int i;
-largc=iargc;
-largv=iargv;
+    int i;
+    largc=iargc;
+    largv=iargv;
 
-strncpy(progname,largv[0],1024);//TODO TEST
-strncpy(window_name, title, 1024);
-strncpy(icon_name, title,1024);
+    strncpy(progname,largv[0],1024);//TODO TEST
+    strncpy(window_name, title, 1024);
+    strncpy(icon_name, title,1024);
 
-for(i=1;i<largc;i++)
-	{
-	if(strncmp(largv[i],"-h",2)==0)
-		{
-		fprintf(stderr,"SYMSHELL for X11 enviroment. Compiled %s\n",__DATE__);
-		fprintf(stderr,"Supported swithes:"
-                "\n\t -mapped+/-] "
-                "\n\t -buffered[+/-]"
-                "\n\t -sclip[+/-]"
-				"\n\t -bestfont[+/-] "
-				"\n\t -traceevt[+/-] "
-				"\n\t -gray[+/-] "
-				"\n");
-		fprintf(stderr,"You can always gracefully break the program sending\n"
-		" the  ^C  or  ^D  key	 to  g_r_a_p_h_i_c_s  w_i_n_d_o_w !\n"
-		"Other methods break the program immediatelly by exit call!\n");
-		}
-	else
-	if(strncmp(largv[i],"-gray",5)==0)
-		{
-		UseGrayScale=(largv[i][5]=='+')?1:0;
-	        fprintf(stderr,"Gray scale is %s\n",(UseGrayScale?"ON":"OFF"));
-		}
-	else
-    if(strncmp(largv[i],"-sclip",6)==0)
-		{
-		ScreenClip=(largv[i][6]=='+')?1:0;
-	        fprintf(stderr,"Clipping to display size is %s\n",(ScreenClip?"ON":"OFF"));
-		}
-	else
-	if(strncmp(largv[i],"-mapped",7)==0)
-		{
-		isbuffered=(largv[i][7]=='+')?1:0;
-	        fprintf(stderr,"Double mapping is %s\n",(isbuffered?"ON":"OFF"));
-		/* Jesli user chec tryb mapowania to nie bedziemy */
-		animate=0; /* animowac */
-		}
-	else
-	if(strncmp(largv[i],"-buffered",9)==0)
-		{
-		animate=(largv[i][9]=='+')?1:0;
-	        fprintf(stderr,"Buffered is %s\n",(animate?"ON":"OFF"));
-		/* Musi byc wlaczona bitmapa buforujaca */
-		isbuffered=animate;/* zeby mozna bylo na nia pisac */
-		}
-	else
-	if(strncmp(largv[i],"-bestfont",9)==0)
-		{
-		ResizeFont=(largv[i][9]=='+')?1:0;
-	        fprintf(stderr,"Search best font is %s\n",(ResizeFont?"ON":"OFF"));
-		}
-	else
-	if(strncmp(largv[i],"-traceevt",9)==0)
-		{
-		trace=(largv[i][9]=='+')?1:0;
-	        fprintf(stderr,"Trace events is %s\n",(trace?"ON":"OFF"));
-		}
-	}
+    for(i=1;i<largc;i++)
+    {
+        if(strncmp(largv[i],"-h",2)==0)
+        {
+            fprintf(stderr,"SYMSHELL for X11 enviroment. Compiled %s\n",__DATE__);
+            fprintf(stderr,"Supported swithes:"
+                           "\n\t -mapped+/-] "
+                           "\n\t -buffered[+/-]"
+                           "\n\t -sclip[+/-]"
+                           "\n\t -bestfont[+/-] "
+                           "\n\t -traceevt[+/-] "
+                           "\n\t -gray[+/-] "
+                           "\n");
+            fprintf(stderr,"You can always gracefully break the program sending\n"
+                           " the  ^C  or  ^D  key	 to  g_r_a_p_h_i_c_s  w_i_n_d_o_w !\n"
+                           "Other methods break the program immediatelly by exit call!\n");
+            exit(-1);
+        }
+        else
+            if(strncmp(largv[i],"-gray",5)==0)
+            {
+                UseGrayScale=(largv[i][5]=='+')?1:0;
+                fprintf(stderr,"Gray scale is %s\n",(UseGrayScale?"ON":"OFF"));
+            }
+            else
+                if(strncmp(largv[i],"-sclip",6)==0)
+                {
+                    ScreenClip=(largv[i][6]=='+')?1:0;
+                    fprintf(stderr,"Clipping to display size is %s\n",(ScreenClip?"ON":"OFF"));
+                }
+                else
+                    if(strncmp(largv[i],"-mapped",7)==0)
+                    {
+                        isbuffered=(largv[i][7]=='+')?1:0;
+                        fprintf(stderr,"Double mapping is %s\n",(isbuffered?"ON":"OFF"));
+                        /* Jesli user chec tryb mapowania to nie bedziemy */
+                        animate=0; /* animowac */
+                    }
+                    else
+                        if(strncmp(largv[i],"-buffered",9)==0)
+                        {
+                            animate=(largv[i][9]=='+')?1:0;
+                            fprintf(stderr,"Buffered is %s\n",(animate?"ON":"OFF"));
+                            /* Musi byc wlaczona bitmapa buforujaca */
+                            isbuffered=animate;/* zeby mozna bylo na nia pisac */
+                        }
+                        else
+                            if(strncmp(largv[i],"-bestfont",9)==0)
+                            {
+                                ResizeFont=(largv[i][9]=='+')?1:0;
+                                fprintf(stderr,"Search best font is %s\n",(ResizeFont?"ON":"OFF"));
+                            }
+                            else
+                                if(strncmp(largv[i],"-traceevt",9)==0)
+                                {
+                                    trace=(largv[i][9]=='+')?1:0;
+                                    fprintf(stderr,"Trace events is %s\n",(trace?"ON":"OFF"));
+                                }
+    }
 }
 
 

@@ -220,16 +220,34 @@ int  repaint_area(ssh_coordinate* x, ssh_coordinate* y,
 
 static_assert( sizeof(uchar8b)==1 , "uchar8b has more than 1 byte" );
 
+inline
+ssh_rgb RGB(ssh_intensity r,ssh_intensity g,ssh_intensity b)/// DO PRZENIESIENIA DO symshell.h TODO!
+{
+    ssh_rgb po;
+    po.r=(uchar8b)(r & 0xff);
+    po.g=(uchar8b)(g & 0xff);
+    po.b=(uchar8b)(b & 0xff);
+    return po;
+}
+
 // Temporary implementation set_background RGB
-inline void set_background(ssh_intensity r,ssh_intensity g,ssh_intensity b)
+inline
+void set_background(ssh_intensity r,ssh_intensity g,ssh_intensity b)
 {   // TODO!
     set_background(r);
 }
 
 // Konwerter na referencje żeby nie trzeba było używać adresów
-inline int  get_mouse_event(int& xpos,int& ypos,int& click)
+inline
+int get_mouse_event(int& xpos,int& ypos,int& click)
 {
     return get_mouse_event(&xpos,&ypos,&click);
+}
+
+inline
+int  repaint_area(ssh_coordinate& x, ssh_coordinate& y,ssh_natural& width, ssh_natural& height)
+{
+    return repaint_area(&x,&y,&width,&height);
 }
 
 // FUNKCJE PRZESTARZALE DOSTEPNE TYLKO DLA KOMPILATORA C++

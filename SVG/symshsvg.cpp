@@ -34,6 +34,7 @@ auto    PID=_getpid();
 
 inline
 #endif
+/*
 ssh_rgb RGB(ssh_intensity r,ssh_intensity g,ssh_intensity b)/// DO PRZENIESIENIA DO symshell.h TODO!
 {
     ssh_rgb po;
@@ -42,10 +43,10 @@ ssh_rgb RGB(ssh_intensity r,ssh_intensity g,ssh_intensity b)/// DO PRZENIESIENIA
     po.b=(uchar8b)(b & 0xff);
     return po;
 }
-
+*/
 /// Wewnętrzne śledzenie wywołań
 //////////////////////////////////////////////////
-#if 0
+#if 1
 #define _FUNCTION_NAME_  __func__ //C11
 #else
 #define STR_HELPER(x) #x
@@ -54,15 +55,15 @@ ssh_rgb RGB(ssh_intensity r,ssh_intensity g,ssh_intensity b)/// DO PRZENIESIENIA
 #endif
 
 //Maska poziomów śledzenia 1-msgs 2-grafika 3-grafika detaliczna 4-alokacje/zwalnianie
-int ssh_trace_level = 0;
-
-double INITIAL_LENGH_RATIO = 0.00003; //Ile d�ugo�ci maksymalnej bierzemy dla tablicy operacji graficznych
+int ssh_trace_level = 1;
+double INITIAL_LENGH_RATIO = 0.001;   //Jaką długości inicjujemy tablice operacji graficznych (mnożone przez liczbę pikseli ekranu)
+double MAXIMAL_LENGH_RATIO = 0.999;   //Ile maksymalnie rekordów jest dopuszczalnych?//(mnożone przez liczbę pikseli ekranu)
 
 const char* GrFileOutputByExtension = "svg";//Tym mo�na sterowa� format pliku wyj�ciwego. Jak format nieznany to wyrzuca strumie� obiektowy .str
 const char* GrTmpOutputDirectory = "./"; // gdzie wrzuca� zrzuty tymczasowe
-unsigned GrReloadInterval = 5000; //Co ile czasu skrypt w pliku SVG wymusza prze�adowanie. Jak 0 to w og�le nie ma skryptu.
-bool GrMouseActive = false;//Myszy domy�lnie nie ma, ale inny modu� mo�e j� symulowa� przez linkowanie do zmiennych globalnych
-int  GrCharMessage = -2;   //Nie ma te� klawiatury, ale  ------------------------------//-------------------------------------
+unsigned GrReloadInterval = 1000; //Co ile czasu skrypt w pliku SVG wymusza przeładowanie. Jak 0 to w ogóle nie ma skryptu.
+bool GrMouseActive = false;//Myszy domyślnie nie ma, ale inny moduł może ją symulować przez linkowanie do tych zmiennych globalnych
+int  GrCharMessage = -2;   //Nie ma też klawiatury, ale  ------------------------------//------------------------------------------
 int  GrMouseX = -1;
 int  GrMouseY = -1;
 int  GrMouseC = -1;
@@ -123,9 +124,9 @@ GrOperation(GrOperation& From)
 	{
 		memcpy(this,&From, sizeof(GrOperation));
 		if (empty.type == GrType::Text || empty.type == GrType::Poly)
-			memset(&From, 0, sizeof(GrOperation));//Wype�nianie zerami
+            memset(&From, 0, sizeof(GrOperation));//Wypełnianie zerami
 	}
-void clean()//czysci operacje - np. gdy uznano �e efekt i tak jest zas�oni�ty, albo clear_screen()
+void clean()//czysci operacje - np. gdy uznano że efekt i tak jest zasłonięty, albo clear_screen()
 	{
 	if (empty.type == GrType::Text && text.txt!=NULL )
 		delete text.txt;
@@ -133,37 +134,59 @@ void clean()//czysci operacje - np. gdy uznano �e efekt i tak jest zas�oni�
 		delete [] poly.points;
 	empty.type = GrType::Empty;
 	}
-~GrOperation() //Je�eli jest zapisany obiekt z danymi dynamicznymi to trzeba zwolni�
+~GrOperation() //Jeżeli jest zapisany obiekt z danymi dynamicznymi to trzeba zwolnić
 	{
 		clean();
 	}
 };
 
 static wb_dynarray<GrOperation> GrList; //Lista operacji rysowania
+static int GrListPosition = -1;         //Aktualna pozycja na liście
+static int maxN=-1;                     //from MAXIMAL_LENGH_RATIO;
 
-static int GrListPosition = -1;
+
 static GrOperation&  NextGrListEntry()
 {
-	if (++GrListPosition < GrList.get_size())
-		return GrList[GrListPosition];//Zwraca dost�p do kolejnej operacji - mo�na wpisywac informacje
-	else //NIE MA MIEJSCA!!!
-	{
-		size_t N = GrList.get_size() * 2;
-		size_t oldsize;
-		GrOperation* RawPtr = GrList.give_dynamic_ptr_val(oldsize); //Nie chcemy u�y� expand bo b�dzie wywo�ywa� destruktory i kopiowanie!
-														assert(GrList.get_size() == 0);
-		GrList.alloc(N);//Nowy, powi�kszony rozmiar
-		memcpy(GrList.get_ptr_val(), RawPtr, oldsize*sizeof(GrOperation));//Przekopiowanie realnej zawarto�ci
-		for (size_t i = 0; i < oldsize; i++)
-			RawPtr[i].empty.type = GrType::Empty;//Wirtualne wyczyszczenie starego
-		delete [] RawPtr; //Zwalnianie bez wywo�ywania mo�liwych istotnych destruktor�w dla Text i Poly
-		return GrList[GrListPosition];//Zwraca dost�p do kolejnej operacji - pierwszej za stara list�
-	}
+    if (++GrListPosition < GrList.get_size())
+    {
+        return GrList[GrListPosition];//Zwraca dostęp do kolejnej operacji - można wpisywać informacje
+    }
+    else //NIE MA MIEJSCA!!!
+    {
+        size_t N = GrList.get_size() * 2;
+        if(N>maxN) N=maxN;//Nie więcej niż maxN
+
+        if(N<maxN)//Jeszcze można powiększyć
+        {
+            //Przy powiększanniu nie chcemy użyć "expand" bo będzie wywoływać destruktory i kopiowanie!
+            size_t oldsize;
+            GrOperation* RawPtr = GrList.give_dynamic_ptr_val(oldsize);         assert(GrList.get_size() == 0);
+
+            GrList.alloc(N);//Nowy bufor w powiększonym rozmiarze
+            memcpy(GrList.get_ptr_val(), RawPtr, oldsize*sizeof(GrOperation));//Przekopiowanie realnej zawartości
+            for (size_t i = 0; i < oldsize; i++)
+                RawPtr[i].empty.type = GrType::Empty;//Wirtualne wyczyszczenie starego
+            delete [] RawPtr; //Zwalnianie bez wywoływania możliwych istotnych destruktorów dla Text i Poly
+        }
+        else //Już nie można bardziej powiększyć bufora! Kasujemy pół najstarszej zawartości i przesuwamy
+        {
+            GrOperation* RawPtr = GrList.get_ptr_val();
+            GrListPosition/=2;
+            for(size_t i=0; i < GrListPosition;i++)
+                RawPtr[i].clean();//Zwalniamy ewentualne składniki dynamiczne
+            memmove(RawPtr,RawPtr+GrListPosition,GrListPosition*sizeof(GrOperation));
+            size_t size=GrList.get_size();
+            for(size_t i=GrListPosition;i<size;i++)
+                RawPtr[i].empty.type = GrType::Empty;//Wirtualne wyczyszczenie zduplikowanej zawartości
+        }
+
+        return GrList[GrListPosition];//Zwraca dostęp do kolejnej operacji - pierwszej za starej listy
+    }
 }
 
 
 /* OTWIERANIE i ZAMYKANIE TRYBU (OKNA) GRAFICZNEGO */
-/* Operacje konfiguracyjne o dzia�aniu gwarantowanym przed inicjacja */
+/* Operacje konfiguracyjne o działaniu gwarantowanym przed inicjacja */
 
 void shell_setup(const char* title,int iargc,const char* iargv[])
 /* Przekazanie parametrow wywolania */
@@ -180,14 +203,35 @@ void shell_setup(const char* title,int iargc,const char* iargv[])
 	for (int i = 1; i < iargc; i++)
 		if (iargv[i][0] == '-')
 		{
-			if (iargv[i][1] == 'f' || iargv[i][1] == 'e')
+            if (iargv[i][1] == 'F' || iargv[i][1] == 'e' || iargv[i][1] == 'f')
 				GrFileOutputByExtension = iargv[i] + 2;
-			if (iargv[i][1] == 'd' || iargv[i][1] == 'D')
+            else
+            if (iargv[i][1] == 'D' || iargv[i][1] == 'd')
 				GrTmpOutputDirectory = iargv[i] + 2;
-			if (iargv[i][1] == 'a' || iargv[i][1] == 'c')
+            else
+            if (iargv[i][1] == 'C' || iargv[i][1] == 'a' || iargv[i][1] == 'c')
 				GrCharMessage = atoi(iargv[i] + 2);
-			if (iargv[i][1] == 'r' )
+            else
+            if (iargv[i][1] == 'R' || iargv[i][1] == 'r')
 				GrReloadInterval = atoi(iargv[i] + 2);
+            else
+            if (iargv[i][1] == 'B' || iargv[i][1] == 'b')
+                MAXIMAL_LENGH_RATIO = atof(iargv[i] + 2);
+            else
+            if (iargv[i][1] == 'T' || iargv[i][1] == 't')
+                    ssh_trace_level = atoi(iargv[i] + 2);
+            else
+            {
+                cout<<"SVG graphics parameters:"<<endl;
+                cout<<"-Fext - output format (svg or str)"<<endl;
+                cout<<"-Dpath - output directory"<<endl;
+                cout<<"-Cchar - single input character"<<endl;
+                cout<<"-Rms - reload interval in SVG embeded script"<<endl;
+                cout<<"-Bratio - maximal size of buffor as ratio of number of pixels"<<endl;
+                cout<<"-Tint - trace level"<<endl;
+                exit(-1);
+                //cout<<"-x"<<endl;
+            }
 		}
 
 }
@@ -217,13 +261,23 @@ int  init_plot(ssh_natural  a, ssh_natural   b,                 /* ile pikseli m
     GrScreenHi = b + GrFontHi* cb;  assert(b>0);
 
     unsigned N = ((a + ca)*(b + cb))*INITIAL_LENGH_RATIO;
-    if(N<1)//To ewidentny błąd
+    maxN=((a + ca)*(b + cb))*MAXIMAL_LENGH_RATIO;
+
+    if(N<1 || maxN<1 || N>maxN )//N lub maxN, mniejsze od 1 to ewidentny błąd
     {
-        cerr<<"((a + ca)*(b + cb))*INITIAL_LENGH_RATIO="
+        cerr<<__FUNCTION__<<": WARNING! : "
+           <<"((a + ca)*(b + cb))*INITIAL_LENGH_RATIO="
            <<"(("<<a<<" + "<<ca<<")*("<<b<<" + "<<cb<<"))*"<<INITIAL_LENGH_RATIO
            <<"="<<N<<endl;
+
         N=100;
+
+        if(maxN<N)
+            maxN=10000;
     }
+
+    N+=N%2;maxN+=maxN%2;//Likwidacja ewentualnej nieparzystości, ważna przy przesuwaniu
+
     GrList.alloc(N);//Tu nie może być zero
 
 	GrClosed = false;
@@ -545,7 +599,7 @@ void printc(int x, int y,
 	va_end(marker);              /* Reset variable arguments.      */
 	//if(Op.text.txt != NULL) //Tu niepotrzebne - nowy obiekt powinien by� zklirowany
 	//		delete Op.text.txt;
-    if(ssh_trace_level>1) cout<<target<< endl;
+    if(ssh_trace_level>0) cout<<target<< endl;
 	Op.text.txt=clone_str(target);
 }
 
@@ -578,7 +632,7 @@ void printbw(int x,int y,const char* format,...)
 	//Op.text.txt.take(clone_str(target));
 	//if(Op.text.txt != NULL)
 	//		delete Op.text.txt;
-    if(ssh_trace_level>1) cout<<target<< endl;
+    if(ssh_trace_level>0) cout<<target<< endl;
 	Op.text.txt=clone_str(target);
 }
 
@@ -615,7 +669,7 @@ void print_rgb(int x, int y,
 	//Op.text.txt.take(clone_str(target));
 	//if(Op.text.txt != NULL)
 	//		delete Op.text.txt;
-    if(ssh_trace_level>1) cout<<target<< endl;
+    if(ssh_trace_level>0) cout<<target<< endl;
 	Op.text.txt=clone_str(target);
 }
 

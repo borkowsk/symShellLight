@@ -7,7 +7,7 @@
 //	wb_pchar- ptr to char[]
 //	wb_dynarray- dynamic array of
 //	wb_dynmatrix- dynamic matrix of
-// !!!:	Zawartosc jest "sztefetowana" pomiedzy obiektami powyøszych typÛw -
+// !!!:	Zawartosc jest "sztefetowana" pomiedzy obiektami powy≈ºszych typ√≥w -
 // w konstruktorze albo przypisaniu jest przenoszona a nie kopiowana.
 /////////////////////////////////////////////////////////////////////////////
 #ifndef __WB_PTR_HPP__
@@ -49,7 +49,7 @@ public:
 	wb_sptr(wb_sptr& nini):ptr(nini.give()){}
 	~wb_sptr(){ dispose(); }
 
-void finalise(){ dispose(); }//Wywolanie rownowaøne destruktorowi
+void finalise(){ dispose(); }//Wywolanie rownowa≈ºne destruktorowi
 
 void dispose()
 	{
@@ -436,7 +436,7 @@ size_t alloc(size_t s)
 	return s;
 	}
 
-//SkrÛcenie wektora - przydatne przy czytaniu
+//Skr√≥cenie wektora - przydatne przy czytaniu
 size_t trunc(size_t s)
     {
     WBPTRLOG( "wb_dynnarray::trunc("<<s<<")" )
@@ -496,13 +496,14 @@ T* get_ptr_val(size_t offset=0,size_t interest=0) const
 	}
 
 //Zabiera adres zpod zarzadu tablicy!!!
+//Pobiera te≈º informacje o aktualnym rozmiarze
 T*  give_dynamic_ptr_val(size_t& outsize)
 	{
 	T* pom=ptr;
 	outsize=size;
 	//kasowanie
 	ptr=NULL;size=0;
-	return pom;
+    return pom;
 	}
 
 //Wymusza umieszczenie dynamicznie alokowanego
@@ -585,7 +586,7 @@ void copy_from(const wb_dynarray<T>& Where)
 
 //Szablon prostej tablicy dwuwymiarowej
 //o dowolnej ilosci wierszy i dowolnej dlugosci kazdego wiersza.
-//Kontrole zakresow itp assercje dziedziczy po klasie macieøystej
+//Kontrole zakresow itp assercje dziedziczy po klasie macie≈ºystej
 template<class T>
 class wb_dynmatrix:public wb_dynarray< wb_dynarray<T> >
 /////////////////////////////////////////////////////////////
@@ -625,7 +626,7 @@ public:
 		dispose();
 		}
 
-//dealokacja wektora wektorÛw
+//dealokacja wektora wektor√≥w
 void dispose()
 	{
 	WBPTRLOG( "wb_dynmatrix::dispose :"<<get_size() );

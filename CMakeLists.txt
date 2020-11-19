@@ -1,3 +1,7 @@
+# CMAKE configuration for SYMSHELLLIGHT libraries wbsyshSVG wbsyshX11
+######################################################################
+# Define WITHTESTS if you want build test aplications!
+#
 cmake_minimum_required(VERSION 2.8)
 
 project(symshelllight)
@@ -11,7 +15,7 @@ add_library( wbsyshSVG STATIC
     "UTILS/wb_pchar.cpp" #Używane wewnątrz modułu
     "UTILS/sshdefs.c"
     "UTILS/sshutils.cpp"
-    "UTILS/sshmenufdummy.c" #zamienia funkcje obslugi menu na puste wywołania
+    "UTILS/sshmenufdummy.c" #dummy functions of menus
 )
 endif()
 
@@ -23,7 +27,7 @@ add_library( wbsyshX11 STATIC
     "X11/wbx11ico.c"
     "UTILS/sshdefs.c"
     "UTILS/sshutils.cpp"
-    "UTILS/sshmenufdummy.c" #zamienia funkcje obslugi menu na puste wywołania
+    "UTILS/sshmenufdummy.c" #dummy functions of menus
 )
 endif()
 
@@ -34,15 +38,16 @@ add_library( wbsyshWIN STATIC
     "WIN/symshwin.c"
     "WIN/autor.cpp"
     "UTILS/sshutils.cpp"
-    "UTILS/sshmenufdummy.c" #zamienia funkcje obslugi menu na puste wywołania
+    "UTILS/sshmenufdummy.c" #dummy functions of menus
     )
 endif()
 
 
-## PROGRAMY TESTOWE ##
-######################
+## PROGRAMY TESTOWE  ##
+## TEST APPLICATIONS ##
+#######################
 
-if(true) #X11 tests
+if(WITHTESTS) #X11 tests
 add_executable("TestmousX11" "TESTS/Testmous.cpp"
     )
 add_executable("TestpaleX11" "TESTS/Testpale.cpp"
@@ -76,7 +81,7 @@ target_link_libraries("CAGasX11"    wbsyshX11 X11 Xpm pthread rt)
 #target_link_libraries("LinktestX11" wbsyshX11 X11 Xpm rt)
 endif()
 
-if(true) #SVG tests
+if(WITHTESTS) #SVG tests
 add_executable("TestmousSVG" "TESTS/Testmous.cpp"
     )
 add_executable("TestpaleSVG" "TESTS/Testpale.cpp"
@@ -110,4 +115,15 @@ add_executable("LinktestSVG" "TESTS/Linktest.cpp"    )
 target_link_libraries("LinktestSVG" wbsyshSVG rt)
 endif()
 
-#KONIEC
+#KONIEC - THE END
+#********************************************************************/
+#*              SYMSHELLLIGHT  version 2020-11-19                   */
+#********************************************************************/
+#*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
+#*            W O J C I E C H   B O R K O W S K I                   */
+#*    Instytut Studiow Spolecznych Uniwersytetu Warszawskiego       */
+#*    WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI  */
+#*    GITHUB: https://github.com/borkowsk                           */
+#*                                                                  */
+#*                               (Don't change or remove this note) */
+#********************************************************************/

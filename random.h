@@ -98,11 +98,14 @@ double DRAND_LOOP(int W)
 #endif
 
 /********************************************************************/
+/*              SYMSHELLLIGHT  version 2020-11-19                   */
+/********************************************************************/
 /*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
 /*            W O J C I E C H   B O R K O W S K I                   */
 /*    Instytut Studiow Spolecznych Uniwersytetu Warszawskiego       */
-/*        WWW:  http://www.iss.uw.edu.pl/borkowski                  */
-/*        MAIL: wborkowski@uw.edu.pl                                */
+/*    WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI  */
+/*    GITHUB: https://github.com/borkowsk                           */
+/*                                                                  */
 /*                               (Don't change or remove this note) */
 /********************************************************************/
 #endif

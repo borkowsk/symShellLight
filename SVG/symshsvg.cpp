@@ -1618,7 +1618,7 @@ int	dump_screen(const char* Filename)
 }
 
 /********************************************************************/
-/*              SYMSHELLLIGHT  version 2020-11-17                   */
+/*              SYMSHELLLIGHT  version 2020-11-19                   */
 /********************************************************************/
 /*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
 /*            W O J C I E C H   B O R K O W S K I                   */
@@ -1628,3 +1628,4 @@ int	dump_screen(const char* Filename)
 /*                                                                  */
 /*                               (Don't change or remove this note) */
 /********************************************************************/
+

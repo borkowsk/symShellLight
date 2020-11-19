@@ -454,12 +454,13 @@ void OptEnumParametr<T>::HelpPrn(ostream& o)
 }//NAMESPACE WBRTM
 
 /********************************************************************/
-/*			        WBRTM  version 2013-09-23                       */
+/*              SYMSHELLLIGHT  version 2020-11-19                   */
 /********************************************************************/
 /*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
 /*            W O J C I E C H   B O R K O W S K I                   */
 /*    Instytut Studiow Spolecznych Uniwersytetu Warszawskiego       */
-/*        WWW:  http://borkowski.iss.uw.edu.pl/                     */
+/*    WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI  */
+/*    GITHUB: https://github.com/borkowsk                           */
 /*                                                                  */
 /*                               (Don't change or remove this note) */
 /********************************************************************/

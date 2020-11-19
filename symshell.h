@@ -217,8 +217,10 @@ int  repaint_area(ssh_coordinate* x, ssh_coordinate* y,
 #endif
 
 #ifdef __cplusplus
-
+// FUNKCJE INLINE DOSTEPNE TYLKO Z POZIOMU C++
 static_assert( sizeof(uchar8b)==1 , "uchar8b has more than 1 byte" );
+
+//namespace SYMSHELL ???
 
 inline
 ssh_rgb RGB(ssh_intensity r,ssh_intensity g,ssh_intensity b)/// DO PRZENIESIENIA DO symshell.h TODO!
@@ -250,7 +252,7 @@ int  repaint_area(ssh_coordinate& x, ssh_coordinate& y,ssh_natural& width, ssh_n
     return repaint_area(&x,&y,&width,&height);
 }
 
-// FUNKCJE PRZESTARZALE DOSTEPNE TYLKO DLA KOMPILATORA C++
+// FUNKCJE PRZESTARZALE TAKZE DOSTEPNE TYLKO DLA KOMPILATORA C++
 inline ssh_mode   get_buffering(){ return 	buffered(); }   // Zwraca 1 jesli buforowane
 inline ssh_mode   get_fixed(){ return fixed(); }                  // Czy okno ma zafiksowana wielkosc
 inline ssh_color  get_background(void){ return background(); }    // Aktualny kolor tla...
@@ -259,7 +261,7 @@ inline ssh_color  get_background(void){ return background(); }    // Aktualny ko
 #endif /* _SYMSHELL_H_ */
 
 /********************************************************************/
-/*              SYMSHELLLIGHT  version 2020-11-17                   */
+/*              SYMSHELLLIGHT  version 2020-11-19                   */
 /********************************************************************/
 /*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
 /*            W O J C I E C H   B O R K O W S K I                   */

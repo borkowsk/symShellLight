@@ -94,14 +94,17 @@ friend
 
 typedef wb_cpu_clock cticker;
 
-#endif //__CPU_CLOCK_HPP_
+/********************************************************************/
+/*              SYMSHELLLIGHT  version 2020-11-19                   */
 /********************************************************************/
 /*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
 /*            W O J C I E C H   B O R K O W S K I                   */
-/* Zaklad Systematyki i Geografii Roslin Uniwersytetu Warszawskiego */
-/*  & Instytut Studiow Spolecznych Uniwersytetu Warszawskiego       */
-/*        WWW:  http://moderato.iss.uw.edu.pl/~borkowsk             */
-/*        MAIL: borkowsk@iss.uw.edu.pl                              */
+/*    Instytut Studiow Spolecznych Uniwersytetu Warszawskiego       */
+/*    WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI  */
+/*    GITHUB: https://github.com/borkowsk                           */
+/*                                                                  */
 /*                               (Don't change or remove this note) */
 /********************************************************************/
+#endif //__CPU_CLOCK_HPP_
+
 

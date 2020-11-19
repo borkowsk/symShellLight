@@ -1,6 +1,7 @@
-/* icon.c - sample implementation */
-/**********************************/
-/* for X11 SYMSHELL implementation */
+/* icon.c - VERY OLD sample implementation */
+/*******************************************/
+/* for X11 SYMSHELL unit                   */
+/*******************************************/
 #include "icon.h"
 int basic_line_with=1;int WB_icon_bitmap_width=100;
 int WB_icon_bitmap_height=120;
@@ -112,6 +113,16 @@ char WB_icon_bitmap_bits[] = {
  0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff
  };
 
-
+/********************************************************************/
+/*              SYMSHELLLIGHT  version 2020-11-19                   */
+/********************************************************************/
+/*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
+/*            W O J C I E C H   B O R K O W S K I                   */
+/*    Instytut Studiow Spolecznych Uniwersytetu Warszawskiego       */
+/*    WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI  */
+/*    GITHUB: https://github.com/borkowsk                           */
+/*                                                                  */
+/*                               (Don't change or remove this note) */
+/********************************************************************/
 
 

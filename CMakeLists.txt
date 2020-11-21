@@ -38,7 +38,6 @@ add_library( wbsyshWIN STATIC
     "WIN/errorent.c"
     "WIN/sshmenufwin.c"
     "WIN/symshwin.c"
-    "WIN/autor.cpp"
     "UTILS/sshutils.cpp"
     "UTILS/sshmenufdummy.c" #dummy functions of menus
     )

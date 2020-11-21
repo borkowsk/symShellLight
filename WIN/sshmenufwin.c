@@ -1,11 +1,19 @@
 /* IMPLEMENTATION FOR SYMSHELL MENU AND RELEATED FEATURES */
 /**********************************************************/
-#include "INCLUDE/platform.h"
+//#include "platform.h"
 
-#if defined( __WIN32__ ) 
+#if defined(_MSC_VER) || defined(__MSWINDOWS__) 
 #include <windows.h> //bo Menu itp
 #include <assert.h>
-#include "../../sshmenuf.h"
+#include "sshmenuf.h"
+
+#if defined(_MSC_VER)
+//#pragma warning(disable:4068)
+#pragma warning(disable : 4996) //deprecated functions
+//TYMCZASEM - OSTRZE¯ENIA O "conversion from 'A' to 'B', possible loss of data"
+//#pragma warning(disable : 4267)
+//#pragma warning(disable : 4244)
+#endif
 
 #ifdef __cplusplus
 extern "C" 

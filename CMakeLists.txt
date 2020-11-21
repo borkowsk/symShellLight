@@ -36,10 +36,11 @@ endif()
 if(WINDOWS) # only for WINDOWS - NOT TESTED IN THIS VERSION (after 2016)
 add_library( wbsyshWIN STATIC
     "WIN/errorent.c"
-    "WIN/sshmenufwin.c"
+
     "WIN/symshwin.c"
     "UTILS/sshutils.cpp"
-    "UTILS/sshmenufdummy.c" #dummy functions of menus
+	"WIN/sshmenufwin.c"
+    #"UTILS/sshmenufdummy.c" #dummy functions of menus
     )
 endif()
 
@@ -103,14 +104,14 @@ add_executable("TurmitWIN" "TESTS/Turmit.cpp"
 add_executable("CAGasWIN" "TESTS/CAGas.cpp"
     )
 
-target_link_libraries("TestmousWIN" wbsyshWIN  rt)
-target_link_libraries("TestpaleWIN" wbsyshWIN  rt)
-target_link_libraries("TestpolyWIN" wbsyshWIN  rt)
-target_link_libraries("TestrandWIN" wbsyshWIN  rt)
-target_link_libraries("TestsymsWIN" wbsyshWIN  rt)
-target_link_libraries("TestsyshWIN" wbsyshWIN  rt)
-target_link_libraries("TurmitWIN"   wbsyshWIN  rt)
-target_link_libraries("CAGasWIN"    wbsyshX11  pthread rt)
+target_link_libraries("TestmousWIN" wbsyshWIN  )
+target_link_libraries("TestpaleWIN" wbsyshWIN  )
+target_link_libraries("TestpolyWIN" wbsyshWIN  )
+target_link_libraries("TestrandWIN" wbsyshWIN  )
+target_link_libraries("TestsymsWIN" wbsyshWIN  )
+target_link_libraries("TestsyshWIN" wbsyshWIN  )
+target_link_libraries("TurmitWIN"   wbsyshWIN  )
+target_link_libraries("CAGasWIN"    wbsyshX11  pthread )
 
 #add_executable("LinktestWIN" "TESTS/Linktest.cpp"    )
 #target_link_libraries("LinktestWIN" wbsyshX11 X11 Xpm rt)

@@ -2,7 +2,7 @@
 *Setting this variable configure SYMSHELL
 *for forcing stop before starting cleanup on exit 
 *******************************************************************************************/
-#include "SYMSHELL/symshell.h"		// prototypes of symshell graphix primitives
+#include "symshell.h"		// prototypes of symshell graphix primitives
 
 #ifdef __cplusplus
 extern "C" {

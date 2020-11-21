@@ -14,6 +14,14 @@
 #include "symshell.h"
 #include "sshutils.hpp"
 
+#if defined(_MSC_VER)
+//#pragma warning(disable:4068)
+#pragma warning(disable : 4996) //deprecated functions
+//TYMCZASEM - OSTRZE¯ENIA O "conversion from 'A' to 'B', possible loss of data"
+//#pragma warning(disable : 4267)
+//#pragma warning(disable : 4244)
+#endif
+
 //Drukuje w obszarze nie wiekszym niz max_width. Zwraca width albo 0
 //wewnetrzny bufor ma nie wiecej niz 1024 znaki
 int print_width(int x,int y,int maxwidth,wb_color col,wb_color bcg,const char* format,...)
@@ -208,14 +216,14 @@ inline int sqr(int x)
 void arrow(int x1,int y1,int x2,int y2,wb_color color,double size,double theta)
 {	
 	//METODA LICZENIA Z OBRACANIA OSI STRZALKI
-	double A=(size>=1?size:size*sqrt(sqr(x1-x2)+sqr(y1-y2)));
+	double A=(size>=1?size:size*sqrt((float)(sqr(x1-x2)+sqr(y1-y2))));
 	double poY=double(y2-y1);
 	double poX=double(x2-x1);
 	if(poY==0 && poX==0)
 	{
 		//Rzadki b³¹d, ale DOMAIN ERROR!
 		cross(x1,y1,color,def_arrow_size/2);
-		circle(x1+def_arrow_size/sqrt(2),y1-def_arrow_size/sqrt(2)+1,def_arrow_size,color);
+		circle(x1+def_arrow_size/sqrt(2.0),y1-def_arrow_size/sqrt(2.0)+1,def_arrow_size,color);
 		return;	
 	}
 	

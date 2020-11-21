@@ -111,10 +111,10 @@ target_link_libraries("TestrandWIN" wbsyshWIN  )
 target_link_libraries("TestsymsWIN" wbsyshWIN  )
 target_link_libraries("TestsyshWIN" wbsyshWIN  )
 target_link_libraries("TurmitWIN"   wbsyshWIN  )
-target_link_libraries("CAGasWIN"    wbsyshX11  pthread )
+target_link_libraries("CAGasWIN"    wbsyshWIN  )
 
 #add_executable("LinktestWIN" "TESTS/Linktest.cpp"    )
-#target_link_libraries("LinktestWIN" wbsyshX11 X11 Xpm rt)
+#target_link_libraries("LinktestWIN" wbsyshWIN )
 endif()
 
 
@@ -139,19 +139,33 @@ add_executable("TurmitSVG" "TESTS/Turmit.cpp"
 add_executable("CAGasSVG" "TESTS/CAGas.cpp"
     )
 
-target_link_libraries("TestmousSVG" wbsyshSVG  rt)
-target_link_libraries("TestpaleSVG" wbsyshSVG  rt)
-target_link_libraries("TestpolySVG" wbsyshSVG  rt)
-target_link_libraries("TestrandSVG" wbsyshSVG  rt)
-target_link_libraries("TestsymsSVG" wbsyshSVG  rt)
-target_link_libraries("TestsyshSVG" wbsyshSVG  rt)
-target_link_libraries("TurmitSVG"   wbsyshSVG  rt)
-target_link_libraries("CAGasSVG"    wbsyshSVG pthread rt)
+if( WINDOWS )
+	target_link_libraries("TestmousSVG" wbsyshSVG  )
+	target_link_libraries("TestpaleSVG" wbsyshSVG  )
+	target_link_libraries("TestpolySVG" wbsyshSVG  )
+	target_link_libraries("TestrandSVG" wbsyshSVG  )
+	target_link_libraries("TestsymsSVG" wbsyshSVG  )
+	target_link_libraries("TestsyshSVG" wbsyshSVG  )
+	target_link_libraries("TurmitSVG"   wbsyshSVG  )
+	target_link_libraries("CAGasSVG"    wbsyshSVG  )
 
-add_executable("LinktestSVG" "TESTS/Linktest.cpp"    )
-target_link_libraries("LinktestSVG" wbsyshSVG rt)
+	add_executable("LinktestSVG" "TESTS/Linktest.cpp"    )
+	target_link_libraries("LinktestSVG" wbsyshSVG  )
+else()
+	target_link_libraries("TestmousSVG" wbsyshSVG  rt)
+	target_link_libraries("TestpaleSVG" wbsyshSVG  rt)
+	target_link_libraries("TestpolySVG" wbsyshSVG  rt)
+	target_link_libraries("TestrandSVG" wbsyshSVG  rt)
+	target_link_libraries("TestsymsSVG" wbsyshSVG  rt)
+	target_link_libraries("TestsyshSVG" wbsyshSVG  rt)
+	target_link_libraries("TurmitSVG"   wbsyshSVG  rt)
+	target_link_libraries("CAGasSVG"    wbsyshSVG  rt)
+
+	add_executable("LinktestSVG" "TESTS/Linktest.cpp"    )
+	target_link_libraries("LinktestSVG" wbsyshSVG rt )
 endif()
 
+endif()
 #KONIEC - THE END
 #********************************************************************/
 #*              SYMSHELLLIGHT  version 2020-11-21                   */

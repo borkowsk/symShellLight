@@ -15,13 +15,25 @@
 #include <cassert>
 #include <fstream>   // C++ strumienie plikowe
 #include <iostream>  // C++ obsługa konsoli
+
 #ifdef MULTITR
 #include <thread>    //Obsluga wątków
 const unsigned max_threads=16;//Maksymalna przewidziana liczba wątków
 unsigned prefered_threads=8; //Ile wątków domyślnie?
 
 //Ziarno dla wątkowego generatora liczb pseudolosowych
-thread_local //__declspec(thread) //thread_local z C++11 powinno działać ale w VC++2012 jednak tego nie robi
+#if defined(_MSC_VER)
+//#pragma warning(disable:4068)
+#pragma warning(disable : 4996) //deprecated functions
+#pragma warning(disable : 4521) //multiple copy constructor
+#pragma warning(disable : 4522) //multiple assigment operator
+//TYMCZASEM - OSTRZEŻENIA O "conversion from 'A' to 'B', possible loss of data"
+//#pragma warning(disable : 4267)
+#pragma warning(disable : 4244) //time_t --> unsigned int
+__declspec(thread) //thread_local z C++11 powinno działać ale w VC++2012 jednak tego nie robi
+#else
+thread_local 
+#endif
 unsigned long  myholdrand=1;
 
 int myrand()//Na wzór rand() Microsoftu
@@ -47,7 +59,7 @@ const int DELA=0;//Jak długie oczekiwanie w obrębie pętli zdarzeń
 unsigned VISUAL=1;//Co ile kroków symulacji odrysowywać widok
 int xmouse=10,ymouse=10;//Pozycja ostatniego "kliku" myszy 
 
-unsigned RANDOM_SEED=time(NULL); //Zarodek generatora pseudolosowego 
+time_t RANDOM_SEED=time(NULL); //Zarodek generatora pseudolosowego 
 unsigned DENSITY=(size*size)/100;//Musi być tyle, żeby były miejsca z komórkami obok siebie
                         //TODO: manipulacja gęstością
                         

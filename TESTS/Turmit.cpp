@@ -7,10 +7,21 @@
 // Turmit ma alement aktywny i środowisko, tzw. "głowicę" albo "czoło" oraz pamieć
 // ponieważ turmit jest tak naprawdę 2 wymiarowym uogólnieniem maszyny Turinga
 
-#include "symshell.h"
+
 #include <stdio.h> //Wyjście na konsole a la język C - printf(....)
 #include <math.h>
 #include <fstream>
+
+#if defined(_MSC_VER)
+//#pragma warning(disable:4068)
+#pragma warning(disable : 4996) //deprecated functions
+#pragma warning(disable : 4521) //multiple copy constructor
+#pragma warning(disable : 4522) //multiple assigment operator
+//TYMCZASEM - OSTRZEŻENIA O "conversion from 'A' to 'B', possible loss of data"
+//#pragma warning(disable : 4267)
+//#pragma warning(disable : 4244)
+#endif
+#include "symshell.h"
 
 #define NAZWAMODELU  "Turmit_przyspieszony" //Użycie define ułatwia montowanie stałych łańcuchów
 

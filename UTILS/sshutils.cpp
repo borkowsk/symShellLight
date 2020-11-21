@@ -11,16 +11,19 @@
 #include <stdarg.h>
 #include <math.h>
 //#include "INCLUDE/wbminmax.hpp"
-#include "symshell.h"
-#include "sshutils.hpp"
 
 #if defined(_MSC_VER)
 //#pragma warning(disable:4068)
 #pragma warning(disable : 4996) //deprecated functions
+#pragma warning(disable : 4521) //multiple copy constructor
+#pragma warning(disable : 4522) //multiple assigment operator
 //TYMCZASEM - OSTRZE¯ENIA O "conversion from 'A' to 'B', possible loss of data"
 //#pragma warning(disable : 4267)
 //#pragma warning(disable : 4244)
 #endif
+
+#include "symshell.h"
+#include "sshutils.hpp"
 
 //Drukuje w obszarze nie wiekszym niz max_width. Zwraca width albo 0
 //wewnetrzny bufor ma nie wiecej niz 1024 znaki
@@ -222,8 +225,8 @@ void arrow(int x1,int y1,int x2,int y2,wb_color color,double size,double theta)
 	if(poY==0 && poX==0)
 	{
 		//Rzadki b³¹d, ale DOMAIN ERROR!
-		cross(x1,y1,color,def_arrow_size/2);
-		circle(x1+def_arrow_size/sqrt(2.0),y1-def_arrow_size/sqrt(2.0)+1,def_arrow_size,color);
+		cross((int)x1,int(y1),color,(int)(def_arrow_size/2));
+		circle((int)(x1+def_arrow_size/sqrt(2.0)),(int)(y1-def_arrow_size/sqrt(2.0)+1),(ssh_natural)(def_arrow_size),color);
 		return;	
 	}
 	

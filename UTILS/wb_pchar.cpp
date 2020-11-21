@@ -6,6 +6,17 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <stdarg.h>
+
+#if defined(_MSC_VER)
+//#pragma warning(disable:4068)
+#pragma warning(disable : 4996) //deprecated functions
+#pragma warning(disable : 4521) //multiple copy constructor
+#pragma warning(disable : 4522) //multiple assigment operator
+//TYMCZASEM - OSTRZE¯ENIA O "conversion from 'A' to 'B', possible loss of data"
+//#pragma warning(disable : 4267)
+//#pragma warning(disable : 4244)
+#endif
+
 #include "wb_ptr.hpp"
 
 namespace wbrtm { //WOJCIECH BORKOWSKI RUN TIME LIBRARY

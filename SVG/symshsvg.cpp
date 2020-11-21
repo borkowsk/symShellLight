@@ -10,10 +10,6 @@
 /************************************************************************/
 /*               SYMSHELLLIGHT  version 2020-11-16                      */
 /************************************************************************/
-
-#include "symshell.h"
-#define HIDE_WB_PTR_IO	1     //I/O NIEPOTRZEBNY
-#include "wb_ptr.hpp"
 #include <iostream>
 #include <fstream>
 #include <cassert>
@@ -21,27 +17,41 @@
 #include <cmath>
 #include <cstdio>
 
+#ifndef MAX_PATH
 #define MAX_PATH 4000
+#endif
 
-#ifndef __MSVC__
+#if defined(_MSC_VER)
+//#pragma warning(disable:4068)
+#pragma warning(disable : 4996) //deprecated functions
+#pragma warning(disable : 4521) //multiple copy constructor
+#pragma warning(disable : 4522) //multiple assigment operator
+//TYMCZASEM - OSTRZEŻENIA O "conversion from 'A' to 'B', possible loss of data"
+//#pragma warning(disable : 4267)
+//#pragma warning(disable : 4244)
+#include <process.h>
+#else
 #include <sys/types.h>
 #include <unistd.h>
 #define _getpid   getpid
-#else
-#include <process.h>
 #endif
+
+#include "symshell.h"
+#define HIDE_WB_PTR_IO	1     //I/O NIEPOTRZEBNY
+#include "wb_ptr.hpp"
 
 using namespace std;
 using namespace wbrtm;
 
 /// Wewnętrzne śledzenie wywołań
 //////////////////////////////////////////////////
-#if 1
-#define _FUNCTION_NAME_  __func__ //C11
+#if defined( _MSC_VER )
+//#define STR_HELPER(x) #x
+//#define STR(x) STR_HELPER(x)
+//#define _FUNCTION_NAME_  ("SYMSHSVG_" STR( __LINE__ ) )
+#define _FUNCTION_NAME_  __FUNCTION__ 
 #else
-#define STR_HELPER(x) #x
-#define STR(x) STR_HELPER(x)
-#define _FUNCTION_NAME_  ("SYMSHSVG_" STR( __LINE__ ) )
+#define _FUNCTION_NAME_  __func__ //C11
 #endif
 
 /// Zmienne eksportowane na zewnątrz
@@ -261,8 +271,8 @@ int  init_plot(ssh_natural  a, ssh_natural   b,                 /* ile pikseli m
     GrScreenWi = a + GrFontWi* ca;  assert(a>0);
     GrScreenHi = b + GrFontHi* cb;  assert(b>0);
 
-    unsigned N = ((a + ca)*(b + cb))*INITIAL_LENGH_RATIO;
-    maxN=((a + ca)*(b + cb))*MAXIMAL_LENGH_RATIO;
+    unsigned N = (unsigned)( ((a + ca)*(b + cb))*INITIAL_LENGH_RATIO );//Potem jest sprawdzane czy nie za małe, warning zbędny
+    maxN=(int)( ((a + ca)*(b + cb))*MAXIMAL_LENGH_RATIO );				//Potem jest sprawdzane czy nie za małe, warning zbędny
 
     if(N<1 || maxN<1 || N>maxN )//N lub maxN, mniejsze od 1 to ewidentny błąd
     {

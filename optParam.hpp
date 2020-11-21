@@ -189,7 +189,7 @@ double OptionalParameter<double>::convert(const char* str)
 template<> inline
 float OptionalParameter<float>::convert(const char* str)
 {
-	return atof(str);
+	return (float)atof(str);// conversion from 'double' to 'float', possible loss of data
 }
 
 template<> inline
@@ -201,13 +201,21 @@ long OptionalParameter<long>::convert(const char* str)
 template<> inline
 long long OptionalParameter<long long>::convert(const char* str)
 {
-	return atof(str);
+#if defined(_MSC_VER)
+	return (long long)atof(str);
+#else
+	return atoll(str);
+#endif
 }
 
 template<> inline
 unsigned long long OptionalParameter<unsigned long long>::convert(const char* str)
 {
-	return atof(str);
+#if defined(_MSC_VER)
+	return (unsigned long long)atof(str);
+#else
+	return atoll(str);
+#endif
 }
 
 template<> inline

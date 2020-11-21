@@ -30,7 +30,7 @@ ssh_menu_handle ssh_sub_menu(
 					ssh_menu_handle hMenu,				
 					unsigned    Position)
 {
-return GetSubMenu(hMenu,Position);
+return GetSubMenu((HMENU)hMenu,Position);
 }
 
 unsigned ssh_get_item_position(

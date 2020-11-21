@@ -6,8 +6,19 @@
 /// W tle miga napisem "Klikaj!"
 ///////////////////////////////////////////////////////////////////////////////////////////
 #include <iostream>
-#include "../symshell.h"
-#include "../wb_ptr.hpp"
+
+#if defined(_MSC_VER)
+//#pragma warning(disable:4068)
+#pragma warning(disable : 4996) //deprecated functions
+#pragma warning(disable : 4521) //multiple copy constructor
+#pragma warning(disable : 4522) //multiple assigment operator
+//TYMCZASEM - OSTRZE¯ENIA O "conversion from 'A' to 'B', possible loss of data"
+//#pragma warning(disable : 4267)
+//#pragma warning(disable : 4244)
+#endif
+#include "symshell.h"
+#include "wb_ptr.hpp"
+
 using namespace std;
 using namespace wbrtm;
 

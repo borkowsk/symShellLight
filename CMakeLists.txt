@@ -4,11 +4,19 @@
 # Define WINDOWS for compiling MS Windows version
 # Define WITHTESTS if you want build test aplications!
 
-cmake_minimum_required(VERSION 2.8)
-
+cmake_minimum_required(VERSION 3.0)
 project(symshelllight)
 
+if (MSVC)
+    # warning level 4 and all warnings as errors if you want
+    add_compile_options(/W4) #  /WX
+else()
+    # C++11 and a lots of warnings if you want
+    add_compile_options(-std=c++11) #-Wall
+endif()
+
 include_directories("./")
+message("C++ compiler flags: ${CMAKE_CXX_FLAGS}")
 
 if(true) # SVG SYMSHELL LIB
 add_library( wbsyshSVG STATIC
@@ -159,7 +167,7 @@ else()
 	target_link_libraries("TestsymsSVG" wbsyshSVG  rt)
 	target_link_libraries("TestsyshSVG" wbsyshSVG  rt)
 	target_link_libraries("TurmitSVG"   wbsyshSVG  rt)
-	target_link_libraries("CAGasSVG"    wbsyshSVG  rt)
+	target_link_libraries("CAGasSVG"    wbsyshSVG pthread rt)
 
 	add_executable("LinktestSVG" "TESTS/Linktest.cpp"    )
 	target_link_libraries("LinktestSVG" wbsyshSVG rt )
@@ -168,7 +176,7 @@ endif()
 endif()
 #KONIEC - THE END
 #********************************************************************/
-#*              SYMSHELLLIGHT  version 2020-11-21                   */
+#*              SYMSHELLLIGHT  version 2020-11-23                   */
 #********************************************************************/
 #*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
 #*            W O J C I E C H   B O R K O W S K I                   */

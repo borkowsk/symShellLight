@@ -17,8 +17,8 @@ To use, perform the following operations in the selected directory:
 
 ```console
   $ git clone https://github.com/borkowsk/SymShellLight.git
-  $ cd SymShellLigt
-  $ cmake . 
+  $ cd SymShellLigt 
+  $ cmake . -DX11=true OR -DWINDOWS=true
   $ make
 ```
 You can also compile tests:
@@ -28,3 +28,4 @@ You can also compile tests:
   $ make
 ```
 
+It was tested on UBUNTU 16.04 with gcc, UBUNTU 18.04 with gcc & MS Windows 7 with MSVC 2012

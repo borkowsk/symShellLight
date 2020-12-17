@@ -91,7 +91,11 @@ void set_pen(ssh_color c, ssh_natural width, ssh_mode style);    /* Ustala aktua
 void set_brush(ssh_color c);                                   /* Ustala aktualny kolor wypelnien za pomoca typu ssh_color */
 void set_pen_rgb(ssh_intensity r, ssh_intensity g, ssh_intensity b, /* Ustala aktualny kolor linii za pomoca skladowych RGB */
                     ssh_natural width, ssh_mode style);         /*  oraz styl i grubość */
+void set_pen_rgba(ssh_intensity r,ssh_intensity g,ssh_intensity b,
+                  ssh_intensity a,ssh_natural size,ssh_mode style);
 void set_brush_rgb(ssh_intensity r,ssh_intensity g,ssh_intensity b); /* Ustala aktualny kolor wypelnien za pomoca skladowych RGB */
+void set_brush_rgba(ssh_intensity r,ssh_intensity g,ssh_intensity b,
+                   ssh_intensity a);
 
 /* ODCZYTYWYWANIE AKTUALNYCH USTAWIEN OKNA GRAFICZNEGO*/
 ssh_mode  buffered();                                           /* Zwraca 1 jesli buforowane */

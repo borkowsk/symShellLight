@@ -9,7 +9,7 @@
 /* File changed masively: 21.10.2020                                    */
 /*                                                                      */
 /* FILE: symshx11.c                                                     */
-/* Wersja: 17.11.2020                                                   */
+/* Wersja: 17.12.2020                                                   */
 /*                                                                      */
 /* UWAGA!                                                               */
 /* WCIĄŻ Z BLEDEM NA EXPOSE TODO , choc raz go juz gdzies usunalem :-/  */
@@ -42,13 +42,13 @@
 
 /* For close_plot() */
  extern int             WB_error_enter_before_clean;/* Czy zamykać okno od razu czy dawać "enter"? */
- int                    trace=0;  /* Sterowanie komunikatami modułu na standardoqe wyjście */
+ int                    trace=1;  /* Sterowanie komunikatami modułu na standardoqe wyjście */
  static int             opened=0; /* Dla close plot. Zerowane tez gdy "broken-pipe" */
 
  /* progname is the string by which this program was invoked; this
   * is global because it is needed in most application functions */
  static char            progname[1024]="WB SYMULATION NAME NOT SET";
- static char            window_name[1024] = "WB X-window symulation shell";
+ static char            window_name[1024] = "WB-sym-shell";//"WB X-window symulation shell";
  static char            icon_name[1024] = "WB-sym-shell";
 
  static size_t  largc=0;    /* Do zapamietania przekazanych przez funkcje setup*/
@@ -79,7 +79,10 @@
 
  static unsigned int    width,height;      /* Window size */
  static int             iniX, iniY;        /* Window position */
- static unsigned int    default_deph = 8;  /* Window deph. 8=>256 colors */ /*TODO ! CURENTLY 32 ONLY IS SUPPOIRTED*/
+
+ //For transperencies to work use:
+ //#define CREATE_FULL_WINDOW 32
+ static unsigned int    default_depth = 24;/* CURENTLY 24 WORK. BUT 32 NOT */
  static unsigned int    border_width = 4;  /* Four pixels */
  static int             window_size = TOO_SMALL;     /* BIG_ENOUGH or TOO_SMALL to display contents */
 
@@ -384,7 +387,7 @@ static void ResizeBuffer(unsigned int nwidth,unsigned int nheight)
         /*getchar();*/
     }
 
-    cont_pixmap=XCreatePixmap(display,win,nwidth,nheight,default_deph);
+    cont_pixmap=XCreatePixmap(display,win,nwidth,nheight,default_depth);
 
     assert(cont_pixmap);
     alloc_cont=1;
@@ -843,13 +846,14 @@ int init_plot(ssh_natural a,ssh_natural b,ssh_natural ca,ssh_natural cb)
 /* typowa dla platformy inicjacja grafiki/semigrafik
  a,b to wymagane rozmiary ekranu */
 {
-int* disp_depht;
-int  disp_depht_num=0,i;
-int real_font_width=0;
-ini_a=a;
-ini_b=b;
-ini_ca=ca;
-ini_cb=cb;
+    int* disp_depht;
+    int  disp_depht_num=0,i;
+    int real_font_width=0;
+    XSetWindowAttributes attrs;
+    ini_a=a;
+    ini_b=b;
+    ini_ca=ca;
+    ini_cb=cb;
 
     if (!(size_hints = XAllocSizeHints())) {
        fprintf(stderr, "%s: failure allocating memory", progname);
@@ -876,28 +880,34 @@ ini_cb=cb;
     screen_num = DefaultScreen(display);
     display_width = DisplayWidth(display, screen_num);
     display_height = DisplayHeight(display, screen_num);
+
     if(trace)
     {
-        fprintf(stderr,"Screen: %u x %u ; %u",display_width,display_height,screen_num);
+        fprintf(stderr,"Screen: %u x %u ; %u\n",display_width,display_height,screen_num);
     }
-	disp_depht = XListDepths(display, screen_num, &disp_depht_num);
+
+    disp_depht = XListDepths(display, screen_num, &disp_depht_num);
+
     if(trace)
-    	{
+    {
     	fprintf(stderr,"Available display depths:");
     	for(i=0;i<disp_depht_num;i++)
     		fprintf(stderr,"%d ",disp_depht[i]);
-    	putchar('\n');
-    	}
+        fprintf(stderr," Prefered depth:%d\n",default_depth);
+    }
 
     /* Search for depht */
     for(i=0;i<disp_depht_num;i++)
-    	if(disp_depht[i]>=default_deph)
-    		{
-    		default_deph=disp_depht[i];/*Pierwszy >= wymaganemu */
-    		break;
-    		}
+        if(disp_depht[i]>=default_depth)
+        {
+            default_depth=disp_depht[i];/*Pierwszy >= wymaganemu */
+            break;
+        }
+
+    //default_deph=32;//??? NOT WORK! WHY???
+
    if(trace)
-   	fprintf(stderr,"Select depth %d\n",default_deph);
+        fprintf(stderr,"Select depth %d\n",default_depth);
 
     /* Note that in a real application, x and y would default
      * to 0 but would be settable from the command line or
@@ -917,34 +927,78 @@ ini_cb=cb;
    fprintf(stderr,"%s=%dx%d\n",icon_name,width,height);
    fflush(stderr);
 
-   size_hints->min_width = width;   /* Startup width/haight */
-   size_hints->min_height = height; /* are minimal */
+   XSetErrorHandler(MyErrorHandler);
 
  /* Create opaque window */
- #ifdef CREATE_FULL
+ #ifdef CREATE_FULL_WINDOW
+ {
+   //It work strange - backgrpound of window is transparent!
+   //https://stackoverflow.com/questions/3645632/how-to-create-a-window-with-a-bit-depth-of-32
+
+   int i,nxvisuals = 0;
+   XVisualInfo  vinfo;
+   XVisualInfo *visual_list;
+   XVisualInfo  visual_template;
+   Visual      *visual;
+   Window       parent;
+   visual_template.screen = DefaultScreen(display);
+   visual_list = XGetVisualInfo (display, VisualScreenMask, &visual_template, &nxvisuals);
+   //for (i = 0; i < nxvisuals; ++i)
+   //    fprintf(stderr,"  %3d: visual 0x%lx class %d (%s) depth %d\n",
+   //           i,visual_list[i].visualid,visual_list[i].class,
+   //           visual_list[i].class == TrueColor ? "TrueColor" : "unknown",visual_list[i].depth);
+
+   if (!XMatchVisualInfo(display, XDefaultScreen(display), 32, TrueColor, &vinfo))
+     {
+       fprintf(stderr, "no such visual\n");
+       return 1;
+     }
+     else
+     fprintf(stderr,"Matched visual 0x%lx class %d (%s) depth %d\n",
+              vinfo.visualid,vinfo.class,
+              vinfo.class == TrueColor ? "TrueColor" : "unknown",vinfo.depth);
+
+   parent = XDefaultRootWindow(display);
+   XSync(display, True);
+
+   visual = vinfo.visual;
+   default_depth = vinfo.depth;
+   attrs.background_pixel = 0xff000000;//0;//BlackPixel(display, screen_num);???
+   attrs.border_pixel = 0;
+   attrs.colormap = XCreateColormap(display, XDefaultRootWindow(display), visual, AllocNone);
+
    win = XCreateWindow(display,
-   		RootWindow(display,screen_num),
-          	x, y, width, height, border_width,
-	  	default_deph /* Window deph */,
-          	InputOutput /*WindowClass*/,
-	  	CopyFromParent /* Visual */,
-	  	0	/* Valuemask */,
-	  	0     /* Atributes */
+            parent,
+            iniX, iniY, width, height,
+            border_width,
+            default_depth        /* Window deph */,
+            InputOutput          /* WindowClass*/,
+            visual               /* Visual */,
+            CWBackPixel | CWBorderPixel | CWColormap  /* Valuemask */,
+            &attrs                   /* Atributes */
 	 	);
+   XSync(display, True);
+
+   }
  #else
     win = XCreateSimpleWindow(display,
-    			RootWindow(display,screen_num),
-                iniX, iniY, width, height, border_width,
-          		BlackPixel(display, screen_num),
-          		WhitePixel(display,screen_num)
+                            RootWindow(display,screen_num),
+                            iniX, iniY, width, height, border_width,
+                            BlackPixel(display, screen_num),
+                            WhitePixel(display, screen_num)
           		);
+    XSync(display, True);
  #endif
 
-    window_size = BIG_ENOUGH ;
+    if(win!=NULL)
+        window_size = BIG_ENOUGH ;
+    else
+        fprintf( stderr, "%s: Window not created! ", progname);
+
     /* Get available icon sizes from window manager */
     if (XGetIconSizes(display, RootWindow(display,screen_num),&size_list, &count) == 0){
-       (void) fprintf( stderr, "%s: Window manager didn't set "
-                                "icon sizes - using default.\n", progname);
+        fprintf( stderr, "%s: Window manager didn't set "
+                         "icon sizes - using default.\n", progname);
      }
     else {
        ;
@@ -953,10 +1007,6 @@ ini_cb=cb;
         * create a pixmap of that size; this requires that
         * the application have data for several sizes of icons */
     }
-
-/* Create pixmap of depth 1 (bitmap) for icon */
-    icon_pixmap = XCreateBitmapFromData(display, win,
-			WB_icon_bitmap_bits,WB_icon_bitmap_width,WB_icon_bitmap_height);
 
     /* Set size hints for window manager; the window manager
      * may override these settings
@@ -967,7 +1017,9 @@ ini_cb=cb;
      * x, y, width, and height hints are now taken from
      * the actual settings of the window when mapped; note
      * that PPosition and PSize must be specified anyway */
-    size_hints->flags = PPosition | PSize | PMinSize;
+    size_hints->flags =  PSize | PPosition | PMinSize;
+    size_hints->min_width =  width;   /* Startup width/haight */
+    size_hints->min_height = height; /* are minimal */
 
 
     /* These calls store window_name and icon_name into
@@ -975,30 +1027,49 @@ ini_cb=cb;
      * properly */
     char* ptrName=window_name;// TODO CHECK!>!>!>
     if (XStringListToTextProperty(&ptrName, 1, &windowName) == 0) {
-       (void) fprintf( stderr, "%s: structure allocation for "
+        fprintf( stderr, "%s: structure allocation for "
                                "windowName failed.\n", progname);
        exit(-1);return 0;
     }
 
     ptrName=icon_name;
     if (XStringListToTextProperty(&ptrName, 1, &iconName) == 0) {
-       (void) fprintf( stderr, "%s: structure allocation for "
-                               "iconName failed.\n", progname);
+        fprintf( stderr, "%s: structure allocation for "
+                         "iconName failed.\n", progname);
        exit(-1);  return 0;
     }
 
+    /* Create pixmap of depth 1 (bitmap) for icon */
+    icon_pixmap = XCreateBitmapFromData(display, win,
+            WB_icon_bitmap_bits,WB_icon_bitmap_width,WB_icon_bitmap_height);
+    if( icon_pixmap==0 )
+        fprintf( stderr, "%s: creation of "
+                         "icon_pixmap failed.\n", progname);
+
+
     wm_hints->initial_state = NormalState;
-    wm_hints->input = True;
     wm_hints->icon_pixmap = icon_pixmap;
-    wm_hints->flags = StateHint | IconPixmapHint | InputHint;
+    wm_hints->input = True;
+    wm_hints->flags = StateHint  | InputHint | IconPixmapHint;
+
     class_hints->res_name = progname;
-    class_hints->res_class = "Basicwin";
-    XSetWMProperties(display, win, &windowName, &iconName,
-          (char**)largv,//TODO "passing argument 5 from incompatible pointer type" expected non const!!!
-          largc,
-          size_hints, wm_hints,
-          class_hints);
-   /* } ??? */
+    class_hints->res_class = "ssh_win";//"Basicwin";
+
+
+    XSetWMProperties( display, win,
+                      &windowName,
+                      &iconName,
+                      //TODO "passing argument 5 from incompatible pointer type" expected non const!!!
+                      (char**)largv,
+                      largc,
+                      size_hints,
+                      wm_hints,
+                      class_hints);
+
+    //if( NO_DIAGNOSTIC? )
+    //    fprintf( stderr, "%s: XSetWMProperties failed.\n", progname);
+    //else
+    //    fprintf( stderr, "%s: XSetWMProperties OK.\n", progname);
 
     /* Select event types wanted */
     XSelectInput(display, win,
@@ -1012,16 +1083,15 @@ ini_cb=cb;
     /* Display window */
     buforek[0]=NODATA;
 
-    XSetErrorHandler(MyErrorHandler);
-
     XMapWindow(display, win);
+
+    opened=1;
+    atexit(close_plot);
+    fprintf(stderr,"atexit(close_plot) installed\n");
 
     /* Alloc pixmap for contens buffering */
     if(isbuffered)
         ResizeBuffer(width,height);
-
-    opened=1;
-    atexit(close_plot);
 
     if(signal(SIGPIPE,SigPipe)!=SIG_ERR)// && trace)
         fprintf(stderr,"SIGPIPE handler installed\n");
@@ -1035,6 +1105,7 @@ ini_cb=cb;
     /* Czysci zeby wprowadzic ustalone tlo */
     if(trace)
         fprintf(stderr,"Background is %d\n",(int)bacground);
+
     clear_screen();
 
     return 1;
@@ -1089,7 +1160,7 @@ ssh_natural  string_width(const char* str)
 void flush_plot()
 /* --------//---------- uzgodnienie zawartosci ekranu */
 {
-    if(trace)
+    if(trace>1)
         fprintf(stderr,"FLUSH %s",icon_name);
 
     if(!opened)
@@ -1104,12 +1175,12 @@ void flush_plot()
                0/*src_x*/, 0/*src_y*/,
                width, height,
                0/*dest_x*/, 0/*dest_y*/);
-            if(trace)
+            if(trace>1)
             fprintf(stderr,"DOING BITBLT");
         }
 
     XFlush(display);
-    if(trace)
+    if(trace>1)
         fprintf(stderr," XFLUSH\n");
     error_count=error_limit;
 }
@@ -1370,6 +1441,15 @@ unsigned long buildColor(unsigned char red, unsigned char green, unsigned char b
            ( (unsigned long)(blue) ) ;
 }
 
+unsigned long buildTransparentColor(unsigned char red, unsigned char green, unsigned char blue,unsigned char transparency)
+/* BUDOWANIE WEWNĘTRZNYCH KOLORÓW W X11 - TODO CHECK*/
+{
+    return ( (unsigned long)(transparency) << 24 ) +
+           ( (unsigned long)(red) << 16) +
+           ( (unsigned long)(green)<< 8) +
+           ( (unsigned long)(blue) ) ;
+}
+
 void print_rgb(ssh_coordinate x,ssh_coordinate y,
                ssh_intensity r,ssh_intensity g,ssh_intensity b,            /*- składowe koloru tekstu */
                ssh_color back,const char* format,...)
@@ -1542,6 +1622,15 @@ void set_pen_rgb(ssh_intensity r,ssh_intensity g,ssh_intensity b,ssh_natural siz
     default_line_width=size;
 }
 
+
+void set_pen_rgba(ssh_intensity r,ssh_intensity g,ssh_intensity b,ssh_intensity a,ssh_natural size,ssh_mode style)
+/* Ustala aktualny kolor linii za pomoca skladowych RGB */
+{
+    PenColor=buildTransparentColor(r,g,b,a);
+    default_line_width=size;
+}
+
+
 ssh_natural get_line_width()
 {
     return default_line_width;
@@ -1577,6 +1666,12 @@ void set_brush_rgb(ssh_intensity r,ssh_intensity g,ssh_intensity b)
 /* Ustala aktualny kolor wypelnien za pomoca skladowych RGB */
 {
     BrushColor=buildColor(r,g,b);
+}
+
+void set_brush_rgba(ssh_intensity r,ssh_intensity g,ssh_intensity b,
+                   ssh_intensity a)
+{
+    BrushColor=buildTransparentColor(r,g,b,a);
 }
 
 void line_d(int x1,int y1,int x2,int y2)

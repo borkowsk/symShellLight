@@ -6,6 +6,7 @@
 
 cmake_minimum_required(VERSION 3.0)
 project(symshelllight)
+set( X11 true)
 
 if (MSVC)
     # warning level 4 and all warnings as errors if you want
@@ -13,7 +14,7 @@ if (MSVC)
 else()
     # C++11 and a lots of warnings if you want
     add_compile_options(-std=c++11) #-Wall
-endif()
+endif(MSVC)
 
 include_directories("./")
 message("C++ compiler flags: ${CMAKE_CXX_FLAGS}")
@@ -39,7 +40,7 @@ add_library( wbsyshX11 STATIC
     "UTILS/sshutils.cpp"
     "UTILS/sshmenufdummy.c" #dummy functions of menus
 )
-endif()
+endif(X11)
 
 if(WINDOWS) # only for WINDOWS - NOT TESTED IN THIS VERSION (after 2016)
 add_library( wbsyshWIN STATIC
@@ -50,7 +51,7 @@ add_library( wbsyshWIN STATIC
 	"WIN/sshmenufwin.c"
     #"UTILS/sshmenufdummy.c" #dummy functions of menus
     )
-endif()
+endif(WINDOWS)
 
 
 ## PROGRAMY TESTOWE  ##

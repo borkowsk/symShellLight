@@ -38,6 +38,7 @@ typedef unsigned char                           uchar8b;       /* MUST HAVE 8 bi
 typedef uchar8b                                 ssh_bool;      /* 0 or 1 */
 typedef int                                     ssh_msg;       /* Character from keyboard or other special numbers, especially from menu */
 typedef signed   int                            ssh_mode;      /* Only symbols defined above expected! */
+typedef signed   int                            ssh_stat;      /* Values returned as status for some functions */
 typedef signed   int                            ssh_coordinate;/* Wszelkie wspołrzędne ekranowe */
 typedef unsigned int                            ssh_natural;   /* Liczby większe od zera gdy zero jest sytuacją nieoczekiwaną */
 typedef unsigned int                            ssh_intensity; /* Składowe kolorów itp. wartości od 0 wzwyż */
@@ -64,8 +65,9 @@ void set_gray(ssh_color shade,ssh_intensity intensity);        /* Zmiania defini
 void set_background(ssh_color c);                              /* Ustala index koloru do czyszczenia - moze nie dzialac po inicjacji*/
 
                                                                /* inicjacja grafiki/semigrafiki */
-int  init_plot(ssh_natural  a,ssh_natural   b,                 /* ile pikseli mam mieć okno */
-               ssh_natural ca, ssh_natural cb);                /* ile dodatkowo lini i kolumn tekstu na dole i po bokach przy domyślnej czcionce */
+ssh_stat  init_plot(ssh_natural  a,ssh_natural   b,            /* ile pikseli mam mieć okno */
+                    ssh_natural ca, ssh_natural cb);           /* ile dodatkowo lini i kolumn tekstu na dole i po bokach przy domyślnej czcionce */
+                                                               /* Zwraca 1 jeśli zadziałał poprawnie */
 
 void close_plot(void);                                         /* zamkniecie grafiki/semigrafiki */
                                                                /* Automatycznie instalowana w atexit - stad durne (void) zeby uniknac warningu */
@@ -77,8 +79,8 @@ void delay_ms(ssh_natural ms);                                 /* Wymuszenie ocz
 void delay_us(ssh_natural ms);                                 /* Wymuszenie oczekiwania przez pewną liczbę micro seconds */
 void flush_plot();                                             /* Ostateczne uzgodnienie zawartosci ekranu z zawartoscia pamieci */
 void clear_screen();                                           /* Czysci ekran lub ekran wirtualny */
-int  invalidate_screen();                                      /* W sposób ukryty zapomina poprzednią zawartość ekranu gdy liczymy że i tak zostałaby zamazana */
-int  dump_screen(const char* Filename);                        /* Zapisuje zawartosc ekranu do pliku graficznego w naturalnym formacie platformy: BMP, XBM itp */
+ssh_stat  invalidate_screen();                                 /* W sposób ukryty zapomina poprzednią zawartość ekranu gdy liczymy że i tak zostałaby zamazana */
+ssh_stat  dump_screen(const char* Filename);                   /* Zapisuje zawartosc ekranu do pliku graficznego w naturalnym formacie platformy: BMP, XBM itp */
                                                                /* Może nie działać w trybie bez buforowania okna/ekranu */
 /* Operacje przestawiania wlasnosci pracy okna graficznego */
 ssh_mode    mouse_activity(ssh_mode Yes);                      /* Ustala czy mysz ma byc obslugiwana. Zwraca poprzedni stan flagi */
@@ -207,14 +209,19 @@ void fill_poly(ssh_coordinate vx,ssh_coordinate vy,                    /* Wypeln
 /* POBIERANIE ZNAKOW Z KLAWIATURY i ZDAZEN OKIENNYCH (w tym z MENU) */
 ssh_mode  input_ready(); /* Funkcja sprawdzajaca czy jest cos do wziecia z wejscia */
 ssh_msg   get_char();    /* Funkcja odczytywania znakow sterowania i zdarzen */
-int  set_char(ssh_msg c);/* Odeslanie znaku na wejscie - zwraca 0 jesli nie ma miejsca */
-                         /* Pewne jest tylko odeslanie jednego znaku. */
+                         /* '\r': Wymagane odrysowanie co najmniej fragmentu ekranu */
+                         /* '\b': Jest zdarzenie myszy do przetworzenia */
+                         /* EOF:  Zamknięto okno graficzne */
 
-int  get_mouse_event(ssh_coordinate* xpos,ssh_coordinate* ypos,ssh_coordinate* click);/* Funkcja odczytujaca ostatnie zdazenie myszy */
-int  repaint_area(ssh_coordinate* x, ssh_coordinate* y,
-                  ssh_natural* width, ssh_natural* height); /* Podaje obszar ktory ma byc odnowiony i zwraca 0 */
-                                                        /* Jesli zwraca -1 to brak danych lub brak implementacji ! Odrysowac calosc. */
-                                                        /* Jesli zwraca -2 to znaczy ze dane juz zostaly odczytane. Nalezy zignorowac. */
+ssh_stat  set_char(ssh_msg c);/* Odeslanie znaku na wejscie - zwraca 0 jesli nie ma miejsca */
+                              /* Pewne jest tylko odeslanie jednego znaku. */
+
+ssh_stat  get_mouse_event(ssh_coordinate* xpos,ssh_coordinate* ypos,ssh_coordinate* click);/* Funkcja odczytujaca ostatnie zdazenie myszy */
+ssh_stat  repaint_area(ssh_coordinate* x, ssh_coordinate* y,
+                  ssh_natural* width, ssh_natural* height); /* Podaje obszar ktory ma byc odnowiony na rządanie '\r' i zwraca 0 */
+                                                        /* Jesli zwraca -1 to brak danych lub brak implementacji. Należy odrysowac calosc. */
+                                                        /* Jesli zwraca -2 to znaczy ze dane juz były odczytane. Nalezy zignorowac. */
+
 
 #ifdef __cplusplus
 } //extern C
@@ -245,13 +252,13 @@ void set_background(ssh_intensity r,ssh_intensity g,ssh_intensity b)
 
 // Konwerter na referencje żeby nie trzeba było używać adresów
 inline
-int get_mouse_event(int& xpos,int& ypos,int& click)
+ssh_stat  get_mouse_event(int& xpos,int& ypos,int& click)
 {
     return get_mouse_event(&xpos,&ypos,&click);
 }
 
 inline
-int  repaint_area(ssh_coordinate& x, ssh_coordinate& y,ssh_natural& width, ssh_natural& height)
+ssh_stat  repaint_area(ssh_coordinate& x, ssh_coordinate& y,ssh_natural& width, ssh_natural& height)
 {
     return repaint_area(&x,&y,&width,&height);
 }
@@ -265,7 +272,7 @@ inline ssh_color  get_background(void){ return background(); }    // Aktualny ko
 #endif /* _SYMSHELL_H_ */
 
 /********************************************************************/
-/*              SYMSHELLLIGHT  version 2020-11-19                   */
+/*              SYMSHELLLIGHT  version 2021-07-16                   */
 /********************************************************************/
 /*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
 /*            W O J C I E C H   B O R K O W S K I                   */

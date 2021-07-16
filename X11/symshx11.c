@@ -842,7 +842,7 @@ void shell_setup(const char* title,int iargc,const char* iargv[])
 }
 
 
-int init_plot(ssh_natural a,ssh_natural b,ssh_natural ca,ssh_natural cb)
+ssh_stat init_plot(ssh_natural a,ssh_natural b,ssh_natural ca,ssh_natural cb)
 /* typowa dla platformy inicjacja grafiki/semigrafik
  a,b to wymagane rozmiary ekranu */
 {
@@ -1219,7 +1219,7 @@ int  input_ready()
     return 0;
 }
 
-int  set_char(int c)
+ssh_stat  set_char(int c)
 /* Odeslanie znaku na wejscie - zwraca 0 jesli nie ma miejsca */
 {
     if(first_to_read!=0)/* Nieodebrano */
@@ -2485,7 +2485,7 @@ void clear_screen()
     }
 }
 
-int repaint_area(ssh_coordinate* x,ssh_coordinate* y,ssh_natural* width,ssh_natural* height)
+ssh_stat repaint_area(ssh_coordinate* x,ssh_coordinate* y,ssh_natural* width,ssh_natural* height)
 {
     if(repaint_flag==1)
     {
@@ -2512,7 +2512,7 @@ int repaint_area(ssh_coordinate* x,ssh_coordinate* y,ssh_natural* width,ssh_natu
         return -1;
 }
 
-int get_mouse_event(int* xpos,int* ypos,int* click)
+ssh_stat get_mouse_event(int* xpos,int* ypos,int* click)
 /* Odczytuje ostatnie zdazenie myszy */
 {
     if(LastMouse.flags!=0)
@@ -2729,7 +2729,7 @@ char* event_name(int code)
 #include <X11/xpm.h>  /*  TAK POWINNO BYĆ - JAK JEST NORMALNIE ZAINSTALOWANE */
 //#include "SYMSHELL/Xpm/xpm.h"
 
-int dump_screen(const char* Filename)
+ssh_stat dump_screen(const char* Filename)
 /* Zapisuje zawartosc ekranu do pliku graficznego w naturalnym formacie platformy: BMP, XBM itp */
 {
     char NameBufor[2048];

@@ -251,7 +251,7 @@ void shell_setup(const char* title,int iargc,const char* iargv[])
 
 static void SetScale(void);  //Gdzieś tam jest funkcja ustalająca domyślną paletę kolorów indeksowanych
 
-int  init_plot(ssh_natural  a, ssh_natural   b,                 /* ile pikseli mam mieć okno */
+ssh_stat init_plot(ssh_natural  a, ssh_natural   b,                 /* ile pikseli mam mieć okno */
                ssh_natural ca, ssh_natural  cb)
 /* inicjacja grafiki/semigrafiki */
 {
@@ -1190,7 +1190,7 @@ ssh_msg get_char()
     //return -1;//-1 oznacza koniec wejścia - np. kliknięcie w "zamykacz okna" - co się tu normalnie nie zdarza
 }
 
-int set_char(ssh_msg c)
+ssh_stat set_char(ssh_msg c)
 /* Odeslanie znaku na wejscie - zwraca 0 jesli nie ma miejsca */
 /* Pewne jest tylko odeslanie jednego znaku. */
 {
@@ -1204,7 +1204,7 @@ int set_char(ssh_msg c)
         return 0;//Nie udało się bo poprzednie nie zostało odczytane
 }
 
-int get_mouse_event(ssh_coordinate *xpos, ssh_coordinate *ypos, ssh_coordinate *click)
+ssh_stat get_mouse_event(ssh_coordinate *xpos, ssh_coordinate *ypos, ssh_coordinate *click)
 /* Funkcja odczytujaca ostatnie zdazenie myszy */
 /* Można odczytać kiedykolwiek, ale sens ma tylko gdy get_char() zwróciło '\b' */
 {
@@ -1221,7 +1221,7 @@ int get_mouse_event(ssh_coordinate *xpos, ssh_coordinate *ypos, ssh_coordinate *
 }
 
 
-int repaint_area(int* x,int* y,unsigned* width,unsigned* height)
+ssh_stat repaint_area(int* x,int* y,unsigned* width,unsigned* height)
 /* Podaje obszar ktory ma byc odnowiony i zwraca 0 */
 /* Jesli zwraca -1 to brak danych lub brak implementacji ! Odrysowac trzeba całosc. */
 /* Jesli zwraca -2 to znaczy ze dane juz były wcześniej odczytane. Nalezy zignorowac. */
@@ -1584,7 +1584,7 @@ void flush_plot()
     dump_screen(name.get()); //Zapisuje liste operacji graficznych do pliku w ustalonym formacie
 }
 
-int	dump_screen(const char* Filename)
+ssh_stat	dump_screen(const char* Filename)
 /* Zapisuje zawartosc ekranu do pliku graficznego w naturalnym formacie platformy */
 /* Tutaj dostepne sa formaty wektorowe "stream", SVG, moze EXM ...*/
 {
@@ -1628,7 +1628,7 @@ int	dump_screen(const char* Filename)
 }
 
 /********************************************************************/
-/*              SYMSHELLLIGHT  version 2020-11-19                   */
+/*              SYMSHELLLIGHT  version 2021-07-16                   */
 /********************************************************************/
 /*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
 /*            W O J C I E C H   B O R K O W S K I                   */

@@ -29,3 +29,10 @@ You can also compile tests:
 ```
 
 It was tested on UBUNTU 16.04 with gcc, UBUNTU 18.04 with gcc & MS Windows 7 with MSVC 2012
+
+
+**Licencing**
+
+You can use this software freely for educational and research purposes, but if you feel that it would be appropriate to repay somehow, please finance me a big coffee :-)
+
+https://www.paypal.com/paypalme/wborkowsk

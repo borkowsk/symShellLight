@@ -8,7 +8,7 @@
 /* SVG IMPLEMENTATION in file symshsvg.cpp                              */
 /* File changed massivelly: 17.11.2020                                  */
 /************************************************************************/
-/*               SYMSHELLLIGHT  version 2020-11-16                      */
+/*               SYMSHELLLIGHT  version 2021-07-20                      */
 /************************************************************************/
 #include <iostream>
 #include <fstream>
@@ -76,13 +76,18 @@ int         GrPrintTransparently = 0;
 int         GrLineWidth = 1;
 int         GrLineStyle = SSH_LINE_SOLID;
 
-ssh_rgb     GrPenColor = { 255,255,255 };
-ssh_rgb     GrBrushColor = { 205,205,205 };
+ssh_rgb     GrPenColor = { 255,255,255};//,255 };
+ssh_rgb     GrBrushColor = { 205,205,205};//,255 };
+
+void*           _ssh_window=NULL;  /* Dummy handler for check and external use */
+
 const char* SEP = "\t";
 
 /// Bez dostępu z zewnątrz modułu
 /////////////////////////////////////////////
 static const char*  ScreenTitle = "SSHSVG"; //Nazwa "okna" czyli domy�lnego pliku generowanego przez flush_plot()
+static char ScreenHeader[1024]="SSH SVG WINDOW";//Domyślny nagłówek pliku
+
 static ssh_color    curr_background = 0;
 static unsigned     GrScreenHi = 0;
 static unsigned     GrScreenWi = 0;
@@ -199,6 +204,11 @@ static GrOperation&  NextGrListEntry()
 /* OTWIERANIE i ZAMYKANIE TRYBU (OKNA) GRAFICZNEGO */
 /* Operacje konfiguracyjne o działaniu gwarantowanym przed inicjacja */
 
+void set_title(const char* window_name)
+{
+    strncpy(ScreenHeader,window_name,1023);
+}
+
 void shell_setup(const char* title,int iargc,const char* iargv[])
 /* Przekazanie parametrow wywolania */
 {
@@ -293,6 +303,10 @@ ssh_stat init_plot(ssh_natural  a, ssh_natural   b,                 /* ile pikse
 
     GrClosed = false;
 
+    _ssh_window=&GrList;
+
+    cerr<<GrScreenWi<<"x"<<GrScreenHi<<"-N:"<<N<<":"<<maxN<<endl;
+
     return 1;
 }
 
@@ -306,19 +320,20 @@ void close_plot()
 
     if(ssh_trace_level>1) cout << "List lenght:"<<SEP<<GrList.get_size()<<SEP<<"USED:"<<SEP<< GrListPosition<<  endl;
     GrClosed = true;
+    _ssh_window=NULL;
 }
 
 void buffering_setup(int Yes)
 /* Przelaczanie buforowanie okna - moze nie zadzialac wywo�ane po inicjacji*/
 {
     //W grafikach rastrowych zawartość pojawia się na ekranie albo od razu, albo po wywołaniu "flush_plot"
-    //Chodzi o lepszą jakość animacji, ale prze debugingu lepiej widzieć w trakcie rysowania
+    //Chodzi o lepszą jakość animacji, ale przy debugingu lepiej widzieć w trakcie rysowania
     if(ssh_trace_level>1) cout << _FUNCTION_NAME_ << SEP;       //buffering_setup
     if(ssh_trace_level>1) cout << Yes <<SEP<<"IGNORED!"<< endl; //Nie ma sensu bo nic nie jest wyświetlane w trakcie rysowania
 }
 
 void fix_size(int Yes)
-/* Czy symulowa� niezmiennosc rozmiarow okna */
+/* Czy symulować niezmiennosc rozmiarow okna */
 {
     //W tym trybie zmiana wielko�ci okna powi�ksza pixele o ca�kowit� wielokrotno��
     //Jak plik graficzny to nie ma znaczenia bo go raczej nie zwi�kszamy
@@ -327,10 +342,21 @@ void fix_size(int Yes)
 }
 
 void delay_ms(unsigned ms)
-/* Wymuszenie oczekiwania przez pewn� liczb� ms - nie ma sensu bo taki program raczej działa w tle!*/
+/* Wymuszenie oczekiwania przez pewn� liczb� ms - nie ma sensu bo taki program raczej działa w tle! Ale trochę robimy, bo mogło chodzić o szanse na przełączenie wątków?*/
 {
-    if(ssh_trace_level>1) cout << _FUNCTION_NAME_ << SEP;//delay_ms ALE DO PRZEMYŚLENIA. TODO
+    if(ssh_trace_level>1) cout << _FUNCTION_NAME_ << SEP;//delay_ms
     if(ssh_trace_level>1) cout << ms << SEP << "IGNORED!" << endl;
+    extern int usleep(useconds_t usec);/* takes microseconds, so you will have to multiply the input by 1000 in order to sleep in milliseconds. */
+    usleep(ms*10);
+}
+
+void delay_us(unsigned us)
+/* Wymuszenie oczekiwania przez pewn� liczb� us - nie ma sensu bo taki program raczej działa w tle! Ale trochę robimy, bo mogło chodzić o szanse na przełączenie wątków?*/
+{
+    if(ssh_trace_level>1) cout << _FUNCTION_NAME_ << SEP;//delay_us
+    if(ssh_trace_level>1) cout << us << SEP << "IGNORED!" << endl;
+    extern int usleep(useconds_t usec);/* takes microseconds, so you will have to multiply the input by 1000 in order to sleep in milliseconds. */
+    usleep(1);
 }
 
 /* OPERACJE DOTYCZACE CALEGO OKNA GRAFICZNEGO */
@@ -341,7 +367,7 @@ int mouse_activity(ssh_mode Yes)
     if(ssh_trace_level>0) cout << _FUNCTION_NAME_ << SEP;//mouse_activity
     if(ssh_trace_level>0) cout << Yes << endl;
     int old = GrMouseActive;
-    //GrMouseActive = (Yes?true:false);//Bo kretyński warning
+    //GrMouseActive = (Yes?true:false);//Bo kretyński warning TODO DEBUG
     return old;
 }
 
@@ -357,8 +383,8 @@ void set_background(ssh_color c)
 void clear_screen()
 /* Czysci ekran lub ekran wirtualny - zaleznie czy jest buforowanie czy nie - a tu nawet nie ma ekranu wirtualnego*/
 {
-    if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP;//clear_screen
-    if(ssh_trace_level>2) cout << endl;
+    if(ssh_trace_level) cout << _FUNCTION_NAME_ << SEP;//clear_screen
+    if(ssh_trace_level) cout << endl;
     for (size_t i = 0; i < GrList.get_size(); i++)
         GrList[i].clean();
     GrListPosition = -1; //Pusto
@@ -366,9 +392,9 @@ void clear_screen()
 
 int invalidate_screen()//Cały ekran/okno zostanie zmazany
 {
-    if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP;
+    if(ssh_trace_level) cout << _FUNCTION_NAME_ << SEP;
     clear_screen();
-    if(ssh_trace_level>2) cout << endl;
+    if(ssh_trace_level) cout << endl;
     return 1;
 }
 
@@ -389,6 +415,7 @@ ssh_natural     line_width(ssh_natural width)
     if(ssh_trace_level>2) cout << width << endl;
 	int old = GrLineWidth;
 	GrLineWidth = width;
+    if(GrLineWidth<=0) GrLineWidth=1;
 	return old;
 }
 
@@ -447,11 +474,13 @@ void set_pen(ssh_color c,ssh_natural width, ssh_mode Style)
     if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP;//set_pen
     if(ssh_trace_level>2) cout << (ssh_color)c <<SEP<<width<<SEP<<  Style << endl;
     GrLineWidth = width;
+    if(GrLineWidth<=0) GrLineWidth=1;
     GrLineStyle = Style;
     GrPenColor = palette[c];
 }
 
-void set_pen_rgb(ssh_intensity r,ssh_intensity g, ssh_intensity b,ssh_natural width,ssh_mode Style)
+void set_pen_rgb(ssh_intensity r,ssh_intensity g, ssh_intensity b,
+                 ssh_natural width,ssh_mode Style)
 // Ustala aktualny kolor linii za pomoca skladowych RGB
 // Je�li kolory indeksowane kozystaj� z cache'owanie tego samego pisaka to
 // nale�y ustali� kolor aktualny na pusty np. curr_color=-1;
@@ -459,10 +488,26 @@ void set_pen_rgb(ssh_intensity r,ssh_intensity g, ssh_intensity b,ssh_natural wi
     if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP;//set_pen_rgb
     if(ssh_trace_level>2) cout << r << SEP << g << SEP << b << SEP << width << SEP << Style << endl;
     GrLineWidth = width;
+    if(GrLineWidth<=0) GrLineWidth=1;
     GrLineStyle = Style;
     GrPenColor.r = r & 0xff;
     GrPenColor.g = g & 0xff;
     GrPenColor.b = b & 0xff;
+}
+
+void set_pen_rgba(ssh_intensity r,ssh_intensity g,ssh_intensity b,ssh_intensity a,
+                  ssh_natural width,ssh_mode style)
+/* Ustala aktualny kolor linii za pomoca skladowych RGBA */
+{
+    if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP;//set_pen_rgba
+    if(ssh_trace_level>2) cout << r << SEP << g << SEP << b << SEP << width << SEP << style << endl;
+    GrLineWidth = width;
+    if(GrLineWidth<=0) GrLineWidth=1;
+    GrLineStyle = style;
+    GrPenColor.r = r & 0xff;
+    GrPenColor.g = g & 0xff;
+    GrPenColor.b = b & 0xff;
+  //GrPenColor.a = a & 0xff;//TODO!
 }
 
 void set_brush(ssh_color c)
@@ -485,6 +530,18 @@ void set_brush_rgb(ssh_intensity r,ssh_intensity g,ssh_intensity b)
     GrBrushColor.r = r & 0xff;
     GrBrushColor.g = g & 0xff;
     GrBrushColor.b = b & 0xff;
+}
+
+void set_brush_rgba(ssh_intensity r,ssh_intensity g,ssh_intensity b,
+                   ssh_intensity a)
+// Ustala aktualny kolor wypelnien za pomoca skladowych RGBA
+{
+    if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP;//set_brush_rgba
+    if(ssh_trace_level>2) cout << r << SEP << g << SEP << b <<  endl;
+    GrBrushColor.r = r & 0xff;
+    GrBrushColor.g = g & 0xff;
+    GrBrushColor.b = b & 0xff;
+    //GrBrushColor.a = a & 0xff;//TODO!
 }
 
 /* ODCZYTYWYWANIE AKTUALNYCH USTAWIEN OKNA GRAFICZNEGO*/
@@ -655,6 +712,40 @@ void printbw(int x,int y,const char* format,...)
     if(ssh_trace_level>0) cout<<target<< endl;
     Op.text.txt=clone_str(target);
 }
+
+void print_d(ssh_coordinate x,ssh_coordinate y,const char* format,...)
+{
+    extern int  GrPrintTransparently;// = 0;
+    if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP << SEP;//print_d
+    if(ssh_trace_level>2) cout << x << SEP << y << SEP
+                               << format << endl;
+
+    GrOperation& Op = NextGrListEntry();//enum  GrType { Empty = 0, Point=1,LineTo=2,Line=3,Circle=4,Rect=5,Text=6,Poly=7 };
+    assert(Op.empty.type==GrType::Empty);
+    Op.empty.type = GrType::Text;
+    //struct Text   { unsigned type :3; unsigned mode :5; unsigned r :8; unsigned g :8; unsigned b :8; unsigned x  :16; unsigned y :16; unsigned rf :8;  unsigned gf :8; unsigned bf :8; wb_pchar txt; } text;
+    Op.text.rf = GrPenColor.r;
+    Op.text.gf = GrPenColor.g;
+    Op.text.bf = GrPenColor.b;
+    Op.text.r = GrBrushColor.r;
+    Op.text.g = GrBrushColor.g;
+    Op.text.b = GrBrushColor.b;
+    Op.text.x = x;
+    Op.text.y = y;
+    Op.text.mode = GrPrintTransparently;
+    char target[2048];
+    va_list marker;
+    va_start(marker, format);     /* Initialize variable arguments. */
+    vsprintf(target, format, marker);			assert(strlen(target) < 2046);
+    va_end(marker);              /* Reset variable arguments.      */
+    //Op.text.txt.take(clone_str(target));
+    //if(Op.text.txt != NULL)
+    //		delete Op.text.txt;
+    if(ssh_trace_level>0) cout<<target<< endl;
+    Op.text.txt=clone_str(target);
+}
+
+
 
 void print_rgb(int x, int y,
                unsigned r, unsigned g, unsigned b,
@@ -945,7 +1036,7 @@ void fill_circle_d(int x,int y,int r)
     Op.circle.bf = GrBrushColor.b;
 }
 
-void fill_ellipse_d(int x,int y,int a,int b)
+void fill_ellipse_d(ssh_coordinate x, ssh_coordinate y, ssh_natural a, ssh_natural b)
 /* Wypełnienie elipsy w kolorach domyslnych - także rgb */
 {
     if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP;//fill_circle_d
@@ -1476,7 +1567,7 @@ int writeSVG(ostream& o)
 	  <<"rgb(" << unsigned(bac.r) << ',' << unsigned(bac.g) << ',' << unsigned(bac.b) << "); "
       <<"stroke:#000000; stroke-width:0px;\" />" << endl;
 
-	o << "<text style=\"fill:red;\" x=\""<< 0 <<"\" y=\""<< GrScreenHi + 12 <<"\">This is SVG from SYMSHELL APP: "<<ScreenTitle<<" </text>"<<endl;
+    o << "<text style=\"fill:red;\" x=\""<< 0 <<"\" y=\""<< GrScreenHi + 12 <<"\">This is SVG from "<<ScreenHeader<<" "<<ScreenTitle<<" </text>"<<endl;
 	for (unsigned i = 0; i <= GrListPosition; i++)
 		switch (GrList[i].empty.type)
 		{
@@ -1523,7 +1614,7 @@ int writeSVG(ostream& o)
 			struct Circle &pr = (GrList[i].circle);
 			//o << "<circle cx=\"120\" cy=\"120\" r=\"80\" fill=\"red\" stroke=\"black\" stroke-width=\"5\" />" << endl;
 			//o << "<ellipse cx=\"200\" cy=\"200\" rx=\"20\" ry=\"7\" fill=\"none\" stroke=\"black\" stroke-width=\"6\" />" << endl;
-			if (pr.rx == pr.ry)//Ko�o
+            if (pr.rx == pr.ry)//Koło - circle
 				o << "<circle r=\"" << pr.ry << "px\" ";
 			else
 				o << "<ellipse rx=" << pr.rx << "px\" ry=\"" << pr.ry << "px\" ";
@@ -1660,7 +1751,7 @@ ssh_stat	dump_screen(const char* Filename)
 }
 
 /********************************************************************/
-/*              SYMSHELLLIGHT  version 2021-07-16                   */
+/*              SYMSHELLLIGHT  version 2021-07-20                   */
 /********************************************************************/
 /*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
 /*            W O J C I E C H   B O R K O W S K I                   */

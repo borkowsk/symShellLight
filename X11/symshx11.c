@@ -9,13 +9,13 @@
 /* File changed masively: 21.10.2020                                    */
 /*                                                                      */
 /* FILE: symshx11.c                                                     */
-/* Wersja: 17.12.2020                                                   */
+/* Wersja: 20.07.2021                                                   */
 /*                                                                      */
 /* UWAGA!                                                               */
 /* WCIĄŻ Z BLEDEM NA EXPOSE TODO , choc raz go juz gdzies usunalem :-/  */
 /*                                                                      */
 /************************************************************************/
-/*               SYMSHELLLIGHT  version 2020-11-16                      */
+/*               SYMSHELLLIGHT  version 2021-07-20                      */
 /************************************************************************/
 
 
@@ -42,7 +42,8 @@
 
 /* For close_plot() */
  extern int             WB_error_enter_before_clean;/* Czy zamykać okno od razu czy dawać "enter"? */
- int                    trace=1;  /* Sterowanie komunikatami modułu na standardoqe wyjście */
+ int                    ssh_trace_level = 1;           //Maska poziomów śledzenia 1-msgs 2-grafika 3-grafika detaliczna 4-alokacje/zwalnianie
+ //int                    trace=1;  /* Sterowanie komunikatami modułu na standardoqe wyjście */
  static int             opened=0; /* Dla close plot. Zerowane tez gdy "broken-pipe" */
 
  /* progname is the string by which this program was invoked; this
@@ -213,7 +214,6 @@
  int	print_transparently(int yes)
  /* Włącza drukowanie tekstu bez zamazywania tla. Zwraca stan poprzedni */
  {
-     //fprintf(stderr,"print_transparently() not implemented\n");
      int ret=transparent_print;
      transparent_print=yes;
      return ret;
@@ -222,7 +222,8 @@
  void fix_size(int Yes)
  /* Czy symulowac niezmiennosc rozmiarow okna */
  {
-     fprintf(stderr,"fix_size() not implemented\n");
+     if(ssh_trace_level)
+        fprintf(stderr,"fix_size() not implemented\n");
  }
 
  int mouse_activity(int yes)
@@ -274,7 +275,8 @@
  {
      if(display==0)
      {
-         if(trace) fprintf(stderr,"Trying to free resources of NULL display!\n");
+         if(ssh_trace_level)
+             fprintf(stderr,"Trying to free resources of NULL display!\n");
          return;
      }
 
@@ -298,28 +300,28 @@
      if(alloc_cont!=0)
      {
          XFreePixmap(display,cont_pixmap);
-         if(trace)
+         if(ssh_trace_level)
              fprintf(stderr,"%s %lx\n","FREE PIXMAP",cont_pixmap);//??? xl?
          cont_pixmap=0;
      }
 
      if(win!=0)
      {
-         if(trace)
+         if(ssh_trace_level)
              fprintf(stderr, "%s %lx ","DESTROY WINDOW",win);
 
          XDestroyWindow(display,win);
-         if(trace)
+         if(ssh_trace_level)
              fprintf(stderr, "-OK %lx\n",win);
          win=0;
      }
 
-     if(trace)
+     if(ssh_trace_level)
          fprintf(stderr,"CLOSE DISPLAY");
 
      XCloseDisplay(display);
 
-     if(trace)
+     if(ssh_trace_level)
          fprintf(stderr,"-OK\n");
 
      display=0;
@@ -384,7 +386,7 @@ static void ResizeBuffer(unsigned int nwidth,unsigned int nheight)
         alloc_cont=cont_pixmap=0;
     }
 
-    if(trace)
+    if(ssh_trace_level)
     {
         fprintf(stderr,"%s %dx%d\n","ALLOC PIXMAP",nwidth,nheight);
         /*getchar();*/
@@ -397,15 +399,17 @@ static void ResizeBuffer(unsigned int nwidth,unsigned int nheight)
     XSetForeground(display, gc, Black);
     CurrForeground=-1;
     XFillRectangle(display,cont_pixmap , gc, 0, 0, nwidth+1, nheight+1);
-    if(trace)
+    if(ssh_trace_level)
     {
         XFlush(display);
-        fprintf(stderr,"PIXMAP %lx DISPLAY %p WIN %lx %s\n",
-                cont_pixmap,
-                display,
-                win,
-                "OK?");
+        if(ssh_trace_level){
+            fprintf(stderr,"PIXMAP %lx DISPLAY %p WIN %lx %s\n",
+                    cont_pixmap,
+                    display,
+                    win,
+                    "OK?");
         /*getchar();*/
+        }
     }
 }
 
@@ -421,7 +425,7 @@ static void load_font(XFontStruct **font_info, GC *gc)
     /* Load font and get font information structure */
     if ((l_font_info = XLoadQueryFont(display,fontname)) == NULL)
     {
-        (void) fprintf( stderr, "%s: Cannot open %s font\n",
+        fprintf( stderr, "%s: Cannot open %s font\n",
                         progname,fontname);
         if( (*font_info)== NULL )
             exit( -1 ); /* Nie ma zadnego fontu */
@@ -440,7 +444,7 @@ static void load_font(XFontStruct **font_info, GC *gc)
     font_width = XTextWidth(*font_info, "X", 1);
     font_height = (*font_info)->ascent + (*font_info)->descent;
 
-    if(trace)
+    if(ssh_trace_level)
         fprintf(stderr,"%s:font %ux%u\n",icon_name,font_width,font_height);
 }
 
@@ -486,7 +490,7 @@ static void Read_XInput()
     switch  (report.type) {
 
     case Expose:
-        if(trace)
+        if(ssh_trace_level)
             fprintf(stderr,"EXPOSE: %s #%d x=%d y=%d %dx%d\n",
                     icon_name,
                     report.xexpose.count,
@@ -535,7 +539,7 @@ static void Read_XInput()
                 /* Set information for main program about refresh screen */
                 if(report.xexpose.count == 0 ||  buffer_empty )
                 {
-                    if(trace)
+                    if(ssh_trace_level)
                         fprintf(stderr,"EXPOSE force repaint\n");
                     buforek[0]='\r';
                     buffer_empty=0;
@@ -545,7 +549,7 @@ static void Read_XInput()
             else
             {
                 /* Refresh from pixmap buffer */
-                if(trace)
+                if(ssh_trace_level)
                     fprintf(stderr,"EXPOSE DOING BITBLT\n");
                 place_graphics(win, gc ,
                                report.xexpose.x,report.xexpose.y,
@@ -563,7 +567,7 @@ static void Read_XInput()
 
     case ConfigureNotify:
         DelayAction=0;/* Pojawila sie aktywnosc. Nie nalezy spac! */
-        if(trace)
+        if(ssh_trace_level)
             fprintf(stderr,"CONFIGURE: %s=%dx%d scale: x=%d:1 y=%d:1 ",
                     icon_name,
                     width,height,mulx,muly);
@@ -574,7 +578,7 @@ static void Read_XInput()
         if( width== report.xconfigure.width &&
                 height== report.xconfigure.height)
         {
-            if(trace)
+            if(ssh_trace_level)
                 fprintf(stderr,"The same.\n");
             break; /* Nic sie nie zmienilo */
         }
@@ -586,7 +590,7 @@ static void Read_XInput()
                 (height < size_hints->min_height))
         {
             window_size = TOO_SMALL;
-            if(trace)
+            if(ssh_trace_level)
                 fprintf(stderr,"To small!\n");
         }
         else
@@ -609,7 +613,7 @@ static void Read_XInput()
                 buffer_empty=1;
             }
 
-            if(trace)
+            if(ssh_trace_level)
                 fprintf(stderr,"->%dx%d scale: x=%d:1 y=%d:1 \n",width,height,mulx,muly);
         }
         break;
@@ -623,7 +627,7 @@ static void Read_XInput()
             LastMouse.x=report.xbutton.x;
             LastMouse.y=report.xbutton.y;
             LastMouse.buttons=report.xbutton.button;
-            if(trace)
+            if(ssh_trace_level)
                 fprintf(stderr,"ButtonPress:x=%d y=%d b=X0%x\n",
                         LastMouse.x,LastMouse.y,LastMouse.buttons  );
         }
@@ -640,7 +644,7 @@ static void Read_XInput()
         if(KeyCount!=1)
             *buforek=NODATA;
 
-        if(trace)
+        if(ssh_trace_level)
             fprintf(stderr,"KeyPress:%c %x \n ",*Bufor,(int)(*Bufor));
 
         if(*Bufor==0x3 || *Bufor==0x4)/* User przerwal w oknie X11 */
@@ -649,7 +653,7 @@ static void Read_XInput()
 
     case ClientMessage: //https://tronche.com/gui/x/xlib/events/client-communication/client-message.html
     {
-        if(trace)
+        if(ssh_trace_level)
         {
             fprintf(stderr," Client message arrived ");
             switch(report.xclient.format){
@@ -674,7 +678,7 @@ static void Read_XInput()
 
     default:
 #	ifdef XDEBUG
-        if(trace)
+        if(ssh_trace_level)
             fprintf(stderr,"Message %d=\"%s\" arrived but ignored \n ",
                     report.type,event_name(report.type) );y2
 #	endif
@@ -838,8 +842,8 @@ void shell_setup(const char* title,int iargc,const char* iargv[])
                             else
                                 if(strncmp(largv[i],"-traceevt",9)==0)
                                 {
-                                    trace=(largv[i][9]=='+')?1:0;
-                                    fprintf(stderr,"Trace events is %s\n",(trace?"ON":"OFF"));
+                                    ssh_trace_level=(largv[i][9]=='+')?1:0;
+                                    fprintf(stderr,"Trace events is %s\n",(ssh_trace_level?"ON":"OFF"));
                                 }
     }
 }
@@ -884,14 +888,14 @@ ssh_stat init_plot(ssh_natural a,ssh_natural b,ssh_natural ca,ssh_natural cb)
     display_width = DisplayWidth(display, screen_num);
     display_height = DisplayHeight(display, screen_num);
 
-    if(trace)
+    if(ssh_trace_level)
     {
         fprintf(stderr,"Screen: %u x %u ; %u\n",display_width,display_height,screen_num);
     }
 
     disp_depht = XListDepths(display, screen_num, &disp_depht_num);
 
-    if(trace)
+    if(ssh_trace_level)
     {
     	fprintf(stderr,"Available display depths:");
     	for(i=0;i<disp_depht_num;i++)
@@ -909,7 +913,7 @@ ssh_stat init_plot(ssh_natural a,ssh_natural b,ssh_natural ca,ssh_natural cb)
 
     //default_deph=32;//??? NOT WORK! WHY???
 
-   if(trace)
+   if(ssh_trace_level)
         fprintf(stderr,"Select depth %d\n",default_depth);
 
     /* Note that in a real application, x and y would default
@@ -927,7 +931,8 @@ ssh_stat init_plot(ssh_natural a,ssh_natural b,ssh_natural ca,ssh_natural cb)
 
    iniX=iniY=0;
 
-   fprintf(stderr,"%s=%dx%d\n",icon_name,width,height);
+   if(ssh_trace_level)
+        fprintf(stderr,"%s=%dx%d\n",icon_name,width,height);
    fflush(stderr);
 
    XSetErrorHandler(MyErrorHandler);
@@ -1058,7 +1063,7 @@ ssh_stat init_plot(ssh_natural a,ssh_natural b,ssh_natural ca,ssh_natural cb)
     class_hints->res_name = progname;
     class_hints->res_class = "ssh_win";//"Basicwin";
 
-
+//void XSetWMProperties(display, w, window_name, icon_name, argv, argc, normal_hints, wm_hints, class_hints)
     XSetWMProperties( display, win,
                       &windowName,
                       &iconName,
@@ -1067,12 +1072,7 @@ ssh_stat init_plot(ssh_natural a,ssh_natural b,ssh_natural ca,ssh_natural cb)
                       largc,
                       size_hints,
                       wm_hints,
-                      class_hints);
-
-    //if( NO_DIAGNOSTIC? )
-    //    fprintf( stderr, "%s: XSetWMProperties failed.\n", progname);
-    //else
-    //    fprintf( stderr, "%s: XSetWMProperties OK.\n", progname);
+                      class_hints);    /* ERRORS MAY APPEAR LATER! */
 
     /* Select event types wanted */
     XSelectInput(display, win,
@@ -1089,24 +1089,24 @@ ssh_stat init_plot(ssh_natural a,ssh_natural b,ssh_natural ca,ssh_natural cb)
     XMapWindow(display, win);
 
     opened=1;
-    atexit(close_plot);
-    fprintf(stderr,"atexit(close_plot) installed\n");
+    if(atexit(close_plot)==0 && ssh_trace_level)
+        fprintf(stderr,"atexit(close_plot) installed\n");
+
+    if(signal(SIGPIPE,SigPipe)!=SIG_ERR && ssh_trace_level)
+        fprintf(stderr,"SIGPIPE handler installed\n");
+
+    XIOErrorHandler ret;
+    if(ret=XSetIOErrorHandler(MyXIOHandler) && ssh_trace_level)
+        fprintf(stderr,"IOErrorHandler installed. Ret=%p\n",ret);
 
     /* Alloc pixmap for contens buffering */
     if(isbuffered)
         ResizeBuffer(width,height);
 
-    if(signal(SIGPIPE,SigPipe)!=SIG_ERR)// && trace)
-        fprintf(stderr,"SIGPIPE handler installed\n");
-
-    XIOErrorHandler ret;
-    if(ret=XSetIOErrorHandler(MyXIOHandler))
-        fprintf(stderr,"IOErrorHandler installed. Ret=%p\n",ret);
-
     while(!input_ready()); /* Wait for expose */
 
     /* Czysci zeby wprowadzic ustalone tlo */
-    if(trace)
+    if(ssh_trace_level)
         fprintf(stderr,"Background is %d\n",(int)bacground);
 
     clear_screen();
@@ -1164,7 +1164,7 @@ ssh_natural  string_width(const char* str)
 void flush_plot()
 /* --------//---------- uzgodnienie zawartosci ekranu */
 {
-    if(trace>1)
+    if(ssh_trace_level>1)
         fprintf(stderr,"FLUSH %s",icon_name);
 
     if(!opened)
@@ -1179,12 +1179,12 @@ void flush_plot()
                0/*src_x*/, 0/*src_y*/,
                width, height,
                0/*dest_x*/, 0/*dest_y*/);
-            if(trace>1)
-            fprintf(stderr,"DOING BITBLT");
+            if(ssh_trace_level>1)
+                fprintf(stderr,"DOING BITBLT");
         }
 
     XFlush(display);
-    if(trace>1)
+    if(ssh_trace_level>1)
         fprintf(stderr," XFLUSH\n");
     error_count=error_limit;
 }
@@ -1203,7 +1203,7 @@ int  input_ready()
 
     if(pipe_break==1)
     {
-        if(trace)
+        if(ssh_trace_level)
             fprintf(stderr,"'pipe_break' flag detected in input_ready() in '%s'.\n",icon_name);
         return EOF;
     }
@@ -1249,7 +1249,7 @@ int  get_char()
 
     if(pipe_break==1)
     {
-        if(trace)
+        if(ssh_trace_level)
             fprintf(stderr,"'pipe_break' flag detected in get_char() in '%s'.\n",icon_name);
         return EOF;
     }
@@ -1285,7 +1285,7 @@ void printbw(ssh_coordinate x,ssh_coordinate y,const char* format,...)
     if(straznik1!=0x77 || straznik2!=0x77)
     {
         fprintf(stderr,"symshell.print(...) - line exced 1024b!");
-        abort();
+        exit(-__LINE__);
     }
 
     /* Print string in window */
@@ -1342,7 +1342,7 @@ void printc(ssh_coordinate x,ssh_coordinate y,
     if(straznik1!=0x77 || straznik2!=0x77)
     {
         fprintf(stderr,"symshell.print(...) - line exced 1024b!");
-        abort();
+        exit(-__LINE__);
     }
 
     /* Print string in window */
@@ -1397,7 +1397,7 @@ void print_d(ssh_coordinate x,ssh_coordinate y,const char* format,...)
     if(straznik1!=0x77 || straznik2!=0x77)
     {
         fprintf(stderr,"symshell.print(...) - line exced 1024b!");
-        abort();
+        exit(-__LINE__);
     }
 
     /* Print string in window */
@@ -1473,7 +1473,7 @@ void print_rgb(ssh_coordinate x,ssh_coordinate y,
     if(straznik1!=0x77 || straznik2!=0x77)
     {
         fprintf(stderr,"symshell.print(...) - line exced 1024b!");
-        abort();
+        exit(-__LINE__);
     }
 
     /* Print string in window */
@@ -1597,8 +1597,10 @@ void plot(ssh_coordinate x,ssh_coordinate y,ssh_color c)
 int line_style(int Style)
 /* Ustala styl rysowania lini: SSH_LINE_SOLID, SSH_LINE_DOTTED, SSH_LINE_DASHED */
 {
-    if(trace>0) fprintf(stderr,"%s %s %c", __FUNCTION__ ,"not implemented ",'\t');
-    if(trace>0) fprintf(stderr,"%u\n", Style);
+    if(ssh_trace_level>0)
+        fprintf(stderr,"%s %s %c", __FUNCTION__ ,"not implemented ",'\t');
+    if(ssh_trace_level>0)
+        fprintf(stderr,"%u\n", Style);
     /*int old = GrLineStyle;
     GrLineStyle = Style;
     return  GrLineStyle;    //Zwraca poprzedni stan
@@ -1628,7 +1630,7 @@ void set_pen_rgb(ssh_intensity r,ssh_intensity g,ssh_intensity b,ssh_natural siz
 
 
 void set_pen_rgba(ssh_intensity r,ssh_intensity g,ssh_intensity b,ssh_intensity a,ssh_natural size,ssh_mode style)
-/* Ustala aktualny kolor linii za pomoca skladowych RGB */
+/* Ustala aktualny kolor linii za pomoca skladowych RGBA */
 {
     PenColor=buildTransparentColor(r,g,b,a);
     default_line_width=size;
@@ -1650,7 +1652,7 @@ ssh_natural line_width(ssh_natural width)
         default_line_width=width;
         XSetLineAttributes(display, gc,default_line_width,
                            LineSolid,  CapRound, JoinRound);
-        if(trace>2)
+        if(ssh_trace_level>2)
            fprintf(stderr,"Set default line width to %d\n",default_line_width);
     }
 
@@ -1686,7 +1688,7 @@ void line_d(int x1,int y1,int x2,int y2)
     if( line_width!=(mulx>muly?muly:mulx) )
     {
         line_width=(mulx>muly?muly:mulx);
-        if(trace>1)
+        if(ssh_trace_level>1)
             fprintf(stderr,"Set line width to %d\n",line_width);
 
         XSetLineAttributes(display, gc,line_width,
@@ -1718,7 +1720,7 @@ void circle_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r)
     if( line_width!=(mulx>muly?muly:mulx) )
     {
         line_width=(mulx>muly?muly:mulx);
-        if(trace>1)
+        if(ssh_trace_level>1)
             fprintf(stderr,"Set line width to %d\n",line_width);
 
         XSetLineAttributes(display, gc,line_width,
@@ -1750,7 +1752,7 @@ void ellipse_d(ssh_coordinate x,ssh_coordinate y,ssh_natural a,ssh_natural b)
     if( line_width!=(mulx>muly?muly:mulx) )
     {
         line_width=(mulx>muly?muly:mulx);
-        if(trace>1)
+        if(ssh_trace_level>1)
             fprintf(stderr,"Set line width to %d\n",line_width);
 
         XSetLineAttributes(display, gc,line_width,
@@ -1782,7 +1784,7 @@ void fill_circle_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r)
     if( line_width!=(mulx>muly?muly:mulx) )
     {
         line_width=(mulx>muly?muly:mulx);
-        if(trace>1)
+        if(ssh_trace_level>1)
             fprintf(stderr,"Set line width to %d\n",line_width);
 
         XSetLineAttributes(display, gc,line_width,
@@ -1823,7 +1825,7 @@ void fill_ellipse_d(ssh_coordinate x, ssh_coordinate y, ssh_natural a, ssh_natur
     if( line_width!=(mulx>muly?muly:mulx) )
     {
         line_width=(mulx>muly?muly:mulx);
-        if(trace>1)
+        if(ssh_trace_level>1)
             fprintf(stderr,"Set line width to %d\n",line_width);
 
         XSetLineAttributes(display, gc,line_width,
@@ -1879,7 +1881,7 @@ void arc_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r,            /*rysuje 
     if( line_width!=(mulx>muly?muly:mulx) )
     {
         line_width=(mulx>muly?muly:mulx);
-        if(trace>1)
+        if(ssh_trace_level>1)
             fprintf(stderr,"Set line width to %d\n",line_width);
 
         XSetLineAttributes(display, gc,line_width,
@@ -1918,7 +1920,7 @@ void arc(ssh_coordinate x,ssh_coordinate y,ssh_natural r,
     if( line_width!=(mulx>muly?muly:mulx) )
     {
         line_width=(mulx>muly?muly:mulx);
-        if(trace>1)
+        if(ssh_trace_level>1)
             fprintf(stderr,"Set line width to %d\n",line_width);
 
         XSetLineAttributes(display, gc,line_width,
@@ -1958,7 +1960,7 @@ void earc_d(ssh_coordinate x,ssh_coordinate y,                         /*rysuje 
     if( line_width!=(mulx>muly?muly:mulx) )
     {
         line_width=(mulx>muly?muly:mulx);
-        if(trace>1)
+        if(ssh_trace_level>1)
             fprintf(stderr,"Set line width to %d\n",line_width);
 
         XSetLineAttributes(display, gc,line_width,
@@ -1998,7 +2000,7 @@ void earc(ssh_coordinate x,ssh_coordinate y,
     if( line_width!=(mulx>muly?muly:mulx) )
     {
         line_width=(mulx>muly?muly:mulx);
-        if(trace>1)
+        if(ssh_trace_level>1)
             fprintf(stderr,"Set line width to %d\n",line_width);
 
         XSetLineAttributes(display, gc,line_width,
@@ -2038,7 +2040,7 @@ void fill_arc_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r,       /* wypeł
     if( line_width!=(mulx>muly?muly:mulx) )
     {
         line_width=(mulx>muly?muly:mulx);
-        if(trace>1)
+        if(ssh_trace_level>1)
             fprintf(stderr,"Set line width to %d\n",line_width);
 
         XSetLineAttributes(display, gc,line_width,
@@ -2093,7 +2095,7 @@ void fill_arc(ssh_coordinate x,ssh_coordinate y,ssh_natural r,         /* wirtua
     if( line_width!=(mulx>muly?muly:mulx) )
     {
         line_width=(mulx>muly?muly:mulx);
-        if(trace>1)
+        if(ssh_trace_level>1)
             fprintf(stderr,"Set line width to %d\n",line_width);
 
         XSetLineAttributes(display, gc,line_width,
@@ -2149,7 +2151,7 @@ void fill_earc_d(ssh_coordinate x,ssh_coordinate y,                    /* wypeł
     if( line_width!=(mulx>muly?muly:mulx) )
     {
         line_width=(mulx>muly?muly:mulx);
-        if(trace>1)
+        if(ssh_trace_level>1)
             fprintf(stderr,"Set line width to %d\n",line_width);
 
         XSetLineAttributes(display, gc,line_width,
@@ -2206,7 +2208,7 @@ void fill_earc(ssh_coordinate x,ssh_coordinate y,                      /* wirtua
     if( line_width!=(mulx>muly?muly:mulx) )
     {
         line_width=(mulx>muly?muly:mulx);
-        if(trace>1)
+        if(ssh_trace_level>1)
             fprintf(stderr,"Set line width to %d\n",line_width);
 
         XSetLineAttributes(display, gc,line_width,
@@ -2316,7 +2318,11 @@ void fill_poly_d(ssh_coordinate vx,ssh_coordinate vy,
         LocalPoints=calloc(number,sizeof(XPoint));
 
     if(LocalPoints==NULL)
-    {assert("No memory for polygon");return;}
+    {
+        if(ssh_trace_level)
+            fprintf(stderr,"No memory for polygon");
+        return;
+    }
 
     if(BrushColor!=-1)
     {
@@ -2354,7 +2360,7 @@ void fill_circle(ssh_coordinate x, ssh_coordinate y, ssh_natural r, ssh_color c)
     if( line_width!=(mulx>muly?muly:mulx) )
     {
         line_width=(mulx>muly?muly:mulx);
-        if(trace>1)
+        if(ssh_trace_level>1)
             fprintf(stderr,"Set line width to %d\n",line_width);
 
         XSetLineAttributes(display, gc,line_width,
@@ -2386,7 +2392,7 @@ void circle(ssh_coordinate x,ssh_coordinate y,ssh_natural r,ssh_color c)
     if( line_width!=(mulx>muly?muly:mulx) )
     {
         line_width=(mulx>muly?muly:mulx);
-        if(trace>1)
+        if(ssh_trace_level>1)
             fprintf(stderr,"Set line width to %d\n",line_width);
 
         XSetLineAttributes(display, gc,line_width,
@@ -2428,7 +2434,11 @@ void fill_poly(ssh_coordinate vx,ssh_coordinate vy,
         LocalPoints=calloc(number,sizeof(XPoint));
 
     if(LocalPoints==NULL)
-    {assert("Memory for polygon");return;}
+    {
+        if(ssh_trace_level)
+            fprintf(stderr,"No memory for polygon");
+        return;
+    }
 
     if(c!=CurrForeground)
     {
@@ -2475,7 +2485,7 @@ void line(ssh_coordinate x1,ssh_coordinate y1,
     if( line_width!=(mulx>muly?muly:mulx) )
     {
         line_width=(mulx>muly?muly:mulx);
-        if(trace>1)
+        if(ssh_trace_level>1)
             fprintf(stderr,"Set line width to %d\n",line_width);
 
         XSetLineAttributes(display, gc,line_width,
@@ -2505,13 +2515,15 @@ void clear_screen()
     /* Clear screen and bitmap */
     if(!animate)
     {
-        if(trace) fprintf(stderr,"Clear window\n");
+        if(ssh_trace_level)
+            fprintf(stderr,"Clear window\n");
         XFillRectangle(display,win , gc, 0,0,width,height);
     }
 
     if(isbuffered)
     {
-        if(trace) fprintf(stderr,"Clear pixmap\n");
+        if(ssh_trace_level)
+            fprintf(stderr,"Clear pixmap\n");
         XFillRectangle(display,cont_pixmap , gc, 0,0,width,height);
     }
 }
@@ -2601,7 +2613,7 @@ void SetScaleOld(XColor RGBarray[])
     RGBarray[255].green=0xffff;
     RGBarray[255].blue=0xffff;
 
-    if(trace)
+    if(ssh_trace_level)
         fprintf(stderr,"%s\n","SetScale completed");
 }
 
@@ -2666,7 +2678,7 @@ void SetScale(XColor RGBarray[])
     RGBarray[255].blue=0xffff;
     Scale[255]=buildColor(255,255,255);
 
-    if(trace)
+    if(ssh_trace_level)
         fprintf(stderr,"%s\n","SetScale completed");
 }
 
@@ -2801,7 +2813,7 @@ ssh_stat dump_screen(const char* Filename)
 }
 /*#pragma exit close_plot*/
 /********************************************************************/
-/*              SYMSHELLLIGHT  version 2020-11-19                   */
+/*              SYMSHELLLIGHT  version 2021-07-20                   */
 /********************************************************************/
 /*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
 /*            W O J C I E C H   B O R K O W S K I                   */

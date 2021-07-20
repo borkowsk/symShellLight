@@ -43,7 +43,8 @@ typedef signed   int                            ssh_coordinate;/* Wszelkie wspo�
 typedef unsigned int                            ssh_natural;   /* Liczby większe od zera gdy zero jest sytuacją nieoczekiwaną */
 typedef unsigned int                            ssh_intensity; /* Składowe kolorów itp. wartości od 0 wzwyż */
 typedef struct ssh_point {ssh_coordinate x,y;}  ssh_point;     /* Punkt we współrzędnych ekranowych */
-typedef struct ssh_rgb   {uchar8b r,g,b;}       ssh_rgb;       /* alpha? union with uint32? TODO */
+typedef struct ssh_rgb   {uchar8b r,g,b;}       ssh_rgb;       /* alpha? Union with uint32? TODO */
+//typedef struct ssh_rgba  {uchar8b r,g,b,a;}     ssh_rgba;      /* With alpha. Union with uint32? TODO */
 typedef unsigned int                            ssh_color;     /* ssh_color_index? TODO */
 typedef float                                   ssh_radian;   /* katy w radianach dla łuków */
 
@@ -286,7 +287,7 @@ inline ssh_color  get_background(void){ return background(); }    // Aktualny ko
 #endif /* _SYMSHELL_H_ */
 
 /********************************************************************/
-/*              SYMSHELLLIGHT  version 2021-07-16                   */
+/*              SYMSHELLLIGHT  version 2021-07-20                   */
 /********************************************************************/
 /*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
 /*            W O J C I E C H   B O R K O W S K I                   */

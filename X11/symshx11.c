@@ -1650,7 +1650,7 @@ ssh_natural line_width(ssh_natural width)
         default_line_width=width;
         XSetLineAttributes(display, gc,default_line_width,
                            LineSolid,  CapRound, JoinRound);
-        if(trace)
+        if(trace>2)
            fprintf(stderr,"Set default line width to %d\n",default_line_width);
     }
 
@@ -2487,6 +2487,13 @@ void line(ssh_coordinate x1,ssh_coordinate y1,
 
     if(isbuffered)
         XDrawLine(display,cont_pixmap, gc, x1, y1, x2, y2);
+}
+
+
+int invalidate_screen()//Cały ekran/okno zostanie zmazany
+{
+    //clear_screen();//Dla pewności?
+    return 0;
 }
 
 void clear_screen()

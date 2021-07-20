@@ -364,6 +364,14 @@ void clear_screen()
     GrListPosition = -1; //Pusto
 }
 
+int invalidate_screen()//Cały ekran/okno zostanie zmazany
+{
+    if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP;
+    clear_screen();
+    if(ssh_trace_level>2) cout << endl;
+    return 1;
+}
+
 ssh_mode     print_transparently(ssh_mode Yes)
 /* Wlacza drukowanie tekstu bez zamazywania t�a. Zwraca stan poprzedni */
 {

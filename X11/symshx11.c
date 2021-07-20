@@ -76,6 +76,7 @@
                                                screen_width() i screen_heiht() i zmiany rozmiaru*/
 
  static Window          win;               /* HANDLER TO MAIN WINDOW */
+        void*           _ssh_window=NULL;  /* Handler for check and external use */
 
  static unsigned int    width,height;      /* Window size */
  static int             iniX, iniY;        /* Window position */
@@ -336,6 +337,8 @@ void close_plot()
     {
         inside_close_plot=1;
         XSync(display,1/*DISCARD EVENTS*/);
+        _ssh_window=NULL; //Do not use this window any more!!!
+
         if(WB_error_enter_before_clean)
         {
             fflush(stdout);
@@ -673,7 +676,7 @@ static void Read_XInput()
 #	ifdef XDEBUG
         if(trace)
             fprintf(stderr,"Message %d=\"%s\" arrived but ignored \n ",
-                    report.type,event_name(report.type) );
+                    report.type,event_name(report.type) );y2
 #	endif
         break;
     } /* End switch */
@@ -951,7 +954,7 @@ ssh_stat init_plot(ssh_natural a,ssh_natural b,ssh_natural ca,ssh_natural cb)
    if (!XMatchVisualInfo(display, XDefaultScreen(display), 32, TrueColor, &vinfo))
      {
        fprintf(stderr, "no such visual\n");
-       return 1;
+       return 0;
      }
      else
      fprintf(stderr,"Matched visual 0x%lx class %d (%s) depth %d\n",
@@ -986,7 +989,7 @@ ssh_stat init_plot(ssh_natural a,ssh_natural b,ssh_natural ca,ssh_natural cb)
                             iniX, iniY, width, height, border_width,
                             BlackPixel(display, screen_num),
                             WhitePixel(display, screen_num)
-          		);
+                );
     XSync(display, True);
  #endif
 
@@ -1036,7 +1039,7 @@ ssh_stat init_plot(ssh_natural a,ssh_natural b,ssh_natural ca,ssh_natural cb)
     if (XStringListToTextProperty(&ptrName, 1, &iconName) == 0) {
         fprintf( stderr, "%s: structure allocation for "
                          "iconName failed.\n", progname);
-       exit(-1);  return 0;
+       exit(-1);return 0;
     }
 
     /* Create pixmap of depth 1 (bitmap) for icon */
@@ -1108,6 +1111,7 @@ ssh_stat init_plot(ssh_natural a,ssh_natural b,ssh_natural ca,ssh_natural cb)
 
     clear_screen();
 
+    _ssh_window=win;//READY TO USE!
     return 1;
 }
 
@@ -1682,7 +1686,7 @@ void line_d(int x1,int y1,int x2,int y2)
     if( line_width!=(mulx>muly?muly:mulx) )
     {
         line_width=(mulx>muly?muly:mulx);
-        if(trace)
+        if(trace>1)
             fprintf(stderr,"Set line width to %d\n",line_width);
 
         XSetLineAttributes(display, gc,line_width,
@@ -1714,7 +1718,7 @@ void circle_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r)
     if( line_width!=(mulx>muly?muly:mulx) )
     {
         line_width=(mulx>muly?muly:mulx);
-        if(trace)
+        if(trace>1)
             fprintf(stderr,"Set line width to %d\n",line_width);
 
         XSetLineAttributes(display, gc,line_width,
@@ -1746,7 +1750,7 @@ void ellipse_d(ssh_coordinate x,ssh_coordinate y,ssh_natural a,ssh_natural b)
     if( line_width!=(mulx>muly?muly:mulx) )
     {
         line_width=(mulx>muly?muly:mulx);
-        if(trace)
+        if(trace>1)
             fprintf(stderr,"Set line width to %d\n",line_width);
 
         XSetLineAttributes(display, gc,line_width,
@@ -1778,7 +1782,7 @@ void fill_circle_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r)
     if( line_width!=(mulx>muly?muly:mulx) )
     {
         line_width=(mulx>muly?muly:mulx);
-        if(trace)
+        if(trace>1)
             fprintf(stderr,"Set line width to %d\n",line_width);
 
         XSetLineAttributes(display, gc,line_width,
@@ -1819,7 +1823,7 @@ void fill_ellipse_d(ssh_coordinate x, ssh_coordinate y, ssh_natural a, ssh_natur
     if( line_width!=(mulx>muly?muly:mulx) )
     {
         line_width=(mulx>muly?muly:mulx);
-        if(trace)
+        if(trace>1)
             fprintf(stderr,"Set line width to %d\n",line_width);
 
         XSetLineAttributes(display, gc,line_width,
@@ -1875,7 +1879,7 @@ void arc_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r,            /*rysuje 
     if( line_width!=(mulx>muly?muly:mulx) )
     {
         line_width=(mulx>muly?muly:mulx);
-        if(trace)
+        if(trace>1)
             fprintf(stderr,"Set line width to %d\n",line_width);
 
         XSetLineAttributes(display, gc,line_width,
@@ -1914,7 +1918,7 @@ void arc(ssh_coordinate x,ssh_coordinate y,ssh_natural r,
     if( line_width!=(mulx>muly?muly:mulx) )
     {
         line_width=(mulx>muly?muly:mulx);
-        if(trace)
+        if(trace>1)
             fprintf(stderr,"Set line width to %d\n",line_width);
 
         XSetLineAttributes(display, gc,line_width,
@@ -1954,7 +1958,7 @@ void earc_d(ssh_coordinate x,ssh_coordinate y,                         /*rysuje 
     if( line_width!=(mulx>muly?muly:mulx) )
     {
         line_width=(mulx>muly?muly:mulx);
-        if(trace)
+        if(trace>1)
             fprintf(stderr,"Set line width to %d\n",line_width);
 
         XSetLineAttributes(display, gc,line_width,
@@ -1994,7 +1998,7 @@ void earc(ssh_coordinate x,ssh_coordinate y,
     if( line_width!=(mulx>muly?muly:mulx) )
     {
         line_width=(mulx>muly?muly:mulx);
-        if(trace)
+        if(trace>1)
             fprintf(stderr,"Set line width to %d\n",line_width);
 
         XSetLineAttributes(display, gc,line_width,
@@ -2034,7 +2038,7 @@ void fill_arc_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r,       /* wypeł
     if( line_width!=(mulx>muly?muly:mulx) )
     {
         line_width=(mulx>muly?muly:mulx);
-        if(trace)
+        if(trace>1)
             fprintf(stderr,"Set line width to %d\n",line_width);
 
         XSetLineAttributes(display, gc,line_width,
@@ -2089,7 +2093,7 @@ void fill_arc(ssh_coordinate x,ssh_coordinate y,ssh_natural r,         /* wirtua
     if( line_width!=(mulx>muly?muly:mulx) )
     {
         line_width=(mulx>muly?muly:mulx);
-        if(trace)
+        if(trace>1)
             fprintf(stderr,"Set line width to %d\n",line_width);
 
         XSetLineAttributes(display, gc,line_width,
@@ -2145,7 +2149,7 @@ void fill_earc_d(ssh_coordinate x,ssh_coordinate y,                    /* wypeł
     if( line_width!=(mulx>muly?muly:mulx) )
     {
         line_width=(mulx>muly?muly:mulx);
-        if(trace)
+        if(trace>1)
             fprintf(stderr,"Set line width to %d\n",line_width);
 
         XSetLineAttributes(display, gc,line_width,
@@ -2202,7 +2206,7 @@ void fill_earc(ssh_coordinate x,ssh_coordinate y,                      /* wirtua
     if( line_width!=(mulx>muly?muly:mulx) )
     {
         line_width=(mulx>muly?muly:mulx);
-        if(trace)
+        if(trace>1)
             fprintf(stderr,"Set line width to %d\n",line_width);
 
         XSetLineAttributes(display, gc,line_width,
@@ -2234,6 +2238,26 @@ void fill_earc(ssh_coordinate x,ssh_coordinate y,                      /* wirtua
     }
 }
 
+void fill_rect_rgb(ssh_coordinate x1,ssh_coordinate y1,                /* Wypełnienie prostokata */
+                   ssh_coordinate x2,ssh_coordinate y2,                /* rozciągniętego między rogami x1y1 a x2y2 */
+                   ssh_intensity r,ssh_intensity g,ssh_intensity b)    /* w kolorze rbg okreslonym składowymi koloru */
+{
+    x1*=mulx; /* Multiplication of coordinates */
+    y1*=muly; /* if window is bigger */
+    x2*=mulx; /* Multiplication of 2' coordinates */
+    y2*=muly; /* if window is bigger */
+
+
+    CurrForeground=-1;
+    BrushColor=-1;
+    XSetForeground(display,gc,buildColor(r,g,b));
+
+    if(!animate)
+        XFillRectangle(display, win, gc, x1, y1, x2-x1, y2-y1 );
+    if(isbuffered)
+        XFillRectangle(display, cont_pixmap, gc, x1, y1, x2-x1, y2-y1 );
+
+}
 
 void fill_rect_d(int x1,int y1,int x2,int y2)
 {
@@ -2246,6 +2270,26 @@ void fill_rect_d(int x1,int y1,int x2,int y2)
     {
         CurrForeground=-1;
         XSetForeground(display,gc,BrushColor);
+    }
+
+    if(!animate)
+        XFillRectangle(display, win, gc, x1, y1, x2-x1, y2-y1 );
+    if(isbuffered)
+        XFillRectangle(display, cont_pixmap, gc, x1, y1, x2-x1, y2-y1 );
+
+}
+
+void fill_rect(int x1,int y1,int x2,int y2,ssh_color c)
+{
+    x1*=mulx; /* Multiplication of coordinates */
+    y1*=muly; /* if window is bigger */
+    x2*=mulx; /* Multiplication of 2' coordinates */
+    y2*=muly; /* if window is bigger */
+
+    if(c!=CurrForeground)
+    {
+        CurrForeground=c;
+        XSetForeground(display,gc,Scale[c]);
     }
 
     if(!animate)
@@ -2310,7 +2354,7 @@ void fill_circle(ssh_coordinate x, ssh_coordinate y, ssh_natural r, ssh_color c)
     if( line_width!=(mulx>muly?muly:mulx) )
     {
         line_width=(mulx>muly?muly:mulx);
-        if(trace)
+        if(trace>1)
             fprintf(stderr,"Set line width to %d\n",line_width);
 
         XSetLineAttributes(display, gc,line_width,
@@ -2342,7 +2386,7 @@ void circle(ssh_coordinate x,ssh_coordinate y,ssh_natural r,ssh_color c)
     if( line_width!=(mulx>muly?muly:mulx) )
     {
         line_width=(mulx>muly?muly:mulx);
-        if(trace)
+        if(trace>1)
             fprintf(stderr,"Set line width to %d\n",line_width);
 
         XSetLineAttributes(display, gc,line_width,
@@ -2365,25 +2409,6 @@ void circle(ssh_coordinate x,ssh_coordinate y,ssh_natural r,ssh_color c)
         XDrawArc(display, cont_pixmap , gc, x-r1, y-r2, r1*2, r2*2, 0, angle2);
 }
 
-void fill_rect(int x1,int y1,int x2,int y2,ssh_color c)
-{
-    x1*=mulx; /* Multiplication of coordinates */
-    y1*=muly; /* if window is bigger */
-    x2*=mulx; /* Multiplication of 2' coordinates */
-    y2*=muly; /* if window is bigger */
-
-    if(c!=CurrForeground)
-    {
-        CurrForeground=c;
-        XSetForeground(display,gc,Scale[c]);
-    }
-
-    if(!animate)
-        XFillRectangle(display, win, gc, x1, y1, x2-x1, y2-y1 );
-    if(isbuffered)
-        XFillRectangle(display, cont_pixmap, gc, x1, y1, x2-x1, y2-y1 );
-
-}
 
 void fill_poly(ssh_coordinate vx,ssh_coordinate vy,
                const ssh_point points[],int number,  /* - tablica wierzchołków wielokąta i jej długość */
@@ -2450,10 +2475,9 @@ void line(ssh_coordinate x1,ssh_coordinate y1,
     if( line_width!=(mulx>muly?muly:mulx) )
     {
         line_width=(mulx>muly?muly:mulx);
-        if(trace)
-        {
+        if(trace>1)
             fprintf(stderr,"Set line width to %d\n",line_width);
-        }
+
         XSetLineAttributes(display, gc,line_width,
                            LineSolid,  CapRound, JoinRound);
     }

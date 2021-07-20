@@ -68,6 +68,7 @@ void set_background(ssh_color c);                              /* Ustala index k
 ssh_stat  init_plot(ssh_natural  a,ssh_natural   b,            /* ile pikseli mam mieć okno */
                     ssh_natural ca, ssh_natural cb);           /* ile dodatkowo lini i kolumn tekstu na dole i po bokach przy domyślnej czcionce */
                                                                /* Zwraca 1 jeśli zadziałał poprawnie */
+extern void* _ssh_window;//If not NULL the window is useable
 
 void close_plot(void);                                         /* zamkniecie grafiki/semigrafiki */
                                                                /* Automatycznie instalowana w atexit - stad durne (void) zeby uniknac warningu */
@@ -144,6 +145,9 @@ void fill_flood_rgb(ssh_coordinate x,ssh_coordinate y,
                 ssh_intensity rb,ssh_intensity gb,ssh_intensity bb);   /*- kolor brzegu podany składowymi */
 
 /* RYSOWANIE LINI */
+void line_rgb(ssh_coordinate x1,ssh_coordinate y1,                     /* Wyswietlenie lini w kolorze domyslnym */
+              ssh_coordinate x2,ssh_coordinate y2,                     /* od punktu x1y1 do x2y2 */
+              ssh_intensity r,ssh_intensity g,ssh_intensity b );       /*- składowe koloru */
 void line_d(ssh_coordinate x1,ssh_coordinate y1,                       /* Wyswietlenie lini w kolorze domyslnym */
             ssh_coordinate x2,ssh_coordinate y2);                      /* od punktu x1y1 do x2y2 */
 void line(ssh_coordinate x1,ssh_coordinate y1,                         /* Wyswietlenie lini w zadanym kolorze */
@@ -151,23 +155,29 @@ void line(ssh_coordinate x1,ssh_coordinate y1,                         /* Wyswie
           ssh_color c);                                                /* - kolor dla linii */
 
 /* RYSOWANIE KÓŁ, ELIPS i ŁUKÓW */
+void circle_rgb(ssh_coordinate x,ssh_coordinate y,ssh_natural r,       /* Wyswietlenie okregu w kolorze okreslonym */
+                ssh_intensity rd,ssh_intensity gr,ssh_intensity bl);   /* składowymi koloru */
 void circle(ssh_coordinate x,ssh_coordinate y,ssh_natural r,ssh_color c);/* Wyswietlenie okregu w kolorze c */
 void circle_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r);        /* Wyswietlenie okregu w kolorze domyslnym */
 
+void ellipse_rgb(ssh_coordinate x,ssh_coordinate y,                    /* Wyswietlenie elipsy */
+                 ssh_natural a,ssh_natural b,                          /* o PÓŁOSIACH dlugości a i b */
+                 ssh_intensity rd,ssh_intensity gr,ssh_intensity bl);  /* ikolorze wg. składowych koloru */
 void ellipse_d(ssh_coordinate x,ssh_coordinate y,                      /* Wyswietlenie elipsy w kolorze domyslnym */
                ssh_natural a,ssh_natural b);                           /* o PÓŁOSIACH dlugości a i b */
 void ellipse(ssh_coordinate x,ssh_coordinate y,                        /* Wyswietlenie elipsy w kolorze c */
              ssh_natural a,ssh_natural b, ssh_color c);                /* o PÓŁOSIACH dlugości a i b */
 
 void arc_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r,            /*rysuje łuk kołowy o promieniu r*/
-           ssh_radian start,ssh_radian stop);
-void arc(ssh_coordinate x,ssh_coordinate y,ssh_natural r,
+           ssh_radian start,ssh_radian stop);                          /* w kolorze domyslnym */
+void arc(ssh_coordinate x,ssh_coordinate y,ssh_natural r,              /*rysuje łuk kołowy o promieniu r*/
            ssh_radian start,ssh_radian stop,ssh_color c);              /* w kolorze c */
+
 void earc_d(ssh_coordinate x,ssh_coordinate y,                         /*rysuje łuk eliptyczny */
             ssh_natural a,ssh_natural b,                               /* o półosiach a i b */
             ssh_radian start,ssh_radian stop);
-void earc(ssh_coordinate x,ssh_coordinate y,
-          ssh_natural a,ssh_natural b,
+void earc(ssh_coordinate x,ssh_coordinate y,                           /*rysuje łuk eliptyczny */
+          ssh_natural a,ssh_natural b,                                 /* o półosiach a i b */
           ssh_radian start,ssh_radian stop,ssh_color c);               /* w kolorze c */
 
 void fill_circle_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r);   /* Wypełnienie kola o promieniu r w kolorach domyslnych*/
@@ -195,6 +205,10 @@ void fill_earc(ssh_coordinate x,ssh_coordinate y,                      /* wirtua
                ssh_bool pie,ssh_color c);                              /* w kolorze c */
 
 /* WIELOKĄTY */
+void fill_rect_rgb(ssh_coordinate x1,ssh_coordinate y1,                /* Wypełnienie prostokata */
+                   ssh_coordinate x2,ssh_coordinate y2,                /* rozciągniętego między rogami x1y1 a x2y2 */
+                   ssh_intensity r,ssh_intensity g,ssh_intensity b);   /* w kolorze rbg okreslonym składowymi koloru */
+
 void fill_rect_d(ssh_coordinate x1, ssh_coordinate y1,                 /* Wypełnienie prostokata w kolorach domyslnych*/
                  ssh_coordinate x2, ssh_coordinate y2);                /* rozciągniętego między rogami x1y1 a x2y2 */
 void fill_rect(ssh_coordinate x1,ssh_coordinate y1,                    /* Wypełnienie prostokata w kolorze c */

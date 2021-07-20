@@ -1049,6 +1049,30 @@ void fill_earc(ssh_coordinate x, ssh_coordinate y,                      /* wirtu
 {}
 
 
+void fill_rect_rgb(ssh_coordinate x1,ssh_coordinate y1,                /* Wypełnienie prostokata */
+                   ssh_coordinate x2,ssh_coordinate y2,                /* rozciągniętego między rogami x1y1 a x2y2 */
+                   ssh_intensity r,ssh_intensity g,ssh_intensity b)    /* w kolorze rbg okreslonym składowymi koloru */
+{
+    if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP;//fill_rect_d
+    if(ssh_trace_level>2) cout << x1 << SEP << y1 << SEP
+                               << x2 << SEP << y2 << endl;
+
+    GrOperation& Op = NextGrListEntry();//enum  GrType { Empty = 0, Point=1,LineTo=2,Line=3,Circle=4,Rect=5,Text=6,Poly=7 };
+    Op.empty.type = GrType::Rect;
+    //struct Rect   { unsigned type :4; unsigned mode :4; unsigned r :8; unsigned g :8; unsigned b :8; unsigned x1 :16; unsigned y1:16; unsigned x2 :16; unsigned y2 :16; unsigned rf :8; unsigned gf :8; unsigned bf :8;} rect;
+    Op.rect.mode = 0x1;//FILL
+    Op.rect.x1 = x1;
+    Op.rect.x2 = x2;
+    Op.rect.y1 = y1;
+    Op.rect.y2 = y2;
+    Op.rect.r = r;//Moze bedzie ignorowane? TODO check!
+    Op.rect.g = g;
+    Op.rect.b = b;
+    Op.rect.rf = r;//Kolor wypelnienia
+    Op.rect.gf = g;
+    Op.rect.bf = b;
+}
+
 void fill_rect_d(ssh_coordinate x1, ssh_coordinate y1, ssh_coordinate x2, ssh_coordinate y2)
 /* Wyswietla prostokat w kolorach domyslnych*/
 {
@@ -1088,10 +1112,10 @@ void fill_rect(ssh_coordinate x1, ssh_coordinate y1, ssh_coordinate x2, ssh_coor
     Op.rect.x2 = x2;
     Op.rect.y1 = y1;
     Op.rect.y2 = y2;
-    Op.rect.r = palette[c].r;//Prawdopodobnie b�dzie ignorowane
+    Op.rect.r = palette[c].r;//Prawdopodobnie bedzie ignorowane
     Op.rect.g = palette[c].g;
     Op.rect.b = palette[c].b;
-    Op.rect.rf = palette[c].r;//Kolor wype�nienia
+    Op.rect.rf = palette[c].r;//Kolor wypelnienia
     Op.rect.gf = palette[c].g;
     Op.rect.bf = palette[c].b;
 }

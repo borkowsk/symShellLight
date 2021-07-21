@@ -164,7 +164,7 @@
      pipe_break=1;
      opened=0;
      signal(num,SIG_IGN);
-     fprintf(stderr,"SYMSHELL received a SIGNALL #%d\n",num);
+     fprintf(stderr,"\nX11-SYMSHELL received a SIGNALL #%d\n",num);
      exit(num);
  }
 
@@ -182,7 +182,7 @@
   */
  {
      pipe_break=1;
-     fprintf(stderr,"SYMSHELL GOT A IOError\n");
+     fprintf(stderr,"\nX11-SYMSHELL GOT A IOError\n");
      XSetIOErrorHandler(NULL);
      exit(-11);
      return -11;
@@ -193,7 +193,7 @@
  {
      char buf[80];
 
-     fprintf(stderr,"\nSYMSHELL received an X error!\n");
+     fprintf(stderr,"\nX11-SYMSHELL received an X error!\n");
      fprintf(stderr,"Ecode  : %d", event->error_code);
      fprintf(stderr,"\tRequest: %d", event->request_code);
      fprintf(stderr,"\tMinor: %d", event->minor_code);
@@ -276,7 +276,7 @@
      if(display==0)
      {
          if(ssh_trace_level)
-             fprintf(stderr,"Trying to free resources of NULL display!\n");
+             fprintf(stderr,"X11: Trying to free resources of NULL display!\n");
          return;
      }
 
@@ -301,14 +301,14 @@
      {
          XFreePixmap(display,cont_pixmap);
          if(ssh_trace_level)
-             fprintf(stderr,"%s %lx\n","FREE PIXMAP",cont_pixmap);//??? xl?
+             fprintf(stderr,"X11: %s %lx\n","FREE PIXMAP",cont_pixmap);//??? xl?
          cont_pixmap=0;
      }
 
      if(win!=0)
      {
          if(ssh_trace_level)
-             fprintf(stderr, "%s %lx ","DESTROY WINDOW",win);
+             fprintf(stderr, "X11: %s %lx ","DESTROY WINDOW",win);
 
          XDestroyWindow(display,win);
          if(ssh_trace_level)
@@ -317,7 +317,7 @@
      }
 
      if(ssh_trace_level)
-         fprintf(stderr,"CLOSE DISPLAY");
+         fprintf(stderr,"X11: CLOSE DISPLAY");
 
      XCloseDisplay(display);
 
@@ -388,7 +388,7 @@ static void ResizeBuffer(unsigned int nwidth,unsigned int nheight)
 
     if(ssh_trace_level)
     {
-        fprintf(stderr,"%s %dx%d\n","ALLOC PIXMAP",nwidth,nheight);
+        fprintf(stderr,"X11: %s %dx%d\n","ALLOC PIXMAP",nwidth,nheight);
         /*getchar();*/
     }
 
@@ -403,7 +403,7 @@ static void ResizeBuffer(unsigned int nwidth,unsigned int nheight)
     {
         XFlush(display);
         if(ssh_trace_level){
-            fprintf(stderr,"PIXMAP %lx DISPLAY %p WIN %lx %s\n",
+            fprintf(stderr,"X11: PIXMAP %lx DISPLAY %p WIN %lx %s\n",
                     cont_pixmap,
                     display,
                     win,
@@ -445,7 +445,7 @@ static void load_font(XFontStruct **font_info, GC *gc)
     font_height = (*font_info)->ascent + (*font_info)->descent;
 
     if(ssh_trace_level)
-        fprintf(stderr,"%s:font %ux%u\n",icon_name,font_width,font_height);
+        fprintf(stderr,"X11: %s:font %ux%u\n",icon_name,font_width,font_height);
 }
 
 static void TooSmall(Window win,GC gc,XFontStruct* font_info)
@@ -491,7 +491,7 @@ static void Read_XInput()
 
     case Expose:
         if(ssh_trace_level)
-            fprintf(stderr,"EXPOSE: %s #%d x=%d y=%d %dx%d\n",
+            fprintf(stderr,"X11: EXPOSE: %s #%d x=%d y=%d %dx%d\n",
                     icon_name,
                     report.xexpose.count,
                     report.xexpose.x,
@@ -520,7 +520,7 @@ static void Read_XInput()
 
             if( repaint_flag==1 || (!isbuffered) || buffer_empty )
             {
-                /* SUmuje z marginesem, takz zeby pokrywalo wszytkie expos'y */
+                /* Sumuje z marginesem, takz zeby pokrywalo wszytkie expos'y */
                 if(last_repaint_data.x>report.xexpose.x)
                     last_repaint_data.x=report.xexpose.x;
 
@@ -540,7 +540,7 @@ static void Read_XInput()
                 if(report.xexpose.count == 0 ||  buffer_empty )
                 {
                     if(ssh_trace_level)
-                        fprintf(stderr,"EXPOSE force repaint\n");
+                        fprintf(stderr,"X11: EXPOSE force repaint\n");
                     buforek[0]='\r';
                     buffer_empty=0;
 
@@ -550,7 +550,7 @@ static void Read_XInput()
             {
                 /* Refresh from pixmap buffer */
                 if(ssh_trace_level)
-                    fprintf(stderr,"EXPOSE DOING BITBLT\n");
+                    fprintf(stderr,"X11: EXPOSE DOING BITBLT\n");
                 place_graphics(win, gc ,
                                report.xexpose.x,report.xexpose.y,
                                report.xexpose.width,report.xexpose.height
@@ -568,7 +568,7 @@ static void Read_XInput()
     case ConfigureNotify:
         DelayAction=0;/* Pojawila sie aktywnosc. Nie nalezy spac! */
         if(ssh_trace_level)
-            fprintf(stderr,"CONFIGURE: %s=%dx%d scale: x=%d:1 y=%d:1 ",
+            fprintf(stderr,"X11: CONFIGURE: %s=%dx%d scale: x=%d:1 y=%d:1 ",
                     icon_name,
                     width,height,mulx,muly);
 
@@ -863,22 +863,22 @@ ssh_stat init_plot(ssh_natural a,ssh_natural b,ssh_natural ca,ssh_natural cb)
     ini_cb=cb;
 
     if (!(size_hints = XAllocSizeHints())) {
-       fprintf(stderr, "%s: failure allocating memory", progname);
+       fprintf(stderr, "X11: %s: failure allocating memory", progname);
          exit(-2);  return 0;
     }
     if (!(wm_hints = XAllocWMHints())) {
-       fprintf(stderr, "%s: failure allocating memory", progname);
+       fprintf(stderr, "X11: %s: failure allocating memory", progname);
          exit(-2);  return 0;
     }
     if (!(class_hints = XAllocClassHint())) {
-       fprintf(stderr, "%s: failure allocating memory", progname);
+       fprintf(stderr, "X11: %s: failure allocating memory", progname);
          exit(-2); return 0;
     }
 
     /* Connect to X server */
     if ( (display=XOpenDisplay(display_name)) == NULL )
     {
-       fprintf( stderr, "'%s': cannot connect to X server '%s'\n",
+       fprintf( stderr, "X11: '%s': cannot connect to X server '%s'\n",
              progname, XDisplayName(display_name));
        exit( -1 );  return 0;
     }
@@ -890,14 +890,14 @@ ssh_stat init_plot(ssh_natural a,ssh_natural b,ssh_natural ca,ssh_natural cb)
 
     if(ssh_trace_level)
     {
-        fprintf(stderr,"Screen: %u x %u ; %u\n",display_width,display_height,screen_num);
+        fprintf(stderr,"X11: Screen: %u x %u ; %u\n",display_width,display_height,screen_num);
     }
 
     disp_depht = XListDepths(display, screen_num, &disp_depht_num);
 
     if(ssh_trace_level)
     {
-    	fprintf(stderr,"Available display depths:");
+        fprintf(stderr,"X11: Available display depths:");
     	for(i=0;i<disp_depht_num;i++)
     		fprintf(stderr,"%d ",disp_depht[i]);
         fprintf(stderr," Prefered depth:%d\n",default_depth);
@@ -914,7 +914,7 @@ ssh_stat init_plot(ssh_natural a,ssh_natural b,ssh_natural ca,ssh_natural cb)
     //default_deph=32;//??? NOT WORK! WHY???
 
    if(ssh_trace_level)
-        fprintf(stderr,"Select depth %d\n",default_depth);
+        fprintf(stderr,"X11: Select depth %d\n",default_depth);
 
     /* Note that in a real application, x and y would default
      * to 0 but would be settable from the command line or
@@ -932,7 +932,7 @@ ssh_stat init_plot(ssh_natural a,ssh_natural b,ssh_natural ca,ssh_natural cb)
    iniX=iniY=0;
 
    if(ssh_trace_level)
-        fprintf(stderr,"%s=%dx%d\n",icon_name,width,height);
+        fprintf(stderr,"X11: %s=%dx%d\n",icon_name,width,height);
    fflush(stderr);
 
    XSetErrorHandler(MyErrorHandler);
@@ -952,17 +952,17 @@ ssh_stat init_plot(ssh_natural a,ssh_natural b,ssh_natural ca,ssh_natural cb)
    visual_template.screen = DefaultScreen(display);
    visual_list = XGetVisualInfo (display, VisualScreenMask, &visual_template, &nxvisuals);
    //for (i = 0; i < nxvisuals; ++i)
-   //    fprintf(stderr,"  %3d: visual 0x%lx class %d (%s) depth %d\n",
+   //    fprintf(stderr,"X11: %3d: visual 0x%lx class %d (%s) depth %d\n",
    //           i,visual_list[i].visualid,visual_list[i].class,
    //           visual_list[i].class == TrueColor ? "TrueColor" : "unknown",visual_list[i].depth);
 
    if (!XMatchVisualInfo(display, XDefaultScreen(display), 32, TrueColor, &vinfo))
      {
-       fprintf(stderr, "no such visual\n");
+       fprintf(stderr, "X11: no such visual\n");
        return 0;
      }
      else
-     fprintf(stderr,"Matched visual 0x%lx class %d (%s) depth %d\n",
+     fprintf(stderr,"X11:Matched visual 0x%lx class %d (%s) depth %d\n",
               vinfo.visualid,vinfo.class,
               vinfo.class == TrueColor ? "TrueColor" : "unknown",vinfo.depth);
 
@@ -1001,11 +1001,11 @@ ssh_stat init_plot(ssh_natural a,ssh_natural b,ssh_natural ca,ssh_natural cb)
     if(win!=NULL)
         window_size = BIG_ENOUGH ;
     else
-        fprintf( stderr, "%s: Window not created! ", progname);
+        fprintf( stderr, "X11: %s: Window not created! ", progname);
 
     /* Get available icon sizes from window manager */
     if (XGetIconSizes(display, RootWindow(display,screen_num),&size_list, &count) == 0){
-        fprintf( stderr, "%s: Window manager didn't set "
+        fprintf( stderr, "X11: %s: Window manager didn't set "
                          "icon sizes - using default.\n", progname);
      }
     else {
@@ -1035,14 +1035,14 @@ ssh_stat init_plot(ssh_natural a,ssh_natural b,ssh_natural ca,ssh_natural cb)
      * properly */
     char* ptrName=window_name;// TODO CHECK!>!>!>
     if (XStringListToTextProperty(&ptrName, 1, &windowName) == 0) {
-        fprintf( stderr, "%s: structure allocation for "
+        fprintf( stderr, "X11: %s: structure allocation for "
                                "windowName failed.\n", progname);
        exit(-1);return 0;
     }
 
     ptrName=icon_name;
     if (XStringListToTextProperty(&ptrName, 1, &iconName) == 0) {
-        fprintf( stderr, "%s: structure allocation for "
+        fprintf( stderr, "X11: %s: structure allocation for "
                          "iconName failed.\n", progname);
        exit(-1);return 0;
     }
@@ -1051,7 +1051,7 @@ ssh_stat init_plot(ssh_natural a,ssh_natural b,ssh_natural ca,ssh_natural cb)
     icon_pixmap = XCreateBitmapFromData(display, win,
             WB_icon_bitmap_bits,WB_icon_bitmap_width,WB_icon_bitmap_height);
     if( icon_pixmap==0 )
-        fprintf( stderr, "%s: creation of "
+        fprintf( stderr, "X11: %s: creation of "
                          "icon_pixmap failed.\n", progname);
 
 
@@ -1090,14 +1090,14 @@ ssh_stat init_plot(ssh_natural a,ssh_natural b,ssh_natural ca,ssh_natural cb)
 
     opened=1;
     if(atexit(close_plot)==0 && ssh_trace_level)
-        fprintf(stderr,"atexit(close_plot) installed\n");
+        fprintf(stderr,"X11: atexit(close_plot) installed\n");
 
     if(signal(SIGPIPE,SigPipe)!=SIG_ERR && ssh_trace_level)
-        fprintf(stderr,"SIGPIPE handler installed\n");
+        fprintf(stderr,"X11: SIGPIPE handler installed\n");
 
     XIOErrorHandler ret;
     if(ret=XSetIOErrorHandler(MyXIOHandler) && ssh_trace_level)
-        fprintf(stderr,"IOErrorHandler installed. Ret=%p\n",ret);
+        fprintf(stderr,"X11: IOErrorHandler installed. Ret=%p\n",ret);
 
     /* Alloc pixmap for contens buffering */
     if(isbuffered)
@@ -1106,8 +1106,8 @@ ssh_stat init_plot(ssh_natural a,ssh_natural b,ssh_natural ca,ssh_natural cb)
     while(!input_ready()); /* Wait for expose */
 
     /* Czysci zeby wprowadzic ustalone tlo */
-    if(ssh_trace_level)
-        fprintf(stderr,"Background is %d\n",(int)bacground);
+    if(ssh_trace_level>1)
+        fprintf(stderr,"X11: Background is %d\n",(int)bacground);
 
     clear_screen();
 
@@ -1165,11 +1165,11 @@ void flush_plot()
 /* --------//---------- uzgodnienie zawartosci ekranu */
 {
     if(ssh_trace_level>1)
-        fprintf(stderr,"FLUSH %s",icon_name);
+        fprintf(stderr,"X11: FLUSH %s",icon_name);
 
     if(!opened)
     {
-        fprintf(stderr,"%s","SYMSHELL graphix not initialised or pipe broken");
+        fprintf(stderr,"X11: %s","SYMSHELL graphix not initialised or pipe broken");
         return;
     }
 
@@ -1180,12 +1180,12 @@ void flush_plot()
                width, height,
                0/*dest_x*/, 0/*dest_y*/);
             if(ssh_trace_level>1)
-                fprintf(stderr,"DOING BITBLT");
+                fprintf(stderr,"X11: DOING BITBLT");
         }
 
     XFlush(display);
     if(ssh_trace_level>1)
-        fprintf(stderr," XFLUSH\n");
+        fprintf(stderr,"X11: XFLUSH\n");
     error_count=error_limit;
 }
 
@@ -2523,7 +2523,7 @@ void clear_screen()
     if(isbuffered)
     {
         if(ssh_trace_level)
-            fprintf(stderr,"Clear pixmap\n");
+            fprintf(stderr,"X11: Clear pixmap\n");
         XFillRectangle(display,cont_pixmap , gc, 0,0,width,height);
     }
 }
@@ -2613,8 +2613,8 @@ void SetScaleOld(XColor RGBarray[])
     RGBarray[255].green=0xffff;
     RGBarray[255].blue=0xffff;
 
-    if(ssh_trace_level)
-        fprintf(stderr,"%s\n","SetScale completed");
+    if(ssh_trace_level>1)
+        fprintf(stderr,"%s\n","X11: SetScaleOld() completed");
 }
 
 static
@@ -2678,8 +2678,8 @@ void SetScale(XColor RGBarray[])
     RGBarray[255].blue=0xffff;
     Scale[255]=buildColor(255,255,255);
 
-    if(ssh_trace_level)
-        fprintf(stderr,"%s\n","SetScale completed");
+    if(ssh_trace_level>1)
+        fprintf(stderr,"%s\n","X11: SetScale() completed");
 }
 
 void    set_rgb(ssh_color color,ssh_intensity r,ssh_intensity g,ssh_intensity b)
@@ -2813,7 +2813,7 @@ ssh_stat dump_screen(const char* Filename)
 }
 /*#pragma exit close_plot*/
 /********************************************************************/
-/*              SYMSHELLLIGHT  version 2021-07-20                   */
+/*              SYMSHELLLIGHT  version 2021-07-21                   */
 /********************************************************************/
 /*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
 /*            W O J C I E C H   B O R K O W S K I                   */

@@ -8,7 +8,7 @@
 /* SVG IMPLEMENTATION in file symshsvg.cpp                              */
 /* File changed massivelly: 17.11.2020                                  */
 /************************************************************************/
-/*               SYMSHELLLIGHT  version 2021-07-20                      */
+/*               SYMSHELLLIGHT  version 2021-07-21                      */
 /************************************************************************/
 #include <iostream>
 #include <fstream>
@@ -214,11 +214,11 @@ void shell_setup(const char* title,int iargc,const char* iargv[])
 {
     if(ssh_trace_level>0) //shell_setup
     {
-        cout << _FUNCTION_NAME_ << SEP;
+        cout << "SVG: " << _FUNCTION_NAME_ << SEP;
         cout << title << SEP << iargc << endl;
         for (int i = 0; i < iargc; i++)
             cout << iargv[i] << SEP;
-        cout << endl<< "Struct size:" << SEP << sizeof(GrOperation) << endl;  //assert(sizeof(GrOperation) == 16);???
+        cout << endl<< "SVG: struct size:" << SEP << sizeof(GrOperation) << endl;  //assert(sizeof(GrOperation) == 16);???
     }
 
     ScreenTitle = title;
@@ -273,7 +273,7 @@ ssh_stat init_plot(ssh_natural  a, ssh_natural   b,                 /* ile pikse
     //... liczone wg. rozmiaru używanego fontu (nie przewidziano używania różnych rozmiarów tekstu
     atexit(close_plot);
 
-    if(ssh_trace_level>1) cout << _FUNCTION_NAME_ << SEP; //init_plot
+    if(ssh_trace_level>1) cout <<"SVG: " << _FUNCTION_NAME_ << SEP; //init_plot
     if(ssh_trace_level>1) cout << a << SEP << b << SEP << ca << SEP << cb << endl;
 
     SetScale(); //Ustawienie kolorów
@@ -315,7 +315,7 @@ void close_plot()
 /* Automatycznie instalowana w atexit */
 /* zeby uniknac warningu          */
 {
-    if(ssh_trace_level>1) cout << _FUNCTION_NAME_ << SEP; //close_plot
+    if(ssh_trace_level>1) cout <<"SVG: " << _FUNCTION_NAME_ << SEP; //close_plot
     if (GrClosed) return;
 
     if(ssh_trace_level>1) cout << "List lenght:"<<SEP<<GrList.get_size()<<SEP<<"USED:"<<SEP<< GrListPosition<<  endl;
@@ -328,7 +328,7 @@ void buffering_setup(int Yes)
 {
     //W grafikach rastrowych zawartość pojawia się na ekranie albo od razu, albo po wywołaniu "flush_plot"
     //Chodzi o lepszą jakość animacji, ale przy debugingu lepiej widzieć w trakcie rysowania
-    if(ssh_trace_level>1) cout << _FUNCTION_NAME_ << SEP;       //buffering_setup
+    if(ssh_trace_level>1) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;       //buffering_setup
     if(ssh_trace_level>1) cout << Yes <<SEP<<"IGNORED!"<< endl; //Nie ma sensu bo nic nie jest wyświetlane w trakcie rysowania
 }
 
@@ -337,14 +337,14 @@ void fix_size(int Yes)
 {
     //W tym trybie zmiana wielko�ci okna powi�ksza pixele o ca�kowit� wielokrotno��
     //Jak plik graficzny to nie ma znaczenia bo go raczej nie zwi�kszamy
-    if(ssh_trace_level>1) cout << _FUNCTION_NAME_ << SEP;//fix_size
+    if(ssh_trace_level>1) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//fix_size
     if(ssh_trace_level>1) cout << Yes << SEP << "IGNORED!" << endl;//Nie ma sensu bo zapis i tak jest wektorowy i nie ma okna
 }
 
 void delay_ms(unsigned ms)
 /* Wymuszenie oczekiwania przez pewn� liczb� ms - nie ma sensu bo taki program raczej działa w tle! Ale trochę robimy, bo mogło chodzić o szanse na przełączenie wątków?*/
 {
-    if(ssh_trace_level>1) cout << _FUNCTION_NAME_ << SEP;//delay_ms
+    if(ssh_trace_level>1) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//delay_ms
     if(ssh_trace_level>1) cout << ms << SEP << "IGNORED!" << endl;
     extern int usleep(useconds_t usec);/* takes microseconds, so you will have to multiply the input by 1000 in order to sleep in milliseconds. */
     usleep(ms*10);
@@ -353,7 +353,7 @@ void delay_ms(unsigned ms)
 void delay_us(unsigned us)
 /* Wymuszenie oczekiwania przez pewn� liczb� us - nie ma sensu bo taki program raczej działa w tle! Ale trochę robimy, bo mogło chodzić o szanse na przełączenie wątków?*/
 {
-    if(ssh_trace_level>1) cout << _FUNCTION_NAME_ << SEP;//delay_us
+    if(ssh_trace_level>1) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//delay_us
     if(ssh_trace_level>1) cout << us << SEP << "IGNORED!" << endl;
     extern int usleep(useconds_t usec);/* takes microseconds, so you will have to multiply the input by 1000 in order to sleep in milliseconds. */
     usleep(1);
@@ -364,7 +364,7 @@ void delay_us(unsigned us)
 int mouse_activity(ssh_mode Yes)
 /* Ustala czy mysz ma byc obslugiwana. Zwraca poprzedni stan flagi */
 {
-    if(ssh_trace_level>0) cout << _FUNCTION_NAME_ << SEP;//mouse_activity
+    if(ssh_trace_level>0) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//mouse_activity
     if(ssh_trace_level>0) cout << Yes << endl;
     int old = GrMouseActive;
     //GrMouseActive = (Yes?true:false);//Bo kretyński warning TODO DEBUG
@@ -374,7 +374,7 @@ int mouse_activity(ssh_mode Yes)
 void set_background(ssh_color c)
 /* Ustala index koloru do czyszczenia - domyslne tło okna - moze nie zadzialac po inicjacji*/
 {
-    if(ssh_trace_level>1) cout << _FUNCTION_NAME_ << SEP;//set_background
+    if(ssh_trace_level>1) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//set_background
     if(ssh_trace_level>1) cout << (ssh_color)c << endl;
     curr_background = c;
 }
@@ -383,7 +383,7 @@ void set_background(ssh_color c)
 void clear_screen()
 /* Czysci ekran lub ekran wirtualny - zaleznie czy jest buforowanie czy nie - a tu nawet nie ma ekranu wirtualnego*/
 {
-    if(ssh_trace_level) cout << _FUNCTION_NAME_ << SEP;//clear_screen
+    if(ssh_trace_level) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//clear_screen
     if(ssh_trace_level) cout << endl;
     for (size_t i = 0; i < GrList.get_size(); i++)
         GrList[i].clean();
@@ -392,7 +392,7 @@ void clear_screen()
 
 int invalidate_screen()//Cały ekran/okno zostanie zmazany
 {
-    if(ssh_trace_level) cout << _FUNCTION_NAME_ << SEP;
+    if(ssh_trace_level) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;
     clear_screen();
     if(ssh_trace_level) cout << endl;
     return 1;
@@ -401,7 +401,7 @@ int invalidate_screen()//Cały ekran/okno zostanie zmazany
 ssh_mode     print_transparently(ssh_mode Yes)
 /* Wlacza drukowanie tekstu bez zamazywania t�a. Zwraca stan poprzedni */
 {
-    if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP;//print_transparently
+    if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//print_transparently
     if(ssh_trace_level>2) cout << Yes << endl;
 	int old = GrPrintTransparently;
     GrPrintTransparently = Yes;
@@ -411,7 +411,7 @@ ssh_mode     print_transparently(ssh_mode Yes)
 ssh_natural     line_width(ssh_natural width)
 /* Ustala szerokosc lini - moze byc kosztowne. Zwraca stan poprzedni */
 {
-    if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP;//line_width
+    if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//line_width
     if(ssh_trace_level>2) cout << width << endl;
 	int old = GrLineWidth;
 	GrLineWidth = width;
@@ -422,7 +422,7 @@ ssh_natural     line_width(ssh_natural width)
 ssh_mode    line_style(ssh_mode Style)
 /* Ustala styl rysowania lini: SSH_LINE_SOLID, SSH_LINE_DOTTED, SSH_LINE_DASHED */
 {
-    if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP;//line_style
+    if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//line_style
     if(ssh_trace_level>2) cout << Style << endl;
     int old = GrLineStyle;
     GrLineStyle = Style;
@@ -432,7 +432,7 @@ ssh_mode    line_style(ssh_mode Style)
 ssh_mode    put_style(ssh_mode Style)
 /* Ustala stosunek nowego rysowania do starej zawartosci ekranu: SSH_SOLID_PUT,SSH_XOR_PUT */
 {
-    if(ssh_trace_level>1) cout << _FUNCTION_NAME_ << SEP;//put_style
+    if(ssh_trace_level>1) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//put_style
     if(ssh_trace_level>1) cout << Style << SEP << "IGNORED!" << endl;
     return  SSH_SOLID_PUT;  //Zwraca poprzedni stan
 }
@@ -445,7 +445,7 @@ void set_rgb(ssh_color color,ssh_intensity r,ssh_intensity g,ssh_intensity b)
 {
     if ( (ssh_trace_level & 4) !=0)//alokacja/zwalnianie (4) //set_rgb
 	{
-		cout << _FUNCTION_NAME_ << SEP;
+		cout <<"SVG: " << _FUNCTION_NAME_ << SEP;
 		cout << (ssh_color)color << SEP << r << SEP << g << SEP << b << SEP << endl;
 	}
 	palette[color] = RGB(r,g,b);
@@ -456,7 +456,7 @@ void set_gray(ssh_color shade,ssh_intensity intensity)
 {
     if ( (ssh_trace_level & 4) !=0)//alokacja/zwalnianie (4) //set_gray
     {
-        cout << _FUNCTION_NAME_ << SEP;
+        cout <<"SVG: " << _FUNCTION_NAME_ << SEP;
         cout << (ssh_color)shade << SEP << intensity << endl;
     }
     palette[256+shade] = RGB(intensity,intensity,intensity);
@@ -471,7 +471,7 @@ void set_pen(ssh_color c,ssh_natural width, ssh_mode Style)
 // Kolory indeksowane w symshwin i symshx11 kozystaj� z cache'owania systemowych pisak�w,
 // �eby by�o szybciej (przynajmniej kiedy�)
 {
-    if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP;//set_pen
+    if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//set_pen
     if(ssh_trace_level>2) cout << (ssh_color)c <<SEP<<width<<SEP<<  Style << endl;
     GrLineWidth = width;
     if(GrLineWidth<=0) GrLineWidth=1;
@@ -485,7 +485,7 @@ void set_pen_rgb(ssh_intensity r,ssh_intensity g, ssh_intensity b,
 // Je�li kolory indeksowane kozystaj� z cache'owanie tego samego pisaka to
 // nale�y ustali� kolor aktualny na pusty np. curr_color=-1;
 {
-    if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP;//set_pen_rgb
+    if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//set_pen_rgb
     if(ssh_trace_level>2) cout << r << SEP << g << SEP << b << SEP << width << SEP << Style << endl;
     GrLineWidth = width;
     if(GrLineWidth<=0) GrLineWidth=1;
@@ -499,7 +499,7 @@ void set_pen_rgba(ssh_intensity r,ssh_intensity g,ssh_intensity b,ssh_intensity 
                   ssh_natural width,ssh_mode style)
 /* Ustala aktualny kolor linii za pomoca skladowych RGBA */
 {
-    if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP;//set_pen_rgba
+    if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//set_pen_rgba
     if(ssh_trace_level>2) cout << r << SEP << g << SEP << b << SEP << width << SEP << style << endl;
     GrLineWidth = width;
     if(GrLineWidth<=0) GrLineWidth=1;
@@ -515,7 +515,7 @@ void set_brush(ssh_color c)
 // ssh_color c , jest jak dot�d zawsze traktowany jako indeks do tabeli, ale ma miejsce na tryb RGB
 // U mnie kolory indeksowane kozystaj� z cache'owania systemowych p�dzli, ale w SVG musi dzia�a� samo
 {
-    if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP;//set_brush
+    if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//set_brush
     if(ssh_trace_level>2) cout << (ssh_color)c << endl;
     GrBrushColor = palette[c];
 }
@@ -525,7 +525,7 @@ void set_brush_rgb(ssh_intensity r,ssh_intensity g,ssh_intensity b)
 // Je�li kolory indeksowane kozystaj� z cache'owanie tego samego p�dzla to
 // nale�y ustali� kolor aktualny na pusty np. curr_fill=-1;
 {
-    if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP;//set_brush_rgb
+    if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//set_brush_rgb
     if(ssh_trace_level>2) cout << r << SEP << g << SEP << b <<  endl;
     GrBrushColor.r = r & 0xff;
     GrBrushColor.g = g & 0xff;
@@ -536,7 +536,7 @@ void set_brush_rgba(ssh_intensity r,ssh_intensity g,ssh_intensity b,
                    ssh_intensity a)
 // Ustala aktualny kolor wypelnien za pomoca skladowych RGBA
 {
-    if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP;//set_brush_rgba
+    if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//set_brush_rgba
     if(ssh_trace_level>2) cout << r << SEP << g << SEP << b <<  endl;
     GrBrushColor.r = r & 0xff;
     GrBrushColor.g = g & 0xff;
@@ -548,7 +548,7 @@ void set_brush_rgba(ssh_intensity r,ssh_intensity g,ssh_intensity b,
 ssh_mode  buffered()
 /* Zwraca 1 jesli buforowane */
 {
-    if(ssh_trace_level>0) cout << _FUNCTION_NAME_ << SEP << "return yes==1";//buffered
+    if(ssh_trace_level>0) cout <<"SVG: " << _FUNCTION_NAME_ << SEP << "return yes==1";//buffered
     if(ssh_trace_level>0) cout << endl;
     return 1;
 }
@@ -556,7 +556,7 @@ ssh_mode  buffered()
 ssh_mode fixed()
 /* Czy okno ma zafiksowana wielkosc */
 {
-    if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP << "return yes===1";//fixed
+    if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP << "return yes===1";//fixed
     if(ssh_trace_level>2) cout << endl;
     return 1;
 }
@@ -564,7 +564,7 @@ ssh_mode fixed()
 ssh_color background()
 /* Aktualny kolor tla... */
 {
-    if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP <<"return "<< curr_background;//background
+    if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP <<"return "<< curr_background;//background
     if(ssh_trace_level>2) cout << endl;
     return curr_background;
 }
@@ -572,7 +572,7 @@ ssh_color background()
 ssh_natural get_line_width()
 /* Aktualna grubosc linii */
 {
-    if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP << "return " << GrLineWidth;//get_line_width
+    if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP << "return " << GrLineWidth;//get_line_width
     if(ssh_trace_level>2) cout << endl;
     return GrLineWidth;
 }
@@ -580,7 +580,7 @@ ssh_natural get_line_width()
 ssh_color get_pen()
 /* Aktualny kolor linii jako ssh_color */
 {
-    if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP;//get_pen
+    if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//get_pen
     if(ssh_trace_level>2) cout <<"IGNORED"<< endl;
     return 255;
 }
@@ -588,7 +588,7 @@ ssh_color get_pen()
 ssh_color get_brush()
 /* Aktualny kolor wypelnien jako ssh_color */
 {
-    if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP;//get_brush
+    if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//get_brush
     if(ssh_trace_level>2) cout <<"IGNORED"<< endl;
     return 0;
 }
@@ -596,7 +596,7 @@ ssh_color get_brush()
 ssh_natural screen_height()
 /* Aktualne rozmiary okna po przeliczeniach z init_plot*/
 {
-    if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP << "return " << GrScreenHi;//screen_height
+    if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP << "return " << GrScreenHi;//screen_height
     if(ssh_trace_level>2) cout << endl;
     return GrScreenHi;
 }
@@ -604,7 +604,7 @@ ssh_natural screen_height()
 ssh_natural screen_width()
 /*  ...i ewentualnych zmianach uczynionych "recznie" przez operatora */
 {
-    if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP << "return " << GrScreenWi;//screen_width
+    if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP << "return " << GrScreenWi;//screen_width
     if(ssh_trace_level>2) cout << endl;
     return GrScreenWi;
 }
@@ -612,7 +612,7 @@ ssh_natural screen_width()
 ssh_natural char_height(char znak)
 /* Aktualne rozmiary znaku - wysokość */
 {
-    if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP << znak << SEP << "return " << GrFontHi;//char_height
+    if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP << znak << SEP << "return " << GrFontHi;//char_height
     if(ssh_trace_level>2) cout << endl;
     return GrFontHi;
 }
@@ -620,7 +620,7 @@ ssh_natural char_height(char znak)
 ssh_natural char_width(char znak)
 /* szerokość znaku - ...potrzebne do pozycjonowania tekstu */
 {
-    if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP <<znak<<SEP<< "return " << GrFontWi;//char_width
+    if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP <<znak<<SEP<< "return " << GrFontWi;//char_width
     if(ssh_trace_level>2) cout << endl;
     return GrFontWi;
 }
@@ -629,7 +629,7 @@ ssh_natural string_height(const char* str)
 /* Aktualne rozmiary wy�wietlania ca�ego lancucha znak�w */
 /* Tu zazwyczaj mo�e by� to samo co char_width.     */
 {
-    if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP ;//string_height
+    if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP ;//string_height
     if(ssh_trace_level>2) cout << str <<SEP << "return " << GrFontHi<< endl;
     return GrFontHi;
 }
@@ -638,7 +638,7 @@ ssh_natural string_width(const char* str)
 /* W najgorszym razie odpowiednia wielokrotność char_width */
 /* ...potrzebne do jego pozycjonowania */
 {
-    if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP;//string_width
+    if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//string_width
     unsigned len = strlen(str);
     if(ssh_trace_level>2) cout << str << SEP << "return " << GrFontWi*len << endl;
     return GrFontWi*len;
@@ -651,7 +651,7 @@ void printc(int x, int y,
 /* Drukuje w kolorach uzytkownika wybranych z palety*/
 {
     extern int  GrPrintTransparently;// = 0;
-    if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP << SEP;//printc
+    if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP << SEP;//printc
     if(ssh_trace_level>2) cout << x << SEP << y << SEP
                                << fore << SEP << back << SEP
                                << format << endl;
@@ -676,7 +676,7 @@ void printc(int x, int y,
     va_end(marker);              /* Reset variable arguments.      */
     //if(Op.text.txt != NULL) //Tu niepotrzebne - nowy obiekt powinien być sklirowany
     //		delete Op.text.txt;
-    if(ssh_trace_level>0) cout<<target<< endl;
+    if(ssh_trace_level>0) cout <<"SVG: "<<target<< endl;
     Op.text.txt=clone_str(target);
 }
 
@@ -684,7 +684,7 @@ void printbw(int x,int y,const char* format,...)
 /* Drukuje czarno na białym*/
 {
     extern int  GrPrintTransparently;// = 0;
-    if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP << SEP;//printbw
+    if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP << SEP;//printbw
     if(ssh_trace_level>2) cout << x << SEP << y <<SEP<< format << endl;
 
     GrOperation& Op = NextGrListEntry();//enum  GrType { Empty = 0, Point=1,LineTo=2,Line=3,Circle=4,Rect=5,Text=6,Poly=7 };
@@ -709,14 +709,14 @@ void printbw(int x,int y,const char* format,...)
     //Op.text.txt.take(clone_str(target));
     //if(Op.text.txt != NULL)
     //		delete Op.text.txt;
-    if(ssh_trace_level>0) cout<<target<< endl;
+    if(ssh_trace_level>0) cout <<"SVG: "<<target<< endl;
     Op.text.txt=clone_str(target);
 }
 
 void print_d(ssh_coordinate x,ssh_coordinate y,const char* format,...)
 {
     extern int  GrPrintTransparently;// = 0;
-    if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP << SEP;//print_d
+    if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP << SEP;//print_d
     if(ssh_trace_level>2) cout << x << SEP << y << SEP
                                << format << endl;
 
@@ -741,7 +741,7 @@ void print_d(ssh_coordinate x,ssh_coordinate y,const char* format,...)
     //Op.text.txt.take(clone_str(target));
     //if(Op.text.txt != NULL)
     //		delete Op.text.txt;
-    if(ssh_trace_level>0) cout<<target<< endl;
+    if(ssh_trace_level>0) cout <<"SVG: "<<target<< endl;
     Op.text.txt=clone_str(target);
 }
 
@@ -754,7 +754,7 @@ void print_rgb(int x, int y,
 /* Drukuje z możliwością ustawienia tuszu poprzez RGB */
 {
     extern int  GrPrintTransparently;// = 0;
-    if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP << SEP;//print_rgb
+    if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP << SEP;//print_rgb
     if(ssh_trace_level>2) cout << x << SEP << y << SEP
                                << r<<','<<g<<','<<b << SEP << back << SEP
                                << format << endl;
@@ -780,7 +780,7 @@ void print_rgb(int x, int y,
     //Op.text.txt.take(clone_str(target));
     //if(Op.text.txt != NULL)
     //		delete Op.text.txt;
-    if(ssh_trace_level>0) cout<<target<< endl;
+    if(ssh_trace_level>0) cout <<"SVG: "<<target<< endl;
     Op.text.txt=clone_str(target);
 }
 
@@ -789,7 +789,7 @@ void print_rgb(int x, int y,
 void plot_d(ssh_coordinate x, ssh_coordinate y)
 /* Wyswietlenie punktu na ekranie */
 {
-    if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP<<SEP;//plot
+    if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP<<SEP;//plot
     if(ssh_trace_level>2) cout << x << SEP << y << endl;
 
     GrOperation& Op = NextGrListEntry();//enum  GrType { Empty = 0, Point=1,LineTo=2,Line=3,Circle=4,Rect=5,Text=6,Poly=7 };
@@ -806,7 +806,7 @@ void plot_d(ssh_coordinate x, ssh_coordinate y)
 void plot(int x,int y, ssh_color c)
 /* Wyswietlenie punktu na ekranie */
 {
-    if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP<<SEP;//plot
+    if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP<<SEP;//plot
     if(ssh_trace_level>2) cout << x << SEP << y << SEP << (ssh_color)c << endl;
 
     GrOperation& Op = NextGrListEntry();//enum  GrType { Empty = 0, Point=1,LineTo=2,Line=3,Circle=4,Rect=5,Text=6,Poly=7 };
@@ -824,7 +824,7 @@ void plot_rgb(ssh_coordinate x, ssh_coordinate y, int r, int g, int b)
 /* Wyswietlenie punktu na ekranie w kolorze true-color.
 Jak inny tryb okna to efekt mo�e by� dziwny - ale ju� niemal nie ma ekran�w nie-true-color*/
 {
-    if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP;//plot_rgb
+    if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//plot_rgb
     if(ssh_trace_level>2) cout << x << SEP << y << SEP
                                << r << SEP << g << SEP << b << endl;
 
@@ -842,7 +842,7 @@ Jak inny tryb okna to efekt mo�e by� dziwny - ale ju� niemal nie ma ekran�
 void fill_flood(ssh_coordinate x, ssh_coordinate y, ssh_color fill, ssh_color border)
 /* Wypełnia powodziowo lub algorytmem siania w kolorze indeksowanym*/
 {
-    if(ssh_trace_level>1) cout << _FUNCTION_NAME_ << SEP;//fill_flood
+    if(ssh_trace_level>1) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//fill_flood
     if(ssh_trace_level>1) cout << x << SEP << y << SEP
                                <<(ssh_color)fill<< SEP << (ssh_color)border << endl;
 
@@ -866,7 +866,7 @@ void fill_flood_rgb(int x,int y,
 /* w kolorze RGB */
 /* Ale SVG chyba tego nie ma? */
 {
-    if(ssh_trace_level>1) cout << _FUNCTION_NAME_ << SEP;//fill_flood_rgb
+    if(ssh_trace_level>1) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//fill_flood_rgb
     if(ssh_trace_level>1) cout << x << SEP << y << SEP
                                << rf << SEP << gf << SEP << bf << SEP
                                << rb << SEP << gb << SEP << bb << endl;
@@ -890,7 +890,7 @@ void fill_flood_rgb(int x,int y,
 void line_d(ssh_coordinate x1, ssh_coordinate y1, ssh_coordinate x2, ssh_coordinate y2)
 /* Wyswietlenie lini w kolorze domyslnym - tak�e rgb */
 {
-    if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP<< SEP;//line_d
+    if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP<< SEP;//line_d
     if(ssh_trace_level>2) cout << x1 << SEP << y1 << SEP
                                << x2 << SEP << y2 << endl;
 
@@ -911,7 +911,7 @@ void line_d(ssh_coordinate x1, ssh_coordinate y1, ssh_coordinate x2, ssh_coordin
 void line(int x1,int y1,int x2,int y2,ssh_color c)
 /* Wyswietlenie lini w kolorze c z palety*/
 {
-    if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP<< SEP;//line
+    if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP<< SEP;//line
     if(ssh_trace_level>2) cout << x1 << SEP << y1 << SEP
                                << x2 << SEP << y2 << SEP
                                << (ssh_color)c << endl;
@@ -933,7 +933,7 @@ void line(int x1,int y1,int x2,int y2,ssh_color c)
 void circle_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r)
 /* Wyswietlenie okregu w kolorze domyslnym - także rgb */
 {
-    if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP;//circle_d
+    if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//circle_d
     if(ssh_trace_level>2) cout << x << SEP << y << SEP
                                << r << endl;
     GrOperation& Op = NextGrListEntry();//enum  GrType { Empty = 0, Point=1,LineTo=2,Line=3,Circle=4,Rect=5,Text=6,Poly=7 };
@@ -953,7 +953,7 @@ void circle_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r)
 void ellipse_d(ssh_coordinate x,ssh_coordinate y, ssh_natural a, ssh_natural b)
 /* Wyswietlenie elipsy w kolorze domyslnym - także rgb */
 {
-    if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP;//circle_d
+    if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//circle_d
     if(ssh_trace_level>2) cout << x << SEP << y << SEP
                                << a << SEP << b << endl;
     GrOperation& Op = NextGrListEntry();//enum  GrType { Empty = 0, Point=1,LineTo=2,Line=3,Circle=4,Rect=5,Text=6,Poly=7 };
@@ -973,7 +973,7 @@ void ellipse_d(ssh_coordinate x,ssh_coordinate y, ssh_natural a, ssh_natural b)
 void ellipse(ssh_coordinate x,ssh_coordinate y, ssh_natural a, ssh_natural b, ssh_color c)
 /* Wyswietlenie elipsy w kolorze c */
 {
-    if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP;//circle_d
+    if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//circle_d
     if(ssh_trace_level>2) cout << x << SEP << y << SEP
                                << a << SEP << b << endl;
     GrOperation& Op = NextGrListEntry();//enum  GrType { Empty = 0, Point=1,LineTo=2,Line=3,Circle=4,Rect=5,Text=6,Poly=7 };
@@ -993,7 +993,7 @@ void ellipse(ssh_coordinate x,ssh_coordinate y, ssh_natural a, ssh_natural b, ss
 void circle(ssh_coordinate x,ssh_coordinate y,ssh_natural r,ssh_color c)
 /* Wyswietlenie okregu w kolorze c  z palety*/
 {
-    if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP<< SEP;//circle
+    if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP<< SEP;//circle
     if(ssh_trace_level>2) cout << x << SEP << y << SEP
                                << r << SEP
                                << (ssh_color)c << endl;
@@ -1015,7 +1015,7 @@ void circle(ssh_coordinate x,ssh_coordinate y,ssh_natural r,ssh_color c)
 void fill_circle_d(int x,int y,int r)
 /* Wyswietlenie kola w kolorach domyslnych - także rgb */
 {
-    if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP;//fill_circle_d
+    if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//fill_circle_d
     if(ssh_trace_level>2) cout << x << SEP << y << SEP
                                << r << endl;
 
@@ -1039,7 +1039,7 @@ void fill_circle_d(int x,int y,int r)
 void fill_ellipse_d(ssh_coordinate x, ssh_coordinate y, ssh_natural a, ssh_natural b)
 /* Wypełnienie elipsy w kolorach domyslnych - także rgb */
 {
-    if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP;//fill_circle_d
+    if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//fill_circle_d
     if(ssh_trace_level>2) cout << x << SEP << y << SEP
                                << a << SEP << b << endl;
 
@@ -1064,7 +1064,7 @@ void fill_circle(ssh_coordinate x,ssh_coordinate y,ssh_natural r,
                  ssh_color c)
 /* Wyswietlenie kola w kolorze c  z palety*/
 {
-    if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP;//fill_circle
+    if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//fill_circle
     if(ssh_trace_level>2) cout << x << SEP << y << SEP
                                << r << SEP
                                << (ssh_color)c << endl;
@@ -1089,7 +1089,7 @@ void fill_circle(ssh_coordinate x,ssh_coordinate y,ssh_natural r,
 void fill_ellipse(ssh_coordinate x, ssh_coordinate y, ssh_natural a, ssh_natural b, ssh_color c)
 /* Wyswietlenie elipsy w kolorze c  z palety*/
 {
-    if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP;//fill_circle
+    if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//fill_circle
     if(ssh_trace_level>2) cout << x << SEP << y << SEP
                                << a << SEP << b << SEP
                                << (ssh_color)c << endl;
@@ -1152,7 +1152,7 @@ void fill_rect_rgb(ssh_coordinate x1,ssh_coordinate y1,                /* Wypeł
                    ssh_coordinate x2,ssh_coordinate y2,                /* rozciągniętego między rogami x1y1 a x2y2 */
                    ssh_intensity r,ssh_intensity g,ssh_intensity b)    /* w kolorze rbg okreslonym składowymi koloru */
 {
-    if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP;//fill_rect_d
+    if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//fill_rect_d
     if(ssh_trace_level>2) cout << x1 << SEP << y1 << SEP
                                << x2 << SEP << y2 << endl;
 
@@ -1175,7 +1175,7 @@ void fill_rect_rgb(ssh_coordinate x1,ssh_coordinate y1,                /* Wypeł
 void fill_rect_d(ssh_coordinate x1, ssh_coordinate y1, ssh_coordinate x2, ssh_coordinate y2)
 /* Wyswietla prostokat w kolorach domyslnych*/
 {
-    if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP;//fill_rect_d
+    if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//fill_rect_d
     if(ssh_trace_level>2) cout << x1 << SEP << y1 << SEP
                                << x2 << SEP << y2 << endl;
 
@@ -1198,7 +1198,7 @@ void fill_rect_d(ssh_coordinate x1, ssh_coordinate y1, ssh_coordinate x2, ssh_co
 void fill_rect(ssh_coordinate x1, ssh_coordinate y1, ssh_coordinate x2, ssh_coordinate y2, ssh_color c)
 /* Wyswietla prostokat w kolorze c  z palety*/
 {
-    if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP;//fill_rect
+    if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//fill_rect
     if(ssh_trace_level>2) cout << x1 << SEP << y1 << SEP
                                << x2 << SEP << y2 << SEP
                                << (ssh_color)c << endl;
@@ -1223,7 +1223,7 @@ void fill_poly_d(ssh_coordinate vx, ssh_coordinate vy,
                  const ssh_point points[], int number)
 /* Wypelnia wielokat przesuniety o vx,vy w kolorach domyslnych */
 {
-    if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP;//fill_poly_d
+    if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//fill_poly_d
     if(ssh_trace_level>2) cout << vx << SEP << vy << SEP
                                << number << endl;
 
@@ -1254,7 +1254,7 @@ void fill_poly(ssh_coordinate vx, ssh_coordinate vy,
                ssh_color c)
 /* Wypelnia wielokat przesuniety o vx,vy w kolorze c  z palety*/
 {
-    if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP;//fill_poly
+    if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//fill_poly
     if(ssh_trace_level>2) cout << vx << SEP << vy << SEP
                                << number << SEP
                                << (ssh_color)c << endl;
@@ -1291,7 +1291,7 @@ elastyczny byłby "named pipe" o nazwie zaleznej od PID i nazwy pliku wykonywaln
 ssh_mode input_ready()
 /* Funkcja sprawdzajaca czy jest cos do wziecia z wejscia */
 {
-    if(ssh_trace_level>2) cout << _FUNCTION_NAME_ <<SEP<< GrCharMessage << endl;//input_ready
+    if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ <<SEP<< GrCharMessage << endl;//input_ready
     if (GrCharMessage >= -1)
         return SSH_YES;
     else
@@ -1301,7 +1301,7 @@ ssh_mode input_ready()
 ssh_msg get_char()
 /* Funkcja odczytywania znakow sterowania i zdarzen */
 {
-    if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP << GrCharMessage << endl;//get_char
+    if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP << GrCharMessage << endl;//get_char
     if (GrCharMessage >= -1)
     {
         int c = GrCharMessage;
@@ -1317,7 +1317,7 @@ ssh_stat set_char(ssh_msg c)
 /* Odeslanie znaku na wejscie - zwraca 0 jesli nie ma miejsca */
 /* Pewne jest tylko odeslanie jednego znaku. */
 {
-    if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP << c << endl;//set_char
+    if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP << c << endl;//set_char
     if (GrCharMessage < -1)
     {
         GrCharMessage = c;
@@ -1331,7 +1331,7 @@ ssh_stat get_mouse_event(ssh_coordinate *xpos, ssh_coordinate *ypos, ssh_coordin
 /* Funkcja odczytujaca ostatnie zdazenie myszy */
 /* Można odczytać kiedykolwiek, ale sens ma tylko gdy get_char() zwróciło '\b' */
 {
-    if(ssh_trace_level>1) cout << _FUNCTION_NAME_ << endl;//get_mouse_event
+    if(ssh_trace_level>1) cout <<"SVG: " << _FUNCTION_NAME_ << endl;//get_mouse_event
     if (GrMouseActive)
     {
         *xpos = GrMouseX;
@@ -1349,7 +1349,7 @@ ssh_stat repaint_area(int* x,int* y,unsigned* width,unsigned* height)
 /* Jesli zwraca -1 to brak danych lub brak implementacji ! Odrysowac trzeba całosc. */
 /* Jesli zwraca -2 to znaczy ze dane juz były wcześniej odczytane. Nalezy zignorowac. */
 {
-    if(ssh_trace_level>0) cout << _FUNCTION_NAME_ << endl;//repaint_area
+    if(ssh_trace_level>0) cout <<"SVG: " << _FUNCTION_NAME_ << endl;//repaint_area
     //Nie powinien by� u�ywany, ale je�li ju� to musi to prosi o odrysowanie ca�o�ci bo tak bezpieczniej
     *x = 0;
     *y = 0;
@@ -1362,7 +1362,7 @@ ssh_rgb get_rgb_from(ssh_color c)
 /* Jakie są ustawienia RGB konkretnego kolorku w palecie */
 {
 	ssh_rgb pom;
-    if(ssh_trace_level>2) cout << _FUNCTION_NAME_ << SEP << (ssh_color)c << endl;//get_rgb_from
+    if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP << (ssh_color)c << endl;//get_rgb_from
 	pom = palette[c];
 	return pom;
 }
@@ -1375,7 +1375,7 @@ static void SetScale(void)
     const double M_PI=3.141595;
 #endif
 
-    if(ssh_trace_level>1) cout << _FUNCTION_NAME_ << endl;
+    if(ssh_trace_level>1) cout <<"SVG: " << _FUNCTION_NAME_ << endl;
 
     if(UseGrayScale)//Uzywa skali szarosci tam gdzie normalnie sa kolory
     {
@@ -1389,7 +1389,7 @@ static void SetScale(void)
         }
 
         if(ssh_trace_level & 4)
-           cout << _FUNCTION_NAME_ << SEP <<"SetScale (0-255 Gray) completed"<< endl;
+           cout <<"SVG: " << _FUNCTION_NAME_ << SEP <<"SetScale (0-255 Gray) completed"<< endl;
     }
     else
     {
@@ -1426,7 +1426,7 @@ static void SetScale(void)
             for(k=256;k<PALETE_LENGHT; k++)
                 set_rgb(k,(unsigned char)k,(unsigned char)k,(unsigned char)k );
             if(ssh_trace_level & 4)
-               cout << _FUNCTION_NAME_ << SEP <<"SetScale (Colors: 0-255; Gray: 256-->" << PALETE_LENGHT << ") completed" << endl;
+               cout <<"SVG: " << _FUNCTION_NAME_ << SEP <<"SetScale (Colors: 0-255; Gray: 256-->" << PALETE_LENGHT << ") completed" << endl;
         }
     }
 
@@ -1700,7 +1700,7 @@ void flush_plot()
     //GrTmpOutputDirectory ?
     static unsigned flush_counter = 0;//Zliczamy
     flush_counter++; //Ale nie uzywamy w nazwie pliku...
-    if(ssh_trace_level>0) cout << _FUNCTION_NAME_ << SEP;//flush_plot
+    if(ssh_trace_level>0) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//flush_plot
     if(ssh_trace_level>0) cout <<'#'<< flush_counter <<SEP<< GrList.get_size() <<SEP<< GrListPosition << endl;
     wb_pchar name(MAX_PATH);
     name.prn("%s%s_%0u", GrTmpOutputDirectory,  ScreenTitle, PID );
@@ -1711,7 +1711,7 @@ ssh_stat	dump_screen(const char* Filename)
 /* Zapisuje zawartosc ekranu do pliku graficznego w naturalnym formacie platformy */
 /* Tutaj dostepne sa formaty wektorowe "stream", SVG, moze EXM ...*/
 {
-    if(ssh_trace_level>0) cout << _FUNCTION_NAME_ << SEP;
+    if(ssh_trace_level>0) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;
     if(ssh_trace_level>0) cout << Filename <<'.'<< GrFileOutputByExtension << endl;
 
     wb_pchar name(MAX_PATH);
@@ -1751,7 +1751,7 @@ ssh_stat	dump_screen(const char* Filename)
 }
 
 /********************************************************************/
-/*              SYMSHELLLIGHT  version 2021-07-20                   */
+/*              SYMSHELLLIGHT  version 2021-07-21                   */
 /********************************************************************/
 /*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
 /*            W O J C I E C H   B O R K O W S K I                   */

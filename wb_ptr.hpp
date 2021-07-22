@@ -309,7 +309,7 @@ void write(ostream& s,const char* p,char enclos='\"');
 
 //Zamienia wszystkie lancuchy forrep zawarte w obiekcie wb_pchar na lancuchy whatins - bufor jest sztafetowany!!!
 friend
-bool replace(wb_pchar& bufor,const char* forrep,const char* whatins,bool fullwords,unsigned startpos=0);//case sensitive bo brak funkcji w rodzaju stristr
+bool replace(wb_pchar& bufor,const char* forrep,const char* whatins,bool fullwords,unsigned startpos/*=0*/);//"case sensitive" bo zwykle brak funkcji w rodzaju stristr
 
 //Wstawia lancuch do bufora na okreslonej pozycji - bufor jest sztafetowany!!!
 friend

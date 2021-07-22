@@ -6,7 +6,10 @@
 
 cmake_minimum_required(VERSION 3.0)
 project(symshelllight)
-set( X11 true)
+
+set( X11 true) #DEFAULT
+#set( WINDOWS true ) #NOT TESTED!
+#set( WITHTESTS true )
 
 if (MSVC)
     # warning level 4 and all warnings as errors if you want
@@ -177,7 +180,7 @@ endif()
 endif()
 #KONIEC - THE END
 #********************************************************************/
-#*              SYMSHELLLIGHT  version 2020-11-23                   */
+#*              SYMSHELLLIGHT  version 2021-07-22                   */
 #********************************************************************/
 #*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
 #*            W O J C I E C H   B O R K O W S K I                   */

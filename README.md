@@ -28,8 +28,14 @@ You can also compile tests:
   $ make
 ```
 
-It was tested on UBUNTU 16.04 with gcc, UBUNTU 18.04 with gcc & MS Windows 7 with MSVC 2012
+It was tested on UBUNTU 16.04 with gcc, UBUNTU 18.04 with gcc & UBUNTU 20.04 with gcc/g++
+Current version was not uder Windows!!! 
 
+**ADDITIONAL REQUIREMENTS**
+
+* Development version of X11 packages
+
+* libxpm-dev (on UBUNTU: sudo apt install libxpm-dev)
 
 **Licencing**
 

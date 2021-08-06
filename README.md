@@ -17,7 +17,8 @@ To use, perform the following operations in the selected directory:
 
 ```console
   $ git clone https://github.com/borkowsk/SymShellLight.git
-  $ cd SymShellLigt 
+  $ cd SymShellLigt
+  $ bash check.sh
   $ cmake . -DX11=true OR -DWINDOWS=true
   $ make
 ```

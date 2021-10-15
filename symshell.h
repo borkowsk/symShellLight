@@ -78,7 +78,7 @@ extern int WB_error_enter_before_clean/* =0 */;                /* Czy zamykac od
 
 /* OPERACJE DOTYCZACE CALEGO OKNA GRAFICZNEGO */
 void delay_ms(ssh_natural ms);                                 /* Wymuszenie oczekiwania przez pewną liczbę milli seconds */
-void delay_us(ssh_natural ms);                                 /* Wymuszenie oczekiwania przez pewną liczbę micro seconds */
+void delay_us(ssh_natural us);                                 /* Wymuszenie oczekiwania przez pewną liczbę micro seconds */
 void flush_plot();                                             /* Ostateczne uzgodnienie zawartosci ekranu z zawartoscia pamieci */
 void clear_screen();                                           /* Czysci ekran lub ekran wirtualny */
 ssh_stat  invalidate_screen();                                 /* W sposób ukryty zapomina poprzednią zawartość ekranu gdy liczymy że i tak zostałaby zamazana */

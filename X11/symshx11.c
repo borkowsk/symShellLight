@@ -9,7 +9,7 @@
 /* File changed masively: 21.10.2020                                    */
 /*                                                                      */
 /* FILE: symshx11.c                                                     */
-/* Wersja: 20.07.2021                                                   */
+/* Wersja: 26.10.2021                                                   */
 /*                                                                      */
 /* UWAGA!                                                               */
 /* WCIĄŻ Z BLEDEM NA EXPOSE TODO , choc raz go juz gdzies usunalem :-/  */
@@ -40,10 +40,13 @@
 #define FALSE 0
 #define NODATA '\0'
 
+#ifndef NULL
+#define NULL __null
+#endif
+
 /* For close_plot() */
  extern int             WB_error_enter_before_clean;/* Czy zamykać okno od razu czy dawać "enter"? */
- int                    ssh_trace_level = 1;           //Maska poziomów śledzenia 1-msgs 2-grafika 3-grafika detaliczna 4-alokacje/zwalnianie
- //int                    trace=1;  /* Sterowanie komunikatami modułu na standardoqe wyjście */
+ int                    ssh_trace_level = 0;        /* Maska poziomów śledzenia 1-msgs 2-grafika 3-grafika detaliczna 4-alokacje/zwalnianie */
  static int             opened=0; /* Dla close plot. Zerowane tez gdy "broken-pipe" */
 
  /* progname is the string by which this program was invoked; this
@@ -52,8 +55,8 @@
  static char            window_name[1024] = "WB-sym-shell";//"WB X-window symulation shell";
  static char            icon_name[1024] = "WB-sym-shell";
 
- static size_t  largc=0;    /* Do zapamietania przekazanych przez funkcje setup*/
- static const char**  largv=NULL;
+ static unsigned        largc=0;    /* Do zapamietania przekazanych przez funkcje setup*/
+ static const char**    largv=NULL;
 
  /* Parametry z inicjalizacji modułu (shell setup) */
  static int             isbuffered=0;       /* Czy okno jest buforowane pixmapa */
@@ -237,12 +240,6 @@
 
  ssh_color background()
  /* Aktualny kolor tla - nowa wersja */
- {
-     return bacground;
- }
-
- unsigned get_background()
- /* Aktualny kolor tla - stara wersja */
  {
      return bacground;
  }
@@ -2813,7 +2810,7 @@ ssh_stat dump_screen(const char* Filename)
 }
 /*#pragma exit close_plot*/
 /********************************************************************/
-/*              SYMSHELLLIGHT  version 2021-07-21                   */
+/*              SYMSHELLLIGHT  version 2021-10-26                   */
 /********************************************************************/
 /*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
 /*            W O J C I E C H   B O R K O W S K I                   */

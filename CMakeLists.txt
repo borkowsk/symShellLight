@@ -12,15 +12,16 @@ set( X11 true) #DEFAULT
 #set( WITHTESTS true )
 
 if (MSVC)
-    # warning level 4 and all warnings as errors if you want
-    add_compile_options(/W4) #  /WX
+    #warning level 4 and/or all warnings as errors if you want
+    #add_compile_options(/W4) #  /WX
 else()
-    # C++11 and a lots of warnings if you want
-    add_compile_options(-std=c++11) #-Wall
+    # A lots of warnings if you want
+    #add_compile_options(-Wall)
 endif(MSVC)
 
 include_directories("./")
-message("C++ compiler flags: ${CMAKE_CXX_FLAGS}")
+#see -> https://cmake.org/cmake/help/v3.16/manual/cmake-compile-features.7.html#manual:cmake-compile-features(7)
+#message("C++ compiler flags: ${CMAKE_CXX_FLAGS}")
 
 if(true) # SVG SYMSHELL LIB
 add_library( wbsyshSVG STATIC
@@ -31,6 +32,7 @@ add_library( wbsyshSVG STATIC
     "UTILS/sshutils.cpp"
     "UTILS/sshmenufdummy.c" #dummy functions of menus
 )
+#target_compile_features(wbsyshSVG PUBLIC cxx_std_11)
 endif()
 
 if(X11) # only for X11 LIB
@@ -43,6 +45,7 @@ add_library( wbsyshX11 STATIC
     "UTILS/sshutils.cpp"
     "UTILS/sshmenufdummy.c" #dummy functions of menus
 )
+#target_compile_features(wbsyshX11 PUBLIC cxx_std_11)
 endif(X11)
 
 if(WINDOWS) # only for WINDOWS - NOT TESTED IN THIS VERSION (after 2016)
@@ -54,6 +57,7 @@ add_library( wbsyshWIN STATIC
 	"WIN/sshmenufwin.c"
     #"UTILS/sshmenufdummy.c" #dummy functions of menus
     )
+#target_compile_features(wbsyshWIN PUBLIC cxx_std_11)
 endif(WINDOWS)
 
 
@@ -180,7 +184,7 @@ endif()
 endif()
 #KONIEC - THE END
 #********************************************************************/
-#*              SYMSHELLLIGHT  version 2021-07-22                   */
+#*              SYMSHELLLIGHT  version 2021-11-05                   */
 #********************************************************************/
 #*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
 #*            W O J C I E C H   B O R K O W S K I                   */

@@ -79,7 +79,7 @@ int         GrLineStyle = SSH_LINE_SOLID;
 ssh_rgb     GrPenColor = { 255,255,255};//,255 };
 ssh_rgb     GrBrushColor = { 205,205,205};//,255 };
 
-void*           _ssh_window=NULL;  /* Dummy handler for check and external use */
+unsigned long    _ssh_window=0;  /* Dummy handler for check and external use */
 
 const char* SEP = "\t";
 
@@ -303,7 +303,7 @@ ssh_stat init_plot(ssh_natural  a, ssh_natural   b,                 /* ile pikse
 
     GrClosed = false;
 
-    _ssh_window=&GrList;
+    //_ssh_window=0;//&GrList;//???
 
     cerr<<GrScreenWi<<"x"<<GrScreenHi<<"-N:"<<N<<":"<<maxN<<endl;
 
@@ -320,7 +320,7 @@ void close_plot()
 
     if(ssh_trace_level>1) cout << "List lenght:"<<SEP<<GrList.get_size()<<SEP<<"USED:"<<SEP<< GrListPosition<<  endl;
     GrClosed = true;
-    _ssh_window=NULL;
+    _ssh_window=0;
 }
 
 void buffering_setup(int Yes)

@@ -69,7 +69,7 @@ void set_background(ssh_color c);                              /* Ustala index k
 ssh_stat  init_plot(ssh_natural  a,ssh_natural   b,            /* ile pikseli mam mieć okno */
                     ssh_natural ca, ssh_natural cb);           /* ile dodatkowo lini i kolumn tekstu na dole i po bokach przy domyślnej czcionce */
                                                                /* Zwraca 1 jeśli zadziałał poprawnie */
-extern void* _ssh_window;//If not NULL the window is useable
+extern unsigned long _ssh_window;//If not 0 the window is useable
 
 void close_plot(void);                                         /* zamkniecie grafiki/semigrafiki */
                                                                /* Automatycznie instalowana w atexit - stad durne (void) zeby uniknac warningu */

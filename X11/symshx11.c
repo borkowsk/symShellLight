@@ -15,7 +15,7 @@
 /* WCIĄŻ Z BLEDEM NA EXPOSE TODO , choc raz go juz gdzies usunalem :-/  */
 /*                                                                      */
 /************************************************************************/
-/*               SYMSHELLLIGHT  version 2021-07-20                      */
+/*               SYMSHELLLIGHT  version 2021-11-10                      */
 /************************************************************************/
 
 
@@ -73,6 +73,7 @@
  static char            *display_name = NULL;        /* Nazwa wyswietlacza - do odczytania */
  static unsigned int    display_width=0;   /* Will be filled during initialisation */
  static unsigned int    display_height=0;  /* Will be filled during initialisation */
+ static XSizeHints      *size_hints;//To jest jeszcze gdzieś używane poza init_plot() Chyba do resize?
 
  static unsigned int    mulx=1,muly=1;      /* Multiplication of x & y */
  static unsigned int    org_width,org_height;  /* Starting Window size */
@@ -80,7 +81,7 @@
                                                screen_width() i screen_heiht() i zmiany rozmiaru*/
 
  static Window          win;               /* HANDLER TO MAIN WINDOW */
-        void*           _ssh_window=NULL;  /* Handler for check and external use */
+        XID             _ssh_window=0;     /* Handler for check and external use */
 
  static unsigned int    width,height;      /* Window size */
  static int             iniX, iniY;        /* Window position */
@@ -95,12 +96,7 @@
  static Pixmap          icon_pixmap;
  static unsigned short  alloc_cont=0;      /* Sygnalizuje ze pixmapa zaostala zaalokowana */
 
- static Pixmap          cont_pixmap=0;     /* ??? TODO ? */
-
- static XSizeHints      *size_hints;
- static XIconSize       *size_list;
- static XWMHints        *wm_hints;
- static XClassHint      *class_hints;
+ static Pixmap          cont_pixmap=0;     /* Uchwyt do Pixmap'y zastępującej/mirrorującej okno */
 
  static XTextProperty    windowName;
  static XTextProperty    iconName;
@@ -142,7 +138,6 @@
  static int             pieMode=-1;/* Tryb wypełniania fragmentu okręgu lib ellipsy */
 
  /* Wejście znakowe? */
- static int              count;      /* ??? TODO ? */
  static KeySym           thekey;
  static int              buforek[2]; /* Bufor na znaki z klawiatury - tylko 0 jest przekazywany */
  //static char bfirst=0;  /* Zmienne na implementacje cykliczną bufora */
@@ -186,10 +181,9 @@
  {
      pipe_break=1;
      fprintf(stderr,"\nX11-SYMSHELL GOT A IOError\n");
-     XSetIOErrorHandler(NULL);
+     XSetIOErrorHandler(NULL);/* Kasowanie dotychgczasowego handlera z wywołania XSetIOErrorHandler(MyXIOHandler); */
      exit(-11);
      return -11;
-     //XSetIOErrorHandler(MyXIOHandler);
  }
 
  int MyErrorHandler(Display *xDisplay, XErrorEvent *event)
@@ -336,7 +330,7 @@ void close_plot()
     {
         inside_close_plot=1;
         XSync(display,1/*DISCARD EVENTS*/);
-        _ssh_window=NULL; //Do not use this window any more!!!
+        _ssh_window=0; /* Do not use this window any more!!!*/
 
         if(WB_error_enter_before_clean)
         {
@@ -845,7 +839,6 @@ void shell_setup(const char* title,int iargc,const char* iargv[])
     }
 }
 
-
 ssh_stat init_plot(ssh_natural a,ssh_natural b,ssh_natural ca,ssh_natural cb)
 /* typowa dla platformy inicjacja grafiki/semigrafik
  a,b to wymagane rozmiary ekranu */
@@ -858,6 +851,9 @@ ssh_stat init_plot(ssh_natural a,ssh_natural b,ssh_natural ca,ssh_natural cb)
     ini_b=b;
     ini_ca=ca;
     ini_cb=cb;
+
+    XWMHints        *wm_hints;
+    XClassHint      *class_hints;
 
     if (!(size_hints = XAllocSizeHints())) {
        fprintf(stderr, "X11: %s: failure allocating memory", progname);
@@ -995,25 +991,63 @@ ssh_stat init_plot(ssh_natural a,ssh_natural b,ssh_natural ca,ssh_natural cb)
     XSync(display, True);
  #endif
 
-    if(win!=NULL)
+    if(win!=0)
         window_size = BIG_ENOUGH ;
-    else
+    else //Czy to się w ogóle ma szansę zdarzyć? Raczej wyleci wczesniej na błędzie?!
         fprintf( stderr, "X11: %s: Window not created! ", progname);
 
-    /* Get available icon sizes from window manager */
-    if (XGetIconSizes(display, RootWindow(display,screen_num),&size_list, &count) == 0){
-        fprintf( stderr, "X11: %s: Window manager didn't set "
-                         "icon sizes - using default.\n", progname);
-     }
-    else {
-       ;
-       /* A real application would search through size_list
-        * here to find an acceptable icon size and then
-        * create a pixmap of that size; this requires that
-        * the application have data for several sizes of icons */
+    /* Get available icon sizes from window manager and create apriopriate bitmap */
+    {   int              count;
+        XIconSize       *size_list;
+        if((XGetIconSizes(display, RootWindow(display,screen_num),&size_list, &count) == 0)  && ssh_trace_level )
+        {
+            fprintf( stderr, "X11: %s: Window manager didn't set "
+                             "icon sizes - using default.\n", progname);
+         }
+        else {
+           ;
+           /* A real application would search through size_list
+            * here to find an acceptable icon size and then
+            * create a pixmap of that size; this requires that
+            * the application have data for several sizes of icons */
+            //...
+            // WB_icon_bitmap_bits=;WB_icon_bitmap_width=;WB_icon_bitmap_height=;
+            /* Create pixmap of depth 1 (bitmap) for icon */
+            XFree(size_list);
+        }
+
+        icon_pixmap = XCreateBitmapFromData(display, win,
+                WB_icon_bitmap_bits,WB_icon_bitmap_width,WB_icon_bitmap_height);
+        if( ssh_trace_level > 1 )
+        fprintf( stderr, "X11: %s: creation of "
+                         "icon_pixmap return %lu.\n", progname,icon_pixmap);
+        if( icon_pixmap==0 )
+            fprintf( stderr, "X11: %s: creation of "
+                             "icon_pixmap failed.\n", progname);
     }
 
-    /* Set size hints for window manager; the window manager
+    /* These calls store window_name and icon_name into
+     * XTextProperty structures and set their other fields
+     * properly */
+    char* ptrName=window_name;// TODO CHECK!>!>!>
+    if ((XStringListToTextProperty(&ptrName, 1, &windowName) == 0) )// && ssh_trace_level )
+    {
+        fprintf( stderr, "X11: %s: structure allocation for "
+                               "windowName failed.\n", progname);
+       exit(-1);return 0;
+    }
+
+    ptrName=icon_name;// TODO CHECK - icon is epty now!!!
+    if ((XStringListToTextProperty(&ptrName, 1, &iconName) == 0) )// && ssh_trace_level )
+    {
+        fprintf( stderr, "X11: %s: structure allocation for "
+                         "iconName failed.\n", progname);
+       exit(-1);return 0;
+    }
+
+    /* Set size hints for window manager:
+     * **********************************
+     * the window manager
      * may override these settings
      * Note that in a real application, if size or position
      * were set by the user, the flags would be USPosition
@@ -1021,42 +1055,23 @@ ssh_stat init_plot(ssh_natural a,ssh_natural b,ssh_natural ca,ssh_natural cb)
      * preferences for this window
      * x, y, width, and height hints are now taken from
      * the actual settings of the window when mapped; note
-     * that PPosition and PSize must be specified anyway */
+     * that PPosition and PSize must be specified anyway
+    */
     size_hints->flags =  PSize | PPosition | PMinSize;
     size_hints->min_width =  width;   /* Startup width/haight */
     size_hints->min_height = height; /* are minimal */
 
-
-    /* These calls store window_name and icon_name into
-     * XTextProperty structures and set their other fields
-     * properly */
-    char* ptrName=window_name;// TODO CHECK!>!>!>
-    if (XStringListToTextProperty(&ptrName, 1, &windowName) == 0) {
-        fprintf( stderr, "X11: %s: structure allocation for "
-                               "windowName failed.\n", progname);
-       exit(-1);return 0;
-    }
-
-    ptrName=icon_name;
-    if (XStringListToTextProperty(&ptrName, 1, &iconName) == 0) {
-        fprintf( stderr, "X11: %s: structure allocation for "
-                         "iconName failed.\n", progname);
-       exit(-1);return 0;
-    }
-
-    /* Create pixmap of depth 1 (bitmap) for icon */
-    icon_pixmap = XCreateBitmapFromData(display, win,
-            WB_icon_bitmap_bits,WB_icon_bitmap_width,WB_icon_bitmap_height);
-    if( icon_pixmap==0 )
-        fprintf( stderr, "X11: %s: creation of "
-                         "icon_pixmap failed.\n", progname);
-
-
+    /* Set window menager hints:
+     * *************************
+     */
     wm_hints->initial_state = NormalState;
     wm_hints->icon_pixmap = icon_pixmap;
     wm_hints->input = True;
     wm_hints->flags = StateHint  | InputHint | IconPixmapHint;
 
+    /* Set window class hints:
+     * ***********************
+     */
     class_hints->res_name = progname;
     class_hints->res_class = "ssh_win";//"Basicwin";
 
@@ -1064,9 +1079,7 @@ ssh_stat init_plot(ssh_natural a,ssh_natural b,ssh_natural ca,ssh_natural cb)
     XSetWMProperties( display, win,
                       &windowName,
                       &iconName,
-                      //TODO "passing argument 5 from incompatible pointer type" expected non const!!!
-                      (char**)largv,
-                      largc,
+                      (char**)largv,largc,//Without cast is "passing argument 5 from incompatible pointer type" expected non const!!!
                       size_hints,
                       wm_hints,
                       class_hints);    /* ERRORS MAY APPEAR LATER! */
@@ -1086,14 +1099,14 @@ ssh_stat init_plot(ssh_natural a,ssh_natural b,ssh_natural ca,ssh_natural cb)
     XMapWindow(display, win);
 
     opened=1;
-    if(atexit(close_plot)==0 && ssh_trace_level)
+    if( (atexit(close_plot)==0) && ssh_trace_level)
         fprintf(stderr,"X11: atexit(close_plot) installed\n");
 
-    if(signal(SIGPIPE,SigPipe)!=SIG_ERR && ssh_trace_level)
+    if( (signal(SIGPIPE,SigPipe)!=SIG_ERR) && ssh_trace_level)
         fprintf(stderr,"X11: SIGPIPE handler installed\n");
 
     XIOErrorHandler ret;
-    if(ret=XSetIOErrorHandler(MyXIOHandler) && ssh_trace_level)
+    if( (ret=XSetIOErrorHandler(MyXIOHandler)) && ssh_trace_level )
         fprintf(stderr,"X11: IOErrorHandler installed. Ret=%p\n",ret);
 
     /* Alloc pixmap for contens buffering */
@@ -2720,7 +2733,7 @@ void delay_us(ssh_natural ms)
 confused with event masks above. They start from 2 because 0 and 1
 are reserved in the protocol for errors and replies. */
 
-static char* event_names[]={
+static const char* event_names[]={
 "Event-0-error",
 "Event-1-reply",
 "KeyPress-2",
@@ -2758,9 +2771,10 @@ static char* event_names[]={
 "MappingNotify-34",
 "LASTEvent-35"};/* must-be-bigger-than-any-event */
 
-char* event_name(int code)
+const char* event_name(int code)
 {
-    if(code>=0 && code<sizeof(event_names)/sizeof(event_names[0]) )
+    if(code >= 0
+    && code < sizeof(event_names)/sizeof(event_names[0]) )
         return event_names[code];
     else
         return "Undefined";
@@ -2810,7 +2824,7 @@ ssh_stat dump_screen(const char* Filename)
 }
 /*#pragma exit close_plot*/
 /********************************************************************/
-/*              SYMSHELLLIGHT  version 2021-10-26                   */
+/*              SYMSHELLLIGHT  version 2021-11-10                   */
 /********************************************************************/
 /*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
 /*            W O J C I E C H   B O R K O W S K I                   */

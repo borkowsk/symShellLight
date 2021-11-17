@@ -80,7 +80,7 @@ void hor_arrow(int x,int y1,int y2,wb_color  color,double size=def_arrow_size);
 
 //Drukuje w obszarze nie wiekszym niz max_width. Zwraca width albo 0
 //wewnetrzny bufor ma nie wiecej niz 1024 znaki
-int print_width(int x,int y,int maxwidth,wb_color col,wb_color bcg,const char* format,...);
+int print_width(int x,int y,int maxwidth,wb_color col,wb_color bcg,const char* format ...);
 
 //Wyswietlanie pliku HTML poprzez system shell - tak naprawde to wszystkiego co moze wyswietlic przegladarka
 extern "C" { int ViewHtml(const char* URL); }//From "symshell" but less or more independent

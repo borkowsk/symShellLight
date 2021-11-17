@@ -998,7 +998,7 @@ ssh_stat init_plot(ssh_natural a,ssh_natural b,ssh_natural ca,ssh_natural cb)
 
     /* Get available icon sizes from window manager and create apriopriate bitmap */
     {   int              count;
-        XIconSize       *size_list;
+        XIconSize       *size_list=NULL;
         if((XGetIconSizes(display, RootWindow(display,screen_num),&size_list, &count) == 0)  && ssh_trace_level )
         {
             fprintf( stderr, "X11: %s: Window manager didn't set "
@@ -1013,9 +1013,11 @@ ssh_stat init_plot(ssh_natural a,ssh_natural b,ssh_natural ca,ssh_natural cb)
             //...
             // WB_icon_bitmap_bits=;WB_icon_bitmap_width=;WB_icon_bitmap_height=;
             /* Create pixmap of depth 1 (bitmap) for icon */
-            XFree(size_list);
+            if(size_list!=NULL) XFree(size_list);
         }
 
+        //May be not supported in moder window menagers?
+        //See-> https://stackoverflow.com/questions/10979412/how-to-add-an-icon-to-an-ubuntu-app
         icon_pixmap = XCreateBitmapFromData(display, win,
                 WB_icon_bitmap_bits,WB_icon_bitmap_width,WB_icon_bitmap_height);
         if( ssh_trace_level > 1 )

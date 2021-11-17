@@ -3,13 +3,13 @@
 * Napisane NIEOBIEKTOWO ale w C++
 * Jest tu: print_width() , rect(), bar3D(), cross(), *_arrow() ...itp...
 *****************************************************************************************/
-#include <assert.h>
-#include <stdio.h>
-#include <errno.h>
+#include <cassert>
+#include <cstdio>
+#include <cstdarg>
+#include <cerrno>
+#include <cstring>
+#include <cmath>
 #include <ctype.h>
-#include <string.h>
-#include <stdarg.h>
-#include <math.h>
 //#include "INCLUDE/wbminmax.hpp"
 
 #if defined(_MSC_VER)
@@ -17,7 +17,7 @@
 #pragma warning(disable : 4996) //deprecated functions
 #pragma warning(disable : 4521) //multiple copy constructor
 #pragma warning(disable : 4522) //multiple assigment operator
-//TYMCZASEM - OSTRZE¯ENIA O "conversion from 'A' to 'B', possible loss of data"
+//TYMCZASEM - OSTRZEÅ»ENIA O "conversion from 'A' to 'B', possible loss of data"
 //#pragma warning(disable : 4267)
 //#pragma warning(disable : 4244)
 #endif
@@ -25,9 +25,11 @@
 #include "symshell.h"
 #include "sshutils.hpp"
 
+using namespace std;
+
 //Drukuje w obszarze nie wiekszym niz max_width. Zwraca width albo 0
 //wewnetrzny bufor ma nie wiecej niz 1024 znaki
-int print_width(int x,int y,int maxwidth,wb_color col,wb_color bcg,const char* format,...)
+int print_width(int x,int y,int maxwidth,wb_color col,wb_color bcg,const char* format ...)
 {
 char yust='L';
 const size_t BUFSIZE=1024;
@@ -38,10 +40,10 @@ if(format[0]=='%' && format[1]=='@')//Zostal podany sposob justowania
 	yust=toupper(format[2]);
 	format+=3;
 	}
-if(strchr(format,'%')!=NULL)//Sa znaki formatujace
+if(strchr(format,'%')!=nullptr)//Sa znaki formatujace
 	{
 	va_list list;
-	va_start(list,format);
+    va_start(list,format);//??? undeclared identifier?
 	if(vsprintf(bufor,format,list)>=BUFSIZE)
 		{
 		errno=ENOMEM;
@@ -87,7 +89,7 @@ void rect(int x1,int y1,int x2,int y2,wb_color frame_c,int width)
     }
     else
     {
-        assert("NOT TESTED CODE in rect()"==NULL);
+        assert("NOT TESTED CODE in rect()"==nullptr);
     fill_rect(x1,y1,x2,y1+width,frame_c);//--->
     fill_rect(x2,y1,x2+width,y2,frame_c);//vvv
     fill_rect(x1,y2,x2,y2+width,frame_c);//<---
@@ -99,7 +101,7 @@ static settings_bar3d s,old;
 
 const settings_bar3d* bar3d_config(settings_bar3d* st)
 {
-if(st!=NULL)
+if(st!=nullptr)
 	{
 	old=s;//Zapamietuje poprzednia
 	s=*st;
@@ -224,7 +226,7 @@ void arrow(int x1,int y1,int x2,int y2,wb_color color,double size,double theta)
 	double poX=double(x2-x1);
 	if(poY==0 && poX==0)
 	{
-		//Rzadki b³¹d, ale DOMAIN ERROR!
+		//Rzadki bÅ‚Ä…d, ale DOMAIN ERROR!
 		cross((int)x1,int(y1),color,(int)(def_arrow_size/2));
 		circle((int)(x1+def_arrow_size/sqrt(2.0)),(int)(y1-def_arrow_size/sqrt(2.0)+1),(ssh_natural)(def_arrow_size),color);
 		return;	

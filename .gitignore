@@ -1,5 +1,6 @@
 # Prerequisites
 *.d
+*.*~
 
 # Compiled Object files
 *.slo
@@ -30,3 +31,20 @@
 *.exe
 *.out
 *.app
+
+# Linux executables - specific for this repository
+*X11
+*SVG
+TESTS/RawTests/native/native
+
+
+# IDE configs or cmake temporaries
+*.cmake
+CMakeFiles/
+cmake-build-debug/
+CMakeLists.txt.user
+Makefile
+
+*.cbp
+.idea/*
+.qtcreator.err

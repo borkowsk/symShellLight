@@ -1,15 +1,14 @@
 ///////////////////////////////////////////////////////////////////////////////////////////
-//                      Przykladowy program SYMSHELLA
-//-----------------------------------------------------------------------------------------
-// Zawiera funkcje replot odrysowujaca glowny wzorek oraz symulacje symulacji w postaci
-// rysowania rosnacych kolek przerywanego akcjami uzytkownika.
+///                      Przykładowy program SYMSHELL'A
+///-----------------------------------------------------------------------------------------
+/// Zawiera funkcje replot() odrysowująca główny wzorek oraz symulacje symulacji ;-)
+/// w postaci rysowania rosnących kołek przerywanego akcjami użytkownika.
 ///////////////////////////////////////////////////////////////////////////////////////////
 #include "symshell.h"
 #include <cstdlib>
 #include <cstdio>
 
-int x,y,vx,vy;
-
+int x,y,vx,vy;//Współrzędne i wektory prędkości
 
 int WB_error_enter_before_clean=1;// Wait for user in close_plot() 
 
@@ -42,7 +41,7 @@ void replot()//Repaint all screen - prymitywne ale skuteczne
     mouse_activity(old);//Ewentualna aktywacja myszy
 }
 
-/*  OGOLNA FUNKCJA MAIN */
+/*  OGÓLNA FUNKCJA MAIN */
 /************************/
 
 int main(int argc,const char* argv[])
@@ -54,9 +53,9 @@ int main(int argc,const char* argv[])
     //INICJACJA APLIKACJI
     mouse_activity(1);
     set_background(128);
-    buffering_setup(0);/* Wylaczona animacja - tu niepotrzebna */
+    buffering_setup(0);/* Wyłączona animacja, bo tu niekonieczna */
     shell_setup("SYMSHELL TEST",argc,argv);
-    printf("COLORS= 256 q-quit s-swich stdout on/off\n"
+    printf("COLORS= 256 q-quit s-switch stdout on/off\n"
            "setup options:\n"
            " -mapped -buffered -bestfont -traceevt\n"
            " + for enable\n - for disable\n ! - for check\n");
@@ -67,57 +66,57 @@ int main(int argc,const char* argv[])
         exit(1);
     }
 
-    //PETLA GLOWNA
-    while(cont)
+    while(cont) //PĘTLA GŁÓWNA
     {
         int tab;
 
-        if(input_ready())//Jesli nie ma wejscia to robi swoje
+        if(input_ready())//Jeśli nie ma wejścia to robi swoje
         {
-            tab=get_char();//Jest wejscie. Nie powinien sie tu zatrzymac. Odczytuje.
+            tab=get_char();//Jest wejście. Nie powinien się tu zatrzymać. Odczytuje.
             switch(tab)
             {
-            case '@':					//Reczne odpalanie replot()
+            case '@':					//Ręczne odpalanie replot()
             case '\r':replot();break;	//Systemowe odpalanie replot()
-            case '\b':get_mouse_event(&xpos,&ypos,&click);//Obsluga zdarzenia myszy
+            case '\b':get_mouse_event(&xpos,&ypos,&click);//Obsługa zdarzenia myszy
                 if(click&0x1)
                     set_char('X');
                 break;
-            case 's':std=!std;break;	//Obsluga echa - specyficzne dla tego przykladu
-            case 'q':					//Reczne zakonczenie aplikacji
-            case EOF:					//Systemowe zakonczenie aplikacji (Close w MSWin, Ctrl-C wX11)
+            case 's':std=!std;break;	//Obsługa echa.
+            case 'q':					//Ręczne zakończenie aplikacji
+            case EOF:					//Systemowe zakończenie aplikacji (Close w MSWin, Ctrl-C wX11)
                 cont=0;
                 break;
             }
 
-            i=0;//Reset promienia okregu
+            i=0;//Reset promienia okręgu
             if(std)//Implementacja echa
             {
                 printf("stdout<<%c\n",tab);
                 fflush(stdout);
             }
+
             printc(screen_width()-char_width('X'),
                    screen_height()-char_height('X'),
                    34,255,"%c",tab);
         }
 
-        //Robmy swoje!!!
+        //Róbmy swoje!!!
         fill_circle(xpos,ypos,(i%256+2)/2,i%256);
         i++;
         flush_plot();
     }
 
-    //Zakonczenie dzialania aplikacji
+    //Zakończenie działania aplikacji
     close_plot();
     printf("Do widzenia!!!\n");
     return 0;
 }
 /********************************************************************/
-/*              SYMSHELLLIGHT  version 2020-11-16                   */
+/*              SYMSHELLLIGHT  version 2021-11-19                   */
 /********************************************************************/
 /*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
 /*            W O J C I E C H   B O R K O W S K I                   */
-/*    Instytut Studiow Spolecznych Uniwersytetu Warszawskiego       */
+/*    Instytut Studiów Społecznych Uniwersytetu Warszawskiego       */
 /*    WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI  */
 /*    GITHUB: https://github.com/borkowsk                           */
 /*                                                                  */

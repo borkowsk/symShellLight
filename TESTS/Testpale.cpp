@@ -1,8 +1,8 @@
 ///////////////////////////////////////////////////////////////////////////////////////////
-//							Przykladowy program SYMSHELLA
-//-----------------------------------------------------------------------------------------
-//Demonstruje skalowanie okna niezalezne od aplikacyjnej strony programu
-//i robione w funkcjach symshella. Petla oblsugi zdarzen bez pracy w tle
+///							Przykładowy program SYMSHELL'A
+///-----------------------------------------------------------------------------------------
+/// Demonstruje skalowanie okna niezależne od aplikacyjnej strony programu
+/// i robione w funkcjach symshell'a. Pętla obsługi zdarzeń bez pracy w tle (TODO ???)
 ///////////////////////////////////////////////////////////////////////////////////////////
 #include "symshell.h"
 #include <cstdio>
@@ -30,8 +30,8 @@ void replot()
     mouse_activity(old);
 }
 
-/*  OGOLNA FUNKCJA MAIN */
-/************************/
+///  OGÓLNA FUNKCJA MAIN
+/// ************************
 
 int main(int argc,const char* argv[])
 {
@@ -39,27 +39,27 @@ int main(int argc,const char* argv[])
     int cont=1;//flaga kontynuacji
     int std=0;
 
-    mouse_activity(0);/*Mysz niepotrzebna */
+    mouse_activity(0);  /*Mysz niepotrzebna */
     set_background(128);
-    buffering_setup(0);/* Wylaczona animacja - tu niepotrzebna */
+    buffering_setup(0); /* Wyłączona animacja, bo tu niepotrzebna */
     shell_setup("SYMSHELL - PALETA",argc,argv);
     printf("COLORS= 256 q-quit s-swich stdout on/off\n"
            "setup options:\n"
            " -mapped -buffered -bestfont -traceevt\n"
            " + for enable\n - for disable\n ! - for check\n");
-    /*
-RANDOMIZE();
-*/
+
+    /* RANDOMIZE();*/ /* Teraz już robi się chyba samo? TODO ??? */
+
     if(!init_plot(16,16,1,1))
     {
         printf("%s\n","Can't initialize graphics");
         exit(1);
     }
 
-    while(cont)
+    while(cont) //PĘTLA GŁÓWNA
     {
         int inpt;
-        // Czekaj na wejscie
+        // Czekaj na wejście
         inpt=get_char();
         switch(inpt)
         {
@@ -88,11 +88,11 @@ RANDOMIZE();
     return 0;
 }
 /********************************************************************/
-/*              SYMSHELLLIGHT  version 2020-11-16                   */
+/*              SYMSHELLLIGHT  version 2021-11-19                   */
 /********************************************************************/
 /*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
 /*            W O J C I E C H   B O R K O W S K I                   */
-/*    Instytut Studiow Spolecznych Uniwersytetu Warszawskiego       */
+/*    Instytut Studiów Społecznych Uniwersytetu Warszawskiego       */
 /*    WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI  */
 /*    GITHUB: https://github.com/borkowsk                           */
 /*                                                                  */

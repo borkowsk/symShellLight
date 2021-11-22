@@ -1,9 +1,9 @@
-///////////////////////////////////////////////////////////////////////////////////////////
-//                      Przykladowy program SYMSHELLA
-//-----------------------------------------------------------------------------------------
-//Demonstruje skalowanie okna niezalezne od aplikacyjnej strony programu
-//i robione w funkcjach symshella. Petla oblsugi zdarzen bez pracy w tle
-///////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+///                     Przykładowy program SYMSHELL'A
+///-------------------------------------------------------------------------
+/// Demonstruje skalowanie okna niezależne od aplikacyjnej strony programu
+/// i robione w funkcjach symshell'a.
+//////////////////////////////////////////////////////////////////////////////
 #include "symshell.h"
 #include <cstdio>
 #include <cstdlib>
@@ -55,20 +55,20 @@ void replot()
     flush_plot();
 }
 
-/*  OGOLNA FUNKCJA MAIN */
+/*  OGÓLNA FUNKCJA MAIN */
 /************************/
 
 int main(int argc,const char* argv[])
 {
-    int i=0,xpos=0,ypos=0,click=0;//Myszowate
-    int cont=1;//flaga kontynuacji
-    int std=0;
+    int i=0,click=0; //xpos=0,ypos=0, to dane myszowe.
+    int cont=1; //flaga kontynuacji
+    int std=0;  //flaga użycia stdout
 
-    mouse_activity(0);/*Mysz niepotrzebna */
+    mouse_activity(0);/* Mysz niepotrzebna */
     set_background(128);
-    buffering_setup(1);/* Wlaczona animacja - tu potrzebna */
+    buffering_setup(1);/* Włączona animacja. Tu będzie potrzebna */
     shell_setup("SYMSHELL - RANDS",argc,argv);
-    printf("COLORS= 256 q-quit s-swich stdout on/off\n");
+    printf("COLORS= 256 q-quit s-switch stdout on/off\n");
 
     if(!init_plot(BOK,BOK,1,1))
     {
@@ -76,14 +76,14 @@ int main(int argc,const char* argv[])
         exit(1);
     }
 
-    while(cont)
+    while(cont)  //PĘTLA GŁÓWNA
     {
         int inpt;
-        // Czekaj na wejscie
-        while(!input_ready())
-            replot();
 
-        inpt=get_char();
+        while(!input_ready()) // Czekaj na wejście
+            replot(); // odrysowując
+
+        inpt=get_char(); //Jest wejście. Trzeba przetworzyć.
         switch(inpt)
         {
         case 's':std=!std;break;
@@ -108,11 +108,11 @@ int main(int argc,const char* argv[])
     return 0;
 }
 /********************************************************************/
-/*              SYMSHELLLIGHT  version 2020-11-16                   */
+/*              SYMSHELLLIGHT  version 2020-11-19                   */
 /********************************************************************/
 /*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
 /*            W O J C I E C H   B O R K O W S K I                   */
-/*    Instytut Studiow Spolecznych Uniwersytetu Warszawskiego       */
+/*    Instytut Studiów Społecznych Uniwersytetu Warszawskiego       */
 /*    WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI  */
 /*    GITHUB: https://github.com/borkowsk                           */
 /*                                                                  */

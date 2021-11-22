@@ -1,10 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////////////////
-//							Przykladowy program SYMSHELLA
-//-----------------------------------------------------------------------------------------
-// Demonstracja uzycia polygonow i pseudo 3D slupkow. Klikanie mysza powoduje
-// cykliczne dodawanie wielobokow do listy. Funcja replot() odrysowuje slupki
-// i poligony. Petla obslugi podobna do tej w testsyms.cxx ale oczekuje na zdazenia
-// i nie umozliwia pracy w tle (nie uzywa input_ready() )
+///							Przykładowy program SYMSHELL'A
+///-----------------------------------------------------------------------------------------
+/// Demonstracja użycia poligonów i pseudo 3D słupków. Klikanie myszą powoduje
+/// cykliczne dodawanie wieloboków do listy. Funkcja replot() odrysowuje słupki
+/// i poligony.
+/// Pętla obsługi podobna do tej w 'testsyms.cpp', ale oczekuje na zdarzenia
+/// i nie umożliwia pracy w tle (nie używa input_ready() )
 ///////////////////////////////////////////////////////////////////////////////////////////
 #include "symshell.h"
 #include <cstdio>
@@ -51,14 +52,14 @@ void slupek(int x,int y,int h,unsigned char col1,unsigned char col2)
 
     line(romb[2].x,romb[2].y,romb[3].x,romb[3].y,WHITE);
 
-} /* end  slupek */
+} /* end  slupek() */
 
 
 //Table for point list
 const int numi=100;
 struct polydata{
 		ssh_point p;
-      unsigned char color;
+        unsigned char color;
       };
 polydata list[numi];
 
@@ -87,7 +88,7 @@ void replot()
     mouse_activity(old);
 }
 
-/*  OGOLNA FUNKCJA MAIN */
+/*  OGÓLNA FUNKCJA MAIN */
 /************************/
 
 int main(int argc,const char* argv[])
@@ -98,27 +99,26 @@ int main(int argc,const char* argv[])
 
     mouse_activity(1);
     set_background(128);
-    buffering_setup(1);/* Wlaczona animacja */
+    buffering_setup(1);/* Włączona animacja */
     shell_setup("SYMSHELL TEST",argc,argv);
-    printf("COLORS= 256 q-quit s-swich stdout on/off\n"
+    printf("COLORS= 256 q-quit s-switch stdout on/off\n"
            "setup options:\n"
            " -mapped -buffered -bestfont -traceevt\n"
            " + for enable\n - for disable\n ! - for check\n");
-    /*
-RANDOMIZE();
-*/
+
+    /* RANDOMIZE();*/
+
     if(!init_plot(256,256,0,1))
     {
         printf("%s\n","Can't initialize graphics");
         exit(1);
     }
 
-
-    while(cont)
+    while(cont) //PĘTLA GŁÓWNA
     {
         char znak;
 
-        znak=get_char();/* Tutaj czeka na zdazenia - nie ma pracy w tle */
+        znak=get_char();/* Tutaj czeka na zdarzenia, więc nie ma pracy w tle */
 
         switch(znak)
         {
@@ -154,11 +154,11 @@ RANDOMIZE();
 }
 
 /********************************************************************/
-/*              SYMSHELLLIGHT  version 2020-11-16                   */
+/*              SYMSHELLLIGHT  version 2021-11-19                   */
 /********************************************************************/
 /*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
 /*            W O J C I E C H   B O R K O W S K I                   */
-/*    Instytut Studiow Spolecznych Uniwersytetu Warszawskiego       */
+/*    Instytut Studiów Społecznych Uniwersytetu Warszawskiego       */
 /*    WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI  */
 /*    GITHUB: https://github.com/borkowsk                           */
 /*                                                                  */

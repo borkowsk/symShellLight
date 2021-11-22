@@ -1,8 +1,8 @@
 ///////////////////////////////////////////////////////////////////////////////////////////
-///	                          Przykladowy program SYMSHELLA
+///	                          Przykładowy program SYMSHELLA
 ///----------------------------------------------------------------------------------------
-/// Demonstruje obsluge zdarzen myszowych.
-/// Zapamientuje punkty klikniec i potrafi odrysowac po nacisnieciu ENTER
+/// Demonstruje obsługę zdarzeń myszowych.
+/// Zapamiętuje punkty kliknięć i potrafi odrysować po naciśnięciu ENTER
 /// W tle miga napisem "Klikaj!"
 ///////////////////////////////////////////////////////////////////////////////////////////
 #include <iostream>
@@ -12,7 +12,7 @@
 #pragma warning(disable : 4996) //deprecated functions
 #pragma warning(disable : 4521) //multiple copy constructor
 #pragma warning(disable : 4522) //multiple assigment operator
-//TYMCZASEM - OSTRZE�ENIA O "conversion from 'A' to 'B', possible loss of data"
+//TYMCZASEM - OSTRZEŻENIA O "conversion from 'A' to 'B', possible loss of data"
 //#pragma warning(disable : 4267)
 //#pragma warning(disable : 4244)
 #endif
@@ -24,7 +24,7 @@ using namespace wbrtm;
 
 #define KOLOR 128
 #define WAIT 20000
-const int max_points=1024;//Ile maksymalnie punktow zapamientywac
+const int max_points=1024;//Ile maksymalnie punktów może zapamiętywać?
 
 struct point
 {
@@ -39,9 +39,9 @@ struct point
 
 wb_dynarray< point >  table(max_points);
 
-int click_index=-1;//Poczatkowy stan indeksu
+int click_index=-1;//Początkowy stan indeksu
 
-void replot()
+void replot() // Odrysowanie klikniętych punktów
 {
     int i;
     for(i=0;i<click_index;i++)
@@ -50,12 +50,11 @@ void replot()
     }
 }
 
-void read_mouse()
-//Przykladowa procedura obslugi myszy
+void read_mouse() //Przykładowa procedura obsługi myszy
 {
-    int xpos,ypos,click;
-    /* Odczytuje ostatnie zdazenie myszy */
-    if(get_mouse_event(&xpos,&ypos,&click)!=-1)
+    int xpos,ypos,click;/* dane z myszy */
+
+    if(get_mouse_event(&xpos,&ypos,&click)!=-1)    /* Odczytuje ostatnie zdarzenie myszy */
     {
         if(click_index<max_points-1)
         {
@@ -68,17 +67,17 @@ void read_mouse()
     }
 }
 
-/*  +- OGOLNA FUNKCJA MAIN */
-/************************/
+/*  +- OGÓLNA FUNKCJA MAIN  */
+/****************************/
 int main(int argc,const char* argv[])
 {
     unsigned step=0;
     unsigned xsize=320;
     unsigned ysize=200;
     mouse_activity(1);
-    shell_setup(argv[0],argc,argv);//Nazwa pliku z programem jako tytul okna!
-    cout<<"TEST OBSLUGI MYSZY W PRZENOSNEJ POWLOCE GRAFICZNEJ:\n";
-    cout<<" COLOROW= 256 q-quit\n";
+    shell_setup(argv[0],argc,argv);//Nazwa pliku z programem jako tytuł okna!
+    cout<<"TEST OBSŁUGI MYSZY W PRZENOŚNEJ POWŁOCE GRAFICZNEJ SYMSHELL'A:\n";
+    cout<<" KOLORÓW= 256 q-quit\n";
     cout.flush();
     init_plot(xsize,ysize,0,0);
 
@@ -119,13 +118,14 @@ END:
 }
 
 /* For close_plot() */
-int WB_error_enter_before_clean=0;/* Zamyka okno nie czekajac */
+int WB_error_enter_before_clean=0;/* Zamyka okno nie czekając, albo czekając (1) na ENTER. */
+
 /********************************************************************/
-/*              SYMSHELLLIGHT  version 2020-11-16                   */
+/*              SYMSHELLLIGHT  version 2021-11-19                   */
 /********************************************************************/
 /*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
 /*            W O J C I E C H   B O R K O W S K I                   */
-/*    Instytut Studiow Spolecznych Uniwersytetu Warszawskiego       */
+/*    Instytut Studiów Społecznych Uniwersytetu Warszawskiego       */
 /*    WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI  */
 /*    GITHUB: https://github.com/borkowsk                           */
 /*                                                                  */

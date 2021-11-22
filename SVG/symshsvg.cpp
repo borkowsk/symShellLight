@@ -1,15 +1,15 @@
-/* SYMSHELL - SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++      */
-/************************************************************************/
-/* Simplest graphix interface implemented for vector graphix            */
-/* SVG graphix unit                                                     */
-/* designed by W.Borkowski from University of Warsaw                    */
-/* https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI              */
-/* https://github.com/borkowsk                                          */
-/* SVG IMPLEMENTATION in file symshsvg.cpp                              */
-/* File changed massivelly: 17.11.2020                                  */
-/************************************************************************/
-/*               SYMSHELLLIGHT  version 2021-07-21                      */
-/************************************************************************/
+/** SYMSHELL - SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++     **/
+/*************************************************************************/
+/** Simplest graphics interface implemented for SVG vector graphic       */
+/** designed by W.Borkowski from University of Warsaw                    */
+/**                                                                      */
+/** https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI              */
+/** https://github.com/borkowsk                                          */
+/** SVG IMPLEMENTATION in file 'symshsvg.cpp'                            */
+/** File changed massivelly: 17.11.2020                                  */
+/*************************************************************************/
+/**               SYMSHELLLIGHT  version 2021-11-22                     **/
+/*************************************************************************/
 #include <iostream>
 #include <fstream>
 #include <cassert>
@@ -61,8 +61,9 @@ int         ssh_trace_level = 1;           //Maska poziomów śledzenia 1-msgs 2
 double      INITIAL_LENGH_RATIO = 0.001;   //Jakiej długości inicjujemy tablice operacji graficznych (mnożone przez liczbę pikseli ekranu)
 double      MAXIMAL_LENGH_RATIO = 0.999;   //Ile maksymalnie rekordów jest dopuszczalnych?//(mnożone przez liczbę pikseli ekranu)
 
-const char* GrFileOutputByExtension = "svg";//Tym mo�na sterowa� format pliku wyj�ciwego. Jak format nieznany to wyrzuca strumie� obiektowy .str
-const char* GrTmpOutputDirectory = "./";    // gdzie wrzuca� zrzuty tymczasowe
+const char* GrFileOutputByExtension = "svg";//Tym można ustalać format pliku wyjściowego.
+                                            // Jak extension nieznane, to wyrzuca strumień obiektowy '.str'
+const char* GrTmpOutputDirectory = "./";    // Ścieżka, gdzie ma wrzucać zrzuty tymczasowe
 
 unsigned    GrReloadInterval = 1000;        //Co ile czasu skrypt w pliku SVG wymusza przeładowanie. Jak 0 to w ogóle nie ma skryptu.
 bool        GrMouseActive = false;          //Myszy domyślnie nie ma, ale inny moduł może ją symulować przez linkowanie do tych zmiennych globalnych
@@ -71,7 +72,7 @@ int         GrMouseX = -1;
 int         GrMouseY = -1;
 int         GrMouseC = -1;
 
-//Jakby się chrzaniło to inny moduł może to zmienić lub od/za blokować
+//Jakby się chrzaniło, to inny moduł może to zmienić lub od/za blokować
 int         GrPrintTransparently = 0;
 int         GrLineWidth = 1;
 int         GrLineStyle = SSH_LINE_SOLID;
@@ -83,9 +84,9 @@ unsigned long    _ssh_window=0;  /* Dummy handler for check and external use */
 
 const char* SEP = "\t";
 
-/// Bez dostępu z zewnątrz modułu
-/////////////////////////////////////////////
-static const char*  ScreenTitle = "SSHSVG"; //Nazwa "okna" czyli domy�lnego pliku generowanego przez flush_plot()
+/// Zmienne 'static' czyli bez dostępu z zewnątrz modułu
+//////////////////////////////////////////////////////////
+static const char*  ScreenTitle = "SSHSVG"; //Nazwa "okna" czyli domyślnego pliku generowanego przez flush_plot()
 static char ScreenHeader[1024]="SSH SVG WINDOW";//Domyślny nagłówek pliku
 
 static ssh_color    curr_background = 0;
@@ -94,12 +95,12 @@ static unsigned     GrScreenWi = 0;
 static unsigned     GrFontHi = 14;
 static unsigned     GrFontWi = 6;
 static ssh_rgb      palette[512];
-static int          UseGrayScale = 0;  //Flaga uzycia skali szarosci - np. do wydruków
+static int          UseGrayScale = 0;  //Flaga użycia skali szarości - np. do wydruków
                                        //Ustawiana jako parametr wywołania programu
-                                       //podobnie jak opcje śledzenia i buforowania
+                                       //podobnie jak opcje śledzenia i buforowania,
                                        //ale dla skali kolorów to jedyny sposób na
                                        //włączenie
-static bool         GrClosed = true;   //Czy grafika juz/jeszcze ZAMKNIĘTA?
+static bool         GrClosed = true;   //Czy grafika już/jeszcze ZAMKNIĘTA?
 
 /// IMPLEMENTACJA
 //////////////////////
@@ -128,9 +129,9 @@ union GrOperation //Struktura do przechowywania operacji rysowania
 
     GrOperation()
     {
-        memset(this, 0, sizeof(GrOperation));//Wype�nianie zerami
+        memset(this, 0, sizeof(GrOperation));//Wypełnianie zerami
                                                 assert(empty.type == GrType::Empty);
-                                                assert(text.txt == NULL);//Powinno by� oczywiste, ale...
+                                                assert(text.txt == NULL);//Powinno być oczywiste, ale...
                                                 assert(poly.points == NULL);
     }
 
@@ -141,7 +142,7 @@ union GrOperation //Struktura do przechowywania operacji rysowania
             memset(&From, 0, sizeof(GrOperation));//Wypełnianie zerami
     }
 
-    void clean()//czysci operacje - np. gdy uznano że efekt i tak jest zasłonięty, albo clear_screen()
+    void clean()//Czyści stare operacje, np. gdy uznano, że efekt i tak jest zasłonięty, albo clear_screen(), albo end.
     {
         if (empty.type == GrType::Text && text.txt!=NULL )
             delete text.txt;
@@ -158,14 +159,14 @@ union GrOperation //Struktura do przechowywania operacji rysowania
 
 static wb_dynarray<GrOperation> GrList; //Lista operacji rysowania
 static int GrListPosition = -1;         //Aktualna pozycja na liście
-static int maxN=-1;                     //from MAXIMAL_LENGH_RATIO;
+static int maxN=-1;                     //from MAXIMAL_LENGTH_RATIO;
 
 
 static GrOperation&  NextGrListEntry()
 {
     if (++GrListPosition < GrList.get_size())
     {
-        return GrList[GrListPosition];//Zwraca dostęp do kolejnej operacji - można wpisywać informacje
+        return GrList[GrListPosition];//Zwraca dostęp do kolejnej operacji. Potem można wpisywać informacje
     }
     else //NIE MA MIEJSCA!!!
     {
@@ -174,7 +175,7 @@ static GrOperation&  NextGrListEntry()
 
         if(N<maxN)//Jeszcze można powiększyć
         {
-            //Przy powiększanniu nie chcemy użyć "expand" bo będzie wywoływać destruktory i kopiowanie!
+            //Przy powiększaniu nie chcemy użyć "expand", bo to by wywoływało destruktory i kopiowanie!
             size_t oldsize;
             GrOperation* RawPtr = GrList.give_dynamic_ptr_val(oldsize);         assert(GrList.get_size() == 0);
 
@@ -196,21 +197,19 @@ static GrOperation&  NextGrListEntry()
                 RawPtr[i].empty.type = GrType::Empty;//Wirtualne wyczyszczenie zduplikowanej zawartości
         }
 
-        return GrList[GrListPosition];//Zwraca dostęp do kolejnej operacji - pierwszej za starej listy
+        return GrList[GrListPosition];//Zwraca dostęp do kolejnej operacji, czyli pierwszej za starej listy
     }
 }
 
-
 /* OTWIERANIE i ZAMYKANIE TRYBU (OKNA) GRAFICZNEGO */
-/* Operacje konfiguracyjne o działaniu gwarantowanym przed inicjacja */
+/* Operacje konfiguracyjne o działaniu gwarantowanym przed inicjacją */
 
 void set_title(const char* window_name)
 {
     strncpy(ScreenHeader,window_name,1023);
 }
 
-void shell_setup(const char* title,int iargc,const char* iargv[])
-/* Przekazanie parametrow wywolania */
+void shell_setup(const char* title,int iargc,const char* iargv[]) /* Obsługa parametrów wywołania programu */
 {
     if(ssh_trace_level>0) //shell_setup
     {
@@ -258,19 +257,23 @@ void shell_setup(const char* title,int iargc,const char* iargv[])
         }
 }
 
+static void SetScale();  //Gdzieś tam jest funkcja ustalająca domyślną paletę kolorów indeksowanych
 
-static void SetScale(void);  //Gdzieś tam jest funkcja ustalająca domyślną paletę kolorów indeksowanych
-
+/// \brief ssh_stat init_plot() - początek pracy okna/ekranu graficznego (tu wirtualnego)
+/// \param a
+/// \param b
+/// \param ca
+/// \param cb
+/// \return ssh_stat
+/// \info inicjacja grafiki/semigrafiki
 ssh_stat init_plot(ssh_natural  a, ssh_natural   b,                 /* ile pikseli mam mieć okno */
-               ssh_natural ca, ssh_natural  cb)
-/* inicjacja grafiki/semigrafiki */
+                   ssh_natural ca, ssh_natural  cb                  /* Ile linii i kolumn znaków marginesu */
+               )
 {
-
-    //a to szerokość okna
-    //b to wysokość
+    //a to szerokość okna, b to wysokość
     //ca to miejsce na dodatkowe kolumny tekstu
     //cb to miejsce na dodatkowe wiersze tekstu
-    //... liczone wg. rozmiaru używanego fontu (nie przewidziano używania różnych rozmiarów tekstu
+    //... liczone wg. rozmiaru używanego fontu (nie przewidziano używania różnych rozmiarów tekstu)
     atexit(close_plot);
 
     if(ssh_trace_level>1) cout <<"SVG: " << _FUNCTION_NAME_ << SEP; //init_plot
@@ -281,8 +284,8 @@ ssh_stat init_plot(ssh_natural  a, ssh_natural   b,                 /* ile pikse
     GrScreenWi = a + GrFontWi* ca;  assert(a>0);
     GrScreenHi = b + GrFontHi* cb;  assert(b>0);
 
-    unsigned N = (unsigned)( ((a + ca)*(b + cb))*INITIAL_LENGH_RATIO );//Potem jest sprawdzane czy nie za małe, warning zbędny
-    maxN=(int)( ((a + ca)*(b + cb))*MAXIMAL_LENGH_RATIO );				//Potem jest sprawdzane czy nie za małe, warning zbędny
+    unsigned N = (unsigned)( ((a + ca)*(b + cb))*INITIAL_LENGH_RATIO );//Potem jest sprawdzane, czy nie za małe, warning zbędny
+    maxN=(int)( ((a + ca)*(b + cb))*MAXIMAL_LENGH_RATIO );				//Potem jest sprawdzane, czy nie za małe, warning zbędny
 
     if(N<1 || maxN<1 || N>maxN )//N lub maxN, mniejsze od 1 to ewidentny błąd
     {
@@ -307,13 +310,13 @@ ssh_stat init_plot(ssh_natural  a, ssh_natural   b,                 /* ile pikse
 
     cerr<<GrScreenWi<<"x"<<GrScreenHi<<"-N:"<<N<<":"<<maxN<<endl;
 
-    return 1;
+    return 1;//OK
 }
 
+/// /brief void close_plot() - koniec pracy
+/// zamkniecie grafiki/semigrafiki - tu grafiki wirtualnej zapisywanej do pliku
+/// Automatycznie instalowana w atexit()
 void close_plot()
-/* zamkniecie grafiki/semigrafiki */
-/* Automatycznie instalowana w atexit */
-/* zeby uniknac warningu          */
 {
     if(ssh_trace_level>1) cout <<"SVG: " << _FUNCTION_NAME_ << SEP; //close_plot
     if (GrClosed) return;
@@ -323,46 +326,65 @@ void close_plot()
     _ssh_window=0;
 }
 
+/// \brief void buffering_setup()
+/// \param Yes or No
+/// \info Przełączanie buforowanie okna. Może nie zadziałać wywołane po inicjacji
+/// W grafikach rastrowych zawartość pojawia się na ekranie albo od razu, albo po wywołaniu "flush_plot"
+/// Chodzi o lepszą jakość animacji. Jednak przy debuggingu lepiej widzieć w trakcie rysowania.
+/// W module SVG aktualnie nie robi nic poza ewentualnym wyświetleniem na konsolę śladu użycia.
 void buffering_setup(int Yes)
-/* Przelaczanie buforowanie okna - moze nie zadzialac wywo�ane po inicjacji*/
 {
-    //W grafikach rastrowych zawartość pojawia się na ekranie albo od razu, albo po wywołaniu "flush_plot"
-    //Chodzi o lepszą jakość animacji, ale przy debugingu lepiej widzieć w trakcie rysowania
     if(ssh_trace_level>1) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;       //buffering_setup
-    if(ssh_trace_level>1) cout << Yes <<SEP<<"IGNORED!"<< endl; //Nie ma sensu bo nic nie jest wyświetlane w trakcie rysowania
+    if(ssh_trace_level>1) cout << Yes <<SEP<<"IGNORED!"<< endl; //Nie ma sensu, bo nic nie jest wyświetlane w trakcie rysowania
 }
 
+/// Czy symulować niezmienność rozmiarów okna?
+/// W takim trybie zmiana wielkości okna powiększa piksele o całkowitą wielokrotność
+/// W tym module SVG aktualnie nie robi nic poza ewentualnym wyświetleniem na konsolę śladu użycia.
+/// Jak plik graficzny to funkcja nie ma znaczenia, bo go raczej nie zwiększamy spoza programu.
 void fix_size(int Yes)
-/* Czy symulować niezmiennosc rozmiarow okna */
 {
-    //W tym trybie zmiana wielko�ci okna powi�ksza pixele o ca�kowit� wielokrotno��
-    //Jak plik graficzny to nie ma znaczenia bo go raczej nie zwi�kszamy
     if(ssh_trace_level>1) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//fix_size
-    if(ssh_trace_level>1) cout << Yes << SEP << "IGNORED!" << endl;//Nie ma sensu bo zapis i tak jest wektorowy i nie ma okna
+    if(ssh_trace_level>1) cout << Yes << SEP << "IGNORED!" << endl;//Nie ma sensu, bo zapis i tak jest wektorowy i nie ma okna
 }
 
+/// \brief void delay_ms() - zawieszenie wykonania programu na pewną liczbę milisekund
+/// \param ms
+/// Wymuszenie oczekiwania przez pewną liczbę ms. -
+/// W module SVG nie ma sensu, bo taki program raczej działa w tle!
+/// Jednak trochę robimy, bo mogło chodzić o szanse na przełączenie wątków
+/// albo procesów.
 void delay_ms(unsigned ms)
-/* Wymuszenie oczekiwania przez pewn� liczb� ms - nie ma sensu bo taki program raczej działa w tle! Ale trochę robimy, bo mogło chodzić o szanse na przełączenie wątków?*/
 {
-    if(ssh_trace_level>1) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//delay_ms
-    if(ssh_trace_level>1) cout << ms << SEP << "IGNORED!" << endl;
     extern int usleep(useconds_t usec);/* takes microseconds, so you will have to multiply the input by 1000 in order to sleep in milliseconds. */
+
+    if(ssh_trace_level>1) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//delay_ms
+    if(ssh_trace_level>1) cout << ms << SEP << "usec->msec*10!" << endl;
+
     usleep(ms*10);
 }
 
+/// \brief void delay_us() - zawieszenie wykonania programu na pewną liczbę milisekund
+/// \param us
+/// Wymuszenie oczekiwania przez pewną liczbę ms. -
+/// W module SVG nie ma sensu, bo taki program raczej działa w tle!
+/// Jednak trochę robimy, bo mogło chodzić o szanse na przełączenie wątków
+/// albo procesów.
 void delay_us(unsigned us)
-/* Wymuszenie oczekiwania przez pewn� liczb� us - nie ma sensu bo taki program raczej działa w tle! Ale trochę robimy, bo mogło chodzić o szanse na przełączenie wątków?*/
 {
-    if(ssh_trace_level>1) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//delay_us
-    if(ssh_trace_level>1) cout << us << SEP << "IGNORED!" << endl;
     extern int usleep(useconds_t usec);/* takes microseconds, so you will have to multiply the input by 1000 in order to sleep in milliseconds. */
+
+    if(ssh_trace_level>1) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//delay_us
+    if(ssh_trace_level>1) cout << us << SEP << "ALWAYS 1 us!" << endl;
+
     usleep(1);
 }
 
-/* OPERACJE DOTYCZACE CALEGO OKNA GRAFICZNEGO */
+/** OPERACJE DOTYCZĄCE CAŁEGO OKNA GRAFICZNEGO /TU WIRTUALNEGO/
+ ************************************************************** */
 
+/// Ustala czy mysz ma byc obsługiwana. Zwraca poprzedni stan tego ustawienia
 int mouse_activity(ssh_mode Yes)
-/* Ustala czy mysz ma byc obslugiwana. Zwraca poprzedni stan flagi */
 {
     if(ssh_trace_level>0) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//mouse_activity
     if(ssh_trace_level>0) cout << Yes << endl;
@@ -371,17 +393,22 @@ int mouse_activity(ssh_mode Yes)
     return old;
 }
 
+/// Ustala index koloru do czyszczenia tła.
+/// Domyślne tło okna. Może nie zadziałać po inicjacji.
 void set_background(ssh_color c)
-/* Ustala index koloru do czyszczenia - domyslne tło okna - moze nie zadzialac po inicjacji*/
 {
     if(ssh_trace_level>1) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//set_background
     if(ssh_trace_level>1) cout << (ssh_color)c << endl;
     curr_background = c;
 }
 
-/* Operacje przestawiania wlasnosci pracy okna graficznego */
+/** Operacje przestawiania wlasnosci pracy okna graficznego
+ * ********************************************************* */
+
+/// Czyści ekran lub ekran wirtualny. Zależnie czy jest buforowanie czy nie.
+/// Tu nawet nie ma ekranu wirtualnego.
+/// CZYSZCZONA JEST LISTA.
 void clear_screen()
-/* Czysci ekran lub ekran wirtualny - zaleznie czy jest buforowanie czy nie - a tu nawet nie ma ekranu wirtualnego*/
 {
     if(ssh_trace_level) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//clear_screen
     if(ssh_trace_level) cout << endl;
@@ -390,7 +417,9 @@ void clear_screen()
     GrListPosition = -1; //Pusto
 }
 
-int invalidate_screen()//Cały ekran/okno zostanie zmazany
+/// Czyszczenie optymalizujące. Specjalnie dla tego modułu. W innych nie robi nic.
+/// Cały ekran/okno zostanie wirtualnie "wymazany"
+int invalidate_screen()
 {
     if(ssh_trace_level) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;
     clear_screen();
@@ -398,8 +427,11 @@ int invalidate_screen()//Cały ekran/okno zostanie zmazany
     return 1;
 }
 
+/// \brief ssh_mode     print_transparently()
+/// \param Yes
+/// \return ssh_mode - stary tryb drukowania
+/// \info Włącza drukowanie tekstu bez zamazywania tła/lub z. Zwraca ustawienie poprzednie.
 ssh_mode     print_transparently(ssh_mode Yes)
-/* Wlacza drukowanie tekstu bez zamazywania t�a. Zwraca stan poprzedni */
 {
     if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//print_transparently
     if(ssh_trace_level>2) cout << Yes << endl;
@@ -408,8 +440,9 @@ ssh_mode     print_transparently(ssh_mode Yes)
 	return old;
 }
 
+/// Ustala szerokosc linii. Moze byc kosztowne (?). Zwraca ustawienie poprzednie.
 ssh_natural     line_width(ssh_natural width)
-/* Ustala szerokosc lini - moze byc kosztowne. Zwraca stan poprzedni */
+
 {
     if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//line_width
     if(ssh_trace_level>2) cout << width << endl;
@@ -419,8 +452,9 @@ ssh_natural     line_width(ssh_natural width)
 	return old;
 }
 
+/// Ustala styl rysowania linii: SSH_LINE_SOLID, SSH_LINE_DOTTED, SSH_LINE_DASHED
+/// Zwraca ustawienie poprzednie.
 ssh_mode    line_style(ssh_mode Style)
-/* Ustala styl rysowania lini: SSH_LINE_SOLID, SSH_LINE_DOTTED, SSH_LINE_DASHED */
 {
     if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//line_style
     if(ssh_trace_level>2) cout << Style << endl;
@@ -429,19 +463,26 @@ ssh_mode    line_style(ssh_mode Style)
     return  GrLineStyle;    //Zwraca poprzedni stan
 }
 
+/// Ustala stosunek nowego rysowania do starej zawartości ekranu: SSH_SOLID_PUT,SSH_XOR_PUT
+/// Zwraca ustawienie poprzednie.
+/// W module SVG nie robi nic.
 ssh_mode    put_style(ssh_mode Style)
-/* Ustala stosunek nowego rysowania do starej zawartosci ekranu: SSH_SOLID_PUT,SSH_XOR_PUT */
 {
     if(ssh_trace_level>1) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//put_style
     if(ssh_trace_level>1) cout << Style << SEP << "IGNORED!" << endl;
     return  SSH_SOLID_PUT;  //Zwraca poprzedni stan
 }
 
+/// \brief set_rgb() - Zmienia definicje pojedynczego koloru indeksowanego
+/// \param color - indeks koloru
+/// \param r
+/// \param g
+/// \param b
+/// Zmienia definicje koloru indeksowanego o indeksie 'color' w tabeli (palecie) kolorów.
+/// Dozwolone indeksy 0..255 bo powyżej jest skala szarości.
+/// Do logowania użycia korzysta z maski poziomów śledzenia: 1-msgs 2-grafika 4-alokacje/zwalnianie
+/// extern int ssh_trace_level = 0;
 void set_rgb(ssh_color color,ssh_intensity r,ssh_intensity g,ssh_intensity b)
-// Zmienia definicje koloru indeksowanego w tabeli (palecie) kolorow.
-//Indeksy 0..255 (powy�ej jest skala szaro�ci)
-//Maska poziom�w �ledzenia 1-msgs 2-grafika 4-alokacje/zwalnianie
-//int ssh_trace_level = 0;
 {
     if ( (ssh_trace_level & 4) !=0)//alokacja/zwalnianie (4) //set_rgb
 	{
@@ -451,10 +492,17 @@ void set_rgb(ssh_color color,ssh_intensity r,ssh_intensity g,ssh_intensity b)
 	palette[color] = RGB(r,g,b);
 }
 
+/// \brief void set_gray()
+/// \param shade
+/// \param intensity
+/// Zmienia definicje pojedynczego odcienia szarości w palecie szarości.
+/// Indeksy 0-255 mapowane na 256..511
+/// Do logowania użycia korzysta z maski poziomów śledzenia: 1-msgs 2-grafika 4-alokacje/zwalnianie
+/// extern int ssh_trace_level = 0;
 void set_gray(ssh_color shade,ssh_intensity intensity)
-/* Zmiania definicje odcienia szarosci w palecie szarosci. Indeksy 256..511 */
 {
-    if ( (ssh_trace_level & 4) !=0)//alokacja/zwalnianie (4) //set_gray
+    shade%=256;
+    if ( (ssh_trace_level & 4) !=0)//alokacja/zwalnianie (4)
     {
         cout <<"SVG: " << _FUNCTION_NAME_ << SEP;
         cout << (ssh_color)shade << SEP << intensity << endl;
@@ -462,14 +510,19 @@ void set_gray(ssh_color shade,ssh_intensity intensity)
     palette[256+shade] = RGB(intensity,intensity,intensity);
 }
 
+/// \brief void set_pen() - Ustala aktualny kolor linii za pomoca typu ssh_color
+/// \param c
+/// \param width
+/// \param Style
+/// Ustala aktualny kolor linii za pomocą typu ssh_color (koloru indeksowanego)
+/// ssh_color c - jest jak dotąd zawsze traktowany jako indeks do tabeli kolorów*
+/// w których pierwsze 256 ustala się wg. jakiejś skali,
+/// a następne 256 są odcieniami szarości, domyślnie od czarnego do białego
+/// Kolory indeksowane w symshwin i symshx11 kozystają z cache'owania systemowych pisaków,
+/// Żeby było szybciej. A przynajmniej kiedyś dawało to wyraźny zysk.
+/// *ssh_color - to int32 więc ma miejsce na tryb RGB, ale nigdy nie zostało to zaimplementowane
 void set_pen(ssh_color c,ssh_natural width, ssh_mode Style)
-// Ustala aktualny kolor linii za pomoca typu ssh_color
-// ssh_color c - jest jak dot�d zawsze traktowany jako indeks do tabeli kolor�w
-// w kt�rych pierwsze 256 ustala si� wg. jakiej� skali,
-// a nastepne 256 sa odcieniami szaro�ci od czarnego do bia�ego
-// ssh_color - to int32 wi�c ma miejsce na tryb RGB, ale nigdy nie zosta�o to zaimplementowane
-// Kolory indeksowane w symshwin i symshx11 kozystaj� z cache'owania systemowych pisak�w,
-// �eby by�o szybciej (przynajmniej kiedy�)
+
 {
     if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//set_pen
     if(ssh_trace_level>2) cout << (ssh_color)c <<SEP<<width<<SEP<<  Style << endl;
@@ -479,11 +532,18 @@ void set_pen(ssh_color c,ssh_natural width, ssh_mode Style)
     GrPenColor = palette[c];
 }
 
+/// \brief void set_pen_rgb() - Ustala aktualny kolor linii za pomocą składowych RGB
+/// \param r
+/// \param g
+/// \param b
+/// \param width
+/// \param Style
+/// Ustala aktualny kolor linii za pomocą składowych RGB, oraz od razu styl, żeby nie mnożyć wywołań
+/// UWAGA DO IMPLEMENTACJI:
+/// Jeżeli kolory indeksowane korzystają z cache'owania tego samego pisaka to
+/// należy ustalić kolor aktualny na pusty np. curr_color=-1;
 void set_pen_rgb(ssh_intensity r,ssh_intensity g, ssh_intensity b,
                  ssh_natural width,ssh_mode Style)
-// Ustala aktualny kolor linii za pomoca skladowych RGB
-// Je�li kolory indeksowane kozystaj� z cache'owanie tego samego pisaka to
-// nale�y ustali� kolor aktualny na pusty np. curr_color=-1;
 {
     if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//set_pen_rgb
     if(ssh_trace_level>2) cout << r << SEP << g << SEP << b << SEP << width << SEP << Style << endl;
@@ -495,9 +555,16 @@ void set_pen_rgb(ssh_intensity r,ssh_intensity g, ssh_intensity b,
     GrPenColor.b = b & 0xff;
 }
 
+/// \brief void set_pen_rgba() - Ustala aktualny kolor linii za pomocą składowych RGBA
+/// \param r
+/// \param g
+/// \param b
+/// \param a
+/// \param width
+/// \param style
+/// Aktualnie składowa 'a' jest IGNOROWANA!
 void set_pen_rgba(ssh_intensity r,ssh_intensity g,ssh_intensity b,ssh_intensity a,
                   ssh_natural width,ssh_mode style)
-/* Ustala aktualny kolor linii za pomoca skladowych RGBA */
 {
     if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//set_pen_rgba
     if(ssh_trace_level>2) cout << r << SEP << g << SEP << b << SEP << width << SEP << style << endl;
@@ -510,20 +577,27 @@ void set_pen_rgba(ssh_intensity r,ssh_intensity g,ssh_intensity b,ssh_intensity 
   //GrPenColor.a = a & 0xff;//TODO!
 }
 
+/// \brief void set_brush() - Ustala aktualny kolor wypełnień za pomocą typu ssh_color
+/// \param c
+/// ssh_color jest jak dotąd zawsze traktowany jako indeks do tabeli, ale ma miejsce na tryb RGB
+/// W modułach Win i X11 kolory indeksowane korzystają z cache'owania systemowych pędzli,
+/// ale w SVG musi działać samo.
 void set_brush(ssh_color c)
-// Ustala aktualny kolor wypelnien za pomoca typu ssh_color
-// ssh_color c , jest jak dot�d zawsze traktowany jako indeks do tabeli, ale ma miejsce na tryb RGB
-// U mnie kolory indeksowane kozystaj� z cache'owania systemowych p�dzli, ale w SVG musi dzia�a� samo
 {
     if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//set_brush
     if(ssh_trace_level>2) cout << (ssh_color)c << endl;
     GrBrushColor = palette[c];
 }
 
+/// \brief void set_brush_rgb() - Ustala aktualny kolor wypełnień za pomocą składowych RGB
+/// \param r
+/// \param g
+/// \param b
+/// UWAGA DO IMPLEMENTACJI:
+/// Jeżeli kolory indeksowane korzystają z cache'owanie tego samego pędzla to
+/// należy ustalić kolor aktualny na pusty np. curr_fill=-1;
+/// W implementacji SVG musi działać samo.
 void set_brush_rgb(ssh_intensity r,ssh_intensity g,ssh_intensity b)
-// Ustala aktualny kolor wypelnien za pomoca skladowych RGB
-// Je�li kolory indeksowane kozystaj� z cache'owanie tego samego p�dzla to
-// nale�y ustali� kolor aktualny na pusty np. curr_fill=-1;
 {
     if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//set_brush_rgb
     if(ssh_trace_level>2) cout << r << SEP << g << SEP << b <<  endl;
@@ -532,9 +606,10 @@ void set_brush_rgb(ssh_intensity r,ssh_intensity g,ssh_intensity b)
     GrBrushColor.b = b & 0xff;
 }
 
+/// Ustala aktualny kolor wypelnień za pomocą składowych RGBA
+/// Składowa 'a' jest na razie ignorowana.
 void set_brush_rgba(ssh_intensity r,ssh_intensity g,ssh_intensity b,
                    ssh_intensity a)
-// Ustala aktualny kolor wypelnien za pomoca skladowych RGBA
 {
     if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//set_brush_rgba
     if(ssh_trace_level>2) cout << r << SEP << g << SEP << b <<  endl;
@@ -544,105 +619,120 @@ void set_brush_rgba(ssh_intensity r,ssh_intensity g,ssh_intensity b,
     //GrBrushColor.a = a & 0xff;//TODO!
 }
 
-/* ODCZYTYWYWANIE AKTUALNYCH USTAWIEN OKNA GRAFICZNEGO*/
+/** ODCZYTYWANIE AKTUALNYCH USTAWIEŃ OKNA GRAFICZNEGO
+ * **************************************************** */
+
+/// Zwraca 1 jeśli okno graficzne (lub wirtualne) jest buforowane
+/// W przypadku implementacji SVG zawsze zwraca 1
 ssh_mode  buffered()
-/* Zwraca 1 jesli buforowane */
 {
     if(ssh_trace_level>0) cout <<"SVG: " << _FUNCTION_NAME_ << SEP << "return yes==1";//buffered
     if(ssh_trace_level>0) cout << endl;
     return 1;
 }
 
+/// Czy okno ma zafiksowana wielkość?
+/// W przypadku implementacji SVG zawsze zwraca 1
 ssh_mode fixed()
-/* Czy okno ma zafiksowana wielkosc */
 {
     if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP << "return yes===1";//fixed
     if(ssh_trace_level>2) cout << endl;
     return 1;
 }
 
+/// Aktualny kolor tla...
 ssh_color background()
-/* Aktualny kolor tla... */
 {
     if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP <<"return "<< curr_background;//background
     if(ssh_trace_level>2) cout << endl;
     return curr_background;
 }
 
+/// Aktualna grubość linii
 ssh_natural get_line_width()
-/* Aktualna grubosc linii */
 {
     if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP << "return " << GrLineWidth;//get_line_width
     if(ssh_trace_level>2) cout << endl;
     return GrLineWidth;
 }
 
+/// Aktualny kolor linii jako ssh_color (indeks)
+/// W przypadku implementacji SVG zawsze zwraca -1024 (out of table!)
 ssh_color get_pen()
-/* Aktualny kolor linii jako ssh_color */
 {
     if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//get_pen
     if(ssh_trace_level>2) cout <<"IGNORED"<< endl;
-    return 255;
+    return -1024;
 }
 
+/// Aktualny kolor wypełnień jako ssh_color
+/// W przypadku implementacji SVG zawsze zwraca 0 (czarny)
+/// Dlaczego nie -1024 (out of table!) ? TODO ?
 ssh_color get_brush()
-/* Aktualny kolor wypelnien jako ssh_color */
 {
     if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//get_brush
     if(ssh_trace_level>2) cout <<"IGNORED"<< endl;
     return 0;
 }
 
+/// Aktualne rozmiary pionowe okna z init_plot po przeliczeniach
+/// ...i ewentualnych zmianach uczynionych "ręcznie" przez operatora
 ssh_natural screen_height()
-/* Aktualne rozmiary okna po przeliczeniach z init_plot*/
 {
     if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP << "return " << GrScreenHi;//screen_height
     if(ssh_trace_level>2) cout << endl;
     return GrScreenHi;
 }
 
+/// Aktualne rozmiary poziome okna z init_plot po przeliczeniach
+/// ...i ewentualnych zmianach uczynionych "ręcznie" przez operatora
 ssh_natural screen_width()
-/*  ...i ewentualnych zmianach uczynionych "recznie" przez operatora */
 {
     if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP << "return " << GrScreenWi;//screen_width
     if(ssh_trace_level>2) cout << endl;
     return GrScreenWi;
 }
 
+/// Aktualne rozmiary znaku - wysokość
+/// ...potrzebne do pozycjonowania tekstu
 ssh_natural char_height(char znak)
-/* Aktualne rozmiary znaku - wysokość */
 {
     if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP << znak << SEP << "return " << GrFontHi;//char_height
     if(ssh_trace_level>2) cout << endl;
     return GrFontHi;
 }
 
+/// Aktualne rozmiary znaku - szerokość
+/// ...potrzebne do pozycjonowania tekstu
 ssh_natural char_width(char znak)
-/* szerokość znaku - ...potrzebne do pozycjonowania tekstu */
 {
     if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP <<znak<<SEP<< "return " << GrFontWi;//char_width
     if(ssh_trace_level>2) cout << endl;
     return GrFontWi;
 }
 
+/// Aktualne rozmiary wyświetlania całego łańcucha znaków - wysokość
+/// Tu zazwyczaj może być to samo co char_height.
 ssh_natural string_height(const char* str)
-/* Aktualne rozmiary wy�wietlania ca�ego lancucha znak�w */
-/* Tu zazwyczaj mo�e by� to samo co char_width.     */
 {
     if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP ;//string_height
     if(ssh_trace_level>2) cout << str <<SEP << "return " << GrFontHi<< endl;
     return GrFontHi;
 }
 
+/// Aktualne rozmiary wyświetlania całego łańcucha znaków - szerokość
+/// W najgorszym razie odpowiednia wielokrotność char_width
+/// ...potrzebne do jego pozycjonowania */
 ssh_natural string_width(const char* str)
-/* W najgorszym razie odpowiednia wielokrotność char_width */
-/* ...potrzebne do jego pozycjonowania */
 {
     if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//string_width
     unsigned len = strlen(str);
     if(ssh_trace_level>2) cout << str << SEP << "return " << GrFontWi*len << endl;
     return GrFontWi*len;
 }
+
+//**  DO TEGO MIEJSCA POPRAWIONE **
+//*********************************
 
 /* WYPROWADZANIE TEKSTU */
 void printc(int x, int y,
@@ -1751,11 +1841,11 @@ ssh_stat	dump_screen(const char* Filename)
 }
 
 /********************************************************************/
-/*              SYMSHELLLIGHT  version 2021-07-21                   */
+/*              SYMSHELLLIGHT  version 2021-11-22                   */
 /********************************************************************/
 /*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
 /*            W O J C I E C H   B O R K O W S K I                   */
-/*    Instytut Studiow Spolecznych Uniwersytetu Warszawskiego       */
+/*    Instytut Studiów Społecznych Uniwersytetu Warszawskiego       */
 /*    WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI  */
 /*    GITHUB: https://github.com/borkowsk                           */
 /*                                                                  */

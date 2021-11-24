@@ -88,8 +88,8 @@ void replot()
     mouse_activity(old);
 }
 
-/*  OGÓLNA FUNKCJA MAIN */
-/************************/
+/*  OGÓLNA FUNKCJA MAIN  */
+/* ********************** */
 
 int main(int argc,const char* argv[])
 {
@@ -154,7 +154,7 @@ int main(int argc,const char* argv[])
 }
 
 /********************************************************************/
-/*              SYMSHELLLIGHT  version 2021-11-19                   */
+/*              SYMSHELLLIGHT  version 2021-11-24                   */
 /********************************************************************/
 /*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
 /*            W O J C I E C H   B O R K O W S K I                   */

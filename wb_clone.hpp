@@ -1,12 +1,11 @@
-/*****************************************************************************************/
-/* 	WB CLONING SUPPORT FOR ANY C++ OBJECTS  	                                         */
-/*****************************************************************************************/
-/* 
-Function for cloning strings;
-Template function for cloning scalars;
-Template class for forced cloning;
-In class pointers to char could be handled intuityvelly - by
-	contens, not by pointer value.
+/**
+*	WB CLONING SUPPORT FOR ANY C++ OBJECTS
+*****************************************************************************************
+*
+* Function for cloning strings;
+* Template function for cloning scalars;
+* Template class for forced cloning;
+* In class pointers to char could be handled intuitively - by contens, not by pointer value.
 */
 #ifndef _WB_CLONE_HPP_
 #define _WB_CLONE_HPP_
@@ -17,12 +16,13 @@ In class pointers to char could be handled intuityvelly - by
 
 #include <string.h>
 
-namespace wbrtm { //WOJCIECH BORKOWSKI RUN TIME LIBRARY
+///\namespace WOJCIECH BORKOWSKI RUN TIME LIBRARY
+namespace wbrtm {
 
+/// Kopiuje stały łańcuch znaków na stertę
+/// Zwraca NULL jeśli nie może
 inline
 char* clone_str(const char *const p)
-// Kopiuje lancuch znakow na sterte
-// Zwraca NULL jesli nie moze
 {
 char* out=NULL;
 if(p!=NULL)
@@ -32,62 +32,59 @@ if(out!=NULL)
 return out;
 }
 
-//Rozne wersje dla char*
-inline
-char* clone(char* p)
-{
-return clone_str(p);
-}
-
+///Klonowanie łańcucha znaków zgodne z szablonem funkcyjnym clone()
+///Wersje dla const char *const
 inline
 char* clone(const char *const p)
 {
-return clone_str(p);
+    return clone_str(p);
 }
 
+///Wersja dla char* nie różni się niczym. Chyba zbędna. TODO?
+inline
+char* clone(char* p)
+{
+    return clone_str(p);
+}
 
-
+/// Funkcja szablonu klonowania obiektu na stertę,
+/// Zwraca NULL jeśli nie może zaalokować.
 template<class T>
 #ifndef __BORLANDC__
-inline 			//W Borlandzie 4.X powoduje wywalke
+inline 			//W Borlandzie 4.X powoduje wywałkę :-D - a to ci stara historia!
 #endif
 T* clone(const T* p)
-// Kopiuje obiekt na sterte,
-// WYRAZENIE :) Zwraca NULL jesli nie moze!!!
 {
-return (p!=NULL?new T(*p):NULL);
+    return (p!=NULL?new T(*p):NULL);
 }
 
-//	CLASS VERSION - FIXING TYPE
-//-------------------------------
+///	CLASS VERSION (FIXING TYPE)
+/// of cloning template
 template<class T>
 class Clone
 {
-T* ptr;
+    T* ptr;
 public:
-Clone(const T* par){ ptr=new T(*par);}
-operator T* () {return ptr;}
+    Clone(const T* par){ ptr=new T(*par);}
+    operator T* () {return ptr;}
 };
 
-template<>		//New syntax
+template<>		//New syntax?
 class Clone<char>
 {
-char* ptr;
+    char* ptr;
 public:
-Clone(const char* par){ ptr=clone_str(par);}
-operator char* () {return ptr;}
+    Clone(const char *const par){ ptr=clone_str(par);}
+    operator char* () {return ptr;}
 };
 
-
-
 } //namespace
-
 /********************************************************************/
-/*              SYMSHELLLIGHT  version 2020-11-19                   */
+/*              SYMSHELLLIGHT  version 2021-11-24                   */
 /********************************************************************/
 /*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
 /*            W O J C I E C H   B O R K O W S K I                   */
-/*    Instytut Studiow Spolecznych Uniwersytetu Warszawskiego       */
+/*    Instytut Studiów Społecznych Uniwersytetu Warszawskiego       */
 /*    WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI  */
 /*    GITHUB: https://github.com/borkowsk                           */
 /*                                                                  */

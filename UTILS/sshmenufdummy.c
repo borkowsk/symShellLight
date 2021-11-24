@@ -1,68 +1,100 @@
-/* DUMMY IMPLEMENTATION FOR SYMSHELL MENU AND RELEATED FEATURES */
-/****************************************************************/
+/** DUMMY IMPLEMENTATION FOR SYMSHELL MENU AND RELATED FEATURES
+(wymagane dla prawidłowego linkowania pod X11, gdzie teraz nie ma menu)
+************************************************************************ */
+
 #include "../sshmenuf.h"
 
+/// Ustala tekst nazwy okna w jego belce
+/// \param WindowName
+/// \return return TRUE on success!
+/// \note Wygląda że stało się redundantne z nowszą funkcją set_title()
 int ssh_set_window_name(const char* WindowName)
-//Ustala tekst nazwy okna w jego belce
 {
-	return 1;
-	// SetWindowText return TRUE on success!
+	return 0;
 }
 
+/// Daje uchwyt do głównego menu
+/// \return
 ssh_menu_handle ssh_main_menu()
-// Daje uchwyt do głównego menu
 {
 	return (ssh_menu_handle)1;
 }
 
+/// Daje uchwyt do podmenu wg. pozycji
+/// \param hMenu
+/// \param Position
+/// \return
 ssh_menu_handle ssh_sub_menu(ssh_menu_handle hMenu, unsigned Position)
-// Daje uchwyt do podmenu wg. pozycji
 {
 	return (ssh_menu_handle)2;
 }
 
+/// Odnajduje pozycje itemu w jakims menu
+/// \param hMenu
+/// \param ItemName
+/// \return
 unsigned ssh_get_item_position(ssh_menu_handle hMenu, const char* ItemName)
-// Odnajduje pozycje itemu w jakims menu
 {
-	return 3;
+	return 3;//3?
 }
 
+/// Dodaje item do menu
+/// \param hMenu
+/// \param ItemName
+/// \param Message
+/// \param Flags
+/// \return
 int ssh_menu_add_item(	ssh_menu_handle hMenu,
 						const char* ItemName,
 						unsigned Message,
 						unsigned Flags)
-// Dodaje item do menu
 {
 	return 4;
 }
 
+/// Usuwa item z menu
+/// \param hMenu
+/// \param ItemCommandOrPosition
+/// \param asPosition
+/// \return
 int ssh_menu_remove_item(
 						ssh_menu_handle hMenu,
 						unsigned ItemCommandOrPosition,
 						unsigned asPosition)
-// Usuwa item z menu
 {
 	return 1;
 }
 
+/// Ustawia lub usuwa marker przy itemie
+/// \param hMenu
+/// \param Check
+/// \param ItemCommandOrPosition
+/// \param asPosition
+/// \return
 int ssh_menu_mark_item(	ssh_menu_handle hMenu,
 						unsigned Check,
 						unsigned ItemCommandOrPosition,
 						unsigned asPosition)
-// Ustawia lub usuwa marker przy itemie
 {
 	return 1;
 }
 
+/// Zapewnia, że menu będzie wyglądać zgodnie z poprzednimi poleceniami
+/// \param hMenu
+/// \return
 int ssh_realize_menu(ssh_menu_handle hMenu)
-// Zapewnia ze menu bedzie wygladac zgodnie z poprzednimi poleceniami
 {
 	return 1;
 }
 
-
+/********************************************************************/
+/*              SYMSHELLLIGHT  version 2021-11-24                   */
 /********************************************************************/
 /*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
 /*            W O J C I E C H   B O R K O W S K I                   */
+/*    Instytut Studiów Społecznych Uniwersytetu Warszawskiego       */
+/*    WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI  */
+/*    GITHUB: https://github.com/borkowsk                           */
+/*                                                                  */
 /*                               (Don't change or remove this note) */
 /********************************************************************/

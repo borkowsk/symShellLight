@@ -67,8 +67,8 @@ void read_mouse() //Przykładowa procedura obsługi myszy
     }
 }
 
-/*  +- OGÓLNA FUNKCJA MAIN  */
-/****************************/
+/*  +- OGÓLNA FUNKCJA MAIN    */
+/* ************************** */
 int main(int argc,const char* argv[])
 {
     unsigned step=0;
@@ -118,10 +118,10 @@ END:
 }
 
 /* For close_plot() */
-int WB_error_enter_before_clean=0;/* Zamyka okno nie czekając, albo czekając (1) na ENTER. */
+int WB_error_enter_before_clean=0;/* Zamyka okno, nie czekając albo jednak czekając (1) na ENTER. */
 
 /********************************************************************/
-/*              SYMSHELLLIGHT  version 2021-11-19                   */
+/*              SYMSHELLLIGHT  version 2021-11-24                   */
 /********************************************************************/
 /*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
 /*            W O J C I E C H   B O R K O W S K I                   */

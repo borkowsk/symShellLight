@@ -4,10 +4,10 @@
 # Define WINDOWS for compiling MS Windows version
 # Define WITHTESTS if you want build test applications!
 
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 2.9)
 project(symshelllight)
 
-set( X11 true) #DEFAULT
+set( X11 true ) #DEFAULT
 #set( WINDOWS true ) #NOT TESTED!
 set( WITHTESTS true )
 
@@ -204,7 +204,7 @@ endif()
 endif()
 #KONIEC - THE END
 #********************************************************************/
-#*              SYMSHELLLIGHT  version 2021-11-17                   */
+#*              SYMSHELLLIGHT  version 2021-11-25                   */
 #********************************************************************/
 #*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
 #*            W O J C I E C H   B O R K O W S K I                   */

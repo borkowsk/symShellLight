@@ -1,15 +1,26 @@
-/** SYMSHELL - SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++     **/
-/*************************************************************************/
-/** Simplest graphics interface implemented for SVG vector graphic       */
-/** designed by W.Borkowski from University of Warsaw                    */
-/**                                                                      */
-/** https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI              */
-/** https://github.com/borkowsk                                          */
-/** SVG IMPLEMENTATION in file 'symshsvg.cpp'                            */
-/** File changed massivelly: 17.11.2020                                  */
-/*************************************************************************/
-/**               SYMSHELLLIGHT  version 2021-11-22                     **/
-/*************************************************************************/
+/**            SYMSHELL: THE SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++
+ ** \brief                      SYMSHELL SVG IMPLEMENTATION
+ ** \verbatim*********************************************************************************\endverbatim
+ ** \details
+ **             Simplest graphics interface implemented for SVG vector graphics.
+ **             All graphic opperation are buffered in a large list, and write
+ **             into SVG file when flush_screen() is called.
+ **             Also dump_screen() produces SVG file.
+ **
+ ** \file 'symshsvg.cpp'
+ ** \note       This source file was changed massively: 17.11.2020, then 17.12.2021.
+ **
+ ** \verbatim*********************************************************************************\endverbatim
+ **
+ ** \author     Designed by W.Borkowski from University of Warsaw
+ **
+ ** \a          https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI
+ ** \a          https://github.com/borkowsk
+ **
+ ** \library    SYMSHELLLIGHT  version 2021-12-17
+ **
+ ** \verbatim*********************************************************************************\endverbatim
+ * */
 #include <iostream>
 #include <fstream>
 #include <cassert>
@@ -44,7 +55,6 @@ using namespace std;
 using namespace wbrtm;
 
 /// Wewnętrzne śledzenie wywołań
-//////////////////////////////////////////////////
 #if defined( _MSC_VER )
 //#define STR_HELPER(x) #x
 //#define STR(x) STR_HELPER(x)
@@ -61,7 +71,7 @@ using namespace wbrtm;
 unsigned long     PID=_getpid();
 
 /// Maska poziomów śledzenia 1-msgs 2-grafika 3-grafika detaliczna 4-alokacje/zwalnianie
-int         ssh_trace_level = 1;
+int         ssh_trace_level = 0;
 
 /// Jakiej długości inicjujemy tablice operacji graficznych (mnożone przez liczbę pikseli ekranu)
 double      INITIAL_LENGH_RATIO = 0.001;
@@ -115,28 +125,52 @@ static unsigned     GrScreenWi = 0;
 static unsigned     GrFontHi = 14;
 static unsigned     GrFontWi = 6;
 static ssh_rgb      palette[512];
-static int          UseGrayScale = 0;  //Flaga użycia skali szarości, np. do wydruków
-                                       //Ustawiana jako parametr wywołania programu
+
+/// Flaga użycia skali szarości, np. do wydruków
+static int          UseGrayScale = 0;  //Ustawiana jako parametr wywołania programu
                                        //podobnie jak opcje śledzenia i buforowania,
                                        //ale dla skali kolorów to jedyny sposób na
                                        //włączenie
-
-static bool         GrClosed = true;   //Czy grafika już/jeszcze ZAMKNIĘTA?
+/// Czy grafika już/jeszcze ZAMKNIĘTA?
+static bool         GrClosed = true;
 
 /* IMPLEMENTACJA
  * ************** */
 
-enum  GrType { Empty = 0, Point=1,LineTo=2,Line=3,Circle=4,Rect=5,Text=6,Poly=7 }; // Typy rekordów
+enum  GrType { Empty = 0, Point=1,LineTo=2,Line=3,Circle=4,Rect=5,Text=6,Poly=7,Arc=8 }; // Typy rekordów
 
-struct Empty { unsigned type : 4; unsigned mode : 4; };
-struct Point { unsigned type : 4; unsigned mode : 4; unsigned r : 8; unsigned g : 8; unsigned b : 8; unsigned x : 16; unsigned y : 16; unsigned rb : 8;  unsigned gb : 8; unsigned bb : 8; };
-struct LineTo{ unsigned type : 4; unsigned mode : 4; unsigned r : 8; unsigned g : 8; unsigned b : 8; unsigned x : 16; unsigned y : 16; unsigned w : 8; };
-struct Line  { unsigned type : 4; unsigned mode : 4; unsigned r : 8; unsigned g : 8; unsigned b : 8; unsigned x1 : 16; unsigned y1 : 16; unsigned x2 : 16; unsigned y2 : 16; unsigned w : 8; };
-struct Circle{ unsigned type : 4; unsigned mode : 4; unsigned r : 8; unsigned g : 8; unsigned b : 8; unsigned x : 16; unsigned y : 16; unsigned rx : 16; unsigned ry : 16; unsigned rf : 8; unsigned gf : 8; unsigned bf : 8; unsigned w : 8;};
-struct Rect  { unsigned type : 4; unsigned mode : 4; unsigned r : 8; unsigned g : 8; unsigned b : 8; unsigned x1 : 16; unsigned y1 : 16; unsigned x2 : 16; unsigned y2 : 16; unsigned rf : 8; unsigned gf : 8; unsigned bf : 8; unsigned w : 8;};
-struct Text  { unsigned type : 4; unsigned mode : 4; unsigned r : 8; unsigned g : 8; unsigned b : 8; unsigned x : 16; unsigned y : 16; unsigned rf : 8; unsigned gf : 8; unsigned bf : 8; char* txt; };
-struct Poly  { unsigned type : 4; unsigned mode : 4; unsigned r : 8; unsigned g : 8; unsigned b : 8; unsigned rf : 8; unsigned gf : 8; unsigned bf : 8; unsigned w : 8; ssh_point* points; unsigned size; };
+struct Empty { unsigned type : 4; unsigned mode : 2; };
+struct Point { unsigned type : 4; unsigned mode : 2; unsigned wi: 2; unsigned x :16; unsigned y :16;// weight & coordinates
+                                                     unsigned r : 8; unsigned g : 8; unsigned b : 8;/* main color */
+                                                     unsigned rb: 8; unsigned gb: 8; unsigned bb: 8;/* background color */ };
+struct LineTo{ unsigned type : 4; unsigned mode : 2; unsigned wi: 2; unsigned x :16; unsigned y :16;// weight & coordinates
+                                                     unsigned r : 8; unsigned g : 8; unsigned b : 8;/* main color */ };
+struct Line  { unsigned type : 4; unsigned mode : 2; unsigned wi: 2; unsigned x1:16; unsigned y1:16;// weight & coordinates
+                                                     unsigned r : 8; unsigned g : 8; unsigned b : 8;// main color
+                                                                     unsigned x2:16; unsigned y2:16;/* end point */ };
+struct Circle{ unsigned type : 4; unsigned mode : 2; unsigned wi: 2; unsigned x :16; unsigned y :16;// weight & coordinates
+                                                     unsigned r : 8; unsigned g : 8; unsigned b : 8;// main color
+                                                                     unsigned rx:16; unsigned ry:16;// the semi-axis of the ellipse
+                                                     unsigned rf: 8; unsigned gf: 8; unsigned bf: 8;/* secondary color */ };
+struct Arc   { unsigned type : 4; unsigned mode : 2; unsigned wi: 2; unsigned x :16; unsigned y :16;// weight & coordinates
+                                                     unsigned r : 8; unsigned g : 8; unsigned b : 8;// main color
+                                                                     unsigned rx:16; unsigned ry:16;// the semi-axis of the ellipse
+                                                                     unsigned as:16; unsigned ae:16;// start & end angles
+                                                     unsigned rf: 8; unsigned gf: 8; unsigned bf: 8;/* secondary color */ };
+struct Rect  { unsigned type : 4; unsigned mode : 2; unsigned wi: 2; unsigned x1:16; unsigned y1:16;// weight & coordinates
+                                                     unsigned r : 8; unsigned g : 8; unsigned b : 8;// main color
+                                                                     unsigned x2:16; unsigned y2:16;// end point
+                                                     unsigned rf: 8; unsigned gf: 8; unsigned bf: 8;/* secondary color */ };
+struct Poly  { unsigned type : 4; unsigned mode : 2; unsigned wi: 2; /*weight*/      unsigned si:16;// array size
+                                                     unsigned r : 8; unsigned g : 8; unsigned b : 8;// main color
+                                                     unsigned rf: 8; unsigned gf: 8; unsigned bf: 8;/* secondary color */
+                                                     ssh_point* points; };
+struct Text  { unsigned type : 4; unsigned mode : 1; unsigned sc: 3; unsigned x :16; unsigned y :16;// height & coordinates
+                                                     unsigned r : 8; unsigned g : 8; unsigned b : 8;// main color
+                                                     unsigned rf: 8; unsigned gf: 8; unsigned bf: 8;/* secondary color */
+                                                     char* txt; };
 
+///\see \a "https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths"
 union GrOperation //Struktura do przechowywania operacji rysowania
 {
     struct Empty  empty;
@@ -144,9 +178,10 @@ union GrOperation //Struktura do przechowywania operacji rysowania
     struct LineTo lineTo;
     struct Line   line;
     struct Circle circle;
+    struct Arc    arc;
     struct Rect   rect;
-    struct Text   text;
     struct Poly   poly;
+    struct Text   text;
 
     GrOperation()
     {
@@ -291,9 +326,9 @@ static void SetScale();  //Gdzieś tam jest funkcja ustalająca domyślną palet
 /// \param b : to wysokość okna
 /// \param ca : to miejsce na dodatkowe kolumny tekstu
 /// \param cb : to miejsce na dodatkowe wiersze tekstu
-/// \return (ssh_stat)1 jeśli wszystko poszło pomyślnie
+/// \return (ssh_stat)1 - o ile wszystko poszło pomyślnie
 /// \info
-///     ca i cb jest liczone wg. rozmiaru używanego fontu.
+///     'ca' i 'cb' jest liczone wg. rozmiaru używanego fontu.
 ///     (na razie nie przewidziano używania różnych rozmiarów tekstu)
 ssh_stat init_plot(ssh_natural  a, ssh_natural   b,                 /* ile pikseli mam mieć okno */
                    ssh_natural ca, ssh_natural  cb                  /* Ile linii i kolumn znaków marginesu */
@@ -309,7 +344,7 @@ ssh_stat init_plot(ssh_natural  a, ssh_natural   b,                 /* ile pikse
     GrScreenWi = a + GrFontWi* ca;  assert(a>0);
     GrScreenHi = b + GrFontHi* cb;  assert(b>0);
 
-    unsigned N = (unsigned)( ((a + ca)*(b + cb))*INITIAL_LENGH_RATIO );//Potem jest sprawdzane, czy nie za małe, warning zbędny
+    unsigned N = (unsigned)( ((a + ca)*(b + cb))*INITIAL_LENGH_RATIO ); //Potem jest sprawdzane, czy nie za małe, warning zbędny
     maxN=(int)( ((a + ca)*(b + cb))*MAXIMAL_LENGH_RATIO );				//Potem jest sprawdzane, czy nie za małe, warning zbędny
 
     if(N<1 || maxN<1 || N>maxN )//N lub maxN, mniejsze od 1 to ewidentny błąd
@@ -331,8 +366,8 @@ ssh_stat init_plot(ssh_natural  a, ssh_natural   b,                 /* ile pikse
 
     GrClosed = false;
 
-    //_ssh_window=0;//&GrList;//???
-
+    _ssh_window=(unsigned long int)&GrList;//Czy to użyteczne to nie wiadomo, ale przynajmniej nie jest 0
+                                           //co by wskazywało że inicjacja grafiki się nie powiodła
     cerr<<GrScreenWi<<"x"<<GrScreenHi<<"-N:"<<N<<":"<<maxN<<endl;
 
     return 1;//OK
@@ -480,7 +515,7 @@ ssh_natural     line_width(ssh_natural width)
     if(ssh_trace_level>2) cout << width << endl;
 	int old = GrLineWidth;
 	GrLineWidth = width;
-    if(GrLineWidth<=0) GrLineWidth=1;
+    if(GrLineWidth<0) GrLineWidth=1;
 	return old;
 }
 
@@ -562,7 +597,7 @@ void set_pen(ssh_color c,ssh_natural width, ssh_mode Style)
     if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//set_pen
     if(ssh_trace_level>2) cout << (ssh_color)c <<SEP<<width<<SEP<<  Style << endl;
     GrLineWidth = width;
-    if(GrLineWidth<=0) GrLineWidth=1;
+    if(GrLineWidth<0) GrLineWidth=1;
     GrLineStyle = Style;
     GrPenColor = palette[c];
 }
@@ -584,7 +619,7 @@ void set_pen_rgb(ssh_intensity r,ssh_intensity g, ssh_intensity b,
     if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//set_pen_rgb
     if(ssh_trace_level>2) cout << r << SEP << g << SEP << b << SEP << width << SEP << Style << endl;
     GrLineWidth = width;
-    if(GrLineWidth<=0) GrLineWidth=1;
+    if(GrLineWidth<0) GrLineWidth=1;
     GrLineStyle = Style;
     GrPenColor.r = r & 0xff;
     GrPenColor.g = g & 0xff;
@@ -606,7 +641,7 @@ void set_pen_rgba(ssh_intensity r,ssh_intensity g,ssh_intensity b,ssh_intensity 
     if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//set_pen_rgba
     if(ssh_trace_level>2) cout << r << SEP << g << SEP << b << SEP << width << SEP << style << endl;
     GrLineWidth = width;
-    if(GrLineWidth<=0) GrLineWidth=1;
+    if(GrLineWidth<0) GrLineWidth=1;
     GrLineStyle = style;
     GrPenColor.r = r & 0xff;
     GrPenColor.g = g & 0xff;
@@ -1084,7 +1119,7 @@ void line_d(ssh_coordinate x1, ssh_coordinate y1, ssh_coordinate x2, ssh_coordin
     Op.empty.type = GrType::Line;
     //struct Line   { unsigned type :3; unsigned mode :5; unsigned r :8; unsigned g :8; unsigned b :8; unsigned x1 :16; unsigned y1:16; unsigned x2 :16; unsigned y2 :16; unsigned w:8;} line;
     Op.line.mode = GrLineStyle;
-    Op.line.w = GrLineWidth;
+    Op.line.wi = GrLineWidth;
     Op.line.x1 = x1;
     Op.line.x2 = x2;
     Op.line.y1 = y1;
@@ -1111,7 +1146,7 @@ void line(int x1,int y1,int x2,int y2,ssh_color c)
     Op.empty.type = GrType::Line;
     //struct Line   { unsigned type :3; unsigned mode :5; unsigned r :8; unsigned g :8; unsigned b :8; unsigned x1 :16; unsigned y1:16; unsigned x2 :16; unsigned y2 :16; unsigned w:8;} line;
     Op.line.mode = GrLineStyle;
-    Op.line.w = GrLineWidth;
+    Op.line.wi = GrLineWidth;
     Op.line.x1 = x1;
     Op.line.x2 = x2;
     Op.line.y1 = y1;
@@ -1134,7 +1169,7 @@ void circle_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r)
     Op.empty.type = GrType::Circle;
     //struct Circle { unsigned type :4; unsigned mode :4; unsigned r :8; unsigned g :8; unsigned b :8; unsigned x  :16; unsigned y :16; unsigned ra :16; unsigned rb :16; unsigned rf :8; unsigned gf :8; unsigned bf :8;} circle;
     Op.circle.mode = 0;//NO FILL
-    Op.circle.w = GrLineWidth;
+    Op.circle.wi = GrLineWidth;
     Op.circle.r = GrPenColor.r;
     Op.circle.g = GrPenColor.g;
     Op.circle.b = GrPenColor.b;
@@ -1158,7 +1193,7 @@ void ellipse_d(ssh_coordinate x,ssh_coordinate y, ssh_natural a, ssh_natural b)
     Op.empty.type = GrType::Circle;
     //struct Circle { unsigned type :4; unsigned mode :4; unsigned r :8; unsigned g :8; unsigned b :8; unsigned x  :16; unsigned y :16; unsigned ra :16; unsigned rb :16; unsigned rf :8; unsigned gf :8; unsigned bf :8;} circle;
     Op.circle.mode = 0;//NO FILL
-    Op.circle.w = GrLineWidth;
+    Op.circle.wi = GrLineWidth;
     Op.circle.r = GrPenColor.r;
     Op.circle.g = GrPenColor.g;
     Op.circle.b = GrPenColor.b;
@@ -1185,7 +1220,7 @@ void ellipse(ssh_coordinate x,ssh_coordinate y, ssh_natural a, ssh_natural b, ss
     //                unsigned x  :16; unsigned y :16; unsigned ra :16; unsigned rb :16;
     //                unsigned rf :8; unsigned gf :8; unsigned bf :8;} circle;
     Op.circle.mode = 0;//NO FILL
-    Op.circle.w = GrLineWidth;
+    Op.circle.wi = GrLineWidth;
     Op.circle.r = palette[c].r;
     Op.circle.g = palette[c].g;
     Op.circle.b = palette[c].b;
@@ -1213,7 +1248,7 @@ void circle(ssh_coordinate x,ssh_coordinate y,ssh_natural r,ssh_color c)
     //                unsigned x  :16; unsigned y :16; unsigned ra :16; unsigned rb :16;
     //                unsigned rf :8; unsigned gf :8; unsigned bf :8;} circle;
     Op.circle.mode = 0;//NO FILL
-    Op.circle.w = GrLineWidth;
+    Op.circle.wi = GrLineWidth;
     Op.circle.r = palette[c].r;
     Op.circle.g = palette[c].g;
     Op.circle.b = palette[c].b;
@@ -1239,7 +1274,7 @@ void fill_circle_d(int x,int y,int r)
     //                unsigned x  :16; unsigned y :16; unsigned ra :16; unsigned rb :16;
     //                unsigned rf :8; unsigned gf :8; unsigned bf :8;} circle;
     Op.circle.mode = 0x1;//FILL
-    Op.circle.w = GrLineWidth;
+    Op.circle.wi = GrLineWidth;
     Op.circle.r = GrPenColor.r;//Prawdopodobnie będzie ignorowane
     Op.circle.g = GrPenColor.g;
     Op.circle.b = GrPenColor.b;
@@ -1269,7 +1304,7 @@ void fill_ellipse_d(ssh_coordinate x, ssh_coordinate y, ssh_natural a, ssh_natur
     //                unsigned x  :16; unsigned y :16; unsigned ra :16; unsigned rb :16;
     //                unsigned rf :8; unsigned gf :8; unsigned bf :8;} circle;
     Op.circle.mode = 0x1;//FILL
-    Op.circle.w = GrLineWidth;
+    Op.circle.wi = GrLineWidth;
     Op.circle.r = GrPenColor.r;//Prawdopodobnie będzie ignorowane
     Op.circle.g = GrPenColor.g;
     Op.circle.b = GrPenColor.b;
@@ -1301,7 +1336,7 @@ void fill_circle(ssh_coordinate x,ssh_coordinate y,ssh_natural r,
     //                unsigned x  :16; unsigned y :16; unsigned ra :16; unsigned rb :16;
     //                unsigned rf :8; unsigned gf :8; unsigned bf :8;} circle;
     Op.circle.mode = 0x1;//FILL
-    Op.circle.w = 0;// GrLineWidth; TAK NIEKONSEKWENTNIE SIĘ ZACHOWUJE ORYGINAŁ BITMAPOWY TODO?
+    Op.circle.wi = 0;// GrLineWidth; TAK NIEKONSEKWENTNIE SIĘ ZACHOWUJE ORYGINAŁ BITMAPOWY TODO?
     Op.circle.r = palette[c].r;//Może będzie ignorowane
     Op.circle.g = palette[c].g;
     Op.circle.b = palette[c].b;
@@ -1331,7 +1366,7 @@ void fill_ellipse(ssh_coordinate x, ssh_coordinate y, ssh_natural a, ssh_natural
     Op.empty.type = GrType::Circle;
     //struct Circle { unsigned type :4; unsigned mode :4; unsigned r :8; unsigned g :8; unsigned b :8; unsigned x  :16; unsigned y :16; unsigned ra :16; unsigned rb :16; unsigned rf :8; unsigned gf :8; unsigned bf :8;} circle;
     Op.circle.mode = 0x1;//FILL
-    Op.circle.w = 0;// GrLineWidth; TAK NIEKONSEKWENTNIE SIĘ ZACHOWUJE ORYGINAŁ BITMAPOWY TODO?
+    Op.circle.wi = 0;// GrLineWidth; TAK NIEKONSEKWENTNIE SIĘ ZACHOWUJE ORYGINAŁ BITMAPOWY TODO?
     Op.circle.r = palette[c].r;//Może będzie ignorowane?
     Op.circle.g = palette[c].g;
     Op.circle.b = palette[c].b;
@@ -1352,7 +1387,9 @@ void fill_ellipse(ssh_coordinate x, ssh_coordinate y, ssh_natural a, ssh_natural
 /// \param stop
 void arc_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r,            /*rysuje łuk kołowy o promieniu r*/
            ssh_radian start,ssh_radian stop)
-{}
+{
+    //TODO
+}
 
 /// Not implemented in SVG module
 /// \param x
@@ -1363,7 +1400,9 @@ void arc_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r,            /*rysuje 
 /// \param c
 void arc(ssh_coordinate x,ssh_coordinate y,ssh_natural r,
            ssh_radian start,ssh_radian stop,ssh_color c)               /* w kolorze c */
-{}
+{
+    //TODO
+}
 
 /// Not implemented in SVG module
 /// \param x
@@ -1375,7 +1414,9 @@ void arc(ssh_coordinate x,ssh_coordinate y,ssh_natural r,
 void earc_d(ssh_coordinate x,ssh_coordinate y,                         /*rysuje łuk eliptyczny */
             ssh_natural a,ssh_natural b,                               /* o półosiach a i b */
             ssh_radian start,ssh_radian stop)
-{}
+{
+    //TODO
+}
 
 /// Not implemented in SVG module
 /// \param x
@@ -1388,7 +1429,9 @@ void earc_d(ssh_coordinate x,ssh_coordinate y,                         /*rysuje 
 void earc(ssh_coordinate x,ssh_coordinate y,
           ssh_natural a,ssh_natural b,
           ssh_radian start,ssh_radian stop,ssh_color c)               /* w kolorze c */
-{}
+{
+    //TODO
+}
 
 /// Not implemented in SVG module
 /// \param x
@@ -1399,7 +1442,9 @@ void earc(ssh_coordinate x,ssh_coordinate y,
 /// \param pie
 void fill_arc_d(ssh_coordinate x, ssh_coordinate y, ssh_natural r,       /* wypełnia łuk kołowy o promieniu r*/
                 ssh_radian start, ssh_radian stop, ssh_bool pie)         /* początek i koniec łuku */
-{}
+{
+    //TODO
+}
 
 /// Not implemented in SVG module
 /// \param x
@@ -1411,7 +1456,9 @@ void fill_arc_d(ssh_coordinate x, ssh_coordinate y, ssh_natural r,       /* wype
 /// \param c
 void fill_arc(ssh_coordinate x, ssh_coordinate y, ssh_natural r,         /* wirtualny środek i promień łuku */
               ssh_radian start, ssh_radian stop, ssh_bool pie, ssh_color c)            /* w kolorze c */
-{}
+{
+    //TODO
+}
 
 /// Not implemented in SVG module
 /// \param x
@@ -1424,7 +1471,9 @@ void fill_arc(ssh_coordinate x, ssh_coordinate y, ssh_natural r,         /* wirt
 void fill_earc_d(ssh_coordinate x, ssh_coordinate y,                    /* wypełnia łuk eliptyczny */
                  ssh_natural a, ssh_natural b,                          /* o półosiach a i b */
                  ssh_radian start, ssh_radian stop, ssh_bool pie)                     /* początek i koniec łuku */
-{}
+{
+    //TODO
+}
 
 /// Not implemented in SVG module
 /// \param x
@@ -1438,7 +1487,9 @@ void fill_earc_d(ssh_coordinate x, ssh_coordinate y,                    /* wype�
 void fill_earc(ssh_coordinate x, ssh_coordinate y,                      /* wirtualny środek łuku */
                ssh_natural a, ssh_natural b,                            /* o półosiach a i b */
                ssh_radian start, ssh_radian stop, ssh_bool pie, ssh_color c)           /* w kolorze c */
-{}
+{
+    //TODO
+}
 
 /// Wypełnienie prostokąta kolorem rgb
 /// \param x1
@@ -1567,7 +1618,7 @@ void fill_poly_d(ssh_coordinate vx, ssh_coordinate vy,
     //if(Op.poly.points!=NULL)
     //	delete [] Op.poly.points;
     Op.poly.points= new ssh_point[number];
-    Op.poly.size=number;
+    Op.poly.si=number;
     for (unsigned i = 0; i < number; i++)
     {
         Op.poly.points[i].x = points[i].x + vx;
@@ -1608,7 +1659,7 @@ void fill_poly(ssh_coordinate vx, ssh_coordinate vy,
     //if(Op.poly.points!=NULL)
     //	delete [] Op.poly.points;
     Op.poly.points= new ssh_point[number];
-    Op.poly.size=number;
+    Op.poly.si=number;
     for (unsigned i = 0; i < number; i++)
     {
         Op.poly.points[i].x = points[i].x + vx;
@@ -1823,14 +1874,14 @@ static int _writeSTR(ostream& o)
 		case GrType::Line: {
 			o << "Line" << "\t{\t";
 			struct Line &pr = (GrList[i].line);
-			o << pr.x1 << "; " << pr.y1 << "; " << pr.x2 << "; " << pr.y2 << "; "<< pr.w << "; 0x"  <<hex<< pr.mode<<dec<< "; ";
+			o << pr.x1 << "; " << pr.y1 << "; " << pr.x2 << "; " << pr.y2 << "; "<< pr.wi << "; 0x"  <<hex<< pr.mode<<dec<< "; ";
 			o << "(" << pr.r << ',' << pr.g << ',' << pr.b << "); ";
 			o << " }" << endl;
 		};  break;
 		case GrType::Circle: {
 			o << "Circle" << "\t{\t";
 			struct Circle &pr = (GrList[i].circle);
-			o << pr.x << "; " << pr.y << "; " << pr.rx << "; " << pr.ry << "; " << pr.w << "; 0x" << hex << pr.mode << dec << "; ";
+			o << pr.x << "; " << pr.y << "; " << pr.rx << "; " << pr.ry << "; " << pr.wi << "; 0x" << hex << pr.mode << dec << "; ";
 			o << "(" << pr.r << ',' << pr.g << ',' << pr.b << "); ";
 			if (pr.mode == 1)//FILL
 				o << "(" << pr.rf << ',' << pr.gf << ',' << pr.bf << "); ";
@@ -1839,7 +1890,7 @@ static int _writeSTR(ostream& o)
 		case GrType::Rect: {
 			o << "Rect" << "\t{\t";
 			struct Rect &pr = (GrList[i].rect);
-			o << pr.x1 << "; " << pr.y1 << "; " << pr.x2 << "; " << pr.y2 << "; " << pr.w << "; 0x" << hex << pr.mode << dec << "; ";
+			o << pr.x1 << "; " << pr.y1 << "; " << pr.x2 << "; " << pr.y2 << "; " << pr.wi << "; 0x" << hex << pr.mode << dec << "; ";
 			o << "(" << pr.r << ',' << pr.g << ',' << pr.b << "); ";
 			if (pr.mode == 0x1)//FILL
 				o << "(" << pr.rf << ',' << pr.gf << ',' << pr.bf << "); ";
@@ -1858,9 +1909,9 @@ static int _writeSTR(ostream& o)
 		case GrType::Poly: {
 			o << "Poly" << "\t{\t";
 			struct Poly &pr = (GrList[i].poly);
-			o << pr.w << "; 0x" << hex << pr.mode << dec << "; " << endl;
-			o << "\t\tint2d[" << pr.size << "] {";
-			for (unsigned j = 0; j < pr.size; j++)
+			o << pr.wi << "; 0x" << hex << pr.mode << dec << "; " << endl;
+			o << "\t\tint2d[" << pr.si << "] {";
+			for (unsigned j = 0; j < pr.si; j++)
 				o << " (" << pr.points[j].x << ',' << pr.points[j].y << ")";
 			o << " }"<<endl;
 			o << "\t\t(" << pr.r << ',' << pr.g << ',' << pr.b << "); ";
@@ -1930,6 +1981,18 @@ static int _writeSVG(ostream& o)
 		switch (GrList[i].empty.type)
 		{
 		case GrType::Empty:	break;//NIE ROBI NIC!
+        case GrType::LineTo: {
+                o << "#LineTo" << "\t{\t";
+                struct LineTo &pr = (GrList[i].lineTo);
+                o << "NOT IMPLEMENTED!";
+                o << " }" << endl;
+            };  break;
+        case GrType::Arc: {
+                o << "#Arc" << "\t{\t";
+                struct Arc &pr = (GrList[i].arc);
+                o << "NOT IMPLEMENTED!";
+                o << " }" << endl;
+            };  break;
 		case GrType::Point: {
 			struct Point &pr = (GrList[i].point);
 			if (pr.mode == 0)//MoveTo
@@ -1953,17 +2016,11 @@ static int _writeSVG(ostream& o)
 					o << "/>" << endl;
 				}
 		}; break;
-		case GrType::LineTo: {
-			o << "#LineTo" << "\t{\t";
-			struct LineTo &pr = (GrList[i].lineTo);
-			o << "NOT IMPLEMENTED!";
-			o << " }" << endl;
-		};  break;
 		case GrType::Line: {
 			struct Line &pr = (GrList[i].line);
 			//o << "<line x1 =\"0\" y1=\"0\" x2=\"100\" y2=\"50\" stroke=\"blue\" stroke-width=\"6\" />" << endl;
-			o << "<line x1=\"" << pr.x1 << "px\" y1=\"" << pr.y1 << "px\" x2=\"" << pr.x2 << "px\" y2=\"" << pr.y2 << "px\" "
-			  << "stroke-width=\"" << pr.w << "px\" ";
+			o << "<line x1=\"" << pr.x1 << "px\" y1=\"" << pr.y1 << "px\" x2=\"" << pr.x2 << "px\" y2=\"" << pr.y2 << "px\" ";
+			if(pr.wi>0) o << "stroke-width=\"" << pr.wi << "px\" ";
 			o << "stroke=\"rgb(" << pr.r << ',' << pr.g << ',' << pr.b << ")\" ";//COLOR
 			//<< "; 0x" << hex << pr.mode << dec << "; ";
 			o << "/>" << endl;
@@ -1977,11 +2034,13 @@ static int _writeSVG(ostream& o)
 			else
 				o << "<ellipse rx=" << pr.rx << "px\" ry=\"" << pr.ry << "px\" ";
 
-			o << "cx=\"" << pr.x << "px\" cy=\"" << pr.y << "px\" "
-			  << "stroke-width=\"" << pr.w << "px\" ";
-			if (pr.w>0)
-				o << "stroke=\"rgb(" << pr.r << ',' << pr.g << ',' << pr.b << ")\" ";//COLOR
-			if (pr.mode == 0x1)//FILL
+			o << "cx=\"" << pr.x << "px\" cy=\"" << pr.y << "px\" ";
+
+			if (pr.wi>0)
+				o << "stroke-width=\"" << pr.wi << "px\" "<< "stroke=\"rgb(" << pr.r << ',' << pr.g << ',' << pr.b << ")\" ";//COLOR
+            else
+                o << "stroke=\"none\" ";
+            if (pr.mode == 0x1)//FILL
 				o << "fill=\"rgb(" << pr.rf << ',' << pr.gf << ',' << pr.bf << ")\" ";//FILL
 			else
 				o << "fill=\"none\" ";
@@ -1991,14 +2050,18 @@ static int _writeSVG(ostream& o)
 		case GrType::Rect: {
 			struct Rect &pr = (GrList[i].rect);
 			o << "<rect ";// x = \"140\" y=\"120\" width=\"250\" height=\"250\" rx=\"40\"
-			o << "x=\"" << pr.x1 << "px\" y=\"" << pr.y1 << "px\" width=\"" << pr.x2-pr.x1 << "px\" height=\"" << pr.y2-pr.y1 << "px\" "
-			  << "stroke-width=\"" << pr.w << "px\" ";
-			if (pr.w>0)
-				o << "stroke=\"rgb(" << pr.r << ',' << pr.g << ',' << pr.b << ")\" ";//COLOR
+			o << "x=\"" << pr.x1 << "px\" y=\"" << pr.y1 << "px\" width=\"" << pr.x2-pr.x1 << "px\" height=\"" << pr.y2-pr.y1 << "px\" ";
+
+			if (pr.wi>0)
+				o << "stroke-width=\"" << pr.wi << "px\" " << "stroke=\"rgb(" << pr.r << ',' << pr.g << ',' << pr.b << ")\" ";//COLOR
+                else
+                o << "stroke=\"none\" ";
+
 			if (pr.mode == 0x1)//FILL
 				o << "fill=\"rgb(" << pr.rf << ',' << pr.gf << ',' << pr.bf << ")\" ";//FILL
 			else
 				o << "fill=\"none\" ";
+
 			//<< "; 0x" << hex << pr.mode << dec << "; ";
 			o << "/>" << endl;
 		}; break;
@@ -2019,19 +2082,24 @@ static int _writeSVG(ostream& o)
 			o << "x = \"" << pr.x << "\" y=\"" << pr.y+ realfont << "\">"<< pr.txt <<"</text>" << endl;
 		}; break;
 		case GrType::Poly: {
-			struct Poly &pr = (GrList[i].poly);
-			//	o << "<polygon class =\"mystar\" fill=\"#3CB54A\"
-			//points=\"134.973,14.204 143.295,31.066 161.903,33.77 148.438,46.896 151.617,65.43 134.973, 56.679, 118.329, 65.43 121.507, 46.896 108.042, 33.77 126.65, 31.066\" />" << endl;
-			o << "<polygon ";
-			if (pr.mode == 0x1)//FILL
-				o << "fill=\"rgb(" << pr.rf << ',' << pr.gf << ',' << pr.bf << ")\" ";//FILL
-			else
-				o << "fill=\"none\" ";
-			o << "stroke-width=\"" << pr.w << "px\" ";
-			if(pr.w>0)
-				o << "stroke=\"rgb(" << pr.r << ',' << pr.g << ',' << pr.b << ")\" ";//COLOR IF EXIST
+            struct Poly &pr = (GrList[i].poly);
+            //	o << "<polygon class =\"mystar\" fill=\"#3CB54A\"
+            //points=\"134.973,14.204 143.295,31.066 161.903,33.77 148.438,46.896 151.617,65.43 134.973, 56.679, 118.329, 65.43 121.507, 46.896 108.042, 33.77 126.65, 31.066\" />" << endl;
+            o << "<polygon ";
+            if (pr.mode == 0x1)//FILL
+                o << "fill=\"rgb(" << pr.rf << ',' << pr.gf << ',' << pr.bf << ")\" ";//FILL
+            else
+                o << "fill=\"none\" ";
+            if (pr.wi > 0)
+            {
+                o << "stroke-width=\"" << pr.wi << "px\" ";
+                o << "stroke=\"rgb(" << pr.r << ',' << pr.g << ',' << pr.b << ")\" ";//COLOR IF EXIST
+            }
+            else
+                o << "stroke=\"none\" ";
+
 			o << "points=\"";
-			for (unsigned j = 0; j < pr.size; j++)
+			for (unsigned j = 0; j < pr.si; j++)
 					o <<" "<< pr.points[j].x << ',' << pr.points[j].y <<" ";
 			o << "\" />";
 		}; break;
@@ -2053,18 +2121,18 @@ void flush_plot()
 {
     if(GrClosed)
     {
-        cerr<<"SYMSHELL graphix not initialised"<<endl;
+        cerr<<"SYMSHELL graphics not initialised"<<endl;
         return;
     }
 
     //GrTmpOutputDirectory ?
     static unsigned flush_counter = 0;//Zliczamy
-    flush_counter++; //Ale nie uzywamy w nazwie pliku...
+    flush_counter++; //Jednak nie używamy w nazwie pliku...
     if(ssh_trace_level>0) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//flush_plot
     if(ssh_trace_level>0) cout <<'#'<< flush_counter <<SEP<< GrList.get_size() <<SEP<< GrListPosition << endl;
     wb_pchar name(MAX_PATH);
     name.prn("%s%s_%0u", GrTmpOutputDirectory,  ScreenTitle, PID );
-    dump_screen(name.get()); //Zapisuje liste operacji graficznych do pliku w ustalonym formacie
+    dump_screen(name.get()); //Zapisuje listę operacji graficznych do pliku w ustalonym formacie
 }
 
 /// Zapisuje zawartość ekranu do pliku graficznego w naturalnym formacie platformy
@@ -2117,7 +2185,7 @@ ssh_stat	dump_screen(const char* Filename)
 }
 
 /********************************************************************/
-/*              SYMSHELLLIGHT  version 2021-11-23                   */
+/*              SYMSHELLLIGHT  version 2021-12-17                   */
 /********************************************************************/
 /*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
 /*            W O J C I E C H   B O R K O W S K I                   */

@@ -1,25 +1,24 @@
-/**            SYMSHELL: THE SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++
- ** \brief                      SYMSHELL SVG IMPLEMENTATION
- ** \verbatim*********************************************************************************\endverbatim
- ** \details
+/**
+ *              SYMSHELL: THE SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++
+ *  \brief                      SYMSHELL SVG IMPLEMENTATION
+ *  \file symshsvg.cpp
+ *//* ******************************************************************************** */
+/** \details
  **             Simplest graphics interface implemented for SVG vector graphics.
- **             All graphic opperation are buffered in a large list, and write
+ **             All graphic operation are buffered in a large list, and write
  **             into SVG file when flush_screen() is called.
  **             Also dump_screen() produces SVG file.
  **
- ** \file 'symshsvg.cpp'
  ** \note       This source file was changed massively: 17.11.2020, then 17.12.2021.
  **
- ** \verbatim*********************************************************************************\endverbatim
  **
  ** \author     Designed by W.Borkowski from University of Warsaw
  **
- ** \a          https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI
- ** \a          https://github.com/borkowsk
+ ** \n          https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI
+ ** \n          https://github.com/borkowsk
  **
  ** \library    SYMSHELLLIGHT  version 2021-12-17
  **
- ** \verbatim*********************************************************************************\endverbatim
  * */
 #include <iostream>
 #include <fstream>
@@ -89,7 +88,7 @@ const char* GrTmpOutputDirectory = "./";
 /// Co ile czasu skrypt w pliku SVG wymusza przeładowanie. Jak 0 to w ogóle nie ma skryptu.
 unsigned    GrReloadInterval = 1000;
 
-/// Myszy domyślnie nie ma, ale inny moduł może ją symulować przez linkowanie do tych zmiennych globalnych
+/// Myszy w SVG domyślnie nie ma, ale inny moduł może ją symulować przez linkowanie do tych zmiennych globalnych
 bool        GrMouseActive = false;
 int         GrMouseX = -1;// Pozycja X symulowanej myszy
 int         GrMouseY = -1;// Pozycja Y symulowanej myszy
@@ -101,23 +100,26 @@ int         GrCharMessage = -2;
 /// "Dummy window" handler for check and external use
 unsigned long    _ssh_window=0;
 
-/// Ustawienia grafiki
-/// Jakby się chrzaniło, to inny moduł może to zmienić lub od/za blokować
-int         GrPrintTransparently = 0;
-int         GrLineWidth = 1;
-int         GrLineStyle = SSH_LINE_SOLID;
-
-ssh_rgb     GrPenColor = { 255,255,255};//,255 };
-ssh_rgb     GrBrushColor = { 205,205,205};//,255 };
-
 /// Separator wydruków
 const char* SEP = "\t";
 
 /* Zmienne 'static' czyli bez dostępu z zewnątrz modułu
  * **************************************************** */
 
-static const char*  ScreenTitle = "SSHSVG"; // Nazwa "okna" czyli domyślnego pliku generowanego przez flush_plot()
-static char ScreenHeader[1024]="SSH SVG WINDOW";// Domyślny nagłówek pliku
+// Nazwa "okna" czyli domyślnego pliku generowanego przez flush_plot()
+static const char*  ScreenTitle = "SSHSVG";
+
+// Domyślny nagłówek pliku
+static char ScreenHeader[1024]="SSH SVG WINDOW";
+
+// Ustawienia grafiki
+static int         GrPrintTransparently = 0;
+
+static int         GrLineWidth = 1;
+static int         GrLineStyle = SSH_LINE_SOLID;
+
+static ssh_rgb     GrPenColor = { 255,255,255};//,255 };
+static ssh_rgb     GrBrushColor = { 205,205,205};//,255 };
 
 static ssh_color    curr_background = 0;
 static unsigned     GrScreenHi = 0;
@@ -126,12 +128,12 @@ static unsigned     GrFontHi = 14;
 static unsigned     GrFontWi = 6;
 static ssh_rgb      palette[512];
 
-/// Flaga użycia skali szarości, np. do wydruków
+//  Flaga użycia skali szarości, np. do wydruków
 static int          UseGrayScale = 0;  //Ustawiana jako parametr wywołania programu
                                        //podobnie jak opcje śledzenia i buforowania,
                                        //ale dla skali kolorów to jedyny sposób na
                                        //włączenie
-/// Czy grafika już/jeszcze ZAMKNIĘTA?
+//  Czy grafika już/jeszcze ZAMKNIĘTA?
 static bool         GrClosed = true;
 
 /* IMPLEMENTACJA
@@ -170,8 +172,9 @@ struct Text  { unsigned type : 4; unsigned mode : 1; unsigned sc: 3; unsigned x 
                                                      unsigned rf: 8; unsigned gf: 8; unsigned bf: 8;/* secondary color */
                                                      char* txt; };
 
-///\see \a "https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths"
-union GrOperation //Struktura do przechowywania operacji rysowania
+/// Struktura do przechowywania operacji rysowania
+///\see \n "https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths"
+union GrOperation
 {
     struct Empty  empty;
     struct Point  point;
@@ -183,14 +186,17 @@ union GrOperation //Struktura do przechowywania operacji rysowania
     struct Poly   poly;
     struct Text   text;
 
+    /// Konstruktor domyślny
     GrOperation()
     {
         memset(this, 0, sizeof(GrOperation));//Wypełnianie zerami
-                                                assert(empty.type == GrType::Empty);
-                                                assert(text.txt == NULL);//Powinno być oczywiste, ale...
-                                                assert(poly.points == NULL);
+                                                                                    //Powinno być oczywiste, ale...
+                                                                                    assert(empty.type == GrType::Empty);
+                                                                                    assert(text.txt == NULL);
+                                                                                    assert(poly.points == NULL);
     }
 
+    /// Konstruktor kopiujący
     GrOperation(GrOperation& From)
     {
         memcpy(this,&From, sizeof(GrOperation));
@@ -198,7 +204,8 @@ union GrOperation //Struktura do przechowywania operacji rysowania
             memset(&From, 0, sizeof(GrOperation));//Wypełnianie zerami
     }
 
-    void clean()//Czyści stare operacje, np. gdy uznano, że efekt i tak jest zasłonięty, albo clear_screen(), albo end.
+    /// Czyści stare operacje, np. gdy uznano, że efekt i tak jest zasłonięty, albo clear_screen(), albo end.
+    void clean()
     {
         if (empty.type == GrType::Text && text.txt!=NULL )
             delete text.txt;
@@ -207,7 +214,8 @@ union GrOperation //Struktura do przechowywania operacji rysowania
         empty.type = GrType::Empty;
     }
 
-    ~GrOperation() //Jeżeli jest zapisany obiekt z danymi dynamicznymi to trzeba zwolnić
+    /// Destruktor. Jeżeli jest zapisany obiekt z danymi dynamicznymi to trzeba zwolnić
+    ~GrOperation()
     {
         clean();
     }
@@ -217,7 +225,7 @@ static wb_dynarray<GrOperation> GrList; //Lista operacji rysowania
 static int GrListPosition = -1;         //Aktualna pozycja na liście
 static int maxN=-1;                     //from MAXIMAL_LENGTH_RATIO;
 
-
+// Funkcja implementacyjna. Zwraca dostęp do kolejnego "entry" tablicy operacji graficznych. W razie potrzeby alokuje.
 static GrOperation&  NextGrListEntry()
 {
     if (++GrListPosition < GrList.get_size())
@@ -1667,7 +1675,7 @@ void fill_poly(ssh_coordinate vx, ssh_coordinate vy,
     }
 }
 
-/** POBIERANIE ZNAKÓW Z KLAWIATURY i ZDARZEŃ OKIENNYCH (w tym z MENU)
+/** POBIERANIE ZNAKÓW Z KLAWIATURY i ZDARZEŃ OKIENNYCH (w tym z MENU)\n
 
 Normalnie są to znaki skierowane do okna graficznego i nie związane ze
 strumieniem wejściowym. W przypadku implementacji na pliku graficznym
@@ -1676,7 +1684,7 @@ elastyczny byłby "named pipe" o nazwie zależnej od PID
 i nazwy pliku wykonywalnego
  **/
 
-/// Funkcja sprawdza czy jest do odczytania jakieś zdarzenie wejściowe
+/// \brief Funkcja sprawdza czy jest do odczytania jakieś zdarzenie wejściowe
 /// \return SSH_YES or SSH_NO
 ssh_mode input_ready()
 {
@@ -1687,7 +1695,7 @@ ssh_mode input_ready()
         return SSH_NO;
 }
 
-/// Funkcja odczytywania znaków sterowania i zdarzen
+/// Funkcja odczytywania znaków sterowania i zdarzeń
 /// \return znak, jak nie ma czego zwrócić to zwraca neutralne 0.
 /// \implementation
 /// W module SVG nigdy nie staje na tej funkcji, jak przy zwykłym oknie
@@ -1762,7 +1770,7 @@ ssh_stat repaint_area(int* x,int* y,unsigned* width,unsigned* height)
 
 /// Jakie są ustawienia RGB konkretnego koloru w palecie
 /// \param c : indeks koloru (0..511)
-/// \return
+/// \return kolor w formacie rbg
 ssh_rgb get_rgb_from(ssh_color c)
 {
 	ssh_rgb pom;
@@ -1771,8 +1779,8 @@ ssh_rgb get_rgb_from(ssh_color c)
 	return pom;
 }
 
-//Wewnętrzna implementacja termicznej skali kolorów,
-//czyli wypełnienie palety rgb dla kolorów indeksowanych
+// Wewnętrzna implementacja termicznej skali kolorów,
+// czyli wypełnienie palety rgb dla kolorów indeksowanych
 static void SetScale()
 {
 #ifndef M_PI
@@ -1834,15 +1842,15 @@ static void SetScale()
         }
     }
 
-    set_rgb(255,255,255,255); //Zazwyczaj oczekuje ze kolor 255 to biały, albo chociaż jasny
+    set_rgb(255,255,255,255); //Zazwyczaj oczekuje, że kolor 255 to biały albo chociaż jasny
 }
 
-/* NAJWAŻNIEJSZE FUNKCJE - ZAPIS INFORMACJI DO PLIKU W FORMACIE WEKTOROWYM
- * *********************************************************************** */
+/* NAJWAŻNIEJSZE FUNKCJE WEWNĘTRZNE - ZAPIS INFORMACJI DO PLIKU W FORMACIE WEKTOROWYM
+ * ********************************************************************************** */
 
-/// Zapisuje w formacie "C++stream"
-/// \param o : jakiś wyjściowy strumień C++
-/// \return 0 chyba że coś padło
+// Zapisuje w formacie "C++stream"
+// \param o : jakiś wyjściowy strumień C++
+// \return 0 chyba że coś padło
 static int _writeSTR(ostream& o)
 {
     extern const char* GrFileOutputByExtension;// = "str";//Tym można sterować format pliku wyjściowego. Jak format nieznany to wyrzuca strumień obiektowy .str
@@ -1927,9 +1935,9 @@ static int _writeSTR(ostream& o)
 	return 0;
 }
 
-/// Zapisuje w formacie SVG
-/// \param o : jakiś wyjściowy strumień C++
-/// \return 0 chyba że coś padło
+// Zapisuje w formacie SVG
+// \param o : jakiś wyjściowy strumień C++
+// \return 0, chyba że coś padło
 static int _writeSVG(ostream& o)
 {
     extern const char* GrFileOutputByExtension;// = "str";//Tym można sterować format pliku wyjściowego. Jak format nieznany to wyrzuca strumień obiektowy .str
@@ -2184,15 +2192,15 @@ ssh_stat	dump_screen(const char* Filename)
     return ret;
 }
 
-/********************************************************************/
-/*              SYMSHELLLIGHT  version 2021-12-17                   */
-/********************************************************************/
-/*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
-/*            W O J C I E C H   B O R K O W S K I                   */
-/*    Instytut Studiów Społecznych Uniwersytetu Warszawskiego       */
-/*    WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI  */
-/*    GITHUB: https://github.com/borkowsk                           */
-/*                                                                  */
-/*                               (Don't change or remove this note) */
-/********************************************************************/
+/* *******************************************************************/
+/*              SYMSHELLLIGHT  version 2022-01-03                    */
+/* *******************************************************************/
+/*            THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
+/*             W O J C I E C H   B O R K O W S K I                   */
+/*     Instytut Studiów Społecznych Uniwersytetu Warszawskiego       */
+/*     WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI  */
+/*     GITHUB: https://github.com/borkowsk                           */
+/*                                                                   */
+/*                                (Don't change or remove this note) */
+/* *******************************************************************/
 

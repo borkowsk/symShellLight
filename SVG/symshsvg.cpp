@@ -269,16 +269,16 @@ static GrOperation&  NextGrListEntry()
 /* Operacje konfiguracyjne o działaniu gwarantowanym przed inicjacją */
 
 /// \brief Ustalanie innego tytułu okna niż nazwa aplikacji
-/// \param window_name
+/// \param [in] window_name
 void set_title(const char* window_name)
 {
     strncpy(ScreenHeader,window_name,1023);
 }
 
 /// \brief Obsługa parametrów wywołania programu
-/// \param title : nazwa okna i aplikacji
-/// \param iargc : liczba parametrów wywołania main()
-/// \param iargv : tablica parametrów wywołania z main()
+/// \param [in] title nazwa okna i aplikacji
+/// \param [in] iargc liczba parametrów wywołania main()
+/// \param [in] iargv tablica parametrów wywołania z main()
 void shell_setup(const char* title,int iargc,const char* iargv[])
 {
     if(ssh_trace_level>0) //shell_setup
@@ -335,7 +335,7 @@ static void SetScale();  //Gdzieś tam jest funkcja ustalająca domyślną palet
 /// \param ca : to miejsce na dodatkowe kolumny tekstu
 /// \param cb : to miejsce na dodatkowe wiersze tekstu
 /// \return (ssh_stat)1 - o ile wszystko poszło pomyślnie
-/// \info
+/// \details
 ///     'ca' i 'cb' jest liczone wg. rozmiaru używanego fontu.
 ///     (na razie nie przewidziano używania różnych rozmiarów tekstu)
 ssh_stat init_plot(ssh_natural  a, ssh_natural   b,                 /* ile pikseli mam mieć okno */
@@ -398,10 +398,10 @@ void close_plot()
 
 /// \brief Przełączanie buforowanie okna. Może nie zadziałać wywołane po inicjacji
 /// \param Yes (or No)
-/// \info
+/// \details
 /// W grafikach rastrowych zawartość pojawia się na ekranie albo od razu, albo po wywołaniu "flush_plot".
 /// Chodzi o lepszą jakość animacji. Jednak przy debuggingu lepiej widzieć w trakcie rysowania.
-/// \implementation W module SVG aktualnie nie robi nic poza ewentualnym wyświetleniem na konsolę śladu użycia.
+/// \warning W module SVG aktualnie nie robi nic poza ewentualnym wyświetleniem na konsolę śladu użycia.
 void buffering_setup(int Yes)
 {
     if(ssh_trace_level>1) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;       //buffering_setup
@@ -642,7 +642,7 @@ void set_pen_rgb(ssh_intensity r,ssh_intensity g, ssh_intensity b,
 /// \param width
 /// \param style
 ///
-/// \info W module SVG składowa 'a' jest IGNOROWANA!
+/// \details W module SVG składowa 'a' jest IGNOROWANA!
 void set_pen_rgba(ssh_intensity r,ssh_intensity g,ssh_intensity b,ssh_intensity a,
                   ssh_natural width,ssh_mode style)
 {
@@ -660,7 +660,7 @@ void set_pen_rgba(ssh_intensity r,ssh_intensity g,ssh_intensity b,ssh_intensity 
 /// \brief Ustala aktualny kolor wypełnień za pomocą typu ssh_color
 /// \param c
 ///
-/// \info ssh_color jest jak dotąd zawsze traktowany jako indeks do tabeli, ale ma miejsce na tryb RGB
+/// \details ssh_color jest jak dotąd zawsze traktowany jako indeks do tabeli, ale ma miejsce na tryb RGB
 /// W modułach Win i X11 kolory indeksowane korzystają z cache'owania systemowych pędzli,
 /// ale w SVG musi działać samo.
 void set_brush(ssh_color c)
@@ -1508,7 +1508,7 @@ void fill_earc(ssh_coordinate x, ssh_coordinate y,                      /* wirtu
 /// \param g : składowa 'g' wypełnienia
 /// \param b : składowa 'b' wypełnienia
 ///
-/// \info Prostokąt jest rozciągnięty między rogami x1y1 a x2y2
+/// \details Prostokąt jest rozciągnięty między rogami x1y1 a x2y2
 void fill_rect_rgb(ssh_coordinate x1,ssh_coordinate y1,
                    ssh_coordinate x2,ssh_coordinate y2,
                    ssh_intensity r,ssh_intensity g,ssh_intensity b)  /* w kolorze rbg określonym składowymi koloru */
@@ -1541,7 +1541,7 @@ void fill_rect_rgb(ssh_coordinate x1,ssh_coordinate y1,
 /// \param x2
 /// \param y2
 ///
-/// \info Prostokąt jest rozciągnięty między rogami x1y1 a x2y2
+/// \details Prostokąt jest rozciągnięty między rogami x1y1 a x2y2
 void fill_rect_d(ssh_coordinate x1, ssh_coordinate y1, ssh_coordinate x2, ssh_coordinate y2)
 {
     if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//fill_rect_d
@@ -1573,7 +1573,7 @@ void fill_rect_d(ssh_coordinate x1, ssh_coordinate y1, ssh_coordinate x2, ssh_co
 /// \param y2
 /// \param c : kolor z palety
 ///
-/// \info Prostokąt jest rozciągnięty między rogami x1y1 a x2y2
+/// \details Prostokąt jest rozciągnięty między rogami x1y1 a x2y2
 void fill_rect(ssh_coordinate x1, ssh_coordinate y1, ssh_coordinate x2, ssh_coordinate y2, ssh_color c)
 {
     if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//fill_rect
@@ -1697,7 +1697,7 @@ ssh_mode input_ready()
 
 /// Funkcja odczytywania znaków sterowania i zdarzeń
 /// \return znak, jak nie ma czego zwrócić to zwraca neutralne 0.
-/// \implementation
+/// \details
 /// W module SVG nigdy nie staje na tej funkcji, jak przy zwykłym oknie
 ssh_msg get_char()
 {
@@ -1716,7 +1716,7 @@ ssh_msg get_char()
 /// Odesłanie znaku na wejście
 /// \param c : znak
 /// \return  Zwraca 0 jeśli nie ma miejsca
-/// \info Pewne jest tylko odesłanie jednego znaku
+/// \details Pewne jest tylko odesłanie jednego znaku
 ssh_stat set_char(ssh_msg c)
 {
     if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP << c << endl;//set_char
@@ -1734,7 +1734,7 @@ ssh_stat set_char(ssh_msg c)
 /// \param ypos : miejsce na wpisanie pozycji Y
 /// \param click : miejsce na ewentualny indeks klikniętego przycisku
 /// \return 1 jeśli są jakieś dane, 0 jeśli mysz nieaktywna
-/// \info  Można odczytać kiedykolwiek, ale sens ma tylko gdy get_char() zwróciło znak '\\b'
+/// \details  Można odczytać kiedykolwiek, ale sens ma tylko gdy get_char() zwróciło znak '\\b'
 ssh_stat get_mouse_event(ssh_coordinate *xpos, ssh_coordinate *ypos, ssh_coordinate *click)
 {
     if(ssh_trace_level>1) cout <<"SVG: " << _FUNCTION_NAME_ << endl;//get_mouse_event

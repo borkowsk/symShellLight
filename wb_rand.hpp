@@ -1,14 +1,16 @@
-/** PODSTAWOWE KLASY GENERATORÓW LICZB PSEUDOLOSOWYCH
-*********************************************************
-* \INTERFACE
-* RandomGenerator
-* \IMPLEMENTATIONS
-* RandG	- Random generator wrote in C based on "Numerical Recipes"
-* RandSTDC	- Random generator build in standard C
+/** \file wb_rand.hpp
+*  \brief BASIC CLASSES OF PSEUDORANDOM NUMBER GENERATORS
+*  \author Wojciech Borkowski @ Instytut Studiów Społecznych UW
+*  \details
+* \n RandomGenerator - interface to random generators
+* \n RandSTDC	- Random generator build in standard C
+* \n RandG	- Random generator wrote in C based on "Numerical Recipes"
+*/
+/*
 * \OBSOLETE
-* RandBSD	- Random generator from BSD UNIX
-* RandSVR4 - Random generator from System V UNIX
-**/
+* \n RandBSD	- Random generator from BSD UNIX
+* \n RandSVR4 - Random generator from System V UNIX
+*/
 #ifndef __cplusplus
 #error Only C++ supported!!!
 #endif
@@ -25,44 +27,37 @@
 
 extern "C"
 {
-    long  my_rand(); //(MUTEXOWE ZABEZPIECZONE TODO!?) ::rand() na wielowątkowość
-    float	randg(); //(MUTEXOWE ZABEZPIECZONY TODO!?) Numerical Recipes random number generator
-	void	srandg(short int);  /* Seed setting for generator */
-	float	randnorm();			/* Normalised output of randg */
-	float	randexp();			/* Exponential output of randg */
+    long    my_rand(); /**< (MUTEX-OWO PROTECTED) :: rand () for multithreaded programs */
+    float	randg();   /**< Numerical Recipes random number generator (TODO MUTEX-OWE ZABEZPIECZENIE) */
+	void	srandg(short int);  /**< Seed setting for generator */
+	float	randnorm();			/**< Normalised output of randg */
+	float	randexp();			/**< Exponential output of randg */
 }
 
-/// Interfejs klasy generatora liczb losowych
+/// Random number generator class interface
 class RandomGenerator
 {
 public:
     ///Max Value that can be returned from Rand()
-	virtual 
-		unsigned long RandomMax()=0;
+	virtual unsigned long RandomMax()=0;
 
     ///Returned unsigned long from 0 to RandomMax
-	virtual 
-		unsigned long Rand()=0;
+	virtual unsigned long Rand()=0;
 
     ///Returned unsigned long from 0 to i
-	virtual 
-		unsigned long Random(unsigned long i)=0;
+	virtual unsigned long Random(unsigned long i)=0;
 
     ///Returned double from <0 to 1)
-	virtual
-		double		  DRand()=0;
+	virtual double		  DRand()=0;
 
     ///Initialisation for well defined repeatable sequence
-    virtual
-		void		  Seed(unsigned long i)=0;
+    virtual void		  Seed(unsigned long i)=0;
 
     ///Initialisation for random selected sequence
-    virtual
-		void		  Reset()=0;
+    virtual void		  Reset()=0;
 };
 
-/// Specjalizacja generatora losowego używająca funkcji randg()
-/// randg jest zabezpieczone mutexem (?)
+/// Random generator specialization using the randg () function. \details randg is (?) secured with a mutex.
 class RandG: public RandomGenerator
 {
 public:
@@ -106,7 +101,7 @@ public:
 	
 };
 
-///Specjalizacja generatora losowego używająca standardowego generator języka C
+/// A random generator specialization that uses the standard C language generator
 class RandSTDC: public RandomGenerator
 {
 public:
@@ -142,12 +137,12 @@ public:
 	
 };
 
-extern RandG TheRandG;
-extern RandSTDC TheRandSTDC;
+extern RandG    TheRandG;             ///< ready to use generator using randg()
+extern RandSTDC TheRandSTDC;          ///< ready to use generator using standard rand()
 
-/********************************************************************/
-/*              SYMSHELLLIGHT  version 2021-11-24                   */
-/********************************************************************/
+/* ******************************************************************/
+/*              SYMSHELLLIGHT  version 2022-01-04                   */
+/* ******************************************************************/
 /*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
 /*            W O J C I E C H   B O R K O W S K I                   */
 /*    Instytut Studiów Społecznych Uniwersytetu Warszawskiego       */
@@ -155,7 +150,7 @@ extern RandSTDC TheRandSTDC;
 /*    GITHUB: https://github.com/borkowsk                           */
 /*                                                                  */
 /*                               (Don't change or remove this note) */
-/********************************************************************/
+/* ******************************************************************/
 #endif
 
 

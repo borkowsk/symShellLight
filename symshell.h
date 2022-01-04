@@ -1,6 +1,7 @@
-/**       SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++          */
-/* *********************************************************************/
 /** \file SYMSHELL.H                                                    *
+ *        SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++          */
+/* **********************************************************************/
+/**                                                                     *
  * \author W.Borkowski from University of Warsaw                        *
  * \n https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI           *
  * \n https://github.com/borkowsk                                       */
@@ -11,7 +12,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-const unsigned  PALETE_LENGHT=512;/**< Długość palety predefiniowanych kolorów */
+const unsigned  PALETE_LENGHT=512;                /**< Długość palety predefiniowanych kolorów */
 const unsigned  SSH_SOLID_TEXT=0;
 const unsigned  SSH_TRANSPARENT_TEXT=1;
 const unsigned  SSH_SOLID_PUT=1;

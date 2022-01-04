@@ -1,45 +1,45 @@
-// Klasa stopera liczacego czas CPU od momentu
-// utworzenia lub wywolania reset() do chwili pobrania
-// wartosci za pomoca "operator double()"
-/////////////////////////////////////////////////////////
+/// \file wb_cpucl.hpp
+// ///////////////////
+/// \class wb_cpu_clock
+/// \brief Klasa stopera liczącego czas CPU
+/// \details liczy od momentu
+/// utworzenia lub wywołania reset() do chwili pobrania
+/// wartości za pomocą "operator double()"
+/// \author borkowsk
+/// \warning OBSOLETE
+// ///////////////////////////////////////////////////////
 #ifndef __CPU_CLOCK_HPP_
 #define __CPU_CLOCK_HPP_
 
 #include <time.h>
-//#include "platform.hpp"
-
 #include <iostream>
-
-//#include "wbminmax.hpp"
 
 class wb_cpu_clock
 {
-clock_t begin_val;
+    clock_t begin_val;
 
-public:
-wb_cpu_clock()
-{ begin_val=clock(); }
+    public:
+    wb_cpu_clock() { begin_val=clock(); }
 
-void reset()
-{ begin_val=clock(); }
+    void reset() { begin_val=clock(); }
 
-operator double() const
-{
-return (double( clock() ) - double( begin_val ))/
-        CLOCKS_PER_SEC;
-#ifdef __BORLAND__ //????
-	 CLK_TCK; 
-#endif
-}
+    operator double() const
+    {
+        return (double( clock() ) - double( begin_val ))/
+                CLOCKS_PER_SEC;
+        #ifdef __BORLAND__ //????
+             CLK_TCK;
+        #endif
+    }
 
-void finalise()
-{
-this->~wb_cpu_clock();
-}
+    void finalise()
+    {
+        this->~wb_cpu_clock();
+    }
 
 #ifndef USES_IOSTREAM
-};
-#else //DEF
+}; //OD RAZU KONIEC KLASY
+#else //DEFINED USES_IOSTREAM
 
 friend
 ostream& operator << (ostream& o, const wb_cpu_clock& c)
@@ -90,21 +90,22 @@ friend
     }
 };
 
-#endif
+#endif //defined USES_IOSTREAM
 
-typedef wb_cpu_clock cticker;
 
-/********************************************************************/
-/*              SYMSHELLLIGHT  version 2020-11-19                   */
-/********************************************************************/
+typedef wb_cpu_clock cticker;///< ready to use timer starting before main()
+
+/* ******************************************************************/
+/*              SYMSHELLLIGHT  version 2022-01-04                   */
+/* ******************************************************************/
 /*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
 /*            W O J C I E C H   B O R K O W S K I                   */
-/*    Instytut Studiow Spolecznych Uniwersytetu Warszawskiego       */
+/*    Instytut Studiów Społecznych Uniwersytetu Warszawskiego       */
 /*    WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI  */
 /*    GITHUB: https://github.com/borkowsk                           */
 /*                                                                  */
 /*                               (Don't change or remove this note) */
-/********************************************************************/
+/* ******************************************************************/
 #endif //__CPU_CLOCK_HPP_
 
 

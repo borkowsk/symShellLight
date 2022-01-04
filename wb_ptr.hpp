@@ -147,7 +147,7 @@ public:
 	return pom;
 	}
 
-    ///Metoda niemal równoważna destruktorowi \OBSOLETE
+    ///Metoda niemal równoważna destruktorowi \warning OBSOLETE
     void finalise(){ dispose(); }
 
 };
@@ -478,7 +478,7 @@ public:
         return ptr!=NULL;
         }
 
-    /// Metoda sprawdza czy tablica została zaalokowana. \OBSOLETE
+    /// Metoda sprawdza czy tablica została zaalokowana. \warning OBSOLETE
     int IsOK() const
         {
         return ptr!=NULL;

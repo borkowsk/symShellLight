@@ -5,9 +5,8 @@
 * \n RandomGenerator - interface to random generators
 * \n RandSTDC	- Random generator build in standard C
 * \n RandG	- Random generator wrote in C based on "Numerical Recipes"
-*/
-/*
-* \OBSOLETE
+*//*
+* \warning OBSOLETE
 * \n RandBSD	- Random generator from BSD UNIX
 * \n RandSVR4 - Random generator from System V UNIX
 */

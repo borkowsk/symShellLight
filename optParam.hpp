@@ -1,14 +1,16 @@
+///\file optParam.hpp
 #ifndef OPTIONAL_PARAMETERS_HPP
 #define  OPTIONAL_PARAMETERS_HPP
-// KLASY potrzebne do obsługi parametrów wywołania programu
-// Obsługiwane są typy standardowe numeryczne oraz
-// inne typy mające implementacje << >> na strumienie i
-// operator porównania <=
-// Obsługiwany jest też typ const char* , ale na poziomie wskaźników, czyli
-// wskaźnik do zawartości linii komend może zostać przypisany na zmienną
-// typu const char*
-// NIESTETY nie można używać typu 'string' bo nie ma on obsługi strumieni!
-// Chyba żeby już była? TODO CHECK IT!
+/// \brief KLASY potrzebne do obsługi parametrów wywołania programu
+/// \details
+/// Obsługiwane są typy standardowe numeryczne oraz
+/// inne typy mające implementacje << >> na strumienie i
+/// operator porównania <=
+/// Obsługiwany jest też typ "const char*" , ale na poziomie wskaźników, czyli
+/// wskaźnik do zawartości linii komend może zostać przypisany na zmienną
+/// typu "const char*"
+/// NIESTETY nie można używać typu 'string' bo nie ma on obsługi strumieni!
+/// Chyba żeby już była? TODO CHECK IT!
 
 //#include "platform.hpp"
 
@@ -26,7 +28,8 @@
 
 #include "wb_ptr.hpp"
 
-namespace wbrtm { //WOJCIECH BORKOWSKI RUN TIME LIBRARY
+///\namespace wbrtm \brief WOJCIECH BORKOWSKI RUN TIME LIBRARY
+namespace wbrtm {
 
 using namespace std;
 
@@ -297,7 +300,7 @@ T OptionalParameter<T>::convert(const char* str)
 /// \param Len
 /// \param SeparatorTab
 /// \param SeparatorLine
-/// \info Zapis parametrów do pliku "raportu"
+/// \details Zapis parametrów do pliku "raportu"
 inline
 void OptionalParameterBase::report(ostream& Out,OptionalParameterBase* Parameters[],
                                    int  Len,const char* SeparatorTab,const char* SeparatorLine)
@@ -321,7 +324,7 @@ void OptionalParameterBase::report(ostream& Out,OptionalParameterBase* Parameter
 /// \param SepTab
 /// \param Head
 /// \param ValHd
-/// \info Zapis parametrów w formie tabeli
+/// \details Zapis parametrów w formie tabeli
 inline
 void OptionalParameterBase::table(ostream& Out,OptionalParameterBase* Parameters[],
                                   int  Len,const char* SepTab,const char* Head,const char* ValHd)
@@ -353,7 +356,7 @@ void OptionalParameterBase::table(ostream& Out,OptionalParameterBase* Parameters
 /// \param Parameters
 /// \param Len
 /// \return 0 if OK, -1 on syntax error
-/// \info Główna funkcja parsująca listę parametrów wywołania
+/// \details Główna funkcja parsująca listę parametrów wywołania
 inline
 int OptionalParameterBase::parse_options(const int argc,const char* argv[],
                                          OptionalParameterBase* Parameters[],int  Len)

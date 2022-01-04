@@ -1,10 +1,12 @@
 /** \file SYMSHELL.H                                                    *
- *        SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++          */
+ *  \brief SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++         */
 /* **********************************************************************/
 /**                                                                     *
  * \author W.Borkowski from University of Warsaw                        *
  * \n https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI           *
- * \n https://github.com/borkowsk                                       */
+ * \n https://github.com/borkowsk                                       *
+ * \n :atom_symbol:
+ */
 /* File changed massively: 15.11.2020                                   */
 
 #ifndef _SYMSHELL_H_
@@ -381,8 +383,8 @@ ssh_msg   get_char();    /**< Funkcja odczytywania znaków sterowania i zdarzeń
                           *  \n Albo liczbę reprezentującą komendę z menu (zazwyczaj dużą)
                           *  */
 
-ssh_stat  set_char(ssh_msg ch);/**< Odesłanie znaku na wejście. \return Zwraca 0, jeśli nie ma miejsca */
-                               /**< \details Gwarantowane jest tylko odesłanie jednego znaku! */
+ssh_stat  set_char(ssh_msg ch);/**< Odesłanie znaku na wejście. \return Zwraca 0, jeśli nie ma miejsca
+                                * \details Gwarantowane jest tylko odesłanie jednego znaku! */
 
 /** Funkcja odczytująca ostatnie zdarzenie myszy. \return ??? */
 ssh_stat  get_mouse_event(ssh_coordinate* x_pos,            /**< [out] adres na który wpisze poziome położenie kursora */
@@ -442,9 +444,9 @@ inline ssh_stat  repaint_area(ssh_coordinate& x, ssh_coordinate& y,ssh_natural& 
 }
 
 /// FUNKCJE PRZESTARZAŁE TAKŻE DOSTĘPNE TYLKO DLA KOMPILATORA C++
-inline ssh_mode   get_buffering(){ return 	buffered(); }       ///< Zwraca 1, jeśli buforowane
-inline ssh_mode   get_fixed(){ return fixed(); }                ///< Czy okno ma zafiksowana wielkość
-inline ssh_color  get_background(void){ return background(); }  ///< Aktualny kolor tla...
+inline ssh_mode   get_buffering(){ return 	buffered(); }       /**< Zwraca 1, jeśli buforowane */
+inline ssh_mode   get_fixed(){ return fixed(); }                /**< Czy okno ma zafiksowana wielkość */
+inline ssh_color  get_background(void){ return background(); }  /**< Aktualny kolor tla... */
 #endif
 
 #endif /* _SYMSHELL_H_ */

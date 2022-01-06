@@ -1,4 +1,4 @@
-/** \file SYMSHELL.H                                                    *
+/** \file symshell.h                                                    *
  *  \brief SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++         */
 /* **********************************************************************/
 /**                                                                     *
@@ -8,6 +8,7 @@
  * \n :atom_symbol:
  */
 /* File changed massively: 15.11.2020                                   */
+/* Comments changed massively: 3-4.01.2022                              */
 
 #ifndef _SYMSHELL_H_
 #define _SYMSHELL_H_
@@ -25,7 +26,7 @@ const unsigned  SSH_LINE_DASHED=3;
 const unsigned  SSH_YES=1;
 const unsigned  SSH_NO=0;
 #else
-#define PALETE_LENGHT      (512)
+#define PALETE_LENGHT      (512)                /**< Długość palety predefiniowanych kolorów */
 #define SSH_SOLID_TEXT       (0)
 #define SSH_TRANSPARENT_TEXT (1)
 #define SSH_SOLID_PUT        (1)
@@ -383,7 +384,7 @@ ssh_msg   get_char();    /**< Funkcja odczytywania znaków sterowania i zdarzeń
                           *  \n Albo liczbę reprezentującą komendę z menu (zazwyczaj dużą)
                           *  */
 
-ssh_stat  set_char(ssh_msg ch);/**< Odesłanie znaku na wejście. \return Zwraca 0, jeśli nie ma miejsca
+ssh_stat  set_char(ssh_msg ch);/**< \brief Odesłanie znaku na wejście. \return Zwraca 0, jeśli nie ma miejsca
                                 * \details Gwarantowane jest tylko odesłanie jednego znaku! */
 
 /** Funkcja odczytująca ostatnie zdarzenie myszy. \return ??? */

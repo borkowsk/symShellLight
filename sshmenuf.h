@@ -1,5 +1,7 @@
-/* INTERFACE FOR SYMSHELL MENU AND RELEATED FEATURES */
-/*****************************************************/
+/** INTERFACE FOR SYMSHELL MENU AND RELEATED FEATURES */
+/** \file sshmenuf.h                                  */
+/** \warning MS WINDOWS ONLY                          */
+/* ************************************************** */
 #ifndef _SYMSHELL_MENUFUNCTIONS_H_
 #define _SYMSHELL_MENUFUNCTIONS_H_
 
@@ -49,17 +51,17 @@ extern char*    ssh_menu_options; 	/*MOTIF STYLE OPTIONS */
 #endif
 
 
-/********************************************************************/
-/*              SYMSHELLLIGHT  version 2020-11-19                   */
-/********************************************************************/
-/*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
-/*            W O J C I E C H   B O R K O W S K I                   */
-/*    Instytut Studiow Spolecznych Uniwersytetu Warszawskiego       */
-/*    WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI  */
-/*    GITHUB: https://github.com/borkowsk                           */
-/*                                                                  */
-/*                               (Don't change or remove this note) */
-/********************************************************************/
+/* *******************************************************************/
+/*               SYMSHELLLIGHT  version 2022-01-06                   */
+/* *******************************************************************/
+/*            THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
+/*             W O J C I E C H   B O R K O W S K I                   */
+/*     Instytut Studiów Społecznych Uniwersytetu Warszawskiego       */
+/*     WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI  */
+/*     GITHUB: https://github.com/borkowsk                           */
+/*                                                                   */
+/*                                (Don't change or remove this note) */
+/* *******************************************************************/
 #endif
 
 

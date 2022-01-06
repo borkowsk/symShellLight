@@ -9,6 +9,7 @@ echo "Cleaning cmake files!"
 echo "Cleaning current directoryfrom cmake files!" `date` >> clean_list.txt
 
 rm -f CMakeCache.txt
+rm -f CMakeLists.txt.user
 rm -f Makefile
 rm -f cmake_install.cmake
 rm -Rf CMakeFiles

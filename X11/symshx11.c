@@ -1485,8 +1485,10 @@ void print_d(ssh_coordinate x,ssh_coordinate y,const char* format,...)
 
 /** BUDOWANIE WEWNĘTRZNYCH KOLORÓW W X11 - TODO CHECK
  *  \brief Tworzenie kolory RBG w X11
+ *  \details Funkcja jest inline i tylko dla tego pliku źródłówego
+ *  \see https://www.geeksforgeeks.org/inline-function-in-c/
  * */
-inline
+static inline
 unsigned long buildColor(unsigned char red, unsigned char green, unsigned char blue)
 {
     return ( (unsigned long)(red) << 16) +
@@ -1496,8 +1498,10 @@ unsigned long buildColor(unsigned char red, unsigned char green, unsigned char b
 
 /** BUDOWANIE WEWNĘTRZNYCH KOLORÓW W X11 - TODO CHECK
  *  \brief Tworzenie kolory RBGA w X11
+ *  \details Funkcja jest inline i tylko dla tego pliku źródłówego
+ *  \see https://www.geeksforgeeks.org/inline-function-in-c/
  * */
-inline
+static inline
 unsigned long buildTransparentColor(unsigned char red, unsigned char green, unsigned char blue,unsigned char transparency)
 {
     return ( (unsigned long)(transparency) << 24 ) +
@@ -2891,7 +2895,7 @@ ssh_stat dump_screen(const char* Filename)
 }
 /*#pragma exit close_plot*/
 /*v******************************************************************/
-/*              SYMSHELLLIGHT  version 2022-01-04                   */
+/*              SYMSHELLLIGHT  version 2022-01-06                   */
 /*v******************************************************************/
 /*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
 /*            W O J C I E C H   B O R K O W S K I                   */

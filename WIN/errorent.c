@@ -1,6 +1,7 @@
 /******************************************************************************************
-*Setting this variable configure SYMSHELL
-*for forcing stop before starting cleanup on exit 
+* Setting this variable configure SYMSHELL
+* for forcing stop before starting cleanup on exit
+* \file errorent.c
 *******************************************************************************************/
 #include "symshell.h"		// prototypes of symshell graphics primitives
 
@@ -13,12 +14,12 @@ int WB_error_enter_before_clean=0;
 #ifdef  __cplusplus
 }
 #endif
-/********************************************************************/
-/*              SYMSHELLLIGHT  version 2021-11-24                  */
-/********************************************************************/
-/*    GITHUB: https://github.com/borkowsk                           */
-/*                               (Don't change or remove this note) */
-/********************************************************************/
+/*v*******************************************************************/
+/*               SYMSHELLLIGHT  version 2022-01-05                   */
+/*v*******************************************************************/
+/*    GITHUB: https://github.com/borkowsk                            */
+/*                                (Don't change or remove this note) */
+/*v*******************************************************************/
 
 
 

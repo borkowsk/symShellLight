@@ -1,28 +1,29 @@
-/* INTERFACE DO ROZMAITYCH GENERATOROW LICZB PSEUDOLOSOWYCH */
-/*----------------------------------------------------------*/
+/** INTERFACE "C" DO ROZMAITYCH GENERATOROW LICZB PSEUDOLOSOWYCH */
+/** \file random.h                                               */
+/**--------------------------------------------------------------*/
 #ifndef __RANDOM__H__INCLUDED__
 #define __RANDOM__H__INCLUDED__  (1)
-#include <time.h> //Potrzebne bo wszedzie time()
+#include <time.h> //Potrzebne bo wszÄ™dzie jest time()
 
 #if   defined( USES_RANDG )
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-float  randg(void); 			/* Random number generator from Numerical Recipies*/
-void   srandg(short int);	/* Seed setting for generator */
-float randnorm(void);
-float randexp(void);
+float  randg(void); 		/**< Random number generator from Numerical Recipies*/
+void   srandg(short int);	/**< Seed setting for generator */
+float  randnorm(void);
+float  randexp(void);
 #ifdef __cplusplus
 }
 #endif
 
-#	define RANDOM_MAX  ( MAXINT )
-#	define RAND()      ( (int)(randg()*RANDOM_MAX) )
-#	define RANDOM(_I_) ( (int)(randg()*(_I_)) )
-#	define SRAND(_P_)  { srandg(- (_P_) ); }
-#	define DRAND()	   ( randg() )
-#	define RANDOMIZE() { srandg( (unsigned) time(NULL) ); }
+#	define RANDOM_MAX                       ( MAXINT )
+#	define RAND()                           ( (int)(randg()*RANDOM_MAX) )
+#	define RANDOM(_I_)                      ( (int)(randg()*(_I_)) )
+#	define SRAND(_P_)                       { srandg(- (_P_) ); }
+#	define DRAND()	                        ( randg() )
+#	define RANDOMIZE()                      { srandg( (unsigned) time(NULL) ); }
 
 #elif defined( USES_BSD_RANDOM )
 
@@ -30,50 +31,50 @@ float randexp(void);
 #	include <math.h>
 #	endif
 
-#	define RANDOM_MAX  ( 0x7fffffffL)
-#	define RAND()      ( random() )
-#	define RANDOM(_I_) ( (int) (((double) (random)() * (_I_) ) / ((double)RANDOM_MAX+1) ) )
-#	define SRAND(_P_)  { srandom(_P_);}
-#   define DRAND()     ( (double)random()/((double)(RANDOM_MAX)+1) )
-#	define RANDOMIZE() { (srandom)( (unsigned) time(NULL) ); }
+#	define RANDOM_MAX                       ( 0x7fffffffL)
+#	define RAND()                           ( random() )
+#	define RANDOM(_I_)                      ( (int) (((double) (random)() * (_I_) ) / ((double)RANDOM_MAX+1) ) )
+#	define SRAND(_P_)                       { srandom(_P_);}
+#   define DRAND()                              ( (double)random()/((double)(RANDOM_MAX)+1) )
+#	define RANDOMIZE()                      { (srandom)( (unsigned) time(NULL) ); }
 
 #elif defined( USES_SVR4_DRAND )
 
-#   define RANDOM_MAX  ( MAXINT)
-#	define RAND() 	   ( lrand48() ) /* CHECK RANGE! */
-#	define RANDOM(_I_) ( drand48()*(_I_))
-#	define SRAND(_P_)  { srand48( _P_ ); }
-#	define DRAND()     ( drand48() )
-#   define RANDOMIZE() { (srand48)( (long) time(NULL) ); }
+#   define RANDOM_MAX                           ( MAXINT)
+#	define RAND() 	                        ( lrand48() ) /* CHECK RANGE! */
+#	define RANDOM(_I_)                      ( drand48()*(_I_))
+#	define SRAND(_P_)                       { srand48( _P_ ); }
+#	define DRAND()                          ( drand48() )
+#   define RANDOMIZE()                          { (srand48)( (long) time(NULL) ); }
 
 #elif defined( USES_STDC_RAND )
 
 #include <stdlib.h>
-#	define RANDOM_MAX  ( RAND_MAX )
-#	define RAND() 	   ( rand() )
-#	define RANDOM(_I_) (int)(((double)rand()*(_I_))/((double)RAND_MAX+1))
-#	define SRAND(_P_)  { srand( _P_ ); }
-#	define DRAND()     ((double)rand()/(double)RAND_MAX)
+#	define RANDOM_MAX               ( RAND_MAX )
+#	define RAND() 	                ( rand() )
+#	define RANDOM(_I_)              (int)(((double)rand()*(_I_))/((double)RAND_MAX+1))
+#	define SRAND(_P_)               { srand( _P_ ); }
+#	define DRAND()                  ((double)rand()/(double)RAND_MAX)
 //( double d=(double)rand()/(double)RAND_MAX,assert(d>0),d )
-#	define RANDOMIZE() {  srand( (unsigned)time(NULL) ); }
+#	define RANDOMIZE()              {  srand( (unsigned)time(NULL) ); }
 
 #else /* NO USEABLE RANDOM FUNCTIONS */
 
-#	define RANDOM_MAX         ( SELECT_RANDOM_NOT_DEFINED_FOR_THIS_CODE  )
-#	define RAND() 	   ( SELECT_RANDOM_NOT_DEFINED_FOR_THIS_CODE  )
-#	define RANDOM(_I_) ( SELECT_RANDOM_NOT_DEFINED_FOR_THIS_CODE  )
-#	define SRAND(_P_)  { SELECT_RANDOM_NOT_DEFINED_FOR_THIS_CODE  }
-#   define DRAND()     ( SELECT_RANDOM_NOT_DEFINED_FOR_THIS_CODE  )
-#	define RANDOMIZE() { SELECT_RANDOM_NOT_DEFINED_FOR_THIS_CODE  }
+#	define RANDOM_MAX               ( SELECT_RANDOM_NOT_DEFINED_FOR_THIS_CODE  )
+#	define RAND() 	                ( SELECT_RANDOM_NOT_DEFINED_FOR_THIS_CODE  )
+#	define RANDOM(_I_)              ( SELECT_RANDOM_NOT_DEFINED_FOR_THIS_CODE  )
+#	define SRAND(_P_)               { SELECT_RANDOM_NOT_DEFINED_FOR_THIS_CODE  }
+#       define DRAND()                 ( SELECT_RANDOM_NOT_DEFINED_FOR_THIS_CODE  )
+#	define RANDOMIZE()              { SELECT_RANDOM_NOT_DEFINED_FOR_THIS_CODE  }
 
 #endif
 
 #ifdef __cplusplus
 //extern "C" {
 
-inline  //Funkcja daj¹ca liczbê losow¹ z zakresu 0..1 ale o rozk³adzie albo
-//gaussopodobnym (W>0) albo paretopodobnym (W<0) lub 1 gdy W=0
-double DRAND_LOOP(int W)
+/** Funkcja dajÄ…ca liczbÄ™ losowÄ… z zakresu 0..1, ale o rozkÅ‚adzie
+ * albo gaussopodobnym (W>0) albo paretopodobnym (W<0) lub 1 gdy W=0 */
+inline  double DRAND_LOOP(int W)
 {
 	double pom;
 	int i;
@@ -97,17 +98,17 @@ double DRAND_LOOP(int W)
 //}
 #endif
 
-/********************************************************************/
-/*              SYMSHELLLIGHT  version 2020-11-19                   */
-/********************************************************************/
-/*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
-/*            W O J C I E C H   B O R K O W S K I                   */
-/*    Instytut Studiow Spolecznych Uniwersytetu Warszawskiego       */
-/*    WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI  */
-/*    GITHUB: https://github.com/borkowsk                           */
-/*                                                                  */
-/*                               (Don't change or remove this note) */
-/********************************************************************/
+/* *******************************************************************/
+/*               SYMSHELLLIGHT  version 2022-01-06                   */
+/* *******************************************************************/
+/*            THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
+/*             W O J C I E C H   B O R K O W S K I                   */
+/*     Instytut StudiÃ³w SpoÅ‚ecznych Uniwersytetu Warszawskiego       */
+/*     WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI  */
+/*     GITHUB: https://github.com/borkowsk                           */
+/*                                                                   */
+/*                                (Don't change or remove this note) */
+/* *******************************************************************/
 #endif
 
 

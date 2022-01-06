@@ -28,141 +28,183 @@
 
 #include "wb_ptr.hpp"
 
+using namespace std;
+
 ///\namespace wbrtm \brief WOJCIECH BORKOWSKI RUN TIME LIBRARY
 namespace wbrtm {
 
-using namespace std;
-
+/// Baza klas dla wszystkich typów parametrów
+/// \details Definiuje interfejs parametru i funkcje statyczne do obsługi całej listy możliwych parametrów
 class OptionalParameterBase
 {
 public:
-    //Interface sprawdzania parametrów obiektami hierarchii OptionalParametr
+    /// Funkcja interfejsu sprawdzania parametrów obiektami hierarchii OptionalParametr
     virtual
     int CheckStr(const char* argv,char sep='=')
     { return 0;} //0: Nie moja sprawa; 1: moje i dobre; -1: Moje, ale zly format
 
-    //Interface drukowania linii HELP'u
+    /// Funkcja interfejsu  drukowania linii HELP'u
 virtual
     void HelpPrn(ostream& o) {o<<"UPSSss..."<<endl;}
-    //For writing state to stream. "buff" should be enough long
+
+    /// Funkcja interfejsu pobierania nazwy parametru
 virtual
     const char* getName() { return "#"; }
+
+    /// funkcja interfejsu pobierająca wartość parametru
 virtual
     const char* getVal(char* buff=NULL)  { return "...";}
 
-//Metoda do obsługi listy parametrów. Musi przeanalizować parametry wywołania
-//trzeba wywołać ją w main() gdzieś w miarę wcześnie
+/// Metoda statyczna do obsługi listy parametrów.
+/// \details Musi przeanalizować parametry wywołania. Trzeba wywołać ją w main() gdzieś w miarę wcześnie
 static
-    int parse_options(const int argc,const char* argv[],OptionalParameterBase* Parameters[],int Len);
+    int parse_options(const int argc,
+                      const char* argv[],
+                      OptionalParameterBase* Parameters[],
+                      int Len
+                      );
 
-//Zapis parametrów do pliku
+/// Metoda statyczna zapisu parametrów do pliku jako raport
 static
-    void report(ostream& Out,OptionalParameterBase* Parameters[],int  Len,const char* SeparatorTab="\t=\t",const char* SeparatorLine="\n");
+    void report(ostream& Out,
+                OptionalParameterBase* Parameters[],
+                int  Len,
+                const char* SeparatorTab="\t=\t",
+                const char* SeparatorLine="\n"
+                        );
+
+/// Metoda statyczna zapisu parametrów do pliku jako tabela
 static
-    void table(ostream& Out,OptionalParameterBase* Parameters[],int  Len,const char* SeparatorTab="\t",const char* Head="$Parameters",const char* ValHd="values");
+    void table(ostream& Out,
+               OptionalParameterBase* Parameters[],
+               int  Len,
+               const char* SeparatorTab="\t",
+               const char* Head="$Parameters",
+               const char* ValHd="values"
+                       );
 };
 
-/// Klasy potomne
-///////////////////
+// Klasy potomne
+// /////////////////
 
-//Do rozdzielania parametrów w tablicy i w helpie
+/// Klasa do rozdzielania parametrów w tablicy i w helpie
 class ParameterLabel:public OptionalParameterBase
 {
+protected:
 	wb_pchar	Lead;
 	wb_pchar	Info;
 
-   //Interface drukowania linii HELP'u
+    /// Implementacja metody drukowania linii HELP'u wymaganej przez klasę bazową
 	virtual void HelpPrn(ostream& o)
 	{o<<Lead.get()<<' '<<Info.get()<<endl;}
 
   public:
+    /// Konstruktor
 	ParameterLabel(const char* iInfo,const char* iLead="\n#"):
 			Lead(clone_str(iLead)),Info(clone_str(iInfo))
             {}
-
+    /// Destruktor
 	~ParameterLabel(){}
 };
 
-//Szablon klasy opcjonalnego parametru
+/// Szablon klasy opcjonalnego parametru
 template<class T>
 class OptionalParameter:public OptionalParameterBase
 {
   protected:
-	wb_pchar	Name;  //Identyfikator (mnemonik) parametru
-	wb_pchar	Info;  //Tekst informacyjny dla użytkownika
-        T& 		Value; //Referencja to zmiennej, która będzie modyfikowana
-        T 		LBound;//Najmniejsza dozwolona wartość
-        T 		HBound;//Największa dozwolona wartość. Dla stringów/tekstów może mieć inne znaczenie
+	wb_pchar	Name;  ///<Identyfikator (mnemonik) parametru
+	wb_pchar	Info;  ///<Tekst informacyjny dla użytkownika
+        T& 		Value; ///<Referencja to zmiennej, która będzie modyfikowana
+        T 		LBound;///<Najmniejsza dozwolona wartość
+        T 		HBound;///<Największa dozwolona wartość. Dla stringów/tekstów może mieć inne znaczenie
 
-	void HelpPrn(ostream& o)     //"Wymagane" przez klasę bazową
+    /// \brief Drukowanie helpu do tego parametru \details Metoda wymagane przez klasę bazową
+	void HelpPrn(ostream& o)
 	{ o<<Name.get()<<": "<<Info.get()<<" Range: <"<<LBound<<','<<HBound<<">; Default: "<<Value<<endl; }
 
   public:
+    /// Konstruktor
 	OptionalParameter(T& iV,const T& iLB,const T& iHB,const char* iName,const char* iInfo):
 		  Value(iV),LBound(iLB),HBound(iHB),Name(clone_str(iName)),Info(clone_str(iInfo)){}
 
+    /// Destruktor
 	~OptionalParameter(){}
 
-	int CheckStr(const char* argv,char sep='='); //Próba przetworzenia konkretnego parametru
+    /// Metoda przetworzenia konkretnego parametru \return ???
+	int CheckStr(const char* argv,char sep='=');
 
-	virtual T convert(const char* str);  //Muszą być różne implementacje w zależności od typu T
+    /// \brief Metoda konwersji. \details Muszą być dostarczone różne implementacje w zależności od typu T
+	virtual T convert(const char* str);
 
-	virtual bool check(const T& _val);    //Sprawdzenie domyślne sprawdza czy wartość w zakresie
-				//ale może być zmienione dla danego typu T (np. wb_pchar czy char*)
+    /// Sprawdzenie domyślne wartości
+    /// \details Sprawdza czy wartość w zakresie, ale może być zmienione dla danego typu T
+    /// (np. wb_pchar czy char* wymagają zupełnie innego sprawdzenia)
+	virtual bool check(const T& _val);
 };
 
-
+/// Szablon klasy opcjonalnego parametru będącego WYLICZENIEM
 template<class T>
 class OptEnumParametr:public OptionalParameter<T>
 {
  protected:
-	unsigned     NofEn;//Ile nazw dla typu zdefiniowano
-	const char** EnNames;//Jakie to nazwy
-	const T*     EnVals;
+	unsigned     NofEn;    ///<Ile nazw dla typu zdefiniowano
+	const char** EnNames;  ///<Jakie to nazwy
+	const T*     EnVals;   ///< Domyślna wartość ???
 
-	void HelpPrn(ostream& o);     //Podstawienie dostarczonej przez klas� bazow�
+	void HelpPrn(ostream& o);     //Podstawienie dostarczonej przez klasę bazową?
 
  public:
+      /// Konstruktor
 	  OptEnumParametr(T& iV,const T& iLB,const T& iHB,
 	                  const char* iName,const char* iInfo,
 					  unsigned NofNames,const char** EnumNames,const T* EnumValues=NULL):
 					  OptionalParameter<T>(iV,iLB,iHB,iName,iInfo),
-					  NofEn(NofNames),EnNames(EnumNames),EnVals(EnumValues){}
+					  NofEn(NofNames),EnNames(EnumNames),EnVals(EnumValues)
+                      {}
+
+      /// Destruktor
 	  ~OptEnumParametr(){}
 
-	T convert(const char* str);  //Musi być implementacja zależna od typu EnNames i EnVals
+    /// \brief Metoda konwersji. \details Musi być implementacja zależna od typu EnNames i EnVals
+	T convert(const char* str);
 };
 
-///////////////////////////////
-/// IMPLEMENTACJE on line
-///////////////////////////////
+// /////////////////////////////
+// IMPLEMENTACJE on line
+// /////////////////////////////
 
-///  Funkcje sprawdzania poprawności
-////////////////////////////////////////////////////////////////////////////////
+//  Funkcje sprawdzania poprawności
+// ////////////////////////////////////
+
+/// Implementacja ogólna sprawdzania poprawności
 template<class T>
 bool OptionalParameter<T>::check(const T& _val)
 {
 	return (LBound<=_val) && (_val<=HBound);
 }
 
+/// Implementacja sprawdzania poprawności dla typu 'string'
 template<> inline
 bool OptionalParameter<string>::check(const string& val)
 {
 	return val.c_str()!=NULL &&  *val.c_str()!='\0';
 }
 
+/// Implementacja sprawdzania poprawności dla typu 'wb_pchar'
 template<> inline
 bool OptionalParameter<wb_pchar>::check(const wb_pchar& val)
 {
 	return val.get()!=NULL && *val.get()!='\0';
 }
 
+/// Implementacja sprawdzania poprawności dla typu 'char*'
 template<> inline
 bool OptionalParameter<char*>::check(char* const& val)
 {
 	return (val!=NULL) && (*val!='\0');
 }
 
+/// Implementacja sprawdzania poprawności dla typu 'const char*'
 template<> inline
 bool OptionalParameter<const char*>::check(const char* const& val)
 {
@@ -170,50 +212,59 @@ bool OptionalParameter<const char*>::check(const char* const& val)
 }
 
 
-/// Funkcje konwersji
-////////////////////////////////////////////////////////////////////////////////
+// Funkcje konwersji
+// //////////////////////////////////////////////////////////////////////////////
+
+/// Konwersja dla typu  'char*'
 template<> inline
 char* OptionalParameter<char*>::convert(const char* str)
 {
 	return clone_str(str);//Bez zwalniania pamięci, bo to przecież parametr wywołania!
 }
 
+/// Konwersja dla typu  'const char*'
+template<> inline
+const char* OptionalParameter<const char*>::convert(const char* str)
+{
+    return str;//to przecież kawałek parametru wywołania, więc nie może się zmienić
+}
+
+/// Konwersja dla typu  'wb_pchar'
 template<> inline
 wb_pchar OptionalParameter<wb_pchar>::convert(const char* str)
 {
 	return wb_pchar(str);//Zrobi zapewne kopie tego, co dostanie (kawałka parametru wywołania)
 }
 
+/// Konwersja dla typu  'string'
 template<> inline
 string OptionalParameter<string>::convert(const char* str)
 {
 	return string(str);
 }
 
-template<> inline
-const char* OptionalParameter<const char*>::convert(const char* str)
-{
-	return str;//to przecież kawałek parametru wywołania, więc nie może się zmienić
-}
-
+/// Konwersja dla typu  'double'
 template<> inline
 double OptionalParameter<double>::convert(const char* str)
 {
 	return atof(str);
 }
 
+/// Konwersja dla typu  'float'
 template<> inline
 float OptionalParameter<float>::convert(const char* str)
 {
 	return (float)atof(str);// conversion from 'double' to 'float', possible loss of data
 }
 
+/// Konwersja dla typu  'long'
 template<> inline
 long OptionalParameter<long>::convert(const char* str)
 {
 	return atol(str);
 }
 
+/// Konwersja dla typu  'long long'
 template<> inline
 long long OptionalParameter<long long>::convert(const char* str)
 {
@@ -224,6 +275,7 @@ long long OptionalParameter<long long>::convert(const char* str)
 #endif
 }
 
+/// Konwersja dla typu  'unsigned long long'
 template<> inline
 unsigned long long OptionalParameter<unsigned long long>::convert(const char* str)
 {
@@ -234,30 +286,35 @@ unsigned long long OptionalParameter<unsigned long long>::convert(const char* st
 #endif
 }
 
+/// Konwersja dla typu  'unsigned int'
 template<> inline
 unsigned OptionalParameter<unsigned>::convert(const char* str)
 {
 	return atol(str);
 }
 
+/// Konwersja dla typu  'int'
 template<> inline
 int OptionalParameter<int>::convert(const char* str)
 {
 	return atoi(str);
 }
 
+/// Konwersja dla typu  'bool'
 template<> inline
 bool OptionalParameter<bool>::convert(const char* str)
 {
 	return toupper(*str)=='Y' || toupper(*str)=='T' || (*str)=='1';
 }
 
-template<class T> inline  //Podstawienie konwersji dostarczonej przez klasę bazową
+/// Szablon konwersji dla typów WYLICZENIOWYCH (enum)
+/// \details Podstawienie konwersji dostarczonej przez klasę bazową
+template<class T> inline
 T OptEnumParametr<T>::convert(const char* str)
 {
     if(('A'<=str[0] && str[0]<='Z')
             || ('a'<=str[0] && str[0]<='z')
-            || (str[0] == '_') )//Jest identyfikator
+            || (str[0] == '_') )//Czy jest identyfikator
     {
         for(unsigned i=0;i<NofEn;i++)
             if(std::strcmp(str,EnNames[i])==0) //Jest?
@@ -267,14 +324,16 @@ T OptEnumParametr<T>::convert(const char* str)
             }
         return T(-9999);
     }
-    else //Probujemy liczbowo
+    else //W przeciwnym razie probujemy liczbowo
     {
         int pom=atol(str);
         return T(pom);
     }
 }
 
-template<class T> inline //  WERSJA OGÓLNA ZGŁASZAJĄCA RACZEJ AWARIE
+///  WERSJA OGÓLNA konwersji ZGŁASZAJĄCA AWARIE
+///\details Zostaje użyta przy próbie konwersji jakiegoś typu, który nie ma przygotowanej implementacji funkcji 'convert'
+template<class T> inline
 T OptionalParameter<T>::convert(const char* str)
 {
   /*	istrstream Strm(str);
@@ -291,16 +350,15 @@ T OptionalParameter<T>::convert(const char* str)
 //*????
 //typedef OptionalParameter<class T> OptPar<class T>;  ??? TODO HOW TO DECLARE THAT?
 
-///	Główne metody
-////////////////////////////////////////////////////////////////////////////////
+//	Główne metody
+// //////////////////////////////////////////////////////////////////////////////
 
-/// \brief OptionalParameterBase::report
+/// \brief Zapis parametrów do pliku "raportu"
 /// \param Out
 /// \param Parameters
 /// \param Len
 /// \param SeparatorTab
 /// \param SeparatorLine
-/// \details Zapis parametrów do pliku "raportu"
 inline
 void OptionalParameterBase::report(ostream& Out,OptionalParameterBase* Parameters[],
                                    int  Len,const char* SeparatorTab,const char* SeparatorLine)
@@ -317,14 +375,13 @@ void OptionalParameterBase::report(ostream& Out,OptionalParameterBase* Parameter
   }
 }
 
-/// \brief OptionalParameterBase::table
+/// \brief Zapis parametrów w formie tabeli
 /// \param Out
 /// \param Parameters
 /// \param Len
 /// \param SepTab
 /// \param Head
 /// \param ValHd
-/// \details Zapis parametrów w formie tabeli
 inline
 void OptionalParameterBase::table(ostream& Out,OptionalParameterBase* Parameters[],
                                   int  Len,const char* SepTab,const char* Head,const char* ValHd)
@@ -350,13 +407,12 @@ void OptionalParameterBase::table(ostream& Out,OptionalParameterBase* Parameters
    }
 }
 
-/// \brief OptionalParameterBase::parse_options
+/// \brief Główna funkcja parsująca listę parametrów wywołania
 /// \param argc
 /// \param argv
 /// \param Parameters
 /// \param Len
 /// \return 0 if OK, -1 on syntax error
-/// \details Główna funkcja parsująca listę parametrów wywołania
 inline
 int OptionalParameterBase::parse_options(const int argc,const char* argv[],
                                          OptionalParameterBase* Parameters[],int  Len)
@@ -392,7 +448,7 @@ CONTINUE:;
     return 0;
 }
 
-/// \brief  OptionalParameterBase::CheckStr<T>
+/// \brief Szablon funkcji sprawdzania łańcucha parametru
 /// \tparam T
 /// \param argv
 /// \param sep
@@ -429,7 +485,7 @@ int OptionalParameter<T>::CheckStr(const char* argv,char sep/*arator*/)
     return 0;//Nie MOJA wartość. Szukaj dalej!
 }
 
-/// \brief  OptionalParameterBase::CheckStr<string>
+/// \brief  funkcji sprawdzania łańcucha parametru dla typu 'string'
 /// \param argv
 /// \param sep
 /// \return 1 if OK, -1 on error, 0 for ignoring
@@ -465,30 +521,36 @@ int OptionalParameter<string>::CheckStr(const char* argv,char sep/*arator*/)
     return 0;//Nie MOJA sprawa
 }
 
-/// NIETYPOWE METODY DRUKOWANIA HELPU DO PARAMETRÓW TEKSTOWYCH
-////////////////////////////////////////////////////////////////////////////////
+// NIETYPOWE METODY DRUKOWANIA HELPU DO PARAMETRÓW TEKSTOWYCH
+// //////////////////////////////////////////////////////////////////////////////
+
+/// \brief  funkcja drukowania helpu parametru dla typu 'string'
 template<> inline
 void OptionalParameter<string>::HelpPrn(ostream& o)
 	{
 		o<<Name.get()<<": "<<Info.get()<<" f.e.:\""<<LBound.c_str()<<"\" or \""<<HBound.c_str()<<"\"; Default: \""<<Value.c_str()<<'"'<<endl;
 	}
 
+/// \brief  funkcja drukowania helpu parametru dla typu 'wb_pchar'
 template<> inline
 void OptionalParameter<wb_pchar>::HelpPrn(ostream& o)
 	{
 		o<<Name.get()<<": "<<Info.get()<<" f.e.:\""<<LBound.get()<<"\" or \""<<HBound.get()<<"\"; Default: \""<<Value.get()<<'"'<<endl;
 	}
 
+/// \brief  funkcja drukowania helpu parametru dla typu 'char*'
 template<> inline
 void OptionalParameter<char*>::HelpPrn(ostream& o)
 	{
 	  o<<Name.get()<<": "<<Info.get()<<" f.e.:\""<<LBound<<"\" or \""<<HBound<<"\"; Default: \""<<Value<<'"'<<endl;
 	}
 
+/// \brief  funkcja drukowania helpu parametru dla typu 'bool'
 template<> inline
 void OptionalParameter<bool>::HelpPrn(ostream& o)
 	{ o<<Name.get()<<": "<<Info.get()<<"; allowed are: 0,1,Yes,No,Tak,Nie; Default: "<<Value<<endl; }
 
+/// \brief  Szablon funkcji drukowania helpu parametru dla typu WYLICZENIOWEGO 'enum'
 template<class T> inline
 void OptEnumParametr<T>::HelpPrn(ostream& o)
 { //G++ chciało tu kiedyś wszędzie this-> ??? TODO - MOŻE JUŻ NIEPOTRZEBNE?
@@ -506,15 +568,15 @@ void OptEnumParametr<T>::HelpPrn(ostream& o)
 
 }//NAMESPACE WBRTM
 
-/********************************************************************/
-/*              SYMSHELLLIGHT  version 2021-11-19                   */
-/********************************************************************/
-/*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
-/*            W O J C I E C H   B O R K O W S K I                   */
-/*    Instytut Studiow Spolecznych Uniwersytetu Warszawskiego       */
-/*    WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI  */
-/*    GITHUB: https://github.com/borkowsk                           */
-/*                                                                  */
-/*                               (Don't change or remove this note) */
-/********************************************************************/
+/*v*******************************************************************/
+/*               SYMSHELLLIGHT  version 2022-01-06                   */
+/*v*******************************************************************/
+/*            THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
+/*             W O J C I E C H   B O R K O W S K I                   */
+/*     Instytut Studiów Społecznych Uniwersytetu Warszawskiego       */
+/*     WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI  */
+/*     GITHUB: https://github.com/borkowsk                           */
+/*                                                                   */
+/*                                (Don't change or remove this note) */
+/*v*******************************************************************/
 #endif

@@ -1,0 +1,120 @@
+/home/data/SCC/__public_git/SymShellLight/symshell.h:51: warning: Compound ssh_point is not documented.
+/home/data/SCC/__public_git/SymShellLight/symshell.h:52: warning: Compound ssh_rgb is not documented.
+/home/data/SCC/__public_git/SymShellLight/sshutils.hpp:22: warning: Member M_PI_2 (macro definition) of file sshutils.hpp is not documented.
+/home/data/SCC/__public_git/SymShellLight/sshutils.hpp:23: warning: Member M_PI_4 (macro definition) of file sshutils.hpp is not documented.
+/home/data/SCC/__public_git/SymShellLight/sshutils.hpp:41: warning: Member def_frame_width (variable) of file sshutils.hpp is not documented.
+/home/data/SCC/__public_git/SymShellLight/symshell.h:30: warning: Member SSH_SOLID_TEXT (macro definition) of file symshell.h is not documented.
+/home/data/SCC/__public_git/SymShellLight/symshell.h:31: warning: Member SSH_TRANSPARENT_TEXT (macro definition) of file symshell.h is not documented.
+/home/data/SCC/__public_git/SymShellLight/symshell.h:32: warning: Member SSH_SOLID_PUT (macro definition) of file symshell.h is not documented.
+/home/data/SCC/__public_git/SymShellLight/symshell.h:33: warning: Member SSH_XOR_PUT (macro definition) of file symshell.h is not documented.
+/home/data/SCC/__public_git/SymShellLight/symshell.h:34: warning: Member SSH_LINE_SOLID (macro definition) of file symshell.h is not documented.
+/home/data/SCC/__public_git/SymShellLight/symshell.h:35: warning: Member SSH_LINE_DOTTED (macro definition) of file symshell.h is not documented.
+/home/data/SCC/__public_git/SymShellLight/symshell.h:36: warning: Member SSH_LINE_DASHED (macro definition) of file symshell.h is not documented.
+/home/data/SCC/__public_git/SymShellLight/symshell.h:37: warning: Member SSH_YES (macro definition) of file symshell.h is not documented.
+/home/data/SCC/__public_git/SymShellLight/symshell.h:38: warning: Member SSH_NO (macro definition) of file symshell.h is not documented.
+/home/data/SCC/__public_git/SymShellLight/symshell.h:282: warning: The following parameters of arc(ssh_coordinate x, ssh_coordinate y, ssh_natural r, ssh_radian start, ssh_radian stop, ssh_color c) are not documented:
+  parameter 'x'
+  parameter 'y'
+  parameter 'r'
+  parameter 'start'
+  parameter 'stop'
+/home/data/SCC/__public_git/SymShellLight/symshell.h:247: warning: The following parameters of circle(ssh_coordinate x, ssh_coordinate y, ssh_natural r, ssh_color c) are not documented:
+  parameter 'x'
+  parameter 'y'
+  parameter 'r'
+/home/data/SCC/__public_git/SymShellLight/symshell.h:252: warning: The following parameters of circle_rgb(ssh_coordinate x, ssh_coordinate y, ssh_natural r, ssh_intensity rd, ssh_intensity gr, ssh_intensity bl) are not documented:
+  parameter 'x'
+  parameter 'y'
+  parameter 'r'
+  parameter 'rd'
+  parameter 'gr'
+/home/data/SCC/__public_git/SymShellLight/symshell.h:296: warning: The following parameters of earc(ssh_coordinate x, ssh_coordinate y, ssh_natural a, ssh_natural b, ssh_radian start, ssh_radian stop, ssh_color c) are not documented:
+  parameter 'x'
+  parameter 'y'
+  parameter 'a'
+  parameter 'b'
+  parameter 'start'
+  parameter 'stop'
+/home/data/SCC/__public_git/SymShellLight/symshell.h:264: warning: The following parameters of ellipse(ssh_coordinate x, ssh_coordinate y, ssh_natural a, ssh_natural b, ssh_color c) are not documented:
+  parameter 'x'
+  parameter 'y'
+  parameter 'a'
+  parameter 'b'
+/home/data/SCC/__public_git/SymShellLight/symshell.h:269: warning: The following parameters of ellipse_rgb(ssh_coordinate x, ssh_coordinate y, ssh_natural a, ssh_natural b, ssh_intensity rd, ssh_intensity gr, ssh_intensity bl) are not documented:
+  parameter 'x'
+  parameter 'y'
+  parameter 'a'
+  parameter 'b'
+  parameter 'rd'
+  parameter 'gr'
+/home/data/SCC/__public_git/SymShellLight/symshell.h:319: warning: The following parameters of fill_arc(ssh_coordinate x, ssh_coordinate y, ssh_natural r, ssh_radian start, ssh_radian stop, ssh_bool pie, ssh_color c) are not documented:
+  parameter 'x'
+  parameter 'y'
+  parameter 'r'
+  parameter 'start'
+  parameter 'stop'
+/home/data/SCC/__public_git/SymShellLight/symshell.h:335: warning: The following parameters of fill_earc(ssh_coordinate x, ssh_coordinate y, ssh_natural a, ssh_natural b, ssh_radian start, ssh_radian stop, ssh_bool pie, ssh_color c) are not documented:
+  parameter 'x'
+  parameter 'y'
+  parameter 'a'
+  parameter 'b'
+  parameter 'start'
+  parameter 'stop'
+/home/data/SCC/__public_git/SymShellLight/symshell.h:214: warning: The following parameters of fill_flood_rgb(ssh_coordinate x, ssh_coordinate y, ssh_intensity rf, ssh_intensity gf, ssh_intensity bf, ssh_intensity rb, ssh_intensity gb, ssh_intensity bb) are not documented:
+  parameter 'x'
+  parameter 'rf'
+  parameter 'gf'
+  parameter 'rb'
+  parameter 'gb'
+/home/data/SCC/__public_git/SymShellLight/symshell.h:368: warning: The following parameters of fill_poly(ssh_coordinate vx, ssh_coordinate vy, const ssh_point points[], int length, ssh_color c) are not documented:
+  parameter 'vx'
+  parameter 'vy'
+  parameter 'points'
+  parameter 'length'
+/home/data/SCC/__public_git/SymShellLight/symshell.h:351: warning: The following parameters of fill_rect(ssh_coordinate x1, ssh_coordinate y1, ssh_coordinate x2, ssh_coordinate y2, ssh_color c) are not documented:
+  parameter 'x1'
+  parameter 'y1'
+  parameter 'x2'
+  parameter 'y2'
+/home/data/SCC/__public_git/SymShellLight/symshell.h:356: warning: The following parameters of fill_rect_rgb(ssh_coordinate x1, ssh_coordinate y1, ssh_coordinate x2, ssh_coordinate y2, ssh_intensity r, ssh_intensity g, ssh_intensity b) are not documented:
+  parameter 'x1'
+  parameter 'y1'
+  parameter 'x2'
+  parameter 'y2'
+  parameter 'r'
+  parameter 'g'
+/home/data/SCC/__public_git/SymShellLight/symshell.h:229: warning: The following parameters of line(ssh_coordinate x1, ssh_coordinate y1, ssh_coordinate x2, ssh_coordinate y2, ssh_color c) are not documented:
+  parameter 'x1'
+  parameter 'y1'
+  parameter 'x2'
+  parameter 'y2'
+/home/data/SCC/__public_git/SymShellLight/symshell.h:234: warning: The following parameters of line_rgb(ssh_coordinate x1, ssh_coordinate y1, ssh_coordinate x2, ssh_coordinate y2, ssh_intensity r, ssh_intensity g, ssh_intensity b) are not documented:
+  parameter 'x1'
+  parameter 'y1'
+  parameter 'x2'
+  parameter 'y2'
+  parameter 'r'
+  parameter 'g'
+/home/data/SCC/__public_git/SymShellLight/symshell.h:396: warning: Found unknown command '\r'
+/home/data/SCC/__public_git/SymShellLight/wb_ptr.hpp:27: warning: Member DEBUG_WB_PTR (macro definition) of file wb_ptr.hpp is not documented.
+/home/data/SCC/__public_git/SymShellLight/wb_ptr.hpp:33: warning: Member WBPTRLOG(_P_) (macro definition) of file wb_ptr.hpp is not documented.
+/home/data/SCC/__public_git/SymShellLight/wb_ptr.hpp:754: warning: Member fill(wb_dynarray< T > &Tab, const T &Val) (function) of namespace wbrtm is not documented.
+/home/data/SCC/__public_git/SymShellLight/wb_ptr.hpp:761: warning: Member fill(wb_dynmatrix< T > &Mat, const T &Val) (function) of namespace wbrtm is not documented.
+/home/data/SCC/__public_git/SymShellLight/symshell.h:51: warning: Member x (variable) of class ssh_point is not documented.
+/home/data/SCC/__public_git/SymShellLight/symshell.h:51: warning: Member y (variable) of class ssh_point is not documented.
+/home/data/SCC/__public_git/SymShellLight/symshell.h:52: warning: Member r (variable) of class ssh_rgb is not documented.
+/home/data/SCC/__public_git/SymShellLight/symshell.h:52: warning: Member g (variable) of class ssh_rgb is not documented.
+/home/data/SCC/__public_git/SymShellLight/symshell.h:52: warning: Member b (variable) of class ssh_rgb is not documented.
+/home/data/SCC/__public_git/SymShellLight/wb_cpucl.hpp:24: warning: Member reset() (function) of class wb_cpu_clock is not documented.
+/home/data/SCC/__public_git/SymShellLight/wb_cpucl.hpp:26: warning: Member operator double() const (function) of class wb_cpu_clock is not documented.
+/home/data/SCC/__public_git/SymShellLight/wb_cpucl.hpp:35: warning: Member finalise() (function) of class wb_cpu_clock is not documented.
+/home/data/SCC/__public_git/SymShellLight/wb_ptr.hpp:754: warning: Member fill(wb_dynarray< T > &Tab, const T &Val) (function) of namespace wbrtm is not documented.
+/home/data/SCC/__public_git/SymShellLight/wb_ptr.hpp:761: warning: Member fill(wb_dynmatrix< T > &Mat, const T &Val) (function) of namespace wbrtm is not documented.
+/home/data/SCC/__public_git/SymShellLight/wb_clone.hpp:68: warning: Member Clone(const T *par) (function) of class wbrtm::Clone is not documented.
+/home/data/SCC/__public_git/SymShellLight/wb_clone.hpp:69: warning: Member operator T*() (function) of class wbrtm::Clone is not documented.
+/home/data/SCC/__public_git/SymShellLight/wb_clone.hpp:78: warning: Member Clone(const char *const par) (function) of class wbrtm::Clone< char > is not documented.
+/home/data/SCC/__public_git/SymShellLight/wb_clone.hpp:79: warning: Member operator char *() (function) of class wbrtm::Clone< char > is not documented.
+/home/data/SCC/__public_git/SymShellLight/optParam.hpp:94: warning: Member Lead (variable) of class wbrtm::ParameterLabel is not documented.
+/home/data/SCC/__public_git/SymShellLight/optParam.hpp:95: warning: Member Info (variable) of class wbrtm::ParameterLabel is not documented.
+/home/data/SCC/__public_git/SymShellLight/symshell.h:396: warning: Found unknown command '\r'
+

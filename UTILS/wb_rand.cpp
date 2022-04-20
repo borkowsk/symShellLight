@@ -1,10 +1,10 @@
 #include "wb_rand.hpp"
-RandG		TheRandG;
-RandSTDC	TheRandSTDC;
+wbrtm::RandG		TheRandG;
+wbrtm::RandSTDC	    TheRandSTDC;
 
 
 /********************************************************************/
-/*              SYMSHELLLIGHT  version 2020-11-16                   */
+/*              SYMSHELLLIGHT  version 2022-04-20                   */
 /********************************************************************/
 /*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
 /*            W O J C I E C H   B O R K O W S K I                   */

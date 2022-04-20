@@ -1,8 +1,9 @@
 # SymShellLight
 
-Light version of __Simulation Shell__. Mostly basic graphix for _X11_,_MS Windows_ & _SVG_ for educational purpose
+Light version of __Simulation Shell__. Mostly basic graphic for _X11_,_MS Windows_ & _SVG_ for educational purpose
 
-PL: Lekka wersja grafiki __SYMSHELL__'a dla _X11_, _MS Windows_ & _SVG_ z niektórymi podstawowymi funkcjonalnościami czasu wykonania. Wyodrebnione w celach dydaktycznych :PL
+PL: Lekka wersja grafiki __SYMSHELL__'a dla _X11_, _MS Windows_ & _SVG_ z niektórymi podstawowymi funkcjonalnościami czasu wykonania. 
+Wyodrębnione z pełnej wersji w celach dydaktycznych :PL
 
 **HISTORY**
 
@@ -18,8 +19,8 @@ To use, perform the following operations in the selected directory:
 ```console
   $ git clone https://github.com/borkowsk/SymShellLight.git
   $ cd SymShellLigt
-  $ bash check.sh
-  $ cmake . -DX11=true OR -DWINDOWS=true
+  $ bash _check.sh
+  $ cmake . -DX11=true OR -DWINDOWS=true -DWITHTESTS=false
   $ make
 ```
 You can also compile tests:
@@ -30,7 +31,7 @@ You can also compile tests:
 ```
 
 It was tested on UBUNTU 16.04 with gcc, UBUNTU 18.04 with gcc & UBUNTU 20.04 with gcc/g++
-Current version does not work uder Windows. Many functions are missed!!! 
+Current version does not work under Windows. Many functions are missed!!! 
 
 **ADDITIONAL REQUIREMENTS**
 
@@ -43,6 +44,8 @@ Current version does not work uder Windows. Many functions are missed!!!
 You can use this software freely for educational and research purposes, but if you feel that it would be appropriate to repay somehow, please finance me a big coffee :-)
 
 **COFFEE**
-https://www.buymeacoffee.com/wborkowsk
-https://www.paypal.com/paypalme/wborkowsk
 
+* https://www.buymeacoffee.com/wborkowsk
+* https://www.paypal.com/paypalme/wborkowsk
+
+last modification: 2022-04-20

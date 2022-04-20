@@ -126,13 +126,13 @@ namespace wbrtm {
 
 } //namespace
 
-extern RandG    TheRandG;             ///< ready to use generator using randg()
-extern RandSTDC TheRandSTDC;          ///< ready to use generator using standard rand()
+extern wbrtm::RandG    TheRandG;             ///< ready to use generator using randg()
+extern wbrtm::RandSTDC TheRandSTDC;          ///< ready to use generator using standard rand()
 
 
 
 /* ******************************************************************/
-/*              SYMSHELLLIGHT  version 2022-01-06                   */
+/*              SYMSHELLLIGHT  version 2022-04-20                   */
 /* ******************************************************************/
 /*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
 /*            W O J C I E C H   B O R K O W S K I                   */

@@ -19,9 +19,9 @@ echo -e "\n CMAKE  OK\n"
 
 echo -e "Test for required library packages:\n"
 cat << EOF >> tmpX11.cpp
-#include <X11/Xlib.h> // libX11-dev ? 
+#include <X11/Xlib.h>   // sudo apt install libx11-dev ? 
 #include <X11/Xutil.h>
-#include <X11/xpm.h> // libxpm-dev ?
+#include <X11/xpm.h>    // sudo apt install libxpm-dev ?
 EOF
 
 g++ -c tmpX11.cpp
@@ -34,6 +34,7 @@ rm -f tmpX11.cpp
 # $ sudo apt install g++
 # $ sudo apt install make
 # $ sudo apt install cmake
-# echo Instaling development versions of non standard libraries 
+# echo Instaling development versions of non standard libraries
+# echo libxpm-dev depends on libx11-dev, so both will be installed by this command:
 # $ sudo apt install libxpm-dev
 

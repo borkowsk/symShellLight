@@ -15,6 +15,8 @@
 /// co oznacza, że w konstruktorze kopiującym albo przypisaniu jest przenoszona,
 /// a nie kopiowana. Obiekt donor staje się PUSTY! Dlatego obiekty te do funkcji
 /// muszą być zawsze przekazywane przez referencję
+///
+/// \author Wojciech Borkowski wborkowski (_at_) uw.edu.pl
 // *******************************************************************************************************************
 #ifndef __WB_PTR_HPP__
 #define __WB_PTR_HPP__
@@ -44,12 +46,12 @@ using namespace std;
 ///\namespace wbrtm \brief WOJCIECH BORKOWSKI RUN TIME LIBRARY
 namespace wbrtm {
 
-///Szablon inteligentnego wskaźnika dla typów skalarnych
+/// Szablon inteligentnego wskaźnika dla typów skalarnych
 template<class T>
 class wb_sptr
 {
 protected:
-    T* ptr;///< Właściwa zawartość inteligentnego wskaźnika
+    T* ptr; ///< Właściwa zawartość inteligentnego wskaźnika
 
 public:
     /// Konstruktor pobierający surowy wskaźnik pod zarząd
@@ -715,15 +717,15 @@ public:
 
 };
 
-// Rozbudowana alokacja zstępująca
+/// Rozbudowana alokacja zstępująca
 template<class T> inline
 size_t wb_dynmatrix<T>::alloc(size_t y,size_t x)
 {
     WBPTRLOG( "wb_dynmatrix::alloc("<<y<<','<<x<<")" );                                                     assert(y>0);
-    if(wb_sptr<T>::get_size()>0)//wb_sptr TODO ???
+    if(this->get_size()>0)
         dispose();
 
-    if(wb_sptr<T>::alloc(y)==0) //wb_sptr TODO ???
+    if(wb_dynarray<wb_dynarray<T>>::alloc(y)==0)
                 return 0;
 
     if(y>0 && x>0)
@@ -733,14 +735,14 @@ size_t wb_dynmatrix<T>::alloc(size_t y,size_t x)
                         return 0;
                 }
 
-    return wb_sptr<T>::get_size();
+    return this->get_size();
 }
 
-// Metoda wypełnianie macierzy dynamicznej zadaną wartością
+/// Metoda wypełnianie macierzy dynamicznej zadaną wartością
 template<class T> inline
 void wb_dynmatrix<T>::fill(const T& Val)
 {
-    size_t i,H=wb_sptr<T>::get_size();
+    size_t i,H=this->get_size();
     for(i=0;i<H;i++)//Po wierszach
         {
         size_t L=(*this)[i].get_size();
@@ -749,14 +751,14 @@ void wb_dynmatrix<T>::fill(const T& Val)
         }
 }
 
-// Funkcja wypełnianie tablicy dynamicznej zadaną wartością
+/// Funkcja wypełnianie tablicy dynamicznej zadaną wartością
 template<class T> inline
 void fill(wb_dynarray<T>& Tab,const T& Val)
 {
     Tab.fill(Val);
 }
 
-// Funkcja wypełnianie macierzy dynamicznej zadaną wartością
+/// Funkcja wypełnianie macierzy dynamicznej zadaną wartością
 template<class T> inline
 void fill(wb_dynmatrix<T>& Mat,const T& Val)
 {
@@ -767,33 +769,33 @@ void fill(wb_dynmatrix<T>& Mat,const T& Val)
 /// Wejście wyjście strumieniowe dla inteligentnych wskaźników.
 /// Tutaj tylko deklaracje - implementacja musi byc w innym pliku
 
-ostream& operator<<(ostream&,const wb_sptr<char>&);///< Czy to gdzieś jest zaimplementowane? TODO?
-istream& operator>>(istream&,wb_sptr<char>&);///< Czy to gdzieś jest zaimplementowane? TODO?
-ostream& operator<<(ostream&,const wb_pchar&);///< Czy to gdzieś jest zaimplementowane? TODO?
-istream& operator>>(istream&,wb_pchar&);///< Czy to gdzieś jest zaimplementowane? TODO?
+ostream& operator<<(ostream&,const wb_sptr<char>&); ///< Czy to gdzieś jest zaimplementowane? TODO?
+istream& operator>>(istream&,wb_sptr<char>&); ///< Czy to gdzieś jest zaimplementowane? TODO?
+ostream& operator<<(ostream&,const wb_pchar&); ///< Czy to gdzieś jest zaimplementowane? TODO?
+istream& operator>>(istream&,wb_pchar&); ///< Czy to gdzieś jest zaimplementowane? TODO?
 
 template<class T>
-    ostream& operator<<(ostream&,const wb_sptr<T>&);///< Czy to gdzieś jest zaimplementowane? TODO?
+    ostream& operator<<(ostream&,const wb_sptr<T>&); ///< Czy to gdzieś jest zaimplementowane? TODO?
 
 template<class T>
-    istream& operator>>(istream&,wb_sptr<T>&);///< Czy to gdzieś jest zaimplementowane? TODO?
+    istream& operator>>(istream&,wb_sptr<T>&); ///< Czy to gdzieś jest zaimplementowane? TODO?
 
 template<class T>
-    ostream& operator<<(ostream&,const wb_dynarray<T>&);///< Czy to gdzieś jest zaimplementowane? TODO?
+    ostream& operator<<(ostream&,const wb_dynarray<T>&); ///< Czy to gdzieś jest zaimplementowane? TODO?
 
 template<class T>
-    istream& operator>>(istream&,wb_dynarray<T>&);///< Czy to gdzieś jest zaimplementowane? TODO?
+    istream& operator>>(istream&,wb_dynarray<T>&); ///< Czy to gdzieś jest zaimplementowane? TODO?
 
 template<class T>
-    ostream& operator<<(ostream&,const wb_dynmatrix<T>&);///< Czy to gdzieś jest zaimplementowane? TODO?
+    ostream& operator<<(ostream&,const wb_dynmatrix<T>&); ///< Czy to gdzieś jest zaimplementowane? TODO?
 
 template<class T>
-    istream& operator>>(istream&,wb_dynmatrix<T>&);///< Czy to gdzieś jest zaimplementowane? TODO?
+    istream& operator>>(istream&,wb_dynmatrix<T>&); ///< Czy to gdzieś jest zaimplementowane? TODO?
 #endif
 
 } //namespace wbrtm
 /* ******************************************************************/
-/*              SYMSHELLLIGHT  version 2022-01-04                   */
+/*              SYMSHELLLIGHT  version 2022-07-04                   */
 /* ******************************************************************/
 /*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
 /*            W O J C I E C H   B O R K O W S K I                   */

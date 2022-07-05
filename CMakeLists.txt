@@ -28,6 +28,8 @@ add_library( wbsyshSVG STATIC
     "SVG/errorent.c"
     "SVG/symshsvg.cpp"
     "UTILS/wb_pchar.cpp" #used internally
+	"UTILS/wb_rand.cpp"
+	"UTILS/wb_randg.c"
     "UTILS/sshdefs.c"
     "UTILS/sshutils.cpp"
     "UTILS/sshmenufdummy.c" #dummy functions of menus
@@ -43,6 +45,9 @@ add_library( wbsyshX11 STATIC
     "X11/wbx11ico.c"
     "UTILS/sshdefs.c"
     "UTILS/sshutils.cpp"
+	"UTILS/wb_pchar.cpp"
+	"UTILS/wb_rand.cpp"
+	"UTILS/wb_randg.c"
     "UTILS/sshmenufdummy.c" #dummy functions of menus
 	)
 #target_compile_features(wbsyshX11 PUBLIC cxx_std_11)

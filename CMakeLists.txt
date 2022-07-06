@@ -9,7 +9,7 @@ project(symshelllight)
 
 set( X11 true ) #DEFAULT
 #set( WINDOWS true ) #NOT TESTED!
-set( WITHTESTS true )
+set( WITHTESTS false )
 
 if (MSVC)
     #warning level 4 and/or all warnings as errors if you want
@@ -72,30 +72,30 @@ endif(WINDOWS)
 
 if(X11 AND WITHTESTS ) #X11 tests
 add_executable("TestmousX11"
-		"TESTS/Testmous.cpp"
+		"EXAMPLES/Testmous.cpp"
     	)
 add_executable("TestpaleX11"
-		"TESTS/Testpale.cpp"
+		"EXAMPLES/Testpale.cpp"
     	)
 add_executable("TestpolyX11"
-		"TESTS/Testpoly.cpp"
+		"EXAMPLES/Testpoly.cpp"
 		)
 add_executable("TestrandX11"
-        "TESTS/Testrand.cpp"
+        "EXAMPLES/Testrand.cpp"
         "UTILS/wb_randg.c"
         "UTILS/wb_rand.cpp"
     	)
 add_executable("TestsymsX11"
-		"TESTS/Testsyms.cpp"
+		"EXAMPLES/Testsyms.cpp"
 		)
 add_executable("TestsyshX11"
-		"TESTS/Testsysh.cpp"
+		"EXAMPLES/Testsysh.cpp"
 		)
 add_executable("TurmitX11"
-		"TESTS/Turmit.cpp"
+		"EXAMPLES/Turmit.cpp"
 		)
 add_executable("CAGasX11"
-		"TESTS/CAGas.cpp"
+		"EXAMPLES/CAGas.cpp"
 		)
 
 target_link_libraries("TestmousX11" wbsyshX11 X11 Xpm rt)
@@ -107,36 +107,36 @@ target_link_libraries("TestsyshX11" wbsyshX11 X11 Xpm rt)
 target_link_libraries("TurmitX11"   wbsyshX11 X11 Xpm rt)
 target_link_libraries("CAGasX11"    wbsyshX11 X11 Xpm pthread rt)
 
-#add_executable("LinktestX11" "TESTS/Linktest.cpp"    )
+#add_executable("LinktestX11" "EXAMPLES/Linktest.cpp"    )
 #target_link_libraries("LinktestX11" wbsyshX11 X11 Xpm rt)
 endif()
 
 if( WINDOWS AND WITHTESTS ) #X11 tests
 add_executable("TestmousWIN"
-		"TESTS/Testmous.cpp"
+		"EXAMPLES/Testmous.cpp"
     	)
 add_executable("TestpaleWIN"
-		"TESTS/Testpale.cpp"
+		"EXAMPLES/Testpale.cpp"
     	)
 add_executable("TestpolyWIN"
-		"TESTS/Testpoly.cpp"
+		"EXAMPLES/Testpoly.cpp"
     	)
 add_executable("TestrandWIN"
-        "TESTS/Testrand.cpp"
+        "EXAMPLES/Testrand.cpp"
         "UTILS/wb_randg.c"
         "UTILS/wb_rand.cpp"
     	)
 add_executable("TestsymsWIN"
-		"TESTS/Testsyms.cpp"
+		"EXAMPLES/Testsyms.cpp"
     	)
 add_executable("TestsyshWIN"
-		"TESTS/Testsysh.cpp"
+		"EXAMPLES/Testsysh.cpp"
     	)
 add_executable("TurmitWIN"
-		"TESTS/Turmit.cpp"
+		"EXAMPLES/Turmit.cpp"
     	)
 add_executable("CAGasWIN"
-		"TESTS/CAGas.cpp"
+		"EXAMPLES/CAGas.cpp"
     	)
 
 target_link_libraries("TestmousWIN" wbsyshWIN  )
@@ -148,30 +148,30 @@ target_link_libraries("TestsyshWIN" wbsyshWIN  )
 target_link_libraries("TurmitWIN"   wbsyshWIN  )
 target_link_libraries("CAGasWIN"    wbsyshWIN  )
 
-#add_executable("LinktestWIN" "TESTS/Linktest.cpp"    )
+#add_executable("LinktestWIN" "EXAMPLES/Linktest.cpp"    )
 #target_link_libraries("LinktestWIN" wbsyshWIN )
 endif()
 
 
 if(WITHTESTS) #SVG tests
-add_executable("TestmousSVG" "TESTS/Testmous.cpp"
+add_executable("TestmousSVG" "EXAMPLES/Testmous.cpp"
     )
-add_executable("TestpaleSVG" "TESTS/Testpale.cpp"
+add_executable("TestpaleSVG" "EXAMPLES/Testpale.cpp"
     )
-add_executable("TestpolySVG" "TESTS/Testpoly.cpp"
+add_executable("TestpolySVG" "EXAMPLES/Testpoly.cpp"
     )
 add_executable("TestrandSVG"
-        "TESTS/Testrand.cpp"
+        "EXAMPLES/Testrand.cpp"
         "UTILS/wb_randg.c"
         "UTILS/wb_rand.cpp"
     )
-add_executable("TestsymsSVG" "TESTS/Testsyms.cpp"
+add_executable("TestsymsSVG" "EXAMPLES/Testsyms.cpp"
     )
-add_executable("TestsyshSVG" "TESTS/Testsysh.cpp"
+add_executable("TestsyshSVG" "EXAMPLES/Testsysh.cpp"
     )
-add_executable("TurmitSVG" "TESTS/Turmit.cpp"
+add_executable("TurmitSVG" "EXAMPLES/Turmit.cpp"
     )
-add_executable("CAGasSVG" "TESTS/CAGas.cpp"
+add_executable("CAGasSVG" "EXAMPLES/CAGas.cpp"
     )
 
 if( WINDOWS )
@@ -185,7 +185,7 @@ if( WINDOWS )
 	target_link_libraries("CAGasSVG"    wbsyshSVG  )
 
 	add_executable("LinktestSVG"
-			"TESTS/Linktest.cpp"
+			"EXAMPLES/Linktest.cpp"
 			)
 
 	target_link_libraries("LinktestSVG" wbsyshSVG  )
@@ -200,7 +200,7 @@ else()
 	target_link_libraries("CAGasSVG"    wbsyshSVG pthread rt)
 
 	add_executable("LinktestSVG"
-			"TESTS/Linktest.cpp"
+			"EXAMPLES/Linktest.cpp"
 			)
 
 	target_link_libraries("LinktestSVG" wbsyshSVG rt )
@@ -209,7 +209,7 @@ endif()
 endif()
 #KONIEC - THE END
 #********************************************************************/
-#*              SYMSHELLLIGHT  version 2021-11-25                   */
+#*              SYMSHELLLIGHT  version 2022-07-05                   */
 #********************************************************************/
 #*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
 #*            W O J C I E C H   B O R K O W S K I                   */

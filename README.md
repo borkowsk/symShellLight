@@ -48,4 +48,4 @@ You can use this software freely for educational and research purposes, but if y
 * https://www.buymeacoffee.com/wborkowsk
 * https://www.paypal.com/paypalme/wborkowsk
 
-last modification: 2022-04-20
+last big modification: 2022-04-20

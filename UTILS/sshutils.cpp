@@ -1,7 +1,7 @@
 /*****************************************************************************************
 * Implementacja pomocniczych funkcji Symshell'a w sposób juz niezależny od platformy.
 * Napisane NIEOBIEKTOWO, ale w C++
-* Jest tu: print_width() , rect(), bar3D(), cross(), *_arrow() ...itp...
+* Jest tu: print_width() , rect(), bar3D(), cross(), *_arrow(), distance() ...itp...
 *****************************************************************************************/
 #include <cassert>
 #include <cstdio>
@@ -10,7 +10,6 @@
 #include <cstring>
 #include <cmath>
 #include <ctype.h>
-//#include "INCLUDE/wbminmax.hpp"
 
 #if defined(_MSC_VER)
 //#pragma warning(disable:4068)
@@ -156,7 +155,7 @@ void bar3d(int x,int y,int h,wb_color col1,wb_color col2)
 		wire_col=(wire_col+s.back)/2;
 	if(wire_col==col2)
 		wire_col=(wire_col+s.back)/2;
-										   /*       6 -----  5   */
+						 /*       6 -----  5   */
 	romb[1].x= x;                          /*     /        / |   */
 	romb[1].y= y - h;                      /*    1 ------ 2  |   */
 	romb[2].x= x + s.a;                    /*    |        |  |   */
@@ -203,7 +202,7 @@ void bar3dRGB(int x,int y,int h,int R,int G,int B,int Shad)
 	ssh_point romb[7];
 	wb_color wire_col=s.wire;
 
-										   /*       6 -----  5   */
+						 /*       6 -----  5   */
 	romb[1].x= x;                          /*     /        / |   */
 	romb[1].y= y - h;                      /*    1 ------ 2  |   */
 	romb[2].x= x + s.a;                    /*    |        |  |   */
@@ -255,9 +254,9 @@ void cross(int x,int y,wb_color color,int width)
 /// Rysuje pionową skalę kolorów
 /// \param x1
 /// \param y1
-/// \param width
-/// \param start
-/// \param end
+/// \param width : szerokość paska
+/// \param start : kolor początkowy
+/// \param end   : kolor końcowy
 void ver_scale(int x1,int y1,int width,wb_color start,wb_color end)
 {
 	for(wb_color i=start;i<=end;i++)
@@ -302,8 +301,20 @@ void arrow(int x1,int y1,int x2,int y2,wb_color color,double size,double theta)
 	line(int(x2+xo2),int(y2+yo2),x2,y2,color);
 	line(x1,y1,x2,y2,color);
 }
+
+/// Funkcja odległości jest często potrzebne w programach symulacyjnych i grach.
+double distance(double X1,double X2,double Y1,double Y2)
+{
+	double dX=X2-X1;
+	double dY=Y2-Y1;
+	if(dX!=0 || dY!=0)
+	  return sqrt(dX*dX+dY*dY);
+	else
+	  return 0;
+}
+
 /********************************************************************/
-/*              SYMSHELLLIGHT  version 2021-11-24                   */
+/*              SYMSHELLLIGHT  version 2022-10-20                   */
 /********************************************************************/
 /*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
 /*            W O J C I E C H   B O R K O W S K I                   */

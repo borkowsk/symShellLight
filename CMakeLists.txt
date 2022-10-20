@@ -25,14 +25,16 @@ include_directories("./")
 
 if(true) # SVG SYMSHELL LIB
 add_library( wbsyshSVG STATIC
-    "SVG/errorent.c"
     "SVG/symshsvg.cpp"
-    "UTILS/wb_pchar.cpp" #used internally
-	"UTILS/wb_rand.cpp"
-	"UTILS/wb_randg.c"
     "UTILS/sshdefs.c"
     "UTILS/sshutils.cpp"
+    "UTILS/strtorgb.cpp"
+    "UTILS/wieloboki.cpp"
+    	"UTILS/wb_pchar.cpp" #used internally
+	"UTILS/wb_rand.cpp"
+	"UTILS/wb_randg.c"
     "UTILS/sshmenufdummy.c" #dummy functions of menus
+     "SVG/errorent.c"  
 	)
 #target_compile_features(wbsyshSVG PUBLIC cxx_std_11)
 endif()
@@ -40,27 +42,33 @@ endif()
 if(X11) # only for X11 LIB
 add_definitions( -DHAVE_X11 -DUSE_X11 )
 add_library( wbsyshX11 STATIC 
-    "X11/errorent.c"
     "X11/symshx11.c"
     "X11/wbx11ico.c"
     "UTILS/sshdefs.c"
     "UTILS/sshutils.cpp"
+    "UTILS/strtorgb.cpp"
+    "UTILS/wieloboki.cpp"	
 	"UTILS/wb_pchar.cpp"
 	"UTILS/wb_rand.cpp"
 	"UTILS/wb_randg.c"
     "UTILS/sshmenufdummy.c" #dummy functions of menus
+    "X11/errorent.c"
 	)
 #target_compile_features(wbsyshX11 PUBLIC cxx_std_11)
 endif(X11)
 
 if(WINDOWS) # only for WINDOWS - NOT TESTED IN THIS VERSION (after 2016)
 add_library( wbsyshWIN STATIC
-    "WIN/errorent.c"
-
     "WIN/symshwin.c"
     "UTILS/sshutils.cpp"
-	"WIN/sshmenufwin.c"
+    "UTILS/strtorgb.cpp"
+    "UTILS/wieloboki.cpp"
+	"UTILS/wb_pchar.cpp"
+	"UTILS/wb_rand.cpp"
+	"UTILS/wb_randg.c"	
+    "WIN/sshmenufwin.c"
     #"UTILS/sshmenufdummy.c" #dummy functions of menus
+    "WIN/errorent.c"
     )
 #target_compile_features(wbsyshWIN PUBLIC cxx_std_11)
 endif(WINDOWS)
@@ -209,7 +217,7 @@ endif()
 endif()
 #KONIEC - THE END
 #********************************************************************/
-#*              SYMSHELLLIGHT  version 2022-07-05                   */
+#*              SYMSHELLLIGHT  version 2022-10-20                   */
 #********************************************************************/
 #*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
 #*            W O J C I E C H   B O R K O W S K I                   */
@@ -226,3 +234,4 @@ endif()
 #*                                                                  */
 #*                               (Don't change or remove this note) */
 #********************************************************************/
+

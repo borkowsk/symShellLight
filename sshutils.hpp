@@ -23,7 +23,11 @@
 #define M_PI_4      0.785398163397448309616
 #endif
 
-/// W funkcjach modułu 'sshutils' używany jest kolor indeksowany
+/// \brief Obliczanie odległości Euklides. Często potrzebne w takich programach
+double distance(double X1,double X2,double Y1,double Y2);
+
+/// \brief Alias dla typu ssh_color
+/// \note W funkcjach rysujących modułu 'sshutils' używany jest kolor indeksowany
 typedef ssh_color wb_color;
 
 // Zestaw identyfikatorów kolorów 'sshutils'
@@ -35,6 +39,10 @@ const wb_color default_white=255;                    ///< domyślny kolor indeks
 const wb_color default_dark_gray=256+64;             ///< domyślny kolor indeksowany ciemno szary
 const wb_color default_half_gray=256+128;            ///< domyślny kolor indeksowany średnio szary
 const wb_color default_light_gray=256+128+64;        ///< domyślny kolor indeksowany jasno szary
+
+//Funkcja interpretująca string jako wartość RGB
+//Dopuszczalne formaty to: xFFFFFF  b111111111111111111111111  rgb(255,255,255) RGB(255,255,255)
+unsigned strtorgb(const char *s, char **endptr);
 
 // Ustawienia grubości i rozmiarów elementów 'sshutils'
 

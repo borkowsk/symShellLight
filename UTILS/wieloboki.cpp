@@ -1,18 +1,21 @@
-#include <cassert> //Funkcja assert() s³u¿¹ca do sprawdzeñ w fazie produkcji
-#include <cstring> //Bo musimy/chcemy u¿yæ funkcji "memcpy" - kopiowania pamiêci i strcmp
-#include <ctype.h> //Nazwy wieloboków maj? by? NON CASE SENSITIVE
+#include <cassert> //Funkcja assert() sï¿½uï¿½ï¿½ca do sprawdzeï¿½ w fazie produkcji
+#include <cstring> //Bo musimy/chcemy uï¿½yï¿½ funkcji "memcpy" - kopiowania pamiï¿½ci i strcmp
+#include <ctype.h> //Nazwy wielobokï¿½w maj? by? NON CASE SENSITIVE
 #define _USE_MATH_DEFINES // For MSVC - gdzie indziej chyba nie przeszkadza
 #include <cmath> //sin, cos, M_PI
 #include <cfloat>
 
-using namespace std;//Troch? to niebezpieczne ale skraca zapis
-#include "wieloboki.hpp"
-#include "compatyb.h" //stricmp() raz jest a raz go nie ma :-) zaleznie od systemu
+#include <cstring> //stricmp() raz jest a raz go nie ma :-) zaleÅ¼nie od systemu
 
-// Definicja konturów ró¿nych figur
-////////////////////////////////////////////
-//S¹ "static" tzn. ¿e nie bêd¹ widoczne poza tym modu³em.
-//Za to bêd¹ widoczne ich "opakowania" dostêpne z typu Wielobok
+using namespace std;//TrochÄ™ to niebezpieczne, ale skraca zapis
+#include "wieloboki.hpp"
+
+//  Definicja konturï¿½w rï¿½nych figur
+//*//////////////////////////////////////////
+
+//Sï¿½ "static" tzn. ï¿½e nie bï¿½dï¿½ widoczne poza tym moduï¿½em.
+//Za to bï¿½dï¿½ widoczne ich "opakowania" dostï¿½pne z typu Wielobok
+
 static ssh_point kNamiot[]=
 {{0,0},{10,30},{-10,30}};
 
@@ -57,10 +60,10 @@ static ssh_point kPojazd4[]=
 {{0,-2},{-2,-1},{-5,-2},{-5,-5},{-15,-5},{-15,-2},{-17,-1},{-20,-2},{-20,-5},
 	{-30,-5},{-30,-10},{-20,-10},{-15,-15},{-0,-15},{5,-20},{10,-20},{10,-5},{0,-5}};
 
-static ssh_point kLudzik0[]= //Prawie bezp³ciowy
+static ssh_point kLudzik0[]= //Prawie bezpï¿½ciowy
 {{0,-12},{1,-12},{2,-11},{2,-10},{1,-8},{4,-6},{4,0},{3,1},{2,11},{3,11},{3,12},{0,12},{0,2},{0,12},{-3,12},{-3,11},{-2,11},{-3,1}, {-4,0},{-4,-6},{-1,-8},{-2,-10},{-2,-11},{-1,-12}};
 
-static ssh_point kLudzik1[]= //Prawie równie bezp³ciowy
+static ssh_point kLudzik1[]= //Prawie rï¿½wnie bezpï¿½ciowy
 {{0,-12},{1,-12},{2,-11},{2,-10},{1,-8},{4,-6},{4,3},{3,2},{3,-3},{3,0},{2,11},{3,11},{3,12},{0,12},{0,2},{0,12},{-3,12},{-3,11},{-2,11},{-3,0},{-3,-3},{-3,2},{-4,3},{-4,-6},{-1,-8},{-2,-10},{-2,-11},{-1,-12}};
 
 static ssh_point kLudzik2[]= //jak zerowy
@@ -106,7 +109,7 @@ static ssh_point kMinisterstwo3[]=
 {{0,0},{25,10},{20,10},{20,30},{16,30},{16,10},{2,10},{2,30},{-2,30},{-2,10},{-16,10},{-16,30},{-20,30},{-20,10},{-25,10}};
 
 
-//Definijemy obiekty dla przyk³adowych kszta³tów - jest ich w sumie niewiele
+//Definijemy obiekty dla przykï¿½adowych ksztaï¿½tï¿½w - jest ich w sumie niewiele
 static Wielobok WNamiot(kNamiot,sizeof(kNamiot)/sizeof(kNamiot[0]));
 static Wielobok WRomb(kRomb,sizeof(kRomb)/sizeof(kRomb[0]));
 static Wielobok WKwadrat(kKwadrat,sizeof(kKwadrat)/sizeof(kKwadrat[0]));
@@ -131,7 +134,7 @@ static Wielobok WGmach3 (kGmach3,sizeof(kGmach3)/sizeof(kGmach3[0]));
 static Wielobok WGmach4 (kGmach4,sizeof(kGmach4)/sizeof(kGmach4[0]));
 
 
-//Wlasciwa biblioteka podstawowych kszta³tów w przestrzeni nazw klasy Wielobok,
+//Wlasciwa biblioteka podstawowych ksztaï¿½tï¿½w w przestrzeni nazw klasy Wielobok,
 ////////////////////////////////////////////////////////////////////////////////
 struct ElementListy
 { const char* Nazwa; Wielobok* Ksztalt;
@@ -185,12 +188,12 @@ static ElementListy ListaKsztaltow[1024]=//Lista jest ze sporym zapasem
 {"building3",&WGmach3},
 {"building4",&WGmach4},
 //{"",&},
-{NULL,NULL} //STRA¯NIK!!!
+{NULL,NULL} //STRAï¿½NIK!!!
 };
 
-//Zrobione jako statyczne metody bo to pozwala robic potem ró¿ne implementacje
-//przechowywania tych wieloboków, np. tworzyc je dopiero gdy b?d? potrzebne
-//lub œci¹gaæ z dysku.
+//Zrobione jako statyczne metody bo to pozwala robic potem rï¿½ne implementacje
+//przechowywania tych wielobokï¿½w, np. tworzyc je dopiero gdy b?d? potrzebne
+//lub ï¿½ciï¿½gaï¿½ z dysku.
 const Wielobok& Wielobok::Ludzik(int typ)
 {
 	  switch(typ){
@@ -206,7 +209,7 @@ const Wielobok& Wielobok::Ludzik(int typ)
 }
 
 const char*     Wielobok::NazwyWielobokow(int pos)
-//Jak NULL to nie ma wiêcej
+//Jak NULL to nie ma wiï¿½cej
 {
 	if(pos<sizeof(ListaKsztaltow)/sizeof(ListaKsztaltow[0]))
 		return ListaKsztaltow[pos].Nazwa;
@@ -222,54 +225,61 @@ static char* strcplower( char* t, const char* s )
 }
 
 const Wielobok& Wielobok::WielobokWgNazwy(const char* Nazwa)
-//Ewentualnie mo¿e byæ nazwa pliku
+//Ewentualnie moï¿½e byï¿½ nazwa pliku
 {
-    char locNazwa[255];//Nie jest to w pe?ni bezpieczne
-    strcplower(locNazwa,Nazwa);//Zmieniamy na same ma?e litery
+    char locNazwa[255]; //Nie jest to w pe?ni bezpieczne
+    strcplower(locNazwa,Nazwa); //Zmieniamy na same ma?e litery
 
 	unsigned size=sizeof(ListaKsztaltow)/sizeof(ListaKsztaltow[0]);
 	for(unsigned i=0;i<size && ListaKsztaltow[i].Nazwa!=NULL;i++)
 	{
-
-        if(stricmp(ListaKsztaltow[i].Nazwa,locNazwa)==0) //_stricmp jest ISO a stricmp jest niby stare z POSIXa - ale jest non case sensitive a strcmp owszem
+#ifdef OLD
+            if(stricmp(ListaKsztaltow[i].Nazwa,locNazwa)==0) //_stricmp jest w MSVC a stricmp jest niby stare z POSIXa
+#else
+            if( strcasecmp(ListaKsztaltow[i].Nazwa,locNazwa)==0 )
+#endif
 				return *ListaKsztaltow[i].Ksztalt;
 	}
 	return Domyslny();
 }
 
 const Wielobok* Wielobok::SprobujWielobok(const char* Nazwa)
-//Jak nie ma to NULL i probuje za?adowac z pliku *.poly
+//Jak nie ma to NULL (albo jeszcze probuje zaÅ‚adowaÄ‡ z pliku *.poly TODO!)
 {
     char locNazwa[255];//Nie jest to w pe?ni bezpieczne
-    strcplower(locNazwa,Nazwa);//Zmieniamy na same ma?e litery
+    strcplower(locNazwa,Nazwa); //Zmieniamy na same maÅ‚e litery
 
 	unsigned size=sizeof(ListaKsztaltow)/sizeof(ListaKsztaltow[0]);
 	for(unsigned i=0;i<size && ListaKsztaltow[i].Nazwa!=NULL;i++)
 	{
-        if(stricmp(ListaKsztaltow[i].Nazwa,locNazwa)==0)//_stricmp jest niby ISO a stricmp jest niby stare z POSIXa - ale jest non case sensitive a strcmp owszem
+#ifdef OLD_CPP
+            if(stricmp(ListaKsztaltow[i].Nazwa,locNazwa)==0)//_stricmp jest niby ISO a stricmp jest niby stare z POSIXa
+#else
+            if(strcasecmp(ListaKsztaltow[i].Nazwa,locNazwa)==0)
+#endif
 				return ListaKsztaltow[i].Ksztalt;
 	}
 	//Jednak nie ma
-    //Proba ?adowania z pliku - raz za?adowane zostaje do konca dzialania programu!
-    //...
+    //Proba Å‚adowania z pliku - raz zaÅ‚adowane zostaje do konca dziaÅ‚ania programu!
+    // TODO!!!
 	return NULL;
 }
 
-//Skróty do czêœciej u¿ywanych
+//Skrï¿½ty do czï¿½ciej uï¿½ywanych
 const Wielobok&  Wielobok::Domyslny() {return WRomb;}
 const Wielobok&  Wielobok::Romb() {return WRomb;}
 const Wielobok&  Wielobok::Namiot() {return WNamiot;}
 const Wielobok&  Wielobok::Domek(){return WDomek;}
 const Wielobok&  Wielobok::Ufo() {return WUfo;}
 
-// W£AŒCIWA IMPLEMENTACJA KLASY WIELOBOK
+// Wï¿½Aï¿½CIWA IMPLEMENTACJA KLASY WIELOBOK
 //////////////////////////////////////////////////////////
-//Transformacje. Modyfikuj¹ listê punktów ¿eby by³o wygodniej
+//Transformacje. Modyfikujï¿½ listï¿½ punktï¿½w ï¿½eby byï¿½o wygodniej
 void Wielobok::Centruj()
-//Zmienia wspó³rzêdne tak, ¿eby by³y wokó³ œrodka ciê¿koœci
+//Zmienia wspï¿½rzï¿½dne tak, ï¿½eby byï¿½y wokï¿½ ï¿½rodka ciï¿½koï¿½ci
 {
   unsigned i;
-  //Najpierw trzeba znaleŸæ œrodek ciê¿koœci figury
+  //Najpierw trzeba znaleï¿½ï¿½ ï¿½rodek ciï¿½koï¿½ci figury
   double x=0,y=0;
   for(i=0;i<Ilobok;i++)
   {
@@ -279,7 +289,7 @@ void Wielobok::Centruj()
   x/=double(Ilobok);
   y/=double(Ilobok);
   
-  //A teraz mo¿na przesun¹æ do œrodka
+  //A teraz moï¿½na przesunï¿½ï¿½ do ï¿½rodka
   for(i=0;i<Ilobok;i++)
   {
      Punkty[i].x-=x;
@@ -288,8 +298,8 @@ void Wielobok::Centruj()
 }
 
 void Wielobok::Zakresy(double& MinX,double& MinY,  //Metoda przelatuje punkty i daje informacje
-			   double& MaxX,double& MaxY,  //O otaczaj¹cym prostok¹cie
-			   double& R) const		   //oraz okr¹gu ze srodkiem w punkcie 0,0
+			   double& MaxX,double& MaxY,  //O otaczajï¿½cym prostokï¿½cie
+			   double& R) const		   //oraz okrï¿½gu ze srodkiem w punkcie 0,0
 {
 	MinX=MinY=DBL_MAX;
 	MinX=MinY=R=-DBL_MAX;
@@ -309,7 +319,7 @@ void Wielobok::Zakresy(double& MinX,double& MinY,  //Metoda przelatuje punkty i 
 }
 
 void Wielobok::Skaluj(double x,double y)
-//Zmienia wspó³rzêdne
+//Zmienia wspï¿½rzï¿½dne
 {
 	for(unsigned i=0;i<Ilobok;i++)
     {
@@ -337,7 +347,7 @@ void Wielobok::OdbijWPoziomie()
 }    
 
 void Wielobok::ObrocORad(double Radiany)
-//Obraca o ileœ radianów
+//Obraca o ileï¿½ radianï¿½w
 {
 	double cosR=cos(Radiany);
 	double sinR=sin(Radiany);
@@ -350,9 +360,9 @@ void Wielobok::ObrocORad(double Radiany)
     }
 }
 
-//Konstruktory - tworz¹ wieloboki na bazie wzorca, tablicy albo innego Wieloboku    
-//Nie ma mo¿liwoœci stworzenia pustego "Wieloboku", choæ mo¿e byæ "zerowy"   
-//Tylko to ju¿ na odpowiedzialnoœæ u¿ytkownika klasy.  
+//Konstruktory - tworzï¿½ wieloboki na bazie wzorca, tablicy albo innego Wieloboku    
+//Nie ma moï¿½liwoï¿½ci stworzenia pustego "Wieloboku", choï¿½ moï¿½e byï¿½ "zerowy"   
+//Tylko to juï¿½ na odpowiedzialnoï¿½ï¿½ uï¿½ytkownika klasy.  
 Wielobok::Wielobok(const ssh_point Wzorek[],unsigned RozmiarWzorka)
 {                                                       assert(RozmiarWzorka>2);
    Punkty=new ssh_point[RozmiarWzorka];                 assert(Punkty!=NULL);
@@ -361,7 +371,7 @@ Wielobok::Wielobok(const ssh_point Wzorek[],unsigned RozmiarWzorka)
 }
 
 Wielobok::Wielobok(const Wielobok& Wzorek)
-//Konstruktor kopuj¹cy
+//Konstruktor kopujï¿½cy
 {
    Punkty=new ssh_point[Wzorek.Ilobok];                  assert(Punkty!=NULL);
    Ilobok=Wzorek.Ilobok;
@@ -369,7 +379,7 @@ Wielobok::Wielobok(const Wielobok& Wzorek)
 }
 
 Wielobok::Wielobok(unsigned IleBokow,float R)
-//Konstruktor N-boków o zmiennym rozmiarze
+//Konstruktor N-bokï¿½w o zmiennym rozmiarze
 {
    Punkty=new ssh_point[IleBokow];                  assert(Punkty!=NULL);
    Ilobok=IleBokow;
@@ -381,17 +391,17 @@ Wielobok::Wielobok(unsigned IleBokow,float R)
    }
 }
 
-//Destruktor - bo trzeba zwolniæ pomocnicz¹ tablice
+//Destruktor - bo trzeba zwolniï¿½ pomocniczï¿½ tablice
 Wielobok::~Wielobok()
 {
   delete []Punkty;
 }
 
-//Rysuj() - rysuje gdzieœ wielobok w zadanym kolorze. Nie modyfikuje stanu!
+//Rysuj() - rysuje gdzieï¿½ wielobok w zadanym kolorze. Nie modyfikuje stanu!
 void Wielobok::Rysuj(int StartX,int StartY,ssh_color Color) const
 //Rysowanie tej figury w miejscu i kolorze zdefiniowanym gdzie indziej 
-//Zrobione jako osobna procedura bo mo¿emy j¹ rozbudowaæ o dodatkowe
-//elementy nie bêd¹ce sk³adowymi samego wiekok¹ta
+//Zrobione jako osobna procedura bo moï¿½emy jï¿½ rozbudowaï¿½ o dodatkowe
+//elementy nie bï¿½dï¿½ce skï¿½adowymi samego wiekokï¿½ta
 {        
    fill_poly(StartX,StartY,Punkty,Ilobok,Color);
 }

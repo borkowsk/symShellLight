@@ -1,7 +1,7 @@
 #include <cctype>
 #include <cstdlib>
 
-#include "INCLUDE/wb_ptr.hpp"
+#include "wb_ptr.hpp"
 
 using namespace std;
 

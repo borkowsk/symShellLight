@@ -1,12 +1,14 @@
 /**
-* \file sshutils.hpp
-* Implementacja pomocniczych funkcji symshell-a w sposób już niezależny od platformy.
-* \author borkowsk                                                                         */
-// //////////////////////////////////////////////////////////////////////////////////////////
-/**
-* \details Napisane PRAWIE NIEOBIEKTOWO ale w C++
-* Jest tu: print_width() , puste rect(), bar3D(), arrow() ...itp...
-*/
+* \file   sshutils.hpp
+* \brief  Implementacja pomocniczych funkcji symshell-a w sposób już niezależny od platformy.
+*         ***********************************************************************************
+* \details
+*          Napisane PRAWIE NIEOBIEKTOWO ale w C++
+*          Jest tu: print_width() , puste rect(), bar3D(), arrow() ...itp...
+* \author borkowsk
+* \n :atom_symbol:
+* */
+
 #ifndef __SSHUTILS_HPP__
 #define __SSHUTILS_HPP__
 
@@ -17,11 +19,22 @@
 #include <math.h>
 #include "symshell.h"
 
-#ifndef M_PI		/* np MVC++ nie definiuje */
+#ifndef M_PI
+/** Własne definicje:
+ *  \def M_PI
+ *  \def M_PI_2
+ *  \def M_PI_4
+ *  definiowane, gdy nie sa dostarczone przez kompilator. Np. starsze MVC++ nie definiowało. */
 #define M_PI        3.14159265358979323846
 #define M_PI_2      1.57079632679489661923
 #define M_PI_4      0.785398163397448309616
 #endif
+
+/**
+ * @defgroup SymShellUtils Różne dodatkowe narzędzia do grafiki
+ * \brief    Zdefiniowane kolory i dodatkowe kształty
+ */
+///@{
 
 /// \brief Obliczanie odległości Euklides. Często potrzebne w takich programach
 double distance(double X1,double X2,double Y1,double Y2);
@@ -40,8 +53,11 @@ const wb_color default_dark_gray=256+64;             ///< domyślny kolor indeks
 const wb_color default_half_gray=256+128;            ///< domyślny kolor indeksowany średnio szary
 const wb_color default_light_gray=256+128+64;        ///< domyślny kolor indeksowany jasno szary
 
-//Funkcja interpretująca string jako wartość RGB
-//Dopuszczalne formaty to: xFFFFFF  b111111111111111111111111  rgb(255,255,255) RGB(255,255,255)
+/// \brief Funkcja interpretująca string jako wartość RGB
+/// \param s powinno zawierać tekst z definicją koloru RBG
+/// \param endptr pozwala sprawdzić czy nie było błędu
+/// \return kolor RBG zakodowany w postaci liczby 32 bitowej. TODO - powinno zwracać ssh_rgba, ale na razie nie używamy
+/// \details Dopuszczalne formaty to: xFFFFFF  b111111111111111111111111  rgb(255,255,255) RGB(255,255,255)
 unsigned strtorgb(const char *s, char **endptr);
 
 // Ustawienia grubości i rozmiarów elementów 'sshutils'
@@ -52,7 +68,7 @@ extern int def_scale_width;/* =10;*/                 ///< domyślna szerokość 
 extern double def_arrow_size;/* =15;*/               ///< domyślna długość grota strzałki
 extern double def_arrow_theta;/*=M_PI/6.0+M_PI;*/    ///< domyślne rozwarcie grota strzałki
 
-/// Struktura konfiguracji słupków 3D.
+/// \brief Struktura konfiguracji słupków 3D.
 struct settings_bar3d
 {
     ///Konstruktor struktury konfiguracji słupków 3D
@@ -65,58 +81,61 @@ struct settings_bar3d
                ):
 		a(ia),b(ib),c(ic),wire(wcol),back(bcol)
         {}
-    int         a; ///<długość odcinka a słupka
-    int         b; ///<długość odcinka b słupka
-    int         c; ///<długość odcinka c słupka
-    wb_color wire; ///<Kolor ramek
-    wb_color back; ///<Informacja o kolorze tla
+    int         a; ///< długość odcinka a słupka
+    int         b; ///< długość odcinka b słupka
+    int         c; ///< długość odcinka c słupka
+    wb_color wire; ///< Kolor ramek
+    wb_color back; ///< Informacja o kolorze tla
 };
 
-/// Funkcja konfiguracji słupków 3D \return Zwraca poprzednią konfiguracje.
-/// \return albo NULL jeśli przywraca poprzednio zapamiętaną
+/// \brief  Funkcja konfiguracji słupków 3D
+/// \return Zwraca poprzednią konfiguracje albo NULL jeśli przywraca poprzednio zapamiętaną
 const settings_bar3d* bar3d_config(settings_bar3d* st);
 
-/// Rysuje słupek 3D w kolorach indeksowanych
+/// \brief  Rysuje słupek 3D w kolorach indeksowanych
 void bar3d(int x,int y,int h,wb_color col1,wb_color col2);
 
-/// Rysuje słupek 3D w kolorze RBG z cieniem
+/// \brief  Rysuje słupek 3D w kolorze RBG z cieniem
 void bar3dRGB(int x,int y,int h,int R,int G,int B,int ShadowDiv);
 
-/// Rysuje kwadratowa ramkę o zadanej grubości
+/// \brief  Rysuje kwadratowa ramkę o zadanej grubości
 void rect(int x1,int y1,int x2,int y2,wb_color frame_c,int width=def_frame_width);
 
-/// Rysuje pionową skalę kolorów
+/// \brief  Rysuje pionową skalę kolorów
 void ver_scale(int x1,int y1,int width=def_scale_width,wb_color start=0,wb_color end=255);
 
-/// Rysuje poziomą skalę kolorów
+/// \brief  Rysuje poziomą skalę kolorów
 void hor_scale(int x1,int y1,int high=def_scale_width,wb_color start=0,wb_color end=255);
 
-/// Rysuje krzyżyk
+/// \brief  Rysuje krzyżyk
 void cross(int x,int y,wb_color color,int width=def_cross_width);
 
-/// Rysuje dowolnie skierowaną strzałkę od punktu x1y1 do x2y2
+/// \brief  Rysuje dowolnie skierowaną strzałkę od punktu x1y1 do x2y2
 void arrow(int x1,int y1,int x2,int y2,wb_color color,double size=def_arrow_size,double theta=def_arrow_theta);
 
-/// Wydajnie rysuje poziomą strzałkę
+/// \brief  Efektywnie rysuje poziomą strzałkę
 void vert_arrow(int x1,int x2,int y,wb_color color,double size=def_arrow_size);
 
-/// Efektywnie rysuje pionową strzałkę
+/// \brief  Efektywnie rysuje pionową strzałkę
 void hor_arrow(int x,int y1,int y2,wb_color  color,double size=def_arrow_size);
 
-/// Drukuje tekst w obszarze nie szerszym niz max_width. \return Zwraca width albo 0
+/// \brief   Drukuje tekst w obszarze nie szerszym niz max_width.
+/// \return  Zwraca width albo 0
 /// \details wewnętrzny bufor ma nie więcej niż 1024 znaki
 int print_width(int x,int y,int max_width,wb_color col,wb_color bcg,const char* format ...);
 
 extern "C" {
-/// \brief Wyświetlanie pliku HTML poprzez system shell systemowy.
+/// \brief Wyświetlanie pliku HTML poprzez shell systemowy.
 /// \details Tak naprawdę można użyć do wszystkich typów plików
-/// jakie może wyświetlić przeglądarka
+///          jakie może wyświetlić przeglądarka
+/// \param URL - pełny URL, ale czasem ujdzie i nazwa pliku :-D
 /// \return powinien zwrócić kod wykonania programu "dziecka"
     int ViewHtml(const char* URL);
 }
 
+///@}
 /* ******************************************************************/
-/*              SYMSHELLLIGHT  version 2022-01-04                   */
+/*              SYMSHELLLIGHT  version 2022-10-27                   */
 /* ******************************************************************/
 /*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
 /*            W O J C I E C H   B O R K O W S K I                   */

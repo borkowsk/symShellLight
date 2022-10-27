@@ -1,16 +1,16 @@
-///\file optParam.hpp
+/// \file optParam.hpp
+/// \brief KLASY potrzebne do obsługi parametrów wywołania programu.
 #ifndef OPTIONAL_PARAMETERS_HPP
 #define  OPTIONAL_PARAMETERS_HPP
-/// \brief KLASY potrzebne do obsługi parametrów wywołania programu
 /// \details
-/// Obsługiwane są typy standardowe numeryczne oraz
-/// inne typy mające implementacje << >> na strumienie i
-/// operator porównania <=
-/// Obsługiwany jest też typ "const char*" , ale na poziomie wskaźników, czyli
-/// wskaźnik do zawartości linii komend może zostać przypisany na zmienną
-/// typu "const char*"
-/// NIESTETY nie można używać typu 'string' bo nie ma on obsługi strumieni!
-/// Chyba żeby już była? TODO CHECK IT!
+///     Obsługiwane są typy standardowe numeryczne oraz
+///     inne typy mające implementacje << >> na strumienie i
+///     operator porównania <=
+///     Obsługiwany jest też typ "const char*" , ale na poziomie wskaźników, czyli
+///     wskaźnik do zawartości linii komend może zostać przypisany na zmienną
+///     typu "const char*"
+///     NIESTETY nie można używać typu 'string' bo nie ma on obsługi strumieni!
+///     Chyba żeby już była? TODO CHECK IT!
 
 //#include "platform.hpp"
 
@@ -32,8 +32,14 @@ using namespace std;
 
 ///\namespace wbrtm \brief WOJCIECH BORKOWSKI RUN TIME LIBRARY
 namespace wbrtm {
+/**
+ * @defgroup MAINandPARS Okolice funkcji main() i parametrów
+ * \brief    Obsługa parametrów wywołania programu i innych aspektów
+ */
+///@{
 
-/// Baza klas dla wszystkich typów parametrów
+
+/// \brief   Baza klas dla wszystkich typów parametrów
 /// \details Definiuje interfejs parametru i funkcje statyczne do obsługi całej listy możliwych parametrów
 class OptionalParameterBase
 {
@@ -565,7 +571,7 @@ void OptEnumParametr<T>::HelpPrn(ostream& o)
     o<<"or integers range: <"<<this->LBound<<','<<this->HBound<<"> Default: "
      <<this->EnNames[this->Value-this->LBound]<<"="<<this->Value<<endl;
 }
-
+///@}
 }//NAMESPACE WBRTM
 
 /*v*******************************************************************/

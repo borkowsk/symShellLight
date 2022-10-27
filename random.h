@@ -1,9 +1,9 @@
-/** INTERFACE "C" DO ROZMAITYCH GENERATOROW LICZB PSEUDOLOSOWYCH */
-/** \file random.h                                               */
-/**--------------------------------------------------------------*/
+/** \brief INTERFACE "C" DO ROZMAITYCH GENERATORÓW LICZB PSEUDOLOSOWYCH */
+/** \file random.h                                                      */
+/**---------------------------------------------------------------------*/
 #ifndef __RANDOM__H__INCLUDED__
 #define __RANDOM__H__INCLUDED__  (1)
-#include <time.h> //Potrzebne bo wszędzie jest time()
+#include <time.h> // Potrzebne, bo wszędzie jest time()
 
 #if   defined( USES_RANDG )
 
@@ -73,7 +73,7 @@ float  randexp(void);
 //extern "C" {
 
 /** Funkcja dająca liczbę losową z zakresu 0..1, ale o rozkładzie
- * albo gaussopodobnym (W>0) albo paretopodobnym (W<0) lub 1 gdy W=0 */
+ * albo gausso-podobnym (W>0) albo pareto-podobnym (W<0) lub 1 gdy W=0 */
 inline  double DRAND_LOOP(int W)
 {
 	double pom;
@@ -99,7 +99,7 @@ inline  double DRAND_LOOP(int W)
 #endif
 
 /* *******************************************************************/
-/*               SYMSHELLLIGHT  version 2022-01-06                   */
+/*               SYMSHELLLIGHT  version 2022-10-27                   */
 /* *******************************************************************/
 /*            THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
 /*             W O J C I E C H   B O R K O W S K I                   */

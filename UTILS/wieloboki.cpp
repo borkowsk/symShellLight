@@ -346,7 +346,7 @@ void Wielobok::OdbijWPoziomie()
     } 
 }    
 
-void Wielobok::ObrocORad(double Radiany)
+void Wielobok::ObracajORad(double Radiany)
 //Obraca o ile� radian�w
 {
 	double cosR=cos(Radiany);

@@ -12,7 +12,7 @@ fi
 echo;echo "RUNNING Doxygen:" ;echo
 
 #run Doxygen directly
-doxygen Doxyfile
+#doxygen Doxyfile
 
 #or run Doxygen via wizzard
-#doxywizard Doxyfile 
+doxywizard Doxyfile 

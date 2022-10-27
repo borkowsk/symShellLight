@@ -3,7 +3,7 @@
 Light version of __Simulation Shell__. Mostly basic graphic for _X11_,_MS Windows_ & _SVG_ for educational purpose
 
 PL: Lekka wersja grafiki __SYMSHELL__'a dla _X11_, _MS Windows_ & _SVG_ z niektórymi podstawowymi funkcjonalnościami czasu wykonania. 
-Wyodrębnione z pełnej wersji w celach dydaktycznych :PL
+Wyodrębnione z pełnej wersji w celach dydaktycznych i eksportowych :PL
 
 **HISTORY**
 
@@ -48,4 +48,4 @@ You can use this software freely for educational and research purposes, but if y
 * https://www.buymeacoffee.com/wborkowsk
 * https://www.paypal.com/paypalme/wborkowsk
 
-last big modification: 2022-04-20
+last big modification: 2022-10-27

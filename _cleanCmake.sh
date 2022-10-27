@@ -13,3 +13,4 @@ rm -f CMakeLists.txt.user
 rm -f Makefile
 rm -f cmake_install.cmake
 rm -Rf CMakeFiles
+rm -R cmake-build-debug

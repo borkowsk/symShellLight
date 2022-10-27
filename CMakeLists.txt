@@ -79,32 +79,18 @@ endif(WINDOWS)
 #######################
 
 if(X11 AND WITHTESTS ) #X11 tests
-add_executable("TestmousX11"
-		"EXAMPLES/Testmous.cpp"
-    	)
-add_executable("TestpaleX11"
-		"EXAMPLES/Testpale.cpp"
-    	)
-add_executable("TestpolyX11"
-		"EXAMPLES/Testpoly.cpp"
-		)
+add_executable("TestmousX11"	"EXAMPLES/Testmous.cpp"    	)
+add_executable("TestpaleX11"	"EXAMPLES/Testpale.cpp"    	)
+add_executable("TestpolyX11"	"EXAMPLES/Testpoly.cpp"	)
 add_executable("TestrandX11"
-        "EXAMPLES/Testrand.cpp"
-        "UTILS/wb_randg.c"
-        "UTILS/wb_rand.cpp"
-    	)
-add_executable("TestsymsX11"
-		"EXAMPLES/Testsyms.cpp"
-		)
-add_executable("TestsyshX11"
-		"EXAMPLES/Testsysh.cpp"
-		)
-add_executable("TurmitX11"
-		"EXAMPLES/Turmit.cpp"
-		)
-add_executable("CAGasX11"
-		"EXAMPLES/CAGas.cpp"
-		)
+				"EXAMPLES/Testrand.cpp"
+				"UTILS/wb_randg.c"
+				"UTILS/wb_rand.cpp"
+    		)
+add_executable("TestsymsX11"	"EXAMPLES/Testsyms.cpp"	)
+add_executable("TestsyshX11"	"EXAMPLES/Testsysh.cpp"	)
+add_executable("TurmitX11"	"EXAMPLES/Turmit.cpp"		)
+add_executable("CAGasX11"	"EXAMPLES/CAGas.cpp"		)
 
 target_link_libraries("TestmousX11" wbsyshLight X11 Xpm rt)
 target_link_libraries("TestpaleX11" wbsyshLight X11 Xpm rt)
@@ -162,25 +148,18 @@ endif()
 
 
 if(WITHTESTS) #SVG tests
-add_executable("TestmousSVG" "EXAMPLES/Testmous.cpp"
-    )
-add_executable("TestpaleSVG" "EXAMPLES/Testpale.cpp"
-    )
-add_executable("TestpolySVG" "EXAMPLES/Testpoly.cpp"
-    )
+add_executable("TestmousSVG" "EXAMPLES/Testmous.cpp"    )
+add_executable("TestpaleSVG" "EXAMPLES/Testpale.cpp"    )
+add_executable("TestpolySVG" "EXAMPLES/Testpoly.cpp"    )
 add_executable("TestrandSVG"
-        "EXAMPLES/Testrand.cpp"
-        "UTILS/wb_randg.c"
-        "UTILS/wb_rand.cpp"
-    )
-add_executable("TestsymsSVG" "EXAMPLES/Testsyms.cpp"
-    )
-add_executable("TestsyshSVG" "EXAMPLES/Testsysh.cpp"
-    )
-add_executable("TurmitSVG" "EXAMPLES/Turmit.cpp"
-    )
-add_executable("CAGasSVG" "EXAMPLES/CAGas.cpp"
-    )
+				"EXAMPLES/Testrand.cpp"
+				"UTILS/wb_randg.c"
+				"UTILS/wb_rand.cpp"
+    		)
+add_executable("TestsymsSVG" "EXAMPLES/Testsyms.cpp"    )
+add_executable("TestsyshSVG" "EXAMPLES/Testsysh.cpp"    )
+add_executable("TurmitSVG" "EXAMPLES/Turmit.cpp"    )
+add_executable("CAGasSVG" "EXAMPLES/CAGas.cpp"    )
 
 if( WINDOWS )
 	target_link_libraries("TestmousSVG" wbsyshLightSVG  )
@@ -217,7 +196,7 @@ endif()
 endif()
 #KONIEC - THE END
 #********************************************************************/
-#*              SYMSHELLLIGHT  version 2022-10-20                   */
+#*              SYMSHELLLIGHT  version 2022-10-27                   */
 #********************************************************************/
 #*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
 #*            W O J C I E C H   B O R K O W S K I                   */

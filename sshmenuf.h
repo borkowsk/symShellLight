@@ -1,7 +1,10 @@
-/** INTERFACE FOR SYMSHELL MENU AND RELEATED FEATURES */
-/** \file sshmenuf.h                                  */
-/** \warning MS WINDOWS ONLY                          */
-/* ************************************************** */
+/** \file   sshmenuf.h
+*  \brief   INTERFACE FOR SYMSHELL MENU AND RELATED FEATURES
+*  \warning MS WINDOWS ONLY. Otherwise dummy version is provided.
+*           Unix version used Motif is outdated.
+*  \author  borkowsk
+*  \n :atom_symbol:
+* ************************************************** */
 #ifndef _SYMSHELL_MENUFUNCTIONS_H_
 #define _SYMSHELL_MENUFUNCTIONS_H_
 
@@ -11,48 +14,75 @@
 #define DEF_VAL_IF_CPP( _P_ )
 #endif
 
+/**
+ * @defgroup SymShellMenu Interface do obsługi menu
+ * \brief    Podstawowe funkcje pozwalające manipulować menu w Windows
+ * \details  Wersja dla X11 używająca Motifs kiedyś istniała, ale jest już raczej bezuzyteczna.
+ *           Jest moduł dummy służący za zaślepkę na tej platformie oraz w SVG.
+ *           TODO wersja tekstowa lub html/JavaScript. A może jest coś przenośnego co by można włączyć?
+ */
+///@{
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef void* ssh_menu_handle;
+    /** \brief Typ uchwytu do menu */
+    typedef void* ssh_menu_handle;
 
-ssh_menu_handle ssh_main_menu();
+    /** \brief Uchwyt do głównego menu */
+    ssh_menu_handle ssh_main_menu();
 
-ssh_menu_handle ssh_sub_menu(
-					ssh_menu_handle hMenu,				
-					unsigned    Position);
+    /** \brief Uchwyt do PODMENU podanego menu */
+    ssh_menu_handle ssh_sub_menu(
+					ssh_menu_handle hMenu,				              /**< uchwyt do menu lub sub-menu */
+					unsigned    Position				              /**< pozycja składowej menu */
+                    );
 
-unsigned ssh_get_item_position(
-                     ssh_menu_handle hMenu,
-                     const char* ItemName);/* Return MAX_UINT if cant find such item */
+    /** \brief pozycja itemu o danej nazwie */
+    /** \return MAX_UINT if cant find such item */
+    unsigned ssh_get_item_position(
+                 ssh_menu_handle hMenu,				                 /**< uchwyt do menu lub sub-menu */
+                 const char* ItemName				                 /**< nazwa składowej menu */
+                 );
 
-int	ssh_menu_add_item(
-					ssh_menu_handle hMenu,
-					const char* ItemName,
-					unsigned    Message,
-					unsigned    Flags DEF_VAL_IF_CPP(0));/* Default is ENABLE immediatelly */
+    /** \brief dodanie itemu o danej nazwie */
+    /** \note  by default item is ENABLE immediately. It could be changed using \p Flags */
+    int	ssh_menu_add_item(
+					ssh_menu_handle hMenu,				             /**< uchwyt do menu lub sub-menu */
+					const char* ItemName,				             /**< nazwa składowej menu */
+					unsigned    Message,                             /**< ??? */
+					unsigned    Flags                                /**< flagi ustawień */
+                                DEF_VAL_IF_CPP(0)
+                                );
 
-int ssh_menu_mark_item(
-					ssh_menu_handle hMenu,
-					unsigned    Check,
+    /** \brief znakowanie itemu menu */
+    /** \param asPosition Need be 1 if submenu checking ??? */
+    int ssh_menu_mark_item(
+					ssh_menu_handle hMenu,				              /**< uchwyt do menu lub sub-menu */
+					unsigned    Check,                                /**< czy z check-markiem */
 					unsigned    ItemCommandOrPosition,										
-					unsigned    asPosition DEF_VAL_IF_CPP(0));/*Need be 1 if submenu checking*/
-					  
-int ssh_realize_menu(ssh_menu_handle hMenu);
+					unsigned    asPosition
+                                DEF_VAL_IF_CPP(0)
+                                );
+
+    /** \brief zapewnia że menu staje się gotowe do użycia */
+    int ssh_realize_menu(ssh_menu_handle hMenu);				      /**< \param hMenu - uchwyt do menu lub sub-menu */
 
 #ifdef unix
-extern int 		ssh_menu_trace; 	/* For debuging purposes - external accesible */
-extern char*    ssh_menu_options; 	/*MOTIF STYLE OPTIONS */
+/** For debuging purposes - external accesible */
+extern int 		ssh_menu_trace;
+/** MOTIF STYLE OPTIONS */
+extern char*    ssh_menu_options;
 #endif
 
 #ifdef __cplusplus
 };
 #endif
-
+///@}
 
 /* *******************************************************************/
-/*               SYMSHELLLIGHT  version 2022-01-06                   */
+/*               SYMSHELLLIGHT  version 2022-10-27                   */
 /* *******************************************************************/
 /*            THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
 /*             W O J C I E C H   B O R K O W S K I                   */

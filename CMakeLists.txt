@@ -1,21 +1,36 @@
 # CMAKE configuration for SYMSHELLLIGHT libraries wbsyshSVG wbsyshX11
 ######################################################################
-# Define X11 for compiling X11 version of library
-# Define WINDOWS for compiling MS Windows version
-# Define WITHTESTS if you want build test applications!
+# X11 auto-defined under linux/unix for compiling X11 version of the library.
+# WINDOWS auto-defined under MS Windows for compiling appr. version of the lib.
+#
+# Manually define WITHTESTS=true, if you want build test applications!
+#
 
 cmake_minimum_required(VERSION 2.9)
 project(symshelllight)
 
-set( X11 true ) #DEFAULT
-#set( WINDOWS true ) #NOT TESTED!
 set( WITHTESTS false )
 
+IF (WIN32)
+  # set stuff for windows
+  message( "MS Windows platform assumed.\n\tInside C/C++ code automatic _MSC_VER variable will be used!" )
+  set( WINDOWS true ) #still not tested!
+  set( MSVC 1 ) #old macro used also somewhere in C code?
+  #set( WINDOWS_ONLY_SRC  "${WBRTM}/BASE/wb_assert.c" )
+ELSE()
+  # set stuff for other systems
+  message( "Linux/unix platform assumed.")
+  set( X11 true )
+  #set( X_ONLY_SRC  "" )
+ENDIF()
+
 if (MSVC)
-    #warning level 4 and/or all warnings as errors if you want
+    # warning level 4 and/or all warnings as errors if you want
+    
     #add_compile_options( /W4 ) #  /WX
 else()
     # A lots of warnings if you want
+    
     #add_compile_options( -Wall )
 endif(MSVC)
 
@@ -196,7 +211,7 @@ endif()
 endif()
 #KONIEC - THE END
 #********************************************************************/
-#*              SYMSHELLLIGHT  version 2022-10-27                   */
+#*              SYMSHELLLIGHT  version 2022-11-07                   */
 #********************************************************************/
 #*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
 #*            W O J C I E C H   B O R K O W S K I                   */

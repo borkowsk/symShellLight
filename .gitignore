@@ -43,6 +43,7 @@ TESTS/RawTests/native/native
 CMakeFiles/
 cmake-build-debug/
 CMakeLists.txt.user
+CMakeCache.txt
 Makefile
 
 *.cbp

@@ -6,20 +6,20 @@
 # Manually define WITHTESTS=true, if you want build test applications!
 #
 
-cmake_minimum_required(VERSION 2.9)
 project(symshelllight)
+cmake_minimum_required(VERSION 2.9)
 
-set( WITHTESTS false )
+set( WITHTESTS true )
 
 IF (WIN32)
   # set stuff for windows
-  message( "MS Windows platform assumed.\n\tInside C/C++ code automatic _MSC_VER variable will be used!" )
+  message( ${PROJECT_NAME} ": MS Windows platform assumed.\n\tInside C/C++ code automatic _MSC_VER variable will be used!" )
   set( WINDOWS true ) #still not tested!
   set( MSVC 1 ) #old macro used also somewhere in C code?
   #set( WINDOWS_ONLY_SRC  "${WBRTM}/BASE/wb_assert.c" )
 ELSE()
   # set stuff for other systems
-  message( "Linux/unix platform assumed.")
+  message( ${PROJECT_NAME} ": Linux/unix platform assumed.")
   set( X11 true )
   #set( X_ONLY_SRC  "" )
 ENDIF()

@@ -10,6 +10,9 @@ using namespace std;
 
 unsigned strtorgb(const char *s, char **endptr)
 {
+#ifdef _MSC_VER
+   char* next_token = NULL;
+#endif
    while(isspace(*s)) s++;   //isblank() Usun biale       ?
 
    if(s[0]=='0' && tolower(s[1])=='x' )
@@ -28,18 +31,29 @@ unsigned strtorgb(const char *s, char **endptr)
    {
 		wbrtm::wb_pchar pom(s+4);
 		char* endptr2=NULL;
-
+#ifdef _MSC_VER
+		char* token = strtok_s(pom.get_ptr_val(), "," , &next_token);
+#else
 		char* token=strtok(pom.get_ptr_val(),",");
+#endif
 		if(token==NULL) { *endptr=(char*)s;return 0; }
 		unsigned val=strtoul(token,&endptr2,10);
 		if(endptr2!=NULL && *endptr2!='\0') { *endptr=(char*)s;return 0; }
 
+#ifdef _MSC_VER
+		token = strtok_s(NULL, ",", &next_token);
+#else
 		token=strtok(NULL,",");
+#endif
 		if(token==NULL) { *endptr=(char*)s;return 0; }
 		val=256*val+strtoul(token,&endptr2,10);
 		if(endptr2!=NULL && *endptr2!='\0') { *endptr=(char*)s;return 0; }
 
-		token=strtok(NULL,")");
+#ifdef _MSC_VER
+		token = strtok_s(NULL, ")", &next_token);
+#else
+		token = strtok(NULL, ")");
+#endif
 		if(token==NULL) { *endptr=(char*)s;return 0; }
 		val=256*val+strtoul(token,&endptr2,10);
 		if(endptr2!=NULL && *endptr2!='\0') { *endptr=(char*)s;return 0; }
@@ -52,22 +66,38 @@ unsigned strtorgb(const char *s, char **endptr)
 		wbrtm::wb_pchar pom(s+5);
 		char* endptr2=NULL;
 
-		char* token=strtok(pom.get_ptr_val(),",");
+#ifdef _MSC_VER
+		char* token = strtok_s(pom.get_ptr_val(), ",", &next_token);
+#else
+		char* token = strtok(pom.get_ptr_val(), ",");
+#endif
 		if(token==NULL) { *endptr=(char*)s;return 0; }
 		unsigned val=strtoul(token,&endptr2,10);
 		if(endptr2!=NULL && *endptr2!='\0') { *endptr=(char*)s;return 0; }
 
-		token=strtok(NULL,",");
+#ifdef _MSC_VER
+		token = strtok_s(NULL, ",", &next_token);
+#else
+		token = strtok(NULL, ",");
+#endif
 		if(token==NULL) { *endptr=(char*)s;return 0; }
 		val=256*val+strtoul(token,&endptr2,10);
 		if(endptr2!=NULL && *endptr2!='\0') { *endptr=(char*)s;return 0; }
 
-		token=strtok(NULL,",");
+#ifdef _MSC_VER
+		token = strtok_s(NULL, ",", &next_token);
+#else
+		token = strtok(NULL, ",");
+#endif
 		if(token==NULL) { *endptr=(char*)s;return 0; }
 		val=256*val+strtoul(token,&endptr2,10);
 		if(endptr2!=NULL && *endptr2!='\0') { *endptr=(char*)s;return 0; }
 
-		token=strtok(NULL,")");
+#ifdef _MSC_VER
+		token = strtok_s(NULL, ")", &next_token);
+#else
+		token = strtok(NULL, ")");
+#endif
 		if(token==NULL) { *endptr=(char*)s;return 0; }
 		val=256*val+strtoul(token,&endptr2,10);
 		if(endptr2!=NULL && *endptr2!='\0') { *endptr=(char*)s;return 0; }

@@ -224,17 +224,17 @@ static char* strcplower( char* t, const char* s )
   return t;
 }
 
+/// \note Ewentualnie może być nazwa pliku
 const Wielobok& Wielobok::WielobokWgNazwy(const char* Nazwa)
-//Ewentualnie mo�e by� nazwa pliku
 {
-    char locNazwa[255]; //Nie jest to w pe?ni bezpieczne
-    strcplower(locNazwa,Nazwa); //Zmieniamy na same ma?e litery
+    char locNazwa[255]; //Nie jest to w pełni bezpieczne
+    strcplower(locNazwa,Nazwa); //Zmieniamy na same małe litery
 
 	unsigned size=sizeof(ListaKsztaltow)/sizeof(ListaKsztaltow[0]);
 	for(unsigned i=0;i<size && ListaKsztaltow[i].Nazwa!=NULL;i++)
 	{
-#ifdef OLD
-            if(stricmp(ListaKsztaltow[i].Nazwa,locNazwa)==0) //_stricmp jest w MSVC a stricmp jest niby stare z POSIXa
+#ifdef _MSC_VER
+            if(_stricmp(ListaKsztaltow[i].Nazwa,locNazwa)==0) //_stricmp jest w MSVC a stricmp jest niby stare z POSIXa
 #else
             if( strcasecmp(ListaKsztaltow[i].Nazwa,locNazwa)==0 )
 #endif
@@ -243,8 +243,9 @@ const Wielobok& Wielobok::WielobokWgNazwy(const char* Nazwa)
 	return Domyslny();
 }
 
+/// \return obiekt z tablicy lub załadowany. Jak nie ma to NULL 
+/// \note TODO: Może probować załadować z pliku *.poly 
 const Wielobok* Wielobok::SprobujWielobok(const char* Nazwa)
-//Jak nie ma to NULL (albo jeszcze probuje załadować z pliku *.poly TODO!)
 {
     char locNazwa[255];//Nie jest to w pe?ni bezpieczne
     strcplower(locNazwa,Nazwa); //Zmieniamy na same małe litery
@@ -252,8 +253,8 @@ const Wielobok* Wielobok::SprobujWielobok(const char* Nazwa)
 	unsigned size=sizeof(ListaKsztaltow)/sizeof(ListaKsztaltow[0]);
 	for(unsigned i=0;i<size && ListaKsztaltow[i].Nazwa!=NULL;i++)
 	{
-#ifdef OLD_CPP
-            if(stricmp(ListaKsztaltow[i].Nazwa,locNazwa)==0)//_stricmp jest niby ISO a stricmp jest niby stare z POSIXa
+#ifdef _MSC_VER
+            if(_stricmp(ListaKsztaltow[i].Nazwa,locNazwa)==0)//_stricmp jest niby ISO a stricmp jest niby stare z POSIXa
 #else
             if(strcasecmp(ListaKsztaltow[i].Nazwa,locNazwa)==0)
 #endif
@@ -265,23 +266,28 @@ const Wielobok* Wielobok::SprobujWielobok(const char* Nazwa)
 	return NULL;
 }
 
-//Skr�ty do cz�ciej u�ywanych
+// Skr�ty do cz�ciej u�ywanych
+// /////////////////////////////
 const Wielobok&  Wielobok::Domyslny() {return WRomb;}
 const Wielobok&  Wielobok::Romb() {return WRomb;}
 const Wielobok&  Wielobok::Namiot() {return WNamiot;}
 const Wielobok&  Wielobok::Domek(){return WDomek;}
 const Wielobok&  Wielobok::Ufo() {return WUfo;}
 
-// W�A�CIWA IMPLEMENTACJA KLASY WIELOBOK
-//////////////////////////////////////////////////////////
-//Transformacje. Modyfikuj� list� punkt�w �eby by�o wygodniej
+//  WŁAŚCIWA IMPLEMENTACJA KLASY WIELOBOK
+// //////////////////////////////////////
+
+// Transformacje. 
+// ////////////// 
+
+/// Zmienia wspórzłdne tak, zeby były wokół środka ciężkości.
+/// Modyfikuje listę punktów żeby było wygodniej (?)
 void Wielobok::Centruj()
-//Zmienia wsp�rz�dne tak, �eby by�y wok� �rodka ci�ko�ci
 {
   unsigned i;
-  //Najpierw trzeba znale�� �rodek ci�ko�ci figury
+  
   double x=0,y=0;
-  for(i=0;i<Ilobok;i++)
+  for(i=0;i<Ilobok;i++) //Najpierw trzeba znaleźć środek ciężkości figury
   {
      x+=Punkty[i].x;
      y+=Punkty[i].y;        
@@ -289,17 +295,18 @@ void Wielobok::Centruj()
   x/=double(Ilobok);
   y/=double(Ilobok);
   
-  //A teraz mo�na przesun�� do �rodka
-  for(i=0;i<Ilobok;i++)
+  for(i=0;i<Ilobok;i++) //A teraz można przesunąć do środka
   {
      Punkty[i].x-=x;
 	 Punkty[i].y-=y;
   }         
 }
 
-void Wielobok::Zakresy(double& MinX,double& MinY,  //Metoda przelatuje punkty i daje informacje
-			   double& MaxX,double& MaxY,  //O otaczaj�cym prostok�cie
-			   double& R) const		   //oraz okr�gu ze srodkiem w punkcie 0,0
+/// Metoda przelatuje punkty i daje informacje o otaczaj�cym prostok�cie
+/// Oraz otaczającym okręgu ze środkiem w punkcie 0,0
+void Wielobok::Zakresy( double& MinX,double& MinY,  
+						double& MaxX,double& MaxY,  
+						double& R) const		   
 {
 	MinX=MinY=DBL_MAX;
 	MinX=MinY=R=-DBL_MAX;
@@ -312,14 +319,16 @@ void Wielobok::Zakresy(double& MinX,double& MinY,  //Metoda przelatuje punkty i 
 	 if(pomY<MinY) MinY=pomY;
 	 if(pomX>MaxX) MaxX=pomX;
 	 if(pomY>MaxY) MaxY=pomY;
+
 	 double D=pomX*pomX+pomY*pomY;
 	 if(D>0) D=sqrt(D);
 	 if(D>R) R=D;
 	}
 }
 
+/// Skaluje o jakiś x i y, czyli różnie dla każdego wymiaru.
+/// \note Zmienia wszystkie wspórzędne!
 void Wielobok::Skaluj(double x,double y)
-//Zmienia wsp�rz�dne
 {
 	for(unsigned i=0;i<Ilobok;i++)
     {
@@ -328,8 +337,9 @@ void Wielobok::Skaluj(double x,double y)
     }         
 }
 
+/// Zmienia w odbicie lustrzane pionowo.
+/// \note Zmienia wszystkie wspórzędne!
 void Wielobok::OdbijWPionie()
-//Zmienia w odbicie lustrzane pionowo
 {
 	for(unsigned i=0;i<Ilobok;i++)
     {
@@ -337,20 +347,23 @@ void Wielobok::OdbijWPionie()
     }        
 }
 
+/// Zmienia w odbicie lustrzane poziomo
+/// \note Zmienia wszystkie wspórzędne!
 void Wielobok::OdbijWPoziomie()
-//Zmienia w odbicie lustrzane poziomo
 {
 	for(unsigned i=0;i<Ilobok;i++)
     {
      Punkty[i].x=-Punkty[i].x;     
     } 
-}    
+}  
 
+/// Obraca o ileś radianów.
+/// \note Zmienia wszystkie wspórzędne co na dłuższą metę jest niszczące dla obiektu!
 void Wielobok::ObracajORad(double Radiany)
-//Obraca o ile� radian�w
 {
 	double cosR=cos(Radiany);
 	double sinR=sin(Radiany);
+
 	for(unsigned i=0;i<Ilobok;i++)
 	{
      double x = Punkty[i].x;
@@ -360,28 +373,28 @@ void Wielobok::ObracajORad(double Radiany)
     }
 }
 
-//Konstruktory - tworz� wieloboki na bazie wzorca, tablicy albo innego Wieloboku    
-//Nie ma mo�liwo�ci stworzenia pustego "Wieloboku", cho� mo�e by� "zerowy"   
-//Tylko to ju� na odpowiedzialno�� u�ytkownika klasy.  
+/// \note Konstruktory - tworzą wieloboki na bazie wzorca, tablicy albo innego Wieloboku.    
+///		  Nie ma możliwosci stworzenia pustego "Wieloboku", choć może być "zerowy",   
+///		  ale to juz na odpowiedzialność użytkownika klasy!  
 Wielobok::Wielobok(const ssh_point Wzorek[],unsigned RozmiarWzorka)
-{                                                       assert(RozmiarWzorka>2);
-   Punkty=new ssh_point[RozmiarWzorka];                 assert(Punkty!=NULL);
+{																assert(RozmiarWzorka>2);
+   Punkty=new ssh_point[RozmiarWzorka];							assert(Punkty!=NULL);
    Ilobok=RozmiarWzorka;
    memcpy(Punkty,Wzorek,Ilobok*sizeof(ssh_point));           
 }
 
+/// Konstruktor kopujący
 Wielobok::Wielobok(const Wielobok& Wzorek)
-//Konstruktor kopuj�cy
 {
-   Punkty=new ssh_point[Wzorek.Ilobok];                  assert(Punkty!=NULL);
+   Punkty=new ssh_point[Wzorek.Ilobok];							assert(Punkty!=NULL);
    Ilobok=Wzorek.Ilobok;
    memcpy(Punkty,Wzorek.Punkty,Ilobok*sizeof(ssh_point));           
 }
 
+/// Konstruktor N-boków o zmiennym rozmiarze
 Wielobok::Wielobok(unsigned IleBokow,float R)
-//Konstruktor N-bok�w o zmiennym rozmiarze
 {
-   Punkty=new ssh_point[IleBokow];                  assert(Punkty!=NULL);
+   Punkty=new ssh_point[IleBokow];								assert(Punkty!=NULL);
    Ilobok=IleBokow;
    double alfa=(2*M_PI)/Ilobok;
    for(unsigned i=0;i<Ilobok;i++)
@@ -391,21 +404,25 @@ Wielobok::Wielobok(unsigned IleBokow,float R)
    }
 }
 
-//Destruktor - bo trzeba zwolni� pomocnicz� tablice
+/// Destruktor: musi zwolnić pomocniczą tablicę
 Wielobok::~Wielobok()
 {
   delete []Punkty;
 }
 
-//Rysuj() - rysuje gdzie� wielobok w zadanym kolorze. Nie modyfikuje stanu!
+
+/// \note
+///		Rysowanie figury w miejscu i kolorze zdefiniowanym gdzie indziej 
+///		zrobione jako osobna procedura, bo możemy rozbudować figure
+///     o dodatkowe elementy nie bedace składowymi samego wielokąta.
+///		
+/// Rysuje gdzieś wielobok w zadanym kolorze. Nie modyfikuje stanu obiektu!
 void Wielobok::Rysuj(int StartX,int StartY,ssh_color Color) const
-//Rysowanie tej figury w miejscu i kolorze zdefiniowanym gdzie indziej 
-//Zrobione jako osobna procedura bo mo�emy j� rozbudowa� o dodatkowe
-//elementy nie b�d�ce sk�adowymi samego wiekok�ta
 {        
    fill_poly(StartX,StartY,Punkty,Ilobok,Color);
 }
 
+/// Rysuje gdzieś wielobok w zadanym kolorze RGB. Nie modyfikuje stanu obiektu!
 void Wielobok::Rysuj(int StartX,int StartY,int R,int G,int B) const
 {
    set_brush_rgb(R,G,B);
@@ -413,6 +430,7 @@ void Wielobok::Rysuj(int StartX,int StartY,int R,int G,int B) const
    fill_poly_d(StartX,StartY,Punkty,Ilobok);
 }
 
+/// Po prostu udostępnia wartość konktretnego punktu ale bez możliwości zmiany.
 const ssh_point&  Wielobok::DajPunkt(unsigned Ktory) const
 {
     return Punkty[Ktory];

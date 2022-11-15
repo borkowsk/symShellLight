@@ -27,6 +27,21 @@
 #include <cmath>
 #include <cstdio>
 
+#ifdef _MSC_VER
+#include <chrono>
+#include <thread>
+/** takes microseconds, so you will have to multiply the input by 1000 in order to sleep in milliseconds. TODO: TEST IT! */
+static inline int  usleep(__int64 usec)
+{
+    std::this_thread::sleep_for(std::chrono::microseconds(usec));
+    return 0; //?
+}
+#else
+// extern int
+#include <unistd.h>
+#endif
+
+
 #ifndef MAX_PATH
 #define MAX_PATH 4096
 #endif
@@ -429,12 +444,10 @@ void fix_size(int Yes)
 /// albo procesów.
 void delay_ms(unsigned ms)
 {
-    extern int usleep(useconds_t usec);/* takes microseconds, so you will have to multiply the input by 1000 in order to sleep in milliseconds. */
-
     if(ssh_trace_level>1) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//delay_ms
-    if(ssh_trace_level>1) cout << ms << SEP << "usec->msec*10!" << endl;
+    if(ssh_trace_level>1) cout << ms << SEP << "ALWAYS 1ms == 10 us!" << endl;
 
-    usleep(ms*10);
+    usleep(10); //(ms*10)
 }
 
 /// \brief Zawieszenie wykonania programu na pewną liczbę mikrosekund
@@ -445,8 +458,6 @@ void delay_ms(unsigned ms)
 /// na przełączenie wątków albo procesów.
 void delay_us(unsigned us)
 {
-    extern int usleep(useconds_t usec);/* takes microseconds, so you will have to multiply the input by 1000 in order to sleep in milliseconds. */
-
     if(ssh_trace_level>1) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//delay_us
     if(ssh_trace_level>1) cout << us << SEP << "ALWAYS 1 us!" << endl;
 
@@ -2074,7 +2085,7 @@ static int _writeSVG(ostream& o)
 			o << "/>" << endl;
 		}; break;
 		case GrType::Text: {
-			struct Text &pr = (GrList[i].text);
+            struct Text& pr = (GrList[i].text);                                                          assert(pr.txt != NULL);
 			int lenght = strlen(pr.txt);
 			if (!pr.mode)//NOT TRANSPARENTLY
 			{

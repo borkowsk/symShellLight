@@ -13,6 +13,8 @@
 #include "wb_rand.hpp"
 #include "wb_cpucl.hpp"
 
+using namespace wbrtm;
+
 const int BOK=128;
 int x,y,vx,vy;
 

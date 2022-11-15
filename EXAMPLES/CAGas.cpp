@@ -53,9 +53,10 @@ int myrand()//Na wzór rand() Microsoftu
 cticker MyCPUClock;         //Czas od startu programu do liczenia "średniego czasu kroku brutto"
 
 #define NAZWAMODELU  "2x2 gas v1.0mt " //Użycie define, a nie const char* ułatwia montowanie stałych łańcuchów
+
 //Wyjściowy rozmiar świata i "ekranu" symulacji
-const int MAXSIZE=1000;
-int size=500;//Raczej powinno być parzyste!
+const int MAXSIDE=1000;
+int     curr_side=500;//Raczej powinno być parzyste!
 
 //Do wizualizacji obsługi zdarzeń
 const char* CZEKAM="?>"; //Monit w pętli zdarzeń
@@ -63,14 +64,14 @@ const int DELA=0;//Jak długie oczekiwanie w obrębie pętli zdarzeń
 unsigned VISUAL=1;//Co ile kroków symulacji odrysowywać widok
 int xmouse=10,ymouse=10;//Pozycja ostatniego "kliku" myszy 
 
-time_t RANDOM_SEED=time(NULL); //Zarodek generatora pseudolosowego 
-unsigned DENSITY=(size*size)/100;//Musi być tyle, żeby były miejsca z komórkami obok siebie
-                        //TODO: manipulacja gęstością
+time_t RANDOM_SEED=time(NULL);    //Zarodek generatora pseudolosowego 
+unsigned DENSITY=(curr_side*curr_side)/100; //Musi być tyle, żeby były miejsca z komórkami obok siebie
+                                  //TODO: manipulacja gęstością
                         
 wbrtm::OptionalParameterBase* Parameters[]={ //sizeof(Parameters)/sizeof(Parameters[])
 new wbrtm::ParameterLabel("PARAMETERS FOR SINGLE SIMULATION"),
 new wbrtm::OptionalParameter<unsigned>(DENSITY,1,10000,"DENSITY","How many particles"),
-new wbrtm::OptionalParameter<int>(size,0,MAXSIZE,"SIDELEN","Side of the world"),
+new wbrtm::OptionalParameter<int>(curr_side,0,MAXSIDE,"SIDELEN","Side of the world"),
 new wbrtm::ParameterLabel("TECHNICAL PARAMETERS"),
 new wbrtm::OptionalParameter<unsigned>(VISUAL,1,10000,"VISUAL","How many steps between visualisation"),
 #ifdef MULTITR
@@ -86,7 +87,7 @@ new wbrtm::ParameterLabel("END OF LIST")
 //Klasyczny automat komórkowy zmienia stan wszystkich komórek "jednocześnie"
 //co w praktyce oznacza, że potrzebna jest jedna tablica na stan aktualny 
 //i jedna na przyszły.
-typedef unsigned char WorldType[MAXSIZE][MAXSIZE]; //Zadeklarowanie takiego typu pomaga obejść
+typedef unsigned char WorldType[MAXSIDE][MAXSIDE]; //Zadeklarowanie takiego typu pomaga obejść
                                              //pokrętny sposób deklaracji wskaźnika do tablicy
 //unsigned char żeby było od 0 do 255, bo typ char bywa też "signed" (zaleznie od kompilatora)
 //Dodatkowa zaleta że wystarczy zmienić ten typedef i zmieniają się wszystkie zmienne 
@@ -105,8 +106,8 @@ void init_world()
     srand(RANDOM_SEED); //Inicjacja generatora liczb pseudolosowych
     for(unsigned k=0;k<DENSITY;k++)
     {
-        unsigned i=rand() % size; //% operacja reszta z dzielenia
-        unsigned j=rand() % size; //czyli "modulo". Chmmm... *
+        unsigned i=rand() % curr_side; //% operacja reszta z dzielenia
+        unsigned j=rand() % curr_side; //czyli "modulo". Chmmm... *
         World1[i][j]=1; //Gdzieniegdzie coś ma być...
     }
     // * Robienie modulo z wynikiem funkcji rand() jest podobno odradzane przez znawców :-)
@@ -171,8 +172,8 @@ void RegulaIZmiana( unsigned i, //Wiersz startowej komórki bloku
                                   //,unsigned& rstate //stan generatora rand_r //TODO PO CO ?
                             )
 {
-    unsigned le=(j+1)%size; //Zamknięcie w torus
-    unsigned bo=(i+1)%size; //jest uproszczone...
+    unsigned le=(j+1)%curr_side; //Zamknięcie w torus
+    unsigned bo=(i+1)%curr_side; //jest uproszczone...
     unsigned char old=(SW[i][ j]&1)*8 + (SW[bo][ j]&1)*4
             +(SW[i][le]&1)*2 + (SW[bo][le]&1)*1;                  assert(old<16);
     //unsigned randVal=4;               //Test bez rand()
@@ -237,8 +238,8 @@ void single_step()
     for(int t=0;t<prefered_threads;t++)
         theThreads[t].join();
 #else
-    for(unsigned i=parity;i<size;i+=2)
-        for(unsigned j=parity;j<size;j+=2)
+    for(unsigned i=parity;i<curr_side;i+=2)
+        for(unsigned j=parity;j<curr_side;j+=2)
             RegulaIZmiana(i,j,*OldWorld,*World);
 #endif
     step_counter++;
@@ -287,15 +288,15 @@ void statistics()
         delete theThreads[t];
     }
 #else
-    for(int x=0;x<size;x++)
-        for(int y=0;y<size;y++)
+    for(int x=0;x<curr_side;x++)
+        for(int y=0;y<curr_side;y++)
         {          //World jest wskaźnikiem na tablicę, więc trzeba go użyć jak
             //wskaźnika, a dopiero potem jak tablicy. Nawias konieczny.
             if((*World)[y][x]!=0)
                 alife_counter++;
         }
 #endif
-    printc(size/2,size,200,64,"%06u  ",alife_counter);//Licznik kroków
+    printc(curr_side/2,curr_side,200,64,"%06u  ",alife_counter);//Licznik kroków
     // std::cout<<step_counter<<"      \t"<< alife_counter <<std::endl;
 }
 
@@ -310,8 +311,8 @@ void screen_to_file(); //Zapis ekranu do pliku
 void replot()
 //Rysuje coś na ekranie
 {
-    for(int x=0;x<size-1;x++)
-        for(int y=0;y<size-1;y++)
+    for(int x=0;x<curr_side-1;x++)
+        for(int y=0;y<curr_side-1;y++)
         {          //World jest wskaźnikiem na tablicę, więc trzeba go użyć jak
             //wskaźnika, a dopiero potem jak tablicy. Nawias konieczny.
             unsigned z=(*World)[y][x]*200;//Spodziewana wartość to 0 lub 1
@@ -319,7 +320,7 @@ void replot()
             //z%=512; //Albo z szarościami
             plot(x,y,z);
         }
-    printc(size/5,size,128,255,"%06u MstT:%g  ",
+    printc(curr_side/5,curr_side,128,255,"%06u MstT:%g  ",
            step_counter,(double)MyCPUClock/step_counter);//Licznik kroków
     //Ostatnie położenie kliku: biały krzyżyk
     //line(xmouse,ymouse-10,xmouse,ymouse+10,255);
@@ -343,7 +344,7 @@ int main(int argc,const char* argv[])//Potrzebne są parametry wywołania progra
     mouse_activity(0); // Czy mysz będzie obsługiwana?
     buffering_setup(1);// Czy będzie rysować poprzez bitmapę z zawartością ekranu?
     shell_setup(NAZWAMODELU,argc,argv);// Przygotowanie okna z użyciem parametrów wywołania
-    init_plot(size,size,0,1);// Otwarcie okna SIZExSIZE pikseli + 1 wiersz znaków za pikselami
+    init_plot(curr_side,curr_side,0,1);// Otwarcie okna SIZExSIZE pikseli + 1 wiersz znaków za pikselami
 
     // Teraz można rysować i pisać w oknie
     init_world();  //Tu jest też wywołanie srand();
@@ -425,9 +426,9 @@ void write_to_file()
     //TODO - funkcja powinna zapisać wyniki modelu do pliku
     //Format - tabela liczb odpowiedniego typu rozdzielanych tabulacjami
     //out<<"L i c z b y:\n"<<a[]<<'\t'<<std::endl;
-    for(int x=0;x<size;x++)
+    for(int x=0;x<curr_side;x++)
     {
-        for(int y=0;y<size;y++)
+        for(int y=0;y<curr_side;y++)
         {   //World jest wskaźnikiem na tablicę, więc trzeba go użyć jak
             //wskaźnika, a dopiero potem jak tablicy. Nawias konieczny.
             unsigned z=(*World)[y][x];//Spodziewana wartość to 0 lub 1

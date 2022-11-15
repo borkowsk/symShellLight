@@ -25,14 +25,20 @@ namespace wbrtm {
 
 /// \brief   Kopiuje stały łańcuch znaków na stertę
 /// \return  NULL jeśli nie może
-inline char* clone_str(const char *const p)
+inline char* clone_str(const char* const p)
 {
-char* out=NULL;
-if(p!=NULL)
-	out=new char[::strlen(p)+1];
-if(out!=NULL)	
-	::strcpy(out,p);
-return out;
+    if (p != NULL)
+    {
+        auto  len = ::strlen(p) + 1;
+        char* out = new char[ len ];
+        if (out != NULL)
+#ifdef _MSC_VER
+            strcpy_s(out,len,p);
+#else
+            ::strcpy(out, p);
+#endif
+    }
+    return NULL;
 }
 
 /// \brief Klonowanie łańcucha znaków zgodne z szablonem funkcyjnym clone()

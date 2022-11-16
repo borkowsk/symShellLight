@@ -1,38 +1,35 @@
 # CMAKE configuration for SYMSHELLLIGHT libraries wbsyshSVG wbsyshX11
-######################################################################
+##################################################################################
 # X11 auto-defined under linux/unix for compiling X11 version of the library.
 # WINDOWS auto-defined under MS Windows for compiling appr. version of the lib.
 #
 # Manually define WITHTESTS=true, if you want build test applications!
 #
+# (c)ISS UW, @author Wojciech Borkowski
+# @date 2022-11-16 (last update)
+##################################################################################
 
 project(symshelllight)
 cmake_minimum_required(VERSION 2.9)
+
+set(CMAKE_CXX_STANDARD 11) # See: https://matgomes.com/setting-cpp-standard-cmake/
 
 set( WITHTESTS true )
 
 IF (WIN32)
   # set stuff for windows
   message( ${PROJECT_NAME} ": MS Windows platform assumed.\n\tInside C/C++ code automatic _MSC_VER variable will be used!" )
-  set( WINDOWS true ) #still not tested!
-  set( MSVC 1 ) #old macro used also somewhere in C code?
+  set( WINDOWS true )
+  #set( MSVC 1 ) #old macro used also somewhere in C code?
   #set( WINDOWS_ONLY_SRC  "${WBRTM}/BASE/wb_assert.c" )
+  #add_compile_options( /W4 ) #  /WX
 ELSE()
   # set stuff for other systems
   message( ${PROJECT_NAME} ": Linux/unix platform assumed.")
   set( X11 true )
   #set( X_ONLY_SRC  "" )
+  #add_compile_options( -Wall )
 ENDIF()
-
-if (MSVC)
-    # warning level 4 and/or all warnings as errors if you want
-    
-    #add_compile_options( /W4 ) #  /WX
-else()
-    # A lots of warnings if you want
-    
-    #add_compile_options( -Wall )
-endif(MSVC)
 
 include_directories("./")
 #see -> https://cmake.org/cmake/help/v3.16/manual/cmake-compile-features.7.html#manual:cmake-compile-features(7)
@@ -211,7 +208,7 @@ endif()
 endif()
 #KONIEC - THE END
 #********************************************************************/
-#*              SYMSHELLLIGHT  version 2022-11-07                   */
+#*              SYMSHELLLIGHT  version 2022-11                      */
 #********************************************************************/
 #*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
 #*            W O J C I E C H   B O R K O W S K I                   */

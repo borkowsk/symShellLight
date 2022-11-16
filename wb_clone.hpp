@@ -24,7 +24,7 @@
 namespace wbrtm {
 
 /// \brief   Kopiuje stały łańcuch znaków na stertę
-/// \return  NULL jeśli nie może
+/// \return  Wynikem jest kopia albo NULL jeśli nie może stworzyć kopi
 inline char* clone_str(const char* const p)
 {
     if (p != NULL)
@@ -37,8 +37,9 @@ inline char* clone_str(const char* const p)
 #else
             ::strcpy(out, p);
 #endif
+        return out;
     }
-    return NULL;
+    else return NULL;
 }
 
 /// \brief Klonowanie łańcucha znaków zgodne z szablonem funkcyjnym clone()
@@ -90,7 +91,7 @@ public:
 
 } //namespace
 /* ******************************************************************/
-/*              SYMSHELLLIGHT  version 2022-10-27                   */
+/*              SYMSHELLLIGHT  version 2022-11-17                   */
 /* ******************************************************************/
 /*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
 /*            W O J C I E C H   B O R K O W S K I                   */

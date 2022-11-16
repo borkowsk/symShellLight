@@ -48,9 +48,9 @@ static inline int  usleep(__int64 usec)
 
 #if defined(_MSC_VER)
 //#pragma warning(disable:4068)
-#pragma warning(disable : 4996) //deprecated functions
-#pragma warning(disable : 4521) //multiple copy constructor
-#pragma warning(disable : 4522) //multiple assigment operator
+//#pragma warning(disable : 4996) //deprecated functions
+//#pragma warning(disable : 4521) //multiple copy constructor
+//#pragma warning(disable : 4522) //multiple assigment operator
 //TYMCZASEM - OSTRZEŻENIA O "conversion from 'A' to 'B', possible loss of data"
 //#pragma warning(disable : 4267)
 //#pragma warning(disable : 4244)
@@ -838,13 +838,13 @@ ssh_natural string_width(const char* str)
 /// \param ...
 void printc(int x, int y,ssh_color fore, ssh_color back,const char* format, ...)
 {
-    extern int  GrPrintTransparently;// = 0;
+    extern int  GrPrintTransparently; // = 0;
     if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP << SEP;//printc
     if(ssh_trace_level>2) cout << x << SEP << y << SEP
                                << fore << SEP << back << SEP
                                << format << endl;
 
-    GrOperation& Op = NextGrListEntry();//enum  GrType { Empty = 0, Point=1,LineTo=2,Line=3,Circle=4,Rect=5,Text=6,Poly=7 };
+    GrOperation& Op = NextGrListEntry(); //enum  GrType { Empty = 0, Point=1,LineTo=2,Line=3,Circle=4,Rect=5,Text=6,Poly=7 };
     assert(Op.empty.type==GrType::Empty);
     Op.empty.type = GrType::Text;
     //struct Text   { unsigned type :3; unsigned mode :5; unsigned r :8; unsigned g :8; unsigned b :8;
@@ -858,7 +858,7 @@ void printc(int x, int y,ssh_color fore, ssh_color back,const char* format, ...)
     Op.text.bf = palette[fore].b;
     Op.text.x = x;
     Op.text.y = y;
-    Op.text.mode = GrPrintTransparently;
+    Op.text.mode = GrPrintTransparently;                                                                  assert(format != NULL);
     char target[2048];
     va_list marker;
     va_start(marker, format);     /* Initialize variable arguments. */
@@ -866,7 +866,7 @@ void printc(int x, int y,ssh_color fore, ssh_color back,const char* format, ...)
     va_end(marker);              /* Reset variable arguments.      */
     //if(Op.text.txt != NULL) //Tu niepotrzebne - nowy obiekt powinien być już wyczyszczony
     //		delete Op.text.txt;
-    if(ssh_trace_level>0) cout <<"SVG: "<<target<< endl;
+    if(ssh_trace_level>0) cout <<"SVG: "<<target<< endl;                                                  assert(target != NULL);
     Op.text.txt=clone_str(target);
 }
 
@@ -877,11 +877,11 @@ void printc(int x, int y,ssh_color fore, ssh_color back,const char* format, ...)
 /// \param ...
 void printbw(int x,int y,const char* format,...)
 {
-    extern int  GrPrintTransparently;// = 0;
+    extern int  GrPrintTransparently; // = 0;
     if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP << SEP;//printbw
     if(ssh_trace_level>2) cout << x << SEP << y <<SEP<< format << endl;
 
-    GrOperation& Op = NextGrListEntry();//enum  GrType { Empty = 0, Point=1,LineTo=2,Line=3,Circle=4,Rect=5,Text=6,Poly=7 };
+    GrOperation& Op = NextGrListEntry(); //enum  GrType { Empty = 0, Point=1,LineTo=2,Line=3,Circle=4,Rect=5,Text=6,Poly=7 };
     assert(Op.empty.type==GrType::Empty);
     Op.empty.type = GrType::Text;
     //struct Text   { unsigned type :3; unsigned mode :5; unsigned r :8; unsigned g :8; unsigned b :8;
@@ -896,7 +896,7 @@ void printbw(int x,int y,const char* format,...)
     Op.text.bf = 0;
     Op.text.x = x;
     Op.text.y = y;
-    Op.text.mode = GrPrintTransparently;
+    Op.text.mode = GrPrintTransparently;                                                                  assert(format != NULL);
     char target[2048];
     va_list marker;
     va_start(marker, format);     /* Initialize variable arguments. */
@@ -905,7 +905,7 @@ void printbw(int x,int y,const char* format,...)
     //Op.text.txt.take(clone_str(target));
     //if(Op.text.txt != NULL)
     //		delete Op.text.txt;
-    if(ssh_trace_level>0) cout <<"SVG: "<<target<< endl;
+    if(ssh_trace_level>0) cout <<"SVG: "<<target<< endl;                                                  assert(target != NULL);
     Op.text.txt=clone_str(target);
 }
 
@@ -916,12 +916,12 @@ void printbw(int x,int y,const char* format,...)
 /// \param ...
 void print_d(ssh_coordinate x,ssh_coordinate y,const char* format,...)
 {
-    extern int  GrPrintTransparently;// = 0;
+    extern int  GrPrintTransparently; // = 0;
     if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP << SEP;//print_d
     if(ssh_trace_level>2) cout << x << SEP << y << SEP
                                << format << endl;
 
-    GrOperation& Op = NextGrListEntry();//enum  GrType { Empty = 0, Point=1,LineTo=2,Line=3,Circle=4,Rect=5,Text=6,Poly=7 };
+    GrOperation& Op = NextGrListEntry(); //enum  GrType { Empty = 0, Point=1,LineTo=2,Line=3,Circle=4,Rect=5,Text=6,Poly=7 };
     assert(Op.empty.type==GrType::Empty);
     Op.empty.type = GrType::Text;
     //struct Text   {   unsigned type :3; unsigned mode :5; unsigned r :8; unsigned g :8; unsigned b :8;
@@ -935,7 +935,7 @@ void print_d(ssh_coordinate x,ssh_coordinate y,const char* format,...)
     Op.text.b = GrBrushColor.b;
     Op.text.x = x;
     Op.text.y = y;
-    Op.text.mode = GrPrintTransparently;
+    Op.text.mode = GrPrintTransparently;                                                                  assert(format != NULL);
     char target[2048];
     va_list marker;
     va_start(marker, format);     /* Initialize variable arguments. */
@@ -944,7 +944,7 @@ void print_d(ssh_coordinate x,ssh_coordinate y,const char* format,...)
     //Op.text.txt.take(clone_str(target));
     //if(Op.text.txt != NULL)
     //		delete Op.text.txt;
-    if(ssh_trace_level>0) cout <<"SVG: "<<target<< endl;
+    if(ssh_trace_level>0) cout <<"SVG: "<<target<< endl;                                                  assert(target != NULL);
     Op.text.txt=clone_str(target);
 }
 
@@ -960,8 +960,8 @@ void print_d(ssh_coordinate x,ssh_coordinate y,const char* format,...)
 /// \param ...
 void print_rgb(int x, int y,unsigned r, unsigned g, unsigned b,ssh_color back,const char* format, ... )
 {
-    extern int  GrPrintTransparently;// = 0;
-    if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP << SEP;//print_rgb
+    extern int  GrPrintTransparently; // = 0;
+    if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP << SEP; //print_rgb
     if(ssh_trace_level>2) cout << x << SEP << y << SEP
                                << r<<','<<g<<','<<b << SEP << back << SEP
                                << format << endl;
@@ -980,7 +980,7 @@ void print_rgb(int x, int y,unsigned r, unsigned g, unsigned b,ssh_color back,co
     Op.text.b = palette[back].b;
     Op.text.x = x;
     Op.text.y = y;
-    Op.text.mode = GrPrintTransparently;
+    Op.text.mode = GrPrintTransparently;                                                                  assert(format != NULL);
     char target[2048];
     va_list marker;
     va_start(marker, format);     /* Initialize variable arguments. */
@@ -989,7 +989,7 @@ void print_rgb(int x, int y,unsigned r, unsigned g, unsigned b,ssh_color back,co
     //Op.text.txt.take(clone_str(target));
     //if(Op.text.txt != NULL)
     //		delete Op.text.txt;
-    if(ssh_trace_level>0) cout <<"SVG: "<<target<< endl;
+    if(ssh_trace_level>0) cout <<"SVG: "<<target<< endl;                                                  assert(target != NULL);
     Op.text.txt=clone_str(target);
 }
 
@@ -2085,7 +2085,16 @@ static int _writeSVG(ostream& o)
 			o << "/>" << endl;
 		}; break;
 		case GrType::Text: {
-            struct Text& pr = (GrList[i].text);                                                          assert(pr.txt != NULL);
+            struct Text& pr = (GrList[i].text);                                                     //assert(pr.txt != NULL);
+            //cerr << '\t' << i << '\t' << pr.type << ' ' << pr.x << ' ' << pr.y;
+            //cerr << ' ' << (pr.txt?pr.txt:"NULL") << endl;
+            if (pr.txt == NULL) // TO SIĘ NIE POWINNO ZDAŻAĆ ALE JEDNAK SIĘ ZDAŻAŁO!!!
+            {
+                cerr << '\t' << i << '\t' << pr.type << ' ' << pr.x << ' ' << pr.y << " NULL" << endl;
+                pr.txt = clone_str("@?@-NULL-@?@");                                                  assert(pr.txt != NULL);
+                //exit(-1);
+            }
+
 			int lenght = strlen(pr.txt);
 			if (!pr.mode)//NOT TRANSPARENTLY
 			{

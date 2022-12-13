@@ -17,7 +17,7 @@
 /**
  * @defgroup SymShellMenu Interface do obsługi menu
  * \brief    Podstawowe funkcje pozwalające manipulować menu w Windows
- * \details  Wersja dla X11 używająca Motifs kiedyś istniała, ale jest już raczej bezuzyteczna.
+ * \details  Wersja dla X11 używająca Motifs kiedyś istniała, ale jest już raczej bezużyteczna.
  *           Jest moduł dummy służący za zaślepkę na tej platformie oraz w SVG.
  *           TODO wersja tekstowa lub html/JavaScript. A może jest coś przenośnego co by można włączyć?
  */
@@ -26,6 +26,9 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+    /** \brief Zmienia tytuł okna */
+    int ssh_set_window_name(const char* WindowName);
 
     /** \brief Typ uchwytu do menu */
     typedef void* ssh_menu_handle;
@@ -61,10 +64,16 @@ extern "C" {
     int ssh_menu_mark_item(
 					ssh_menu_handle hMenu,				              /**< uchwyt do menu lub sub-menu */
 					unsigned    Check,                                /**< czy z check-markiem */
-					unsigned    ItemCommandOrPosition,										
-					unsigned    asPosition
-                                DEF_VAL_IF_CPP(0)
+					unsigned    ItemCommandOrPosition,				  /**< jakiś identyfikator itemu */
+					unsigned    asPosition DEF_VAL_IF_CPP(0)
                                 );
+
+    /** \brief Usuwa item z menu */
+    int ssh_menu_remove_item(
+                    ssh_menu_handle hMenu,				             /**< uchwyt do menu lub sub-menu */
+                    unsigned    ItemCommandOrPosition,				 /**< jakiś identyfikator itemu */
+                    unsigned    asPosition DEF_VAL_IF_CPP(0)
+                    );
 
     /** \brief zapewnia że menu staje się gotowe do użycia */
     int ssh_realize_menu(ssh_menu_handle hMenu);				      /**< \param hMenu - uchwyt do menu lub sub-menu */

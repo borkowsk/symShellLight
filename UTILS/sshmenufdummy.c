@@ -6,7 +6,7 @@
 
 /// Ustala tekst nazwy okna w jego belce
 /// \param WindowName
-/// \return return TRUE on success!
+/// \return TRUE - success!
 /// \note Wygląda że stało się redundantne z nowszą funkcją set_title()
 int ssh_set_window_name(const char* WindowName)
 {
@@ -14,7 +14,7 @@ int ssh_set_window_name(const char* WindowName)
 }
 
 /// Daje uchwyt do głównego menu
-/// \return
+/// \return HANDLE
 ssh_menu_handle ssh_main_menu()
 {
 	return (ssh_menu_handle)1;
@@ -23,7 +23,7 @@ ssh_menu_handle ssh_main_menu()
 /// Daje uchwyt do podmenu wg. pozycji
 /// \param hMenu
 /// \param Position
-/// \return
+/// \return HANDLE
 ssh_menu_handle ssh_sub_menu(ssh_menu_handle hMenu, unsigned Position)
 {
 	return (ssh_menu_handle)2;
@@ -32,7 +32,7 @@ ssh_menu_handle ssh_sub_menu(ssh_menu_handle hMenu, unsigned Position)
 /// Odnajduje pozycje itemu w jakims menu
 /// \param hMenu
 /// \param ItemName
-/// \return
+/// \return item position
 unsigned ssh_get_item_position(ssh_menu_handle hMenu, const char* ItemName)
 {
 	return 3;//3?
@@ -43,7 +43,7 @@ unsigned ssh_get_item_position(ssh_menu_handle hMenu, const char* ItemName)
 /// \param ItemName
 /// \param Message
 /// \param Flags
-/// \return
+/// \return ???
 int ssh_menu_add_item(	ssh_menu_handle hMenu,
 						const char* ItemName,
 						unsigned Message,
@@ -56,7 +56,7 @@ int ssh_menu_add_item(	ssh_menu_handle hMenu,
 /// \param hMenu
 /// \param ItemCommandOrPosition
 /// \param asPosition
-/// \return
+/// \return ???
 int ssh_menu_remove_item(
 						ssh_menu_handle hMenu,
 						unsigned ItemCommandOrPosition,
@@ -87,14 +87,14 @@ int ssh_realize_menu(ssh_menu_handle hMenu)
 	return 1;
 }
 
-/********************************************************************/
-/*              SYMSHELLLIGHT  version 2021-11-24                   */
-/********************************************************************/
-/*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
-/*            W O J C I E C H   B O R K O W S K I                   */
-/*    Instytut Studiów Społecznych Uniwersytetu Warszawskiego       */
-/*    WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI  */
-/*    GITHUB: https://github.com/borkowsk                           */
-/*                                                                  */
-/*                               (Don't change or remove this note) */
-/********************************************************************/
+/* *******************************************************************/
+/*              SYMSHELLLIGHT  version 2022-12-13                    */
+/* *******************************************************************/
+/*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                  */
+/*            W O J C I E C H   B O R K O W S K I                    */
+/*    Instytut Studiów Społecznych Uniwersytetu Warszawskiego        */
+/*    WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI   */
+/*    GITHUB: https://github.com/borkowsk                            */
+/*                                                                   */
+/*                               (Don't change or remove this note)  */
+/* *******************************************************************/

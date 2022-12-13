@@ -464,7 +464,7 @@ public:
 		}
 
 	/// \brief Konstruktor wieloparametrowy inicjujący itemy
-	explicit wb_dynarray(size_t s,T /*first,second,...*/...):size(s)
+	explicit wb_dynarray(size_t s, T /* T first,second,...*/...):size(s)
     {
 		WBPTRLOG( "wb_dynarray::CONSTRUCTOR("<<size<<",T ...)" )                                        assert(size>=1);
 		ptr=new T[s];                                                             /*After allocation*/assert(ptr!=NULL);

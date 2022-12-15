@@ -5,8 +5,8 @@
 *  \author  borkowsk
 *  \n :atom_symbol:
 * ************************************************** */
-#ifndef _SYMSHELL_MENUFUNCTIONS_H_
-#define _SYMSHELL_MENUFUNCTIONS_H_
+#ifndef SYMSHELL_MENU_FUNCTIONS_H_INCLUDED
+#define SYMSHELL_MENU_FUNCTIONS_H_INCLUDED
 
 #ifdef __cplusplus
 #define DEF_VAL_IF_CPP( _P_ )  =(_P_)
@@ -33,7 +33,7 @@ extern "C" {
     /** \brief Typ uchwytu do menu */
     typedef void* ssh_menu_handle;
 
-    /** \brief Uchwyt do głównego menu */
+    /** \brief Uchwyt do głównego menu. \return Cokolwiek zwraca, to raczej 0 jest wartością niepoprawną.  */
     ssh_menu_handle ssh_main_menu();
 
     /** \brief Uchwyt do PODMENU podanego menu */
@@ -101,7 +101,7 @@ extern char*    ssh_menu_options;
 /*                                                                   */
 /*                                (Don't change or remove this note) */
 /* *******************************************************************/
-#endif
+#endif //SYMSHELL_MENU_FUNCTIONS_H_INCLUDED
 
 
 

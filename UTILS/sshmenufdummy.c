@@ -13,11 +13,12 @@ int ssh_set_window_name(const char* WindowName)
 	return 0;
 }
 
-/// Daje uchwyt do głównego menu
-/// \return HANDLE
+/// Normalnie tworzy/koduje uchwyt do głównego menu, który powinien być raczej niezerowy.
+/// Więc zero wskazuje że nie należy tego używać.
+/// \return Cokolwiek zwraca, to raczej 0 jest wartością niepoprawną!
 ssh_menu_handle ssh_main_menu()
 {
-	return (ssh_menu_handle)1;
+	return (ssh_menu_handle)0;
 }
 
 /// Daje uchwyt do podmenu wg. pozycji
@@ -29,7 +30,7 @@ ssh_menu_handle ssh_sub_menu(ssh_menu_handle hMenu, unsigned Position)
 	return (ssh_menu_handle)2;
 }
 
-/// Odnajduje pozycje itemu w jakims menu
+/// Odnajduje pozycje itemu w jakimś menu
 /// \param hMenu
 /// \param ItemName
 /// \return item position
@@ -88,7 +89,7 @@ int ssh_realize_menu(ssh_menu_handle hMenu)
 }
 
 /* *******************************************************************/
-/*              SYMSHELLLIGHT  version 2022-12-13                    */
+/*              SYMSHELLLIGHT  version 2022-12-15                    */
 /* *******************************************************************/
 /*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                  */
 /*            W O J C I E C H   B O R K O W S K I                    */

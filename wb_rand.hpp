@@ -56,6 +56,9 @@ class RandomGenerator {
 
         /// \brief Initialisation for random selected sequence
         virtual void Reset() = 0;
+
+        /// \brief Required virtual destructor
+        virtual ~RandomGenerator(){};
     };
 
 /// \brief Random generator specialization using the randg () function.

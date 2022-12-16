@@ -1,23 +1,35 @@
 #!/bin/bash
 #Checking for required dependencies
 
+set -e # https://intoli.com/blog/exit-on-errors-in-bash-scripts/
+
+source "./screen.ini"
 EDIT=nano
 
-set -e # https://intoli.com/blog/exit-on-errors-in-bash-scripts/
-echo "Running" `realpath $0`
+echo -e $COLOR1"Running" `realpath $0` $COLERR
 echo -e "\n\tThis script stops on any error!\n\tWhen it stop, remove source of the error & run it again!\n"
      
-echo -e "Test for required software:\n" 
+echo -e $COLOR1"Test for required software:\n"$COLOR2 
 gcc --version 
-echo -e "\n GCC  OK\n"
+echo -e $COLOR1"\n GCC  OK\n"$COLOR2
 g++ --version
-echo -e "\n G++  OK\n"
+echo -e $COLOR1"\n G++  OK\n"$COLOR2
 make --version 
-echo -e "\n MAKE  OK\n"
+echo -e $COLOR1"\n MAKE  OK\n"$COLOR2
 cmake --version 
-echo -e "\n CMAKE  OK\n"
+echo -e $COLOR1"\n CMAKE  OK\n"$COLOR2
 
-echo -e "Test for required library packages:\n"
+echo -e $COLOR1"Compilation test:\n"$COLOR2
+
+echo -e "Version:"$COLERR  `g++ -dumpversion` $COLOR2
+
+echo -e "Machine:"$COLERR  `g++ -dumpmachine` $COLOR2
+
+echo -e $COLOR2"Directories:"$COLERR
+g++ --print-search-dirs
+
+echo -e $COLOR2"Required library packages:"$COLERR
+
 cat << EOF >> tmpX11.cpp
 #include <X11/Xlib.h>   // sudo apt install libx11-dev ? 
 #include <X11/Xutil.h>
@@ -25,9 +37,12 @@ cat << EOF >> tmpX11.cpp
 EOF
 
 g++ -c tmpX11.cpp
-echo -e "\n libxpm-dev  OK\n"
+
+echo -e $COLOR1'\n libx11-dev && libxpm-dev  OK\'$COLOR2
 
 rm -f tmpX11.cpp
+
+echo -e $NORMCO
 
 #Dependencies installation under UBUNTU:
 # $ sudo apt install gcc

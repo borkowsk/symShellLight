@@ -6,7 +6,7 @@
 # Manually define WITHTESTS=true, if you want build test applications!
 #
 # (c)ISS UW, @author Wojciech Borkowski
-# @date 2022-11-16 (last update)
+# @date 2022-12-22 (last update)
 ##################################################################################
 
 project(symshelllight)

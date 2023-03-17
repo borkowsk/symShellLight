@@ -93,52 +93,53 @@ if(width<=maxwidth)
 	return 0;//Nie ma miejsca nawet na gwiazdkę
 }
 
-/// Domyślna grubość ramki
+/// Domyślna grubość ramki używana do ustawiania ostatniego parametru wywołania.
 int def_frame_width=1;
 
-/// Rysuje kwadratowa ramkę o zadanej grubości
+/// \details Rysuje kwadratowa ramkę o zadanej grubości
 /// \param x1
 /// \param y1
 /// \param x2
 /// \param y2
-/// \param frame_c
-/// \param width
-void rect(int x1,int y1,int x2,int y2,wb_color frame_c,int width)
+/// \param frame_color
+/// \param line_weight
+void rect(int x1,int y1,int x2,int y2,wb_color frame_color,int line_weight)
 {
-    if(width<=1)
+    if(line_weight<=1)
     {
-	line(x1,y1,x2,y1,frame_c);//--->
-	line(x2,y1,x2,y2,frame_c);//vvv
-	line(x1,y2,x2,y2,frame_c);//<---
-	line(x1,y1,x1,y2,frame_c);//^^^
+        line(x1,y1,x2,y1,frame_color);//--->
+        line(x2,y1,x2,y2,frame_color);//vvv
+        line(x1,y2,x2,y2,frame_color);//<---
+        line(x1,y1,x1,y2,frame_color);//^^^
     }
     else
     {
-        assert("NOT TESTED CODE in rect()"==nullptr);
-    fill_rect(x1,y1,x2,y1+width,frame_c);//--->
-    fill_rect(x2,y1,x2+width,y2,frame_c);//vvv
-    fill_rect(x1,y2,x2,y2+width,frame_c);//<---
-    fill_rect(x1,y1,x1+width,y2,frame_c);//^^^
+                                                                        //assert("NOT TESTED CODE in rect()"!=nullptr);
+        fill_rect(x1,y1,x2,y1+line_weight,frame_color);//--->
+        fill_rect(x2,y1,x2+line_weight,y2,frame_color);//vvv
+        fill_rect(x1,y2,x2,y2+line_weight,frame_color);//<---
+        fill_rect(x1,y1,x1+line_weight,y2,frame_color);//^^^
     }
 }
 
 /// Stałe parametry konfiguracji słupka: s-aktualny old-poprzedni
-static settings_bar3d s,old;
+static settings_bar3d bar3d_settings,old_bar3d_settings;
 
 /// Konfiguracja słupków 3D. Zwraca poprzednią konfiguracje.
 /// Jeśli parametr == NULL to przywraca poprzednio zapamiętaną w 'old'
-/// \param st
-/// \return
-const settings_bar3d* bar3d_config(settings_bar3d* st)
+/// \param  new_settings
+/// \return pointer to 'old_bar3d_settings`.
+const settings_bar3d* bar3d_config(settings_bar3d* new_settings)
 {
-if(st!=nullptr)
-	{
-	old=s;//Zapamiętuje poprzednia
-	s=*st;
-	}
-	else
-	s=old;//Przywraca poprzednia
-return &old;
+    if(new_settings!=nullptr)
+    {
+        old_bar3d_settings=bar3d_settings; //Zapamiętuje poprzednia
+        bar3d_settings=*new_settings;
+    }
+    else
+        bar3d_settings=old_bar3d_settings; //Przywraca poprzednia
+
+    return &old_bar3d_settings;
 }
 
 /// Rysuje słupek 3D w kolorach indeksowanych
@@ -150,26 +151,27 @@ return &old;
 void bar3d(int x,int y,int h,wb_color col1,wb_color col2)
 {
 	ssh_point romb[7];
-	wb_color wire_col=s.wire;
+	wb_color wire_col=bar3d_settings.wire;
 	if(wire_col==col1)
-		wire_col=(wire_col+s.back)/2;
+		wire_col=(wire_col+bar3d_settings.back)/2;
 	if(wire_col==col2)
-		wire_col=(wire_col+s.back)/2;
-						 /*       6 -----  5   */
+		wire_col=(wire_col+bar3d_settings.back)/2;
+                                           /*       6 -----  5   */
 	romb[1].x= x;                          /*     /        / |   */
 	romb[1].y= y - h;                      /*    1 ------ 2  |   */
-	romb[2].x= x + s.a;                    /*    |        |  |   */
+	romb[2].x= x + bar3d_settings.a;       /*    |        |  |   */
 	romb[2].y= romb[1].y;                  /*    |        |  |   */
 	romb[3].x= romb[2].x;                  /*    |        |  |   */
 	romb[3].y= y;                          /*    |        |  4   */
-	romb[4].x= x + s.a + s.b;              /*    |        | /  c */
-	romb[4].y= y - s.c;                    /*  x,y ------ 3      */
-	romb[5].x= romb[4].x;                  /*         a      b   */
-	romb[5].y= y - h - s.c;
-	romb[6].x= x + s.b;
+	romb[4].x= x + bar3d_settings.a        /*    |        | /  c */
+                 + bar3d_settings.b;       /*  x,y ------ 3      */
+	romb[4].y= y - bar3d_settings.c;       /*         a      b   */
+	romb[5].x= romb[4].x;
+	romb[5].y= y - h - bar3d_settings.c;
+	romb[6].x= x + bar3d_settings.b;
 	romb[6].y= romb[5].y;
 
-	fill_rect(x,y-h,x+s.a,y,col1);               //front
+	fill_rect(x,y-h,x+bar3d_settings.a,y,col1);               //front
 
 	fill_poly(0,0,romb+1,6,col2);              //bok i gora
 
@@ -200,24 +202,24 @@ void bar3d(int x,int y,int h,wb_color col1,wb_color col2)
 void bar3dRGB(int x,int y,int h,int R,int G,int B,int Shad)
 {
 	ssh_point romb[7];
-	wb_color wire_col=s.wire;
-
-						 /*       6 -----  5   */
-	romb[1].x= x;                          /*     /        / |   */
-	romb[1].y= y - h;                      /*    1 ------ 2  |   */
-	romb[2].x= x + s.a;                    /*    |        |  |   */
-	romb[2].y= romb[1].y;                  /*    |        |  |   */
-	romb[3].x= romb[2].x;                  /*    |        |  |   */
-	romb[3].y= y;                          /*    |        |  4   */
-	romb[4].x= x + s.a + s.b;              /*    |        | /  c */
-	romb[4].y= y - s.c;                    /*  x,y ------ 3      */
-	romb[5].x= romb[4].x;                  /*         a      b   */
-	romb[5].y= y - h - s.c;
-	romb[6].x= x + s.b;
-	romb[6].y= romb[5].y;
+	wb_color wire_col=bar3d_settings.wire;
+                                           /*       6 -----  5   */
+    romb[1].x= x;                          /*     /        / |   */
+    romb[1].y= y - h;                      /*    1 ------ 2  |   */
+    romb[2].x= x + bar3d_settings.a;       /*    |        |  |   */
+    romb[2].y= romb[1].y;                  /*    |        |  |   */
+    romb[3].x= romb[2].x;                  /*    |        |  |   */
+    romb[3].y= y;                          /*    |        |  4   */
+    romb[4].x= x + bar3d_settings.a        /*    |        | /  c */
+                 + bar3d_settings.b;       /*  x,y ------ 3      */
+    romb[4].y= y - bar3d_settings.c;       /*         a      b   */
+    romb[5].x= romb[4].x;
+    romb[5].y= y - h - bar3d_settings.c;
+    romb[6].x= x + bar3d_settings.b;
+    romb[6].y= romb[5].y;
 
 	set_brush_rgb(R,G,B);
-	fill_rect_d(x,y-h,x+s.a,y);               //front
+	fill_rect_d(x,y-h,x+bar3d_settings.a,y);               //front
 
 	set_brush_rgb(R/Shad,G/Shad,B/Shad);
 	fill_poly_d(0,0,romb+1,6);              //bok i gora
@@ -244,11 +246,11 @@ int def_cross_width=5;
 /// \param x
 /// \param y
 /// \param color
-/// \param width
-void cross(int x,int y,wb_color color,int width)
+/// \param line_width
+void cross(int x,int y,wb_color color,int line_width)
 {
-	line(x-width,y,x+width,y,color);
-	line(x,y-width,x,y+width,color);
+	line(x - line_width, y, x + line_width, y, color);
+	line(x, y - line_width, x, y + line_width, color);
 }
 
 /// Rysuje pionową skalę kolorów
@@ -313,16 +315,16 @@ double distance(double X1,double X2,double Y1,double Y2)
 	  return 0;
 }
 
-/********************************************************************/
-/*              SYMSHELLLIGHT  version 2022-10-20                   */
-/********************************************************************/
-/*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
-/*            W O J C I E C H   B O R K O W S K I                   */
-/*    Instytut Studiów Społecznych Uniwersytetu Warszawskiego       */
-/*    WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI  */
-/*    GITHUB: https://github.com/borkowsk                           */
-/*                                                                  */
-/*                               (Don't change or remove this note) */
-/********************************************************************/
+/* ****************************************************************** */
+/*               SYMSHELLLIGHT  version 2022-03-14                    */
+/* ****************************************************************** */
+/*            THIS CODE IS DESIGNED & COPYRIGHT  BY:                  */
+/*             W O J C I E C H   B O R K O W S K I                    */
+/*     Instytut Studiów Społecznych Uniwersytetu Warszawskiego        */
+/*     WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI   */
+/*     GITHUB: https://github.com/borkowsk                            */
+/*                                                                    */
+/*                                (Don't change or remove this note)  */
+/* ****************************************************************** */
 
 

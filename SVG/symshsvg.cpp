@@ -17,7 +17,7 @@
  ** \n          https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI
  ** \n          https://github.com/borkowsk
  **
- ** \library    SYMSHELLLIGHT  version 2021-12-17
+ ** \library    SYMSHELLLIGHT  version 2023
  **
  * */
 #include <iostream>
@@ -68,7 +68,7 @@ static inline int  usleep(__int64 usec)
 using namespace std;
 using namespace wbrtm;
 
-/// Wewnętrzne śledzenie wywołań
+/// Wewnętrzne śledzenie wywołań.
 #if defined( _MSC_VER )
 //#define STR_HELPER(x) #x
 //#define STR(x) STR_HELPER(x)
@@ -84,38 +84,38 @@ using namespace wbrtm;
 /// Pid procesu. Przydaje się
 unsigned long     PID=_getpid();
 
-/// Maska poziomów śledzenia 1-msgs 2-grafika 3-grafika detaliczna 4-alokacje/zwalnianie
+/// Maska poziomów śledzenia 1-msgs 2-grafika 3-grafika detaliczna 4-alokacje/zwalnianie.
 int         ssh_trace_level = 0;
 
-/// Jakiej długości inicjujemy tablice operacji graficznych (mnożone przez liczbę pikseli ekranu)
+/// Jakiej długości inicjujemy tablice operacji graficznych (mnożone przez liczbę pikseli ekranu).
 double      INITIAL_LENGH_RATIO = 0.001;
 
-/// Ile maksymalnie rekordów jest dopuszczalnych?//(mnożone przez liczbę pikseli ekranu)
+/// Ile maksymalnie rekordów jest dopuszczalnych?//(mnożone przez liczbę pikseli ekranu).
 double      MAXIMAL_LENGH_RATIO = 0.999;
 
 /// Rozszerzenie nazwy pliku wyjściowego. Jednocześnie określa format pliku wyjściowego.
 /// Jak extension nieznane, to wyrzuca strumień obiektowy '.str'
 const char* GrFileOutputByExtension = "svg";
 
-/// Ścieżka, gdzie ma wrzucać zrzuty tymczasowe
+/// Ścieżka, gdzie ma wrzucać zrzuty tymczasowe.
 const char* GrTmpOutputDirectory = "./";
 
 /// Co ile czasu skrypt w pliku SVG wymusza przeładowanie. Jak 0 to w ogóle nie ma skryptu.
 unsigned    GrReloadInterval = 1000;
 
-/// Myszy w SVG domyślnie nie ma, ale inny moduł może ją symulować przez linkowanie do tych zmiennych globalnych
+/// Myszy w SVG domyślnie nie ma, ale inny moduł może ją symulować przez linkowanie do tych zmiennych globalnych.
 bool        GrMouseActive = false;
-int         GrMouseX = -1;// Pozycja X symulowanej myszy
-int         GrMouseY = -1;// Pozycja Y symulowanej myszy
-int         GrMouseC = -1;// Klik symulowanej myszy (0,1,2)
+int         GrMouseX = -1; // Pozycja X symulowanej myszy
+int         GrMouseY = -1; // Pozycja Y symulowanej myszy
+int         GrMouseC = -1; // Klik symulowanej myszy (0,1,2)
 
-/// Nie ma też klawiatury, ale inny moduł może ją symulować przez linkowanie do tych zmiennych globalnych
+/// Nie ma też klawiatury, ale inny moduł może ją symulować przez linkowanie do tych zmiennych globalnych.
 int         GrCharMessage = -2;
 
-/// "Dummy window" handler for check and external use
+/// "Dummy window" handler for check and external use.
 unsigned long    _ssh_window=0;
 
-/// Separator wydruków
+/// Separator wydruków.
 const char* SEP = "\t";
 
 /* Zmienne 'static' czyli bez dostępu z zewnątrz modułu
@@ -130,11 +130,11 @@ static char ScreenHeader[1024]="SSH SVG WINDOW";
 // Ustawienia grafiki
 static int         GrPrintTransparently = 0;
 
-static int         GrLineWidth = 1;
-static int         GrLineStyle = SSH_LINE_SOLID;
+static int          GrLineWidth = 1;
+static int          GrLineStyle = SSH_LINE_SOLID;
 
-static ssh_rgb     GrPenColor = { 255,255,255};//,255 };
-static ssh_rgb     GrBrushColor = { 205,205,205};//,255 };
+static ssh_rgb      GrPenColor = { 255,255,255};//,255 };
+static ssh_rgb      GrBrushColor = { 205,205,205};//,255 };
 
 static ssh_color    curr_background = 0;
 static unsigned     GrScreenHi = 0;
@@ -157,37 +157,37 @@ static bool         GrClosed = true;
 enum  GrType { Empty = 0, Point=1,LineTo=2,Line=3,Circle=4,Rect=5,Text=6,Poly=7,Arc=8 }; // Typy rekordów
 
 struct Empty { unsigned type : 4; unsigned mode : 2; };
-struct Point { unsigned type : 4; unsigned mode : 2; unsigned wi: 2; unsigned x :16; unsigned y :16;// weight & coordinates
-                                                     unsigned r : 8; unsigned g : 8; unsigned b : 8;/* main color */
-                                                     unsigned rb: 8; unsigned gb: 8; unsigned bb: 8;/* background color */ };
-struct LineTo{ unsigned type : 4; unsigned mode : 2; unsigned wi: 2; unsigned x :16; unsigned y :16;// weight & coordinates
-                                                     unsigned r : 8; unsigned g : 8; unsigned b : 8;/* main color */ };
-struct Line  { unsigned type : 4; unsigned mode : 2; unsigned wi: 2; unsigned x1:16; unsigned y1:16;// weight & coordinates
-                                                     unsigned r : 8; unsigned g : 8; unsigned b : 8;// main color
-                                                                     unsigned x2:16; unsigned y2:16;/* end point */ };
-struct Circle{ unsigned type : 4; unsigned mode : 2; unsigned wi: 2; unsigned x :16; unsigned y :16;// weight & coordinates
-                                                     unsigned r : 8; unsigned g : 8; unsigned b : 8;// main color
-                                                                     unsigned rx:16; unsigned ry:16;// the semi-axis of the ellipse
-                                                     unsigned rf: 8; unsigned gf: 8; unsigned bf: 8;/* secondary color */ };
-struct Arc   { unsigned type : 4; unsigned mode : 2; unsigned wi: 2; unsigned x :16; unsigned y :16;// weight & coordinates
-                                                     unsigned r : 8; unsigned g : 8; unsigned b : 8;// main color
-                                                                     unsigned rx:16; unsigned ry:16;// the semi-axis of the ellipse
-                                                                     unsigned as:16; unsigned ae:16;// start & end angles
-                                                     unsigned rf: 8; unsigned gf: 8; unsigned bf: 8;/* secondary color */ };
-struct Rect  { unsigned type : 4; unsigned mode : 2; unsigned wi: 2; unsigned x1:16; unsigned y1:16;// weight & coordinates
-                                                     unsigned r : 8; unsigned g : 8; unsigned b : 8;// main color
-                                                                     unsigned x2:16; unsigned y2:16;// end point
-                                                     unsigned rf: 8; unsigned gf: 8; unsigned bf: 8;/* secondary color */ };
-struct Poly  { unsigned type : 4; unsigned mode : 2; unsigned wi: 2; /*weight*/      unsigned si:16;// array size
-                                                     unsigned r : 8; unsigned g : 8; unsigned b : 8;// main color
-                                                     unsigned rf: 8; unsigned gf: 8; unsigned bf: 8;/* secondary color */
+struct Point { unsigned type : 4; unsigned mode : 2; unsigned wi: 2; unsigned x :16; unsigned y :16; // weight & coordinates
+                                                     unsigned r : 8; unsigned g : 8; unsigned b : 8; /* main color */
+                                                     unsigned rb: 8; unsigned gb: 8; unsigned bb: 8; /* background color */ };
+struct LineTo{ unsigned type : 4; unsigned mode : 2; unsigned wi: 2; unsigned x :16; unsigned y :16; // weight & coordinates
+                                                     unsigned r : 8; unsigned g : 8; unsigned b : 8; /* main color */ };
+struct Line  { unsigned type : 4; unsigned mode : 2; unsigned wi: 2; unsigned x1:16; unsigned y1:16; // weight & coordinates
+                                                     unsigned r : 8; unsigned g : 8; unsigned b : 8; // main color
+                                                                     unsigned x2:16; unsigned y2:16; /* end point */ };
+struct Circle{ unsigned type : 4; unsigned mode : 2; unsigned wi: 2; unsigned x :16; unsigned y :16; // weight & coordinates
+                                                     unsigned r : 8; unsigned g : 8; unsigned b : 8; // main color
+                                                                     unsigned rx:16; unsigned ry:16; // the semi-axis of the ellipse
+                                                     unsigned rf: 8; unsigned gf: 8; unsigned bf: 8; /* secondary color */ };
+struct Arc   { unsigned type : 4; unsigned mode : 2; unsigned wi: 2; unsigned x :16; unsigned y :16; // weight & coordinates
+                                                     unsigned r : 8; unsigned g : 8; unsigned b : 8; // main color
+                                                                     unsigned rx:16; unsigned ry:16; // the semi-axis of the ellipse
+                                                                     unsigned as:16; unsigned ae:16; // start & end angles
+                                                     unsigned rf: 8; unsigned gf: 8; unsigned bf: 8; /* secondary color */ };
+struct Rect  { unsigned type : 4; unsigned mode : 2; unsigned wi: 2; unsigned x1:16; unsigned y1:16; // weight & coordinates
+                                                     unsigned r : 8; unsigned g : 8; unsigned b : 8; // main color
+                                                                     unsigned x2:16; unsigned y2:16; // end point
+                                                     unsigned rf: 8; unsigned gf: 8; unsigned bf: 8; /* secondary color */ };
+struct Poly  { unsigned type : 4; unsigned mode : 2; unsigned wi: 2; /*weight*/      unsigned si:16; // array size
+                                                     unsigned r : 8; unsigned g : 8; unsigned b : 8; // main color
+                                                     unsigned rf: 8; unsigned gf: 8; unsigned bf: 8; /* secondary color */
                                                      ssh_point* points; };
-struct Text  { unsigned type : 4; unsigned mode : 1; unsigned sc: 3; unsigned x :16; unsigned y :16;// height & coordinates
-                                                     unsigned r : 8; unsigned g : 8; unsigned b : 8;// main color
-                                                     unsigned rf: 8; unsigned gf: 8; unsigned bf: 8;/* secondary color */
+struct Text  { unsigned type : 4; unsigned mode : 1; unsigned sc: 3; unsigned x :16; unsigned y :16; // height & coordinates
+                                                     unsigned r : 8; unsigned g : 8; unsigned b : 8; // main color
+                                                     unsigned rf: 8; unsigned gf: 8; unsigned bf: 8; /* secondary color */
                                                      char* txt; };
 
-/// Struktura do przechowywania operacji rysowania
+/// Struktura do przechowywania operacji rysowania.
 ///\see \n "https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths"
 union GrOperation
 {
@@ -201,7 +201,7 @@ union GrOperation
     struct Poly   poly;
     struct Text   text;
 
-    /// Konstruktor domyślny
+    /// Konstruktor domyślny.
     GrOperation()
     {
         memset(this, 0, sizeof(GrOperation));//Wypełnianie zerami
@@ -211,7 +211,7 @@ union GrOperation
                                                                                     assert(poly.points == NULL);
     }
 
-    /// Konstruktor kopiujący
+    /// Konstruktor kopiujący.
     GrOperation(GrOperation& From)
     {
         memcpy(this,&From, sizeof(GrOperation));
@@ -236,32 +236,32 @@ union GrOperation
     }
 };
 
-static wb_dynarray<GrOperation> GrList; //Lista operacji rysowania
-static int GrListPosition = -1;         //Aktualna pozycja na liście
-static int maxN=-1;                     //from MAXIMAL_LENGTH_RATIO;
+static wb_dynarray<GrOperation> GrList; // Lista operacji rysowania
+static int GrListPosition = -1;         // Aktualna pozycja na liście
+static int maxN=-1;                     // from MAXIMAL_LENGTH_RATIO;
 
 // Funkcja implementacyjna. Zwraca dostęp do kolejnego "entry" tablicy operacji graficznych. W razie potrzeby alokuje.
 static GrOperation&  NextGrListEntry()
 {
     if (++GrListPosition < GrList.get_size())
     {
-        return GrList[GrListPosition];//Zwraca dostęp do kolejnej operacji. Potem można wpisywać informacje
+        return GrList[GrListPosition]; //Zwraca dostęp do kolejnej operacji. Potem można wpisywać informacje
     }
     else //NIE MA MIEJSCA!!!
     {
         size_t N = GrList.get_size() * 2;
-        if(N>maxN) N=maxN;//Nie więcej niż maxN
+        if(N>maxN) N=maxN; //Nie więcej niż maxN
 
-        if(N<maxN)//Jeszcze można powiększyć
+        if(N<maxN) //Jeszcze można powiększyć
         {
             //Przy powiększaniu nie chcemy użyć "expand", bo to by wywoływało destruktory i kopiowanie!
             size_t oldsize;
-            GrOperation* RawPtr = GrList.give_dynamic_ptr_val(oldsize);         assert(GrList.get_size() == 0);
+            GrOperation* RawPtr = GrList.give_dynamic_ptr_val(oldsize);               assert(GrList.get_size() == 0);
 
-            GrList.alloc(N);//Nowy bufor w powiększonym rozmiarze
-            memcpy(GrList.get_ptr_val(), RawPtr, oldsize*sizeof(GrOperation));//Przekopiowanie realnej zawartości
+            GrList.alloc(N); //Nowy bufor w powiększonym rozmiarze
+            memcpy(GrList.get_ptr_val(), RawPtr, oldsize*sizeof(GrOperation)); //Przekopiowanie realnej zawartości
             for (size_t i = 0; i < oldsize; i++)
-                RawPtr[i].empty.type = GrType::Empty;//Wirtualne wyczyszczenie starego
+                RawPtr[i].empty.type = GrType::Empty; //Wirtualne wyczyszczenie starego
             delete [] RawPtr; //Zwalnianie bez wywoływania możliwych istotnych destruktorów dla Text i Poly
         }
         else //Już nie można bardziej powiększyć bufora! Kasujemy pół najstarszej zawartości i przesuwamy
@@ -269,28 +269,28 @@ static GrOperation&  NextGrListEntry()
             GrOperation* RawPtr = GrList.get_ptr_val();
             GrListPosition/=2;
             for(size_t i=0; i < GrListPosition;i++)
-                RawPtr[i].clean();//Zwalniamy ewentualne składniki dynamiczne
+                RawPtr[i].clean(); //Zwalniamy ewentualne składniki dynamiczne
             memmove(RawPtr,RawPtr+GrListPosition,GrListPosition*sizeof(GrOperation));
             size_t size=GrList.get_size();
             for(size_t i=GrListPosition;i<size;i++)
-                RawPtr[i].empty.type = GrType::Empty;//Wirtualne wyczyszczenie zduplikowanej zawartości
+                RawPtr[i].empty.type = GrType::Empty; //Wirtualne wyczyszczenie zduplikowanej zawartości
         }
 
-        return GrList[GrListPosition];//Zwraca dostęp do kolejnej operacji, czyli pierwszej za starej listy
+        return GrList[GrListPosition]; //Zwraca dostęp do kolejnej operacji, czyli pierwszej za starej listy
     }
 }
 
 /* OTWIERANIE i ZAMYKANIE TRYBU (OKNA) GRAFICZNEGO */
 /* Operacje konfiguracyjne o działaniu gwarantowanym przed inicjacją */
 
-/// \brief Ustalanie innego tytułu okna niż nazwa aplikacji
+/// \brief Ustalanie innego tytułu okna niż nazwa aplikacji.
 /// \param [in] window_name
 void set_title(const char* window_name)
 {
     strncpy(ScreenHeader,window_name,1023);
 }
 
-/// \brief Obsługa parametrów wywołania programu
+/// \brief Obsługa parametrów wywołania programu.
 /// \param [in] title nazwa okna i aplikacji
 /// \param [in] iargc liczba parametrów wywołania main()
 /// \param [in] iargv tablica parametrów wywołania z main()
@@ -505,7 +505,7 @@ void clear_screen()
 }
 
 /// Czyszczenie optymalizujące. Specjalnie dla tego modułu. W innych nie robi nic.
-/// Cały ekran/okno zostanie wirtualnie "wymazane"
+/// Cały ekran/okno zostanie wirtualnie "wymazany/e"
 int invalidate_screen()
 {
     if(ssh_trace_level) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;
@@ -528,18 +528,24 @@ ssh_mode     print_transparently(ssh_mode Yes)
 
 /// Ustala szerokość linii. Może byc kosztowne (?). Zwraca ustawienie poprzednie.
 ssh_natural     line_width(ssh_natural width)
-
 {
     if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//line_width
     if(ssh_trace_level>2) cout << width << endl;
 	int old = GrLineWidth;
+
 	GrLineWidth = width;
-    if(GrLineWidth<0) GrLineWidth=1;
+    if(GrLineWidth<0)
+        GrLineWidth=1;  // WHY NOT 0!!!
+    if(GrLineWidth>3)
+    {
+        GrLineWidth=3; //SĄ NA TO TYLKO 2 bity w rekordzie!!!
+        cerr<< "Warning! 'line_width' is currently limited to 3 in SVG SymShell!"<<endl;
+    }
 	return old;
 }
 
-/// Ustala styl rysowania linii: SSH_LINE_SOLID, SSH_LINE_DOTTED, SSH_LINE_DASHED
-/// Zwraca ustawienie poprzednie.
+/// \brief Ustala styl rysowania linii: `SSH_LINE_SOLID`, `SSH_LINE_DOTTED`, `SSH_LINE_DASHED`
+/// \return Zwraca ustawienie poprzednie.
 ssh_mode    line_style(ssh_mode Style)
 {
     if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//line_style
@@ -549,9 +555,9 @@ ssh_mode    line_style(ssh_mode Style)
     return  GrLineStyle;    //Zwraca poprzedni stan
 }
 
-/// Ustala stosunek nowego rysowania do starej zawartości ekranu: SSH_SOLID_PUT,SSH_XOR_PUT
-/// Zwraca ustawienie poprzednie.
-/// W module SVG nie robi nic.
+/// \brief Ustala stosunek nowego rysowania do starej zawartości ekranu: `SSH_SOLID_PUT`,`SSH_XOR_PUT`
+/// \return Zwraca ustawienie poprzednie.
+/// \note W module SVG nie robi nic.
 ssh_mode    put_style(ssh_mode Style)
 {
     if(ssh_trace_level>1) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//put_style
@@ -559,7 +565,7 @@ ssh_mode    put_style(ssh_mode Style)
     return  SSH_SOLID_PUT;  //Zwraca poprzedni stan
 }
 
-/// \brief Zmienia definicje pojedynczego koloru indeksowanego
+/// \brief Zmienia definicje pojedynczego koloru indeksowanego.
 /// \param color : indeks koloru
 /// \param r    : składowa czerwona
 /// \param g    : składowa zielona
@@ -597,7 +603,7 @@ void set_gray(ssh_color shade,ssh_intensity intensity)
     palette[256+shade] = RGB(intensity,intensity,intensity);
 }
 
-/// \brief Ustala aktualny kolor linii za pomocą indeksu do palety
+/// \brief Ustala aktualny kolor linii za pomocą indeksu do palety.
 /// \param c
 /// \param width
 /// \param Style
@@ -606,22 +612,31 @@ void set_gray(ssh_color shade,ssh_intensity intensity)
 /// ssh_color c - jest jak dotąd zawsze traktowany jako indeks do tabeli kolorów[1]
 /// w których pierwsze 256 ustala się wg. jakiejś skali,
 /// a następne 256 są odcieniami szarości, domyślnie od czarnego do białego
-/// Kolory indeksowane w symshwin i symshx11 korzystają z cache'owania systemowych pisaków,
+/// Kolory indeksowane w _symshwin_ i _symshx11_ korzystają z cache'owania systemowych pisaków,
 /// żeby było szybciej. A przynajmniej kiedyś dawało to wyraźny zysk.
 ///
 /// [1]ssh_color - to int32 więc ma miejsce na tryb RGB, ale nigdy nie zostało to zaimplementowane
-void set_pen(ssh_color c,ssh_natural width, ssh_mode Style)
+void set_pen(ssh_color c,ssh_natural line_width, ssh_mode Style)
 
 {
     if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//set_pen
-    if(ssh_trace_level>2) cout << (ssh_color)c <<SEP<<width<<SEP<<  Style << endl;
-    GrLineWidth = width;
-    if(GrLineWidth<0) GrLineWidth=1;
+    if(ssh_trace_level>2) cout << (ssh_color)c <<SEP<<line_width<<SEP<<  Style << endl;
+
+    GrLineWidth = line_width;
+    if(GrLineWidth<0)
+        GrLineWidth=1;
+
+    if(GrLineWidth>3)
+    {
+        GrLineWidth=3; //SĄ NA TO TYLKO 2 bity w rekordzie!!!
+        cerr<< "Warning! 'line_width' in 'set_pen' is currently limited to 3 in SVG SymShell!"<<endl;
+    }
+
     GrLineStyle = Style;
     GrPenColor = palette[c];
 }
 
-/// \brief Ustala aktualny kolor linii za pomocą składowych RGB
+/// \brief Ustala aktualny kolor linii za pomocą składowych RGB.
 /// \param r
 /// \param g
 /// \param b
@@ -629,23 +644,32 @@ void set_pen(ssh_color c,ssh_natural width, ssh_mode Style)
 /// \param Style
 ///
 /// Poza kolorem linii za pomocą składowych RGB, ustala też od razu styl, żeby nie mnożyć wywołań
-/// \IMPLEMENTACJA
-/// Jeżeli kolory indeksowane korzystają z cache'owania tego samego pisaka to
-/// należy ustalić kolor aktualny na pusty np. curr_color=-1;
+/// \internal
+///     Jeżeli kolory indeksowane korzystają z cache'owania tego samego pisaka to
+///     należy ustalić kolor aktualny na pusty np. curr_color=-1;
 void set_pen_rgb(ssh_intensity r,ssh_intensity g, ssh_intensity b,
-                 ssh_natural width,ssh_mode Style)
+                 ssh_natural line_width,ssh_mode Style)
 {
     if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//set_pen_rgb
-    if(ssh_trace_level>2) cout << r << SEP << g << SEP << b << SEP << width << SEP << Style << endl;
-    GrLineWidth = width;
-    if(GrLineWidth<0) GrLineWidth=1;
+    if(ssh_trace_level>2) cout << r << SEP << g << SEP << b << SEP << line_width << SEP << Style << endl;
+
+    GrLineWidth = line_width;
+    if(GrLineWidth<0)
+        GrLineWidth=1;
+
+    if(GrLineWidth>3)
+    {
+        GrLineWidth=3; //SĄ NA TO TYLKO 2 bity w rekordzie!!!
+        cerr<< "Warning! 'line_width' in 'set_pen_rgb' is currently limited to 3 in SVG SymShell!"<<endl;
+    }
+
     GrLineStyle = Style;
     GrPenColor.r = r & 0xff;
     GrPenColor.g = g & 0xff;
     GrPenColor.b = b & 0xff;
 }
 
-/// \brief Ustala aktualny kolor linii za pomocą składowych RGBA
+/// \brief Ustala aktualny kolor linii za pomocą składowych RGBA.
 /// \param r
 /// \param g
 /// \param b
@@ -653,14 +677,23 @@ void set_pen_rgb(ssh_intensity r,ssh_intensity g, ssh_intensity b,
 /// \param width
 /// \param style
 ///
-/// \details W module SVG składowa 'a' jest IGNOROWANA!
+/// \note W module SVG składowa 'a' jest IGNOROWANA!
 void set_pen_rgba(ssh_intensity r,ssh_intensity g,ssh_intensity b,ssh_intensity a,
-                  ssh_natural width,ssh_mode style)
+                  ssh_natural line_width,ssh_mode style)
 {
     if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//set_pen_rgba
-    if(ssh_trace_level>2) cout << r << SEP << g << SEP << b << SEP << width << SEP << style << endl;
-    GrLineWidth = width;
-    if(GrLineWidth<0) GrLineWidth=1;
+    if(ssh_trace_level>2) cout << r << SEP << g << SEP << b << SEP << line_width << SEP << style << endl;
+
+    GrLineWidth = line_width;
+    if(GrLineWidth<0)
+        GrLineWidth=1;
+
+    if(GrLineWidth>3)
+    {
+        GrLineWidth=3; //SĄ NA TO TYLKO 2 bity w rekordzie!!!
+        cerr<< "Warning! 'line_width' in 'set_pen_rgb' is currently limited to 3 in SVG SymShell!"<<endl;
+    }
+
     GrLineStyle = style;
     GrPenColor.r = r & 0xff;
     GrPenColor.g = g & 0xff;
@@ -672,8 +705,8 @@ void set_pen_rgba(ssh_intensity r,ssh_intensity g,ssh_intensity b,ssh_intensity 
 /// \param c
 ///
 /// \details ssh_color jest jak dotąd zawsze traktowany jako indeks do tabeli, ale ma miejsce na tryb RGB
-/// W modułach Win i X11 kolory indeksowane korzystają z cache'owania systemowych pędzli,
-/// ale w SVG musi działać samo.
+///     W modułach Win i X11 kolory indeksowane korzystają z cache'owania systemowych pędzli,
+///     ale w SVG musi działać samo.
 void set_brush(ssh_color c)
 {
     if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//set_brush
@@ -681,15 +714,15 @@ void set_brush(ssh_color c)
     GrBrushColor = palette[c];
 }
 
-/// \brief Ustala aktualny kolor wypełnień za pomocą składowych RGB
+/// \brief Ustala aktualny kolor wypełnień za pomocą składowych RGB.
 /// \param r
 /// \param g
 /// \param b
 ///
-/// \IMPLEMENTACJA
-/// Jeżeli kolory indeksowane korzystają z cache'owanie tego samego pędzla to
-/// należy ustalić kolor aktualny na pusty np. curr_fill=-1;
-/// W implementacji SVG musi działać samo.
+/// \internal
+///     Jeżeli kolory indeksowane korzystają z cache'owanie tego samego pędzla to
+///     należy ustalić kolor aktualny na pusty np. curr_fill=-1;
+///     W implementacji SVG musi działać samo.
 void set_brush_rgb(ssh_intensity r,ssh_intensity g,ssh_intensity b)
 {
     if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//set_brush_rgb
@@ -699,7 +732,7 @@ void set_brush_rgb(ssh_intensity r,ssh_intensity g,ssh_intensity b)
     GrBrushColor.b = b & 0xff;
 }
 
-/// Ustala aktualny kolor wypełnień za pomocą składowych RGBA
+/// Ustala aktualny kolor wypełnień za pomocą składowych RGBA.
 /// Składowa 'a' jest na razie ignorowana.
 void set_brush_rgba(ssh_intensity r,ssh_intensity g,ssh_intensity b,
                    ssh_intensity a)
@@ -716,7 +749,7 @@ void set_brush_rgba(ssh_intensity r,ssh_intensity g,ssh_intensity b,
  * **************************************************** */
 
 
-/// \brief Zwraca 1 jeśli okno graficzne (lub wirtualne) jest buforowane
+/// \brief Zwraca 1 jeśli okno graficzne (lub wirtualne) jest buforowane.
 /// \return
 /// W przypadku implementacji SVG zawsze zwraca 1
 ssh_mode  buffered()
@@ -726,7 +759,7 @@ ssh_mode  buffered()
     return 1;
 }
 
-/// Czy okno ma zafiksowana wielkość?
+/// \brief Sprawdza, czy okno ma zafiksowana wielkość?
 /// W przypadku implementacji SVG zawsze zwraca 1
 ssh_mode fixed()
 {
@@ -735,7 +768,7 @@ ssh_mode fixed()
     return 1;
 }
 
-/// Aktualny kolor tla...
+/// Aktualny kolor tla.
 ssh_color background()
 {
     if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP <<"return "<< curr_background;//background
@@ -743,7 +776,7 @@ ssh_color background()
     return curr_background;
 }
 
-/// Aktualna grubość linii
+/// Aktualna grubość linii.
 ssh_natural get_line_width()
 {
     if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP << "return " << GrLineWidth;//get_line_width
@@ -751,8 +784,8 @@ ssh_natural get_line_width()
     return GrLineWidth;
 }
 
-/// Aktualny kolor linii jako ssh_color (indeks)
-/// W przypadku implementacji SVG zawsze zwraca -1024 (out of table!)
+/// Aktualny kolor linii jako ssh_color (indeks).
+/// \note W przypadku implementacji SVG zawsze zwraca -1024 (out of table!)
 ssh_color get_pen()
 {
     if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//get_pen
@@ -760,17 +793,17 @@ ssh_color get_pen()
     return -1024;
 }
 
-/// Aktualny kolor wypełnień jako ssh_color
+/// Aktualny kolor wypełnień jako `ssh_color`.
 /// W przypadku implementacji SVG zawsze zwraca 0 (czarny)
 /// Dlaczego nie -1024 (out of table!) ? TODO ?
 ssh_color get_brush()
 {
-    if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//get_brush
+    if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP; //get_brush
     if(ssh_trace_level>2) cout <<"IGNORED"<< endl;
     return 0;
 }
 
-/// Aktualne rozmiary pionowe okna z init_plot po przeliczeniach
+/// Aktualne rozmiary pionowe okna z init_plot po przeliczeniach.
 /// ...i ewentualnych zmianach uczynionych "ręcznie" przez operatora
 ssh_natural screen_height()
 {
@@ -779,8 +812,8 @@ ssh_natural screen_height()
     return GrScreenHi;
 }
 
-/// Aktualne rozmiary poziome okna z init_plot po przeliczeniach
-/// ...i ewentualnych zmianach uczynionych "ręcznie" przez operatora
+/// Aktualne rozmiary poziome okna z init_plot po przeliczeniach.
+/// ...i ewentualnych zmianach uczynionych "ręcznie" przez operatora.
 ssh_natural screen_width()
 {
     if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP << "return " << GrScreenWi;//screen_width
@@ -788,7 +821,7 @@ ssh_natural screen_width()
     return GrScreenWi;
 }
 
-/// Aktualne rozmiary znaku - wysokość
+/// Aktualne rozmiary znaku - wysokość.
 /// ...potrzebne do pozycjonowania tekstu
 ssh_natural char_height(char znak)
 {
@@ -797,7 +830,7 @@ ssh_natural char_height(char znak)
     return GrFontHi;
 }
 
-/// Aktualne rozmiary znaku - szerokość
+/// Aktualne rozmiary znaku - szerokość.
 /// ...potrzebne do pozycjonowania tekstu
 ssh_natural char_width(char znak)
 {
@@ -806,7 +839,7 @@ ssh_natural char_width(char znak)
     return GrFontWi;
 }
 
-/// Aktualne rozmiary wyświetlania całego łańcucha znaków - wysokość
+/// Aktualne rozmiary wyświetlania całego łańcucha znaków - wysokość.
 /// Tu zazwyczaj może być to samo co char_height.
 ssh_natural string_height(const char* str)
 {
@@ -815,7 +848,7 @@ ssh_natural string_height(const char* str)
     return GrFontHi;
 }
 
-/// Aktualne rozmiary wyświetlania całego łańcucha znaków - szerokość
+/// Aktualne rozmiary wyświetlania całego łańcucha znaków - szerokość.
 /// W najgorszym razie odpowiednia wielokrotność char_width
 /// ...potrzebne do jego pozycjonowania */
 ssh_natural string_width(const char* str)
@@ -829,7 +862,7 @@ ssh_natural string_width(const char* str)
 /*     WYPROWADZANIE TEKSTU
  * ******************************* */
 
-/// void Drukuje w kolorach użytkownika wybranych z palety
+/// \brief Wyświetla tekst w kolorach użytkownika wybranych z palety.
 /// \param x
 /// \param y
 /// \param fore
@@ -870,7 +903,7 @@ void printc(int x, int y,ssh_color fore, ssh_color back,const char* format, ...)
     Op.text.txt=clone_str(target);
 }
 
-/// \brief Drukuje czarno na białym
+/// \brief Drukuje czarno na białym.
 /// \param x
 /// \param y
 /// \param format
@@ -909,7 +942,7 @@ void printbw(int x,int y,const char* format,...)
     Op.text.txt=clone_str(target);
 }
 
-/// \brief Drukuje w kolorach domyślnych pen & brush
+/// \brief Drukuje w kolorach domyślnych pen & brush.
 /// \param x
 /// \param y
 /// \param format
@@ -949,7 +982,7 @@ void print_d(ssh_coordinate x,ssh_coordinate y,const char* format,...)
 }
 
 
-/// \brief Drukuje w kolorze RBG na tle z palety
+/// \brief Drukuje w kolorze RBG na tle z palety.
 /// \param x
 /// \param y
 /// \param r
@@ -996,7 +1029,7 @@ void print_rgb(int x, int y,unsigned r, unsigned g, unsigned b,ssh_color back,co
 /*   PUNKTOWANIE
  * **************** */
 
-/// \brief Wyświetlenie punktu na ekranie (wirtualnym) w kolorze domyślnym pisaka
+/// \brief Wyświetlenie punktu na ekranie (wirtualnym) w kolorze domyślnym pisaka.
 /// \param x
 /// \param y
 void plot_d(ssh_coordinate x, ssh_coordinate y)
@@ -1015,7 +1048,7 @@ void plot_d(ssh_coordinate x, ssh_coordinate y)
     Op.point.y = y;
 }
 
-/// \brief Wyświetlenie punktu na ekranie w kolorze indeksowanym
+/// \brief Wyświetlenie punktu na ekranie w kolorze indeksowanym.
 /// \param x
 /// \param y
 /// \param c : kolor z palety
@@ -1062,7 +1095,7 @@ void plot_rgb(ssh_coordinate x, ssh_coordinate y, int r, int g, int b)
     Op.point.y = y;
 }
 
-/// \brief Wypełnia powodziowo lub algorytmem siania w kolorze indeksowanym
+/// \brief Wypełnia powodziowo lub algorytmem siania w kolorze indeksowanym.
 /// \param x : współrzędna pozioma punktu startu
 /// \param y : współrzędna pionowa punktu startu
 /// \param fill : indeksowany kolor wypełnienia
@@ -1089,7 +1122,7 @@ void fill_flood(ssh_coordinate x, ssh_coordinate y, ssh_color fill, ssh_color bo
     Op.point.bb = palette[border].b;
 }
 
-/// \brief Wypełnia powodziowo lub algorytmem siania w kolorze RGB
+/// \brief Wypełnia powodziowo lub algorytmem siania w kolorze RGB.
 /// \param x : współrzędna pozioma punktu startu
 /// \param y : współrzędna pionowa punktu startu
 /// \param rf : czerwona składowa koloru wypełniania
@@ -1123,7 +1156,7 @@ void fill_flood_rgb(int x,int y,int rf,int gf,int bf,int rb,int gb,int bb)
 
 /* RYSOWANIE  */
 
-/// \brief Wyświetlenie linii w aktualnym kolorze domyślnym - także rgb
+/// \brief Wyświetlenie linii w aktualnym kolorze domyślnym - także RGB.
 /// \param x1 : pozioma współrzędna startowa
 /// \param y1 : pionowa współrzędna startowa
 /// \param x2 : pozioma współrzędna końcowa
@@ -1148,7 +1181,7 @@ void line_d(ssh_coordinate x1, ssh_coordinate y1, ssh_coordinate x2, ssh_coordin
     Op.line.b = GrPenColor.b;
 }
 
-/// \brief Wyświetlenie linii w kolorze indeksowanym z palety
+/// \brief Wyświetlenie linii w kolorze indeksowanym z palety.
 /// \param x1 : pozioma współrzędna startowa
 /// \param y1 : pionowa współrzędna startowa
 /// \param x2 : pozioma współrzędna końcowa
@@ -1175,7 +1208,7 @@ void line(int x1,int y1,int x2,int y2,ssh_color c)
     Op.line.b = palette[c].b;
 }
 
-/// Wyświetlenie okręgu w kolorze ustawionego pisaka (także rgb)
+/// Wyświetlenie okręgu w kolorze ustawionego pisaka (także rgb).
 /// \param x
 /// \param y
 /// \param r : promień okręgu
@@ -1198,7 +1231,7 @@ void circle_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r)
     Op.circle.ry = r;
 }
 
-/// Wyświetlenie elipsy w kolorze ustawionego pisaka (także rgb)
+/// Wyświetlenie elipsy w kolorze ustawionego pisaka (także rgb).
 /// \param x
 /// \param y
 /// \param a : półoś pozioma
@@ -1222,7 +1255,7 @@ void ellipse_d(ssh_coordinate x,ssh_coordinate y, ssh_natural a, ssh_natural b)
     Op.circle.ry = b;
 }
 
-/// Wyświetlenie elipsy w kolorze indeksowanym
+/// Wyświetlenie elipsy w kolorze indeksowanym.
 /// \param x
 /// \param y
 /// \param a : półoś pozioma
@@ -1249,7 +1282,7 @@ void ellipse(ssh_coordinate x,ssh_coordinate y, ssh_natural a, ssh_natural b, ss
     Op.circle.ry = b;
 }
 
-/// Wyświetlenie okręgu w kolorze z palety
+/// Wyświetlenie okręgu w kolorze z palety.
 /// \param x
 /// \param y
 /// \param r : promień okręgu
@@ -1277,11 +1310,11 @@ void circle(ssh_coordinate x,ssh_coordinate y,ssh_natural r,ssh_color c)
     Op.circle.ry = r;
 }
 
-/// Wyświetlenie koła w kolorach domyślnych (pen & fill - także rgb)
+/// Wyświetlenie koła w kolorach domyślnych (pen & fill - także rgb).
 /// \param x
 /// \param y
 /// \param r : promień okręgu
-void fill_circle_d(int x,int y,int r)
+void fill_circle_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r)
 {
     if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//fill_circle_d
     if(ssh_trace_level>2) cout << x << SEP << y << SEP
@@ -1306,7 +1339,7 @@ void fill_circle_d(int x,int y,int r)
     Op.circle.bf = GrBrushColor.b;
 }
 
-/// Wypełnienie elipsy w kolorach domyślnych (pen & fill - także rgb)
+/// Wypełnienie elipsy w kolorach domyślnych (pen & fill - także rgb).
 /// \param x
 /// \param y
 /// \param a : półoś pozioma
@@ -1368,7 +1401,7 @@ void fill_circle(ssh_coordinate x,ssh_coordinate y,ssh_natural r,
     Op.circle.bf = palette[c].b;
 }
 
-/// Wypełnienie elipsy kolorem c z palety
+/// Wypełnienie elipsy kolorem c z palety.
 /// \param x
 /// \param y
 /// \param a : półoś pozioma
@@ -1398,7 +1431,7 @@ void fill_ellipse(ssh_coordinate x, ssh_coordinate y, ssh_natural a, ssh_natural
     Op.circle.bf = palette[c].b;
 }
 
-/// Not implemented in SVG module
+/// Not implemented in SVG module.
 /// \param x
 /// \param y
 /// \param r
@@ -1510,7 +1543,7 @@ void fill_earc(ssh_coordinate x, ssh_coordinate y,                      /* wirtu
     //TODO
 }
 
-/// Wypełnienie prostokąta kolorem rgb
+/// Wypełnienie prostokąta kolorem rgb.
 /// \param x1
 /// \param y1
 /// \param x2
@@ -1534,6 +1567,7 @@ void fill_rect_rgb(ssh_coordinate x1,ssh_coordinate y1,
     //                unsigned x1 :16; unsigned y1:16; unsigned x2 :16; unsigned y2 :16;
     //                unsigned rf :8; unsigned gf :8; unsigned bf :8;} rect;
     Op.rect.mode = 0x1;//FILL
+    Op.rect.wi = 0;// GrLineWidth; BACKWARD COMPATIBILITY
     Op.rect.x1 = x1;
     Op.rect.x2 = x2;
     Op.rect.y1 = y1;
@@ -1546,7 +1580,7 @@ void fill_rect_rgb(ssh_coordinate x1,ssh_coordinate y1,
     Op.rect.bf = b;
 }
 
-/// Wypełnia prostokąt w kolorach domyślnych (pen & fill)
+/// Wypełnia prostokąt w kolorach domyślnych (pen & fill).
 /// \param x1
 /// \param y1
 /// \param x2
@@ -1565,6 +1599,7 @@ void fill_rect_d(ssh_coordinate x1, ssh_coordinate y1, ssh_coordinate x2, ssh_co
     //                unsigned x1 :16; unsigned y1:16; unsigned x2 :16; unsigned y2 :16;
     //                unsigned rf :8; unsigned gf :8; unsigned bf :8;} rect;
     Op.rect.mode = 0x1;//FILL
+    Op.rect.wi = GrLineWidth;
     Op.rect.x1 = x1;
     Op.rect.x2 = x2;
     Op.rect.y1 = y1;
@@ -1577,7 +1612,7 @@ void fill_rect_d(ssh_coordinate x1, ssh_coordinate y1, ssh_coordinate x2, ssh_co
     Op.rect.bf = GrBrushColor.b;
 }
 
-/// Wypełnia prostokąt w kolorze z palety
+/// Wypełnia prostokąt w kolorze z palety.
 /// \param x1
 /// \param y1
 /// \param x2
@@ -1587,7 +1622,7 @@ void fill_rect_d(ssh_coordinate x1, ssh_coordinate y1, ssh_coordinate x2, ssh_co
 /// \details Prostokąt jest rozciągnięty między rogami x1y1 a x2y2
 void fill_rect(ssh_coordinate x1, ssh_coordinate y1, ssh_coordinate x2, ssh_coordinate y2, ssh_color c)
 {
-    if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//fill_rect
+    if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP; //fill_rect
     if(ssh_trace_level>2) cout << x1 << SEP << y1 << SEP
                                << x2 << SEP << y2 << SEP
                                << (ssh_color)c << endl;
@@ -1598,6 +1633,7 @@ void fill_rect(ssh_coordinate x1, ssh_coordinate y1, ssh_coordinate x2, ssh_coor
     //                unsigned x1 :16; unsigned y1:16; unsigned x2 :16; unsigned y2 :16;
     //                unsigned rf :8; unsigned gf :8; unsigned bf :8;} rect;
     Op.rect.mode = 0x1;//FILL
+    Op.rect.wi = 0;// GrLineWidth; BACK COMPATIBILITY!!!
     Op.rect.x1 = x1;
     Op.rect.x2 = x2;
     Op.rect.y1 = y1;
@@ -1610,7 +1646,7 @@ void fill_rect(ssh_coordinate x1, ssh_coordinate y1, ssh_coordinate x2, ssh_coor
     Op.rect.bf = palette[c].b;
 }
 
-/// Wypełnia wielokąt przesunięty o vx,vy w kolorach domyślnych (pen & fill)
+/// Wypełnia wielokąt przesunięty o vx,vy w kolorach domyślnych (pen & fill).
 /// \param vx : poziome przesunięcie wielokąta
 /// \param vy : pionowe przesuniecie wielokąta
 /// \param points : surowa tablica punktów (a la C)
@@ -1618,16 +1654,17 @@ void fill_rect(ssh_coordinate x1, ssh_coordinate y1, ssh_coordinate x2, ssh_coor
 void fill_poly_d(ssh_coordinate vx, ssh_coordinate vy,
                  const ssh_point points[], int number)
 {
-    if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//fill_poly_d
+    if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP; //fill_poly_d
     if(ssh_trace_level>2) cout << vx << SEP << vy << SEP
                                << number << endl;
 
     GrOperation& Op = NextGrListEntry();//enum  GrType { Empty = 0, Point=1,LineTo=2,Line=3,Circle=4,Rect=5,Text=6,Poly=7 };
-    assert(Op.empty.type==GrType::Empty);
+                                                                                   assert(Op.empty.type==GrType::Empty);
     Op.empty.type = GrType::Poly;
     //struct Poly   { unsigned type :4; unsigned mode :4; unsigned r :8; unsigned g :8; unsigned b :8;
     //                unsigned rf : 8; unsigned gf : 8;unsigned bf :8; wb_dynarray<ssh_point> points; } poly;
     Op.poly.mode = 0x1;//FILL
+    Op.poly.wi = GrLineWidth;
     Op.poly.r = GrPenColor.r;//Prawdopodobnie będzie ignorowane
     Op.poly.g = GrPenColor.g;
     Op.poly.b = GrPenColor.b;
@@ -1657,7 +1694,7 @@ void fill_poly(ssh_coordinate vx, ssh_coordinate vy,
                const ssh_point points[], int number,
                ssh_color c)
 {
-    if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//fill_poly
+    if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP; //fill_poly
     if(ssh_trace_level>2) cout << vx << SEP << vy << SEP
                                << number << SEP
                                << (ssh_color)c << endl;
@@ -1668,6 +1705,7 @@ void fill_poly(ssh_coordinate vx, ssh_coordinate vy,
     //struct Poly   { unsigned type :4; unsigned mode :4; unsigned r :8; unsigned g :8; unsigned b :8;
     //                unsigned rf : 8; unsigned gf : 8;unsigned bf :8; wb_dynarray<ssh_point> points; } poly;
     Op.poly.mode = 0x1;//FILL
+    Op.poly.wi = 0;// GrLineWidth; BACKWARD COMPATIBILITY!
     Op.poly.r = palette[c].r;//Prawdopodobnie będzie ignorowane
     Op.poly.g = palette[c].g;
     Op.poly.b = palette[c].b;
@@ -1706,7 +1744,7 @@ ssh_mode input_ready()
         return SSH_NO;
 }
 
-/// Funkcja odczytywania znaków sterowania i zdarzeń
+/// Funkcja odczytywania znaków sterowania i zdarzeń.
 /// \return znak, jak nie ma czego zwrócić to zwraca neutralne 0.
 /// \details
 /// W module SVG nigdy nie staje na tej funkcji, jak przy zwykłym oknie
@@ -2022,7 +2060,7 @@ static int _writeSVG(ostream& o)
 			else
 				if (pr.mode == 1)//FLOOD FILL TO BORDER
 				{
-					// https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/flood-color
+					// TODO https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/flood-color
 					// o << " rgb(" << pr.r << ',' << pr.g << ',' << pr.b << "); ";//COLOR
 					// o << " rgb(" << pr.rb << ',' << pr.gb << ',' << pr.bb << "); ";//BORDER
 				}
@@ -2129,7 +2167,7 @@ static int _writeSVG(ostream& o)
 			o << "points=\"";
 			for (unsigned j = 0; j < pr.si; j++)
 					o <<" "<< pr.points[j].x << ',' << pr.points[j].y <<" ";
-			o << "\" />";
+			o << "\" />" << endl;
 		}; break;
 		default:
 			o << "#unknown type!!! " << GrList[i].empty.type << endl;
@@ -2142,9 +2180,9 @@ static int _writeSVG(ostream& o)
 	return 0;
 }
 
-/// Ostateczne uzgodnienie zawartości ekranu realnego z zawartością ekranu wirtualnego/tymczasowego w pamięci
-/// \implementation
-/// W module SVG zapisuje listę operacji graficznych do pliku o ustalonym formacie (najczęściej SVG)
+/// Ostateczne uzgodnienie zawartości ekranu realnego z zawartością ekranu wirtualnego/tymczasowego w pamięci.
+/// \internal
+///     W module SVG zapisuje listę operacji graficznych do pliku o ustalonym formacie (najczęściej SVG)
 void flush_plot()
 {
     if(GrClosed)
@@ -2163,7 +2201,7 @@ void flush_plot()
     dump_screen(name.get()); //Zapisuje listę operacji graficznych do pliku w ustalonym formacie
 }
 
-/// Zapisuje zawartość ekranu do pliku graficznego w naturalnym formacie platformy
+/// Zapisuje zawartość ekranu do pliku graficznego w naturalnym formacie platformy.
 /// \param Filename
 /// \return wynik funkcji zapisu, zwykle 0
 /// \implementation W module SVG dostępne są tekstowe formaty wektorowe, SVG (może kiedyś też EXM?) TODO?
@@ -2213,7 +2251,7 @@ ssh_stat	dump_screen(const char* Filename)
 }
 
 /* *******************************************************************/
-/*              SYMSHELLLIGHT  version 2022-01-03                    */
+/*              SYMSHELLLIGHT  version 2023-03-14                    */
 /* *******************************************************************/
 /*            THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
 /*             W O J C I E C H   B O R K O W S K I                   */

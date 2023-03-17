@@ -20,7 +20,7 @@
 * @brief	przenośne między X11 i Windows funkcje rysujące i stowarzyszone
 * @details
 *	        Większość to moduły w języku C a przynajmniej z takim interfejsem.
-*	        Działa też implemtowana w C++ wersja zapisująca do plików SVG.
+*	        Działa też implementowana w C++ wersja zapisująca do plików SVG.
 */
 ///@{
 
@@ -70,7 +70,7 @@ typedef float                                   ssh_radian;    /**< \brief katy 
 
 /** \brief Przekazanie parametrów wywołania i nazwy okna */
 void shell_setup(const char* title,                            /**< Nazwa aplikacji używana jako tytuł okna lub jego część */
-                 int iargc,                                    /**< liczba WSZYSTKICH parametrów wywołania */
+                 const int   iargc,                            /**< liczba WSZYSTKICH parametrów wywołania */
                  const char* iargv[]                           /**< Przekazanie parametrów wywołania */
                 );
 
@@ -175,7 +175,7 @@ void set_pen_rgba(ssh_intensity r,                             /**< składowa re
                   ssh_intensity g,                             /**< składowa green */
                   ssh_intensity b,                             /**< składowa blue */
                   ssh_intensity a,                             /**< kanał alfa */
-                  ssh_natural size,                            /**< grubość linii */
+                  ssh_natural width,                           /**< grubość linii */
                   ssh_mode style                               /**< styl rysowania linii jak w \see line_style */
                   );
 
@@ -584,7 +584,7 @@ inline ssh_color  get_background(void){ return background(); }  /**< Aktualny ko
 
 ///@}
 /* ****************************************************************** */
-/*              SYMSHELLLIGHT  version 2022-10-27                     */
+/*              SYMSHELLLIGHT  version 2023-03-14                     */
 /* ****************************************************************** */
 /*            THIS CODE IS DESIGNED & COPYRIGHT  BY:                  */
 /*             W O J C I E C H   B O R K O W S K I                    */

@@ -2,9 +2,9 @@
  * \file symshx11.c                                                     *
  * \brief X11 implementation of                                         *
  *      SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++            *
- ************************************************************************
+ * ******************************************************************** *
  * \details Najprostszy interface wizualizacyjny zaimplementowany       *
- * pod X-windows za pomocą biblioteki X11                               *
+ *          pod X-windows za pomocą biblioteki X11                      *
  *                                                                      *
  * \author W.Borkowski from University of Warsaw                        *
  * \n https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI           *
@@ -16,7 +16,7 @@
  * WCIĄŻ Z BŁĘDEM NA EXPOSE! TODO , choć raz go już gdzieś usunąłem :-/ *
  *                                                                      *
  ************************************************************************
- *               SYMSHELLLIGHT  version 2022-01-04                      *
+ *               SYMSHELLLIGHT  version 2023-03-14                      *
  ************************************************************************/
 
 #include <stdlib.h>
@@ -2353,7 +2353,8 @@ void fill_rect_d(int x1,int y1,int x2,int y2)
 
 /** Wypełnienie prostokąta rozciągniętego między rogami x1y1 a x2y2, w kolorze indeksowanym c */
 void fill_rect(int x1,int y1,int x2,int y2,ssh_color c)
-{
+{                                                                                                 assert( display!=NULL);
+                                                                                                   assert( gc != NULL);
     x1*=mulx; /* Multiplication of coordinates */
     y1*=muly; /* if window is bigger */
     x2*=mulx; /* Multiplication of 2' coordinates */
@@ -2895,7 +2896,7 @@ ssh_stat dump_screen(const char* Filename)
 }
 /*#pragma exit close_plot*/
 /*v******************************************************************/
-/*              SYMSHELLLIGHT  version 2022-01-06                   */
+/*              SYMSHELLLIGHT  version 2023-03...                   */
 /*v******************************************************************/
 /*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
 /*            W O J C I E C H   B O R K O W S K I                   */

@@ -108,7 +108,7 @@ void ver_scale(int x1,int y1,int width=def_scale_width,wb_color start=0,wb_color
 void hor_scale(int x1,int y1,int high=def_scale_width,wb_color start=0,wb_color end=255);
 
 /// \brief  Rysuje krzyżyk
-void cross(int x,int y,wb_color color,int width=def_cross_width);
+void cross(int x,int y,wb_color color,int line_width=def_cross_width);
 
 /// \brief  Rysuje dowolnie skierowaną strzałkę od punktu x1y1 do x2y2
 void arrow(int x1,int y1,int x2,int y2,wb_color color,double size=def_arrow_size,double theta=def_arrow_theta);

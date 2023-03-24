@@ -38,11 +38,17 @@ EOF
 
 g++ -c tmpX11.cpp
 
-echo -e $COLOR1'\n libx11-dev && libxpm-dev  OK\'$COLOR2
+echo -e $COLOR1'\n libx11-dev && libxpm-dev  OK'$COLOR2
 
 rm -f tmpX11.cpp
 
-echo -e $NORMCO
+echo -e $COLOR2"\nNow you can try to compile..."$COLOR1
+
+echo    "	cmake ."
+echo -e "	nano CMakeLists.txt" $COLOR3  "#if something was wrong." $COLOR1
+echo    "	make"
+
+echo -e $COLOR2 "\nEND" $NORMCO
 
 #Dependencies installation under UBUNTU:
 # $ sudo apt install gcc

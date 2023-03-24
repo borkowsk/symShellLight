@@ -14,7 +14,7 @@ cmake_minimum_required(VERSION 2.9)
 
 set(CMAKE_CXX_STANDARD 11) # See: https://matgomes.com/setting-cpp-standard-cmake/
 
-set( WITHTESTS true )
+set( WITHTESTS false )
 
 IF (WIN32)
   # set stuff for windows

@@ -163,8 +163,8 @@
           unsigned buttons;}        LastMouse={0, 0, 0, 0};
 
  /* OBSŁUGA SYGNAŁÓW */
- const   int            error_limit=3;             /**< Limit odesłanych błędów od x-serwera */
- static int             error_count=error_limit;   /* antylicznik błędów. Gdy osiąga 0 - koniec programu */
+ const  int             error_limit=3;             /**< Limit odesłanych błędów od x-serwera */
+ static int             error_count=3;             /* antylicznik błędów. Gdy osiąga 0 - koniec programu */
 
  static int             DelayAction=0;             /* Sterowanie zasypianiem, jeśli program czeka */
  static int             pipe_break=0;              /* Informacja o zerwaniu połączenia z X serwerem */

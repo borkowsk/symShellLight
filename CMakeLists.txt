@@ -42,9 +42,9 @@ add_library( wbsyshLightSVG STATIC
     "UTILS/sshutils.cpp"
     "UTILS/strtorgb.cpp"
     "UTILS/wieloboki.cpp"
-    	"UTILS/wb_pchar.cpp" #used internally
-	"UTILS/wb_rand.cpp"
-	"UTILS/wb_randg.c"
+    "UTILS/wb_pchar.cpp" #used internally
+    "UTILS/wb_rand.cpp"
+    "UTILS/wb_randg.c"
     "UTILS/sshmenufdummy.c" #dummy functions of menus
      "SVG/errorent.c"  
 	)
@@ -60,9 +60,9 @@ add_library( wbsyshLight STATIC
     "UTILS/sshutils.cpp"
     "UTILS/strtorgb.cpp"
     "UTILS/wieloboki.cpp"	
-	"UTILS/wb_pchar.cpp"
-	"UTILS/wb_rand.cpp"
-	"UTILS/wb_randg.c"
+    "UTILS/wb_pchar.cpp"
+    "UTILS/wb_rand.cpp"
+    "UTILS/wb_randg.c"
     "UTILS/sshmenufdummy.c" #dummy functions of menus
     "X11/errorent.c"
 	)
@@ -75,9 +75,9 @@ add_library( wbsyshLight STATIC
     "UTILS/sshutils.cpp"
     "UTILS/strtorgb.cpp"
     "UTILS/wieloboki.cpp"
-	"UTILS/wb_pchar.cpp"
-	"UTILS/wb_rand.cpp"
-	"UTILS/wb_randg.c"	
+    "UTILS/wb_pchar.cpp"
+    "UTILS/wb_rand.cpp"
+    "UTILS/wb_randg.c"	
     "WIN/sshmenufwin.c"
     #"UTILS/sshmenufdummy.c" #dummy functions of menus
     "WIN/errorent.c"
@@ -208,14 +208,14 @@ endif()
 endif()
 #KONIEC - THE END
 #********************************************************************/
-#*              SYMSHELLLIGHT  version 2022-11                      */
+#*              SYMSHELLLIGHT  version 2023                         */
 #********************************************************************/
 #*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
 #*            W O J C I E C H   B O R K O W S K I                   */
 #*    WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI  */
 #*    GITHUB: https://github.com/borkowsk                           */
 #*                                                                  */
-#*    Instytut Studiów Społecznych im. Profesora Roberta Zajonca    */
+#*    Instytut Studiów Społecznych im. Profesora Roberta Zajonc  */
 #*    Uniwersytetu Warszawskiego                                    */
 #*    PL.WWW: http://iss.uw.edu.pl/                                 */
 #*                                                                  */

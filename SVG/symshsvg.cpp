@@ -515,7 +515,7 @@ int invalidate_screen()
 }
 
 /// \brief Włącza drukowanie tekstu bez zamazywania tła/lub z.
-/// \param Yes or No
+/// \param Yes (`1` or `0`)
 /// \return Zwraca ustawienie poprzednie trybu drukowania
 ssh_mode     print_transparently(ssh_mode Yes)
 {
@@ -539,7 +539,12 @@ ssh_natural     line_width(ssh_natural width)
     if(GrLineWidth>3)
     {
         GrLineWidth=3; //SĄ NA TO TYLKO 2 bity w rekordzie!!!
-        cerr<< "Warning! 'line_width' is currently limited to 3 in SVG SymShell!"<<endl;
+        static int first_time=1;
+        if(first_time==1)
+        {
+            cerr << "Warning! 'line_width' is currently limited to 3 in SVG SymShell!" << endl;
+            first_time=0;
+        }
     }
 	return old;
 }
@@ -629,7 +634,12 @@ void set_pen(ssh_color c,ssh_natural line_width, ssh_mode Style)
     if(GrLineWidth>3)
     {
         GrLineWidth=3; //SĄ NA TO TYLKO 2 bity w rekordzie!!!
-        cerr<< "Warning! 'line_width' in 'set_pen' is currently limited to 3 in SVG SymShell!"<<endl;
+        static int first_time=1;
+        if(first_time==1)
+        {
+            cerr << "Warning! 'line_width' in 'set_pen' is currently limited to 3 in SVG SymShell!" << endl;
+            first_time=0;
+        }
     }
 
     GrLineStyle = Style;
@@ -660,7 +670,12 @@ void set_pen_rgb(ssh_intensity r,ssh_intensity g, ssh_intensity b,
     if(GrLineWidth>3)
     {
         GrLineWidth=3; //SĄ NA TO TYLKO 2 bity w rekordzie!!!
-        cerr<< "Warning! 'line_width' in 'set_pen_rgb' is currently limited to 3 in SVG SymShell!"<<endl;
+        static int first_time=1;
+        if(first_time==1)
+        {
+            cerr << "Warning! 'line_width' in 'set_pen_rgb' is currently limited to 3 in SVG SymShell!" << endl;
+            first_time=0;
+        }
     }
 
     GrLineStyle = Style;
@@ -691,7 +706,12 @@ void set_pen_rgba(ssh_intensity r,ssh_intensity g,ssh_intensity b,ssh_intensity 
     if(GrLineWidth>3)
     {
         GrLineWidth=3; //SĄ NA TO TYLKO 2 bity w rekordzie!!!
-        cerr<< "Warning! 'line_width' in 'set_pen_rgb' is currently limited to 3 in SVG SymShell!"<<endl;
+        static int first_time=1;
+        if(first_time==1)
+        {
+            cerr << "Warning! 'line_width' in 'set_pen_rgba' is currently limited to 3 in SVG SymShell!" << endl;
+            first_time=0;
+        }
     }
 
     GrLineStyle = style;
@@ -1908,8 +1928,9 @@ static int _writeSTR(ostream& o)
 	ssh_rgb bac = get_rgb_from( get_background() );
 	o << "BACKGROUND=( " << unsigned(bac.r) << ',' << unsigned(bac.g) << ',' << unsigned(bac.b) << " )" << endl;
 	o << "GrOpt*[" << GrListPosition + 1 << "] {" << endl;
-	for (unsigned i = 0; i <= GrListPosition;i++)
-		switch (GrList[i].empty.type)
+    if(GrListPosition!=-1)
+      for (unsigned i = 0; i <= GrListPosition;i++)
+        switch (GrList[i].empty.type)
 		{
 		case GrType::Empty:	break;//NIE ROBI NIC!
 		case GrType::Point: {
@@ -2034,8 +2055,9 @@ static int _writeSVG(ostream& o)
       <<"stroke:#000000; stroke-width:0px;\" />" << endl;
 
     o << "<text style=\"fill:red;\" x=\""<< 0 <<"\" y=\""<< GrScreenHi + 12 <<"\">This is SVG from "<<ScreenHeader<<" "<<ScreenTitle<<" </text>"<<endl;
-	for (unsigned i = 0; i <= GrListPosition; i++)
-		switch (GrList[i].empty.type)
+    if(GrListPosition!=-1)
+      for (unsigned i = 0; i <= GrListPosition; i++)
+        switch (GrList[i].empty.type)
 		{
 		case GrType::Empty:	break;//NIE ROBI NIC!
         case GrType::LineTo: {

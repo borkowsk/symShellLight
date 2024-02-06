@@ -14,7 +14,7 @@ cmake_minimum_required(VERSION 2.9)
 
 set(CMAKE_CXX_STANDARD 11) # See: https://matgomes.com/setting-cpp-standard-cmake/
 
-set( WITHTESTS false )
+set( WITHTESTS true )
 
 IF (WIN32)
   # set stuff for windows
@@ -154,8 +154,8 @@ target_link_libraries("TestsyshWIN" wbsyshLight  )
 target_link_libraries("TurmitWIN"   wbsyshLight  )
 target_link_libraries("CAGasWIN"    wbsyshLight  )
 
-#add_executable("LinktestWIN" "EXAMPLES/Linktest.cpp"    )
-#target_link_libraries("LinktestWIN" wbsyshWIN )
+add_executable("LinktestWIN" "EXAMPLES/Linktest.cpp"    )
+target_link_libraries("LinktestWIN" wbsyshLight )
 endif()
 
 

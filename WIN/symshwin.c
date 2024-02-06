@@ -49,32 +49,25 @@ extern int WB_error_enter_before_clean;/* For controling closing graphics window
 /* FOR OTHER MODULES */
 HINSTANCE	WB_Instance=0;
 HINSTANCE	WB_PrevInstance=0;
-HWND		WB_Hwnd=0;					//???
-HWND		MyHwnd=0;						//Main window handle.
+HWND		WB_Hwnd=0;					  ///< ???
+HWND		MyHwnd=0;					  ///< Main window handle.
+char szAppName[128] = "SYMSHELL";         ///< The name of this application, if not in resources
+char szClassName[128] = "CLASS_SYMSHELL"; ///< The name of window class
 
+/* LOCAL VARIABLES */
 static const char* progname="WB SYMSHELL APPLICATION "__DATE__;
 static char window_name[1024]="Windows WB SYMSHELL interface "__DATE__;//TODO - z jakiegoœ powodu MessageBox traktuje to niepoprawnie
 static char icon_name[1024]="Windows SYMSHELL "__DATE__;
-char szAppName[128]="SYMSHELL";   // The name of this application, if not in resources
-char szClassName[128]="CLASS_SYMSHELL";//The name of window class
 
-static	HACCEL	hAccelTable;		// For read from resources
-static	HDC	MyHdc=0;				//Current HDC
-static	HDC	WnHdc=0;				//Window HDC
-static	HDC	MbHdc=0;				//Memory bitmap HDC
-static	HMENU	MainMenu=0;			//Menu handle loaded from resorce
-static	HBITMAP	VirtualScreen=0;	//Memory bitmap CreateCompatible BitBlt
-static	HFONT	UserFont=0;			//Handle to extra font
-static	TEXTMETRIC	font_info;		//Struktura na in formacje o aktualnym foncie
-static	MSG	msg;					//Struktura na aktualny komunikat
-
-
-typedef struct
-{
-	HPEN handle;
-	int  size;	//Grubosci zaalokowanych piór
-	int  style;	//Style dla zaalokowanych piór
-}	piora;
+static	HACCEL	    hAccelTable; // For read from resources
+static	HDC     	    MyHdc=0; // Current HDC
+static	HDC	            WnHdc=0; // Window HDC
+static	HDC	            MbHdc=0; // Memory bitmap HDC
+static	HMENU	     MainMenu=0; // Menu handle loaded from resorce
+static	HBITMAP	VirtualScreen=0; // Memory bitmap CreateCompatible BitBlt
+static	HFONT	     UserFont=0; // Handle to extra font
+static	TEXTMETRIC	  font_info; // Struktura na in formacje o aktualnym foncie
+static	MSG	                msg; // Struktura na aktualny komunikat
 
 static COLORREF curent_pen_rgb=RGB(0,0,0);
 //static COLORREF curent_brush_rgb=RGB(0,0,0);
@@ -86,10 +79,18 @@ static HBRUSH brushes[PALETE_LENGHT];		//Tablice uchwytow do pedzli
 
 static HPEN curent_pen=NULL;				//Aktualny uchwyt do pióra
 static HPEN free_style_pen=NULL;			//Alokowane dowolne pióro
+
+typedef struct
+{
+	HPEN handle;
+	int  size;	//Grubosci zaalokowanych piór
+	int  style;	//Style dla zaalokowanych piór
+}	piora;
+
 static piora	pens[PALETE_LENGHT];		//Tablice uchwytow do piór.
 
-
 static int NoResources=1;			// No resources attached to exe file
+
 static int WindowClosed=1;			// Window destroyed/notopen flag for close_plot
 static int curr_color=-1;			// indeks koloru w aktualnym pisaku
 static int curr_fill=-1;			// indeks koloru w aktualnym pêdzlu
@@ -99,25 +100,27 @@ static int is_mouse=0;
 static int animate=0;
 static int is_buffered=0;
 static int transparently=0;
-static int Flexible=0;			//Czy dopuscic elestyczny rezizing okna
+static int Flexible=0;			    // Czy dopuscic elestyczny rezizing okna
 
-static int DelayTime=0;			//Delay time after gr. sync
+static int DelayTime=0;			    // Delay time after gr. sync
 static int LineWidth=1;
 static int LineStyle=SSH_LINE_SOLID;
 static int mulx=1;
 static int muly=1;
 static int W_width,W_height;
-static int ini_width;		//MAXX+1 obszaru bitowego
-static int ini_height;		//MAXY+1 obszaru bitowego
-static int ForceHeight=0;	//Na rozmiary okna wymuszone parametrami wywo³ania
-static int ForceWidth=0;	// -width=  i -height=
-static int ini_col;			//Ile kolumn tekstu dodatkowo
-static int ini_row;			//Ile wierszy tekstu dodatkowo
+static int ini_width;		       // MAXX+1 obszaru bitowego
+static int ini_height;		       // MAXY+1 obszaru bitowego
+static int ForceHeight=0;	       // Na rozmiary okna wymuszone parametrami wywo³ania
+static int ForceWidth=0;	       // -width=  i -height=
+static int ini_col;			       // Ile kolumn tekstu dodatkowo
+static int ini_row;			       // Ile wierszy tekstu dodatkowo
 static int Is_finfo=0;
 static const char* UserFontStr=NULL;
 
-static int CharToGet=0;
-static int UseGrayScale=0;	//Flaga uzycia skali szarosci
+static int CharToGet=0;			   // ???
+static int UseGrayScale=0;	       // Flaga uzycia skali szarosci
+
+/* LOCAL FUNCTIONS */
 
 static HPEN GetMyPen(ssh_color color,int size,int style);
 static HBRUSH GetMyBrush(ssh_color color);
@@ -370,6 +373,12 @@ void	set_brush(ssh_color c)
 	curr_fill=-1;//Funkcje same ustawiajace brush musza to zrobic po uzyciu set_brush
 }
 
+/// Aktualny kolor wype³nieñ jako `ssh_color`.
+ssh_color get_brush()
+{
+	return curr_fill;
+}
+
 void set_brush_rgb(ssh_intensity r,ssh_intensity g,ssh_intensity b)
 /* Ustala aktualny kolor wypelnien za pomoca skladowych RGB */
 {
@@ -444,6 +453,12 @@ void set_pen(ssh_color c, ssh_natural width, ssh_mode style)
 	LineWidth=width;
 }
 
+/// Aktualny kolor linii jako ssh_color (indeks).
+ssh_color get_pen()
+{
+	return curr_color;
+}
+
 void set_pen_rgb(ssh_intensity r, ssh_intensity g, ssh_intensity b,
                     ssh_natural size, ssh_mode style)
 /* Ustala aktualny kolor linii za pomoca skladowych RGB */
@@ -482,7 +497,11 @@ void set_rgb(ssh_color color,                                  /* - indeks kolor
              ssh_intensity r,ssh_intensity g,ssh_intensity b) /*- wartoœci sk³adowych */
 /* Zmienia definicje koloru w palecie kolorow. Indeksy 0..PALETE_LENGHT */
 {
-    assert(color<PALETE_LENGHT);
+	if (color >= PALETE_LENGHT)
+	{
+		fprintf(stderr, "WARNING! Invalid index of color: %i \n", (int)color);
+		color = PALETE_LENGHT-1;
+	}
 
 	colors[color]=RGB(r,g,b);
 
@@ -527,7 +546,8 @@ ssh_rgb   get_rgb_from(ssh_color c)
 void set_gray(ssh_color shade,ssh_intensity intensity)
 /* Zmiania definicje odcienia szarosci w palecie szarosci. Indeksy 256..511 */
 {
-    assert(255<shade && shade<PALETE_LENGHT);
+    if( ! (255<shade && shade<PALETE_LENGHT) )
+		fprintf(stderr, "WARNING! Invalid shade of gray: %i \n",(int)shade);
     set_rgb(shade,intensity,intensity,intensity);
 }
 
@@ -794,7 +814,7 @@ if(UseGrayScale)//Uzywa skali szarosci tam gdzie normalnie sa kolory
 			set_rgb(k,(unsigned char)k,(unsigned char)k,(unsigned char)k );
 
 	 _TRACE( 4)
-		fprintf(stderr,"%s\n","SetScale (Colors: 0-255; Gray: 256--> %d) completed",PALETE_LENGHT);
+		fprintf(stderr,"SetScale (Colors: 0-255; Gray: 256--> %d) completed",PALETE_LENGHT);
 	  _TREND
 	  }
   }
@@ -2355,7 +2375,7 @@ LRESULT MsgGetMinMaxInfo(HWND   hwnd,
 _TRACE(1)
 	fprintf(stderr,
 		  "MsgGetMinMaxInfo: %x, %d, %d\n",
-		  wparam, LOWORD(lparam), HIWORD(lparam)
+		  (unsigned int)wparam, LOWORD(lparam), HIWORD(lparam)
 			);
 _TREND
 

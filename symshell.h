@@ -206,10 +206,14 @@ ssh_rgb   get_rgb_from(ssh_color c);
 /** \brief Aktualny kolor tla... */
 ssh_color background();
 
-/** \brief Aktualny kolor linii jako ssh_color */
+/** \brief Aktualny kolor linii jako ssh_color
+    \details W przypadku implementacji SVG zawsze zwraca -1024 (out of table!)
+*/
 ssh_color get_pen();
 
-/** \brief Aktualny kolor wypełnień jako ssh_color */
+/** \brief Aktualny kolor wypełnień jako ssh_color 
+    \details W przypadku implementacji SVG zawsze zwraca 0 (czarny)
+*/
 ssh_color get_brush();
 
 /** \brief Aktualna grubość linii */

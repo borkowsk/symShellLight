@@ -6,14 +6,14 @@
 # Manually define WITHTESTS=true, if you want build test applications!
 #
 # (c)ISS UW, @author Wojciech Borkowski
-# @date 2022-12-22 (last update)
+# @date 2024-02-09 (last update)
 ##################################################################################
 
 project(symshelllight)
 cmake_minimum_required(VERSION 2.9)
-
 set(CMAKE_CXX_STANDARD 11) # See: https://matgomes.com/setting-cpp-standard-cmake/
 
+# Define WITHTESTS if you want build test applications!
 set( WITHTESTS true )
 
 IF (WIN32)
@@ -25,7 +25,7 @@ IF (WIN32)
   #add_compile_options( /W4 ) #  /WX
 ELSE()
   # set stuff for other systems
-  message( ${PROJECT_NAME} ": Linux/unix platform assumed.")
+  message( ${PROJECT_NAME} ": Linux/unix platform with X11 assumed.")
   set( X11 true )
   #set( X_ONLY_SRC  "" )
   #add_compile_options( -Wall )

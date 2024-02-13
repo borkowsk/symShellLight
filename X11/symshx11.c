@@ -1,23 +1,25 @@
-/**
+/** *********************************************************************
  * \file symshx11.c                                                     *
  * \brief X11 implementation of                                         *
  *      SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++            *
  * ******************************************************************** *
  * \details Najprostszy interface wizualizacyjny zaimplementowany       *
- *          pod X-windows za pomocą biblioteki X11                      *
+ *          pod X-windows za pomocą biblioteki X11                      *                    
+ *          Na Ubuntu/Debianie potrzebne pakiety:                       *
+ *                  `libx11-dev` i `libxpm-dev`                         *
  *                                                                      *
  * \author W.Borkowski from University of Warsaw                        *
- * \n https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI           *
- * \n https://github.com/borkowsk                                       *
- *//*
- * File changed massively: 21.10.2020                                   *
+ * 	- https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI       *
+ * 	- https://github.com/borkowsk                                   *
  *                                                                      *
- * UWAGA!                                                               *
- * WCIĄŻ Z BŁĘDEM NA EXPOSE! TODO , choć raz go już gdzieś usunąłem :-/ *
+ *      File changed massively: 21.10.2020                              *
+ * \date 2024-02-13 (last modifications)                                *
+ * \note                                                                *
+ *  WCIĄŻ Z BŁĘDEM NA EXPOSE! TODO , choć raz go już gdzieś usunąłem :-/*
  *                                                                      *
  ************************************************************************
- *               SYMSHELLLIGHT  version 2023-03-14                      *
- ************************************************************************/
+ *               SYMSHELLLIGHT  version 2024-02                         *
+ ************************************************************************ */
 
 #include <stdlib.h>
 #include <stdio.h>

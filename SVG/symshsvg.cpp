@@ -1,9 +1,9 @@
-/**
- *              SYMSHELL: THE SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++
+/** @file symshsvg.cpp
  *  \brief                      SYMSHELL SVG IMPLEMENTATION
- *  \file symshsvg.cpp
  *//* ******************************************************************************** */
-/** \details
+/** \details    SYMSHELL IS A SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++
+ **             ==================================================================
+ **
  **             Simplest graphics interface implemented for SVG vector graphics.
  **             All graphic operation are buffered in a large list, and write
  **             into SVG file when flush_screen() is called.
@@ -17,7 +17,7 @@
  ** \n          https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI
  ** \n          https://github.com/borkowsk
  **
- ** \library    SYMSHELLLIGHT  version 2023
+ ** \library    SYMSHELLLIGHT  version 2023b
  **
  * */
 #include <iostream>
@@ -1097,7 +1097,8 @@ void plot(int x,int y, ssh_color c)
 ///
 /// Jak inny tryb kolorów okna/ekranu to efekt może być dziwny,
 /// ale już niemal nie ma ekranów nie-true-color
-void plot_rgb(ssh_coordinate x, ssh_coordinate y, int r, int g, int b)
+void plot_rgb(ssh_coordinate x, ssh_coordinate y,                       /* Współrzędne */
+              ssh_intensity r, ssh_intensity g, ssh_intensity b)
 
 {
     if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//plot_rgb

@@ -167,6 +167,17 @@ void symshell_about(const char* my_window_name)
 	wb_about(my_window_name);
 }
 
+void set_title(const char* WindowName)
+{
+	assert(WindowName != 0);
+	if (!SetWindowText(WB_Hwnd, WindowName)) // SetWindowText return TRUE on success!
+	{
+		_TRACE(0) //if(trace_level & 4)
+			fprintf(stderr, "Cannot set window name into \"%s\"\n", WindowName);
+		_TREND
+	}
+}
+
 static int error_proc(void)
 {
 DWORD code=GetLastError();
@@ -383,11 +394,26 @@ void set_brush_rgb(ssh_intensity r,ssh_intensity g,ssh_intensity b)
 /* Ustala aktualny kolor wypelnien za pomoca skladowych RGB */
 {
 	COLORREF MyColor = RGB(r,g,b);
+
 	if(free_style_brush!=NULL)
 		DeleteObject(free_style_brush);
 	free_style_brush=curent_brush=CreateSolidBrush(MyColor);
+
 	SelectObject(GetMyHdc(),free_style_brush);
 	curr_fill=-1;//Funkcje same ustawiajace brush musza to zrobic po uzyciu set_brush
+}
+
+void set_brush_rgba(ssh_intensity r, ssh_intensity g, ssh_intensity b, ssh_intensity a )
+/* Ustala aktualny kolor wypelnien za pomoca skladowych RGB */
+{
+	COLORREF MyColor = RGB(r, g, b);
+	//MyColor |= a << 24; //Teoretycznie, ale w Windows tak nie dzia³a
+	if (free_style_brush != NULL)
+		DeleteObject(free_style_brush);
+	free_style_brush = curent_brush = CreateSolidBrush(MyColor);
+
+	SelectObject(GetMyHdc(), free_style_brush);
+	curr_fill = -1;//Funkcje same ustawiajace brush musza to zrobic po uzyciu set_brush
 }
 
 static HPEN GetMyPen(ssh_color color,int size,int style)
@@ -448,6 +474,7 @@ void set_pen(ssh_color c, ssh_natural width, ssh_mode style)
 
 	curent_pen=GetMyPen(c,width,style);
     SelectObject(hdc,curent_pen);
+
 	curr_color=-1;/* Funcje same ustawiajace pen sa zmuszone to zrobic po uzyciu set_pen */
 	LineStyle=style;//???
 	LineWidth=width;
@@ -486,11 +513,52 @@ void set_pen_rgb(ssh_intensity r, ssh_intensity g, ssh_intensity b,
 
 		free_style_pen=curent_pen=CreatePen(win_style,pom,RGB(r,g,b));
 	}
+
 	//Od razu uzycie piora
 	SelectObject(GetMyHdc(),free_style_pen);
-	curr_color=-1;/* Funcje same ustawiajace pen sa zmuszone to zrobic po uzyciu set_pen */
+
+	curr_color=-1;/* Funkcje same ustawiajace pen sa zmuszone to zrobic po uzyciu set_pen */
 	LineStyle=style;//???
 	LineWidth=size;
+}
+
+void set_pen_rgba(ssh_intensity r, ssh_intensity g, ssh_intensity b,
+	              ssh_intensity a,                             /**< kana³ alfa */
+	              ssh_natural size, ssh_mode style)
+	/* Ustala aktualny domyœlny kolor linii za pomoca skladowych RGB */
+{
+	if (free_style_pen)
+		DeleteObject(free_style_pen);
+
+	_TRACE(4)
+		fprintf(stderr, "Free style pen allocation rgba:%x%x%x%x s:%d style:%d.\n", r, g, b,a, size, style);
+	_TREND
+
+	//Tworzenie nowego piora
+	{
+		int sX = mulx * size;
+		int sY = muly * size;
+		int pom = sX < sY ? sX : sY;
+
+		int win_style = 0;
+		switch (style)
+		{
+		case SSH_LINE_SOLID:win_style = PS_SOLID; break;
+		case SSH_LINE_DOTTED:win_style = PS_DOT; break;
+		case SSH_LINE_DASHED:win_style = PS_DASH; break;
+		}
+
+		COLORREF MyColor = RGB(r, g, b);
+		//MyColor |= a << 24; TO TAK NIE DZIA£A W WINDOWS
+		free_style_pen = curent_pen = CreatePen(win_style,pom, MyColor);
+	}
+
+	//Od razu uzycie piora
+	SelectObject(GetMyHdc(), free_style_pen);
+
+	curr_color = -1;/* Funcje same ustawiajace pen sa zmuszone to zrobic po uzyciu set_pen */
+	LineStyle = style;//???
+	LineWidth = size;
 }
 
 void set_rgb(ssh_color color,                                  /* - indeks koloru */

@@ -1,7 +1,6 @@
 /** \file symshell.h
  *  \brief SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++
- * ********************************************************************* */
-/**
+ *         ====================================================
  * \details
  *             Whole file changed massively: 15.11.2020
  *             Comments changed massively: 3-4.01.2022
@@ -207,13 +206,11 @@ ssh_rgb   get_rgb_from(ssh_color c);
 ssh_color background();
 
 /** \brief Aktualny kolor linii jako ssh_color
-    \details W przypadku implementacji SVG zawsze zwraca -1024 (out of table!)
-*/
+    \details W przypadku implementacji SVG zawsze zwraca -1024 (out of table!) */
 ssh_color get_pen();
 
 /** \brief Aktualny kolor wypełnień jako ssh_color 
-    \details W przypadku implementacji SVG zawsze zwraca 0 (czarny)
-*/
+    \details W przypadku implementacji SVG zawsze zwraca 0 (czarny) */
 ssh_color get_brush();
 
 /** \brief Aktualna grubość linii */
@@ -224,7 +221,8 @@ ssh_natural  get_line_width();
 ssh_natural  screen_width();                                    /**< Całkowita użyteczna szerokość okna w pikselach */
 ssh_natural  screen_height();                                   /**< Całkowita użyteczna wysokość okna w pikselach */
 
-/* Wielkości znaków i tekstów */
+/* Wielkości znaków i tekstów 
+   ==========================  */
 
 /** \brief Aktualne rozmiary znaku potrzebne do pozycjonowania tekstu */
 ssh_natural  char_height(char znak);                            /**< Wysokość znaku */
@@ -259,7 +257,8 @@ void print_rgb(ssh_coordinate x,                                      /**< wspó
                ...                                                    /**< wolne parametry zależne od formatu */
                );
 
-/* Zapalanie punktów na ekranie  */
+/* Zapalanie punktów na ekranie  
+   ============================  */
 
 void plot_d(ssh_coordinate x,ssh_coordinate y);                       /**< Wyświetlenie punktu na ekranie w kolorze domyślnym */
 void plot(ssh_coordinate x,ssh_coordinate y, ssh_color c);            /**< Wyświetlenie punktu w kolorze z palety */
@@ -289,7 +288,8 @@ void fill_flood_rgb(ssh_coordinate x,ssh_coordinate y,                /**< wspó
                 ssh_intensity bb                                      /**< składowa B koloru brzegu */
                 );
 
-/* RYSOWANIE LINII */
+/* RYSOWANIE LINII 
+   ===============  */
 
 /** \brief Wyświetlenie linii w kolorze domyślnym od punktu x1y1 do x2y2 */
 void line_d(ssh_coordinate x1,                                        /**< współrzędna pozioma punktu startu */
@@ -316,7 +316,8 @@ void line_rgb(ssh_coordinate x1,                                      /**< wspó
               ssh_intensity r,ssh_intensity g,ssh_intensity b         /**< składowe koloru */
               );
 
-/* RYSOWANIE KÓŁ, ELIPS i ŁUKÓW */
+/* RYSOWANIE KÓŁ, ELIPS i ŁUKÓW 
+   ============================ */
 
 /** \brief Wyświetlenie okręgu o promieniu 'r' w kolorze domyślnym */
 void circle_d(ssh_coordinate x,                                       /**< współrzędna pozioma środka */
@@ -466,7 +467,8 @@ void fill_earc(ssh_coordinate x,                                     /**< wspó�
                );
 
 
-/* WIELOKĄTY */
+/* WIELOKĄTY 
+   ========= */
 
 /** \brief Wypełnienie prostokąta rozciągniętego między rogami x1y1 a x2y2 kolorem domyślnym */
 void fill_rect_d(ssh_coordinate x1,                                  /**< współrzędna pozioma narożnika startu */
@@ -508,7 +510,8 @@ void fill_poly(ssh_coordinate vx,                                    /**< poziom
 
 
 
-/* POBIERANIE ZNAKÓW Z KLAWIATURY i ZDARZEŃ OKIENNYCH (w tym z MENU) */
+/* POBIERANIE ZNAKÓW Z KLAWIATURY i ZDARZEŃ OKIENNYCH (w tym z MENU) 
+   ================================================================= */
 
 ssh_mode  input_ready(); /**< \brief Funkcja sprawdzająca, czy jest coś do wzięcia z wejścia */
 
@@ -588,7 +591,7 @@ inline ssh_color  get_background(void){ return background(); }  /**< Aktualny ko
 
 ///@}
 /* ****************************************************************** */
-/*              SYMSHELLLIGHT  version 2023-03-14                     */
+/*              SYMSHELLLIGHT  version 2024-06-24                     */
 /* ****************************************************************** */
 /*            THIS CODE IS DESIGNED & COPYRIGHT  BY:                  */
 /*             W O J C I E C H   B O R K O W S K I                    */

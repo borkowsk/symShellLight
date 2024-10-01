@@ -1,15 +1,19 @@
-# SymShellLight
+#  SymShellLight - basic graphics for Unix/Window simulations
+## @date 2024-10-01 (last change)
 
 Light version of __Simulation Shell__. Mostly basic graphic for _X11_,_MS Windows_ & _SVG_ for educational purpose
 
 PL: Lekka wersja grafiki __SYMSHELL__'a dla _X11_, _MS Windows_ & _SVG_ z niektórymi podstawowymi funkcjonalnościami czasu wykonania. 
-Wyodrębnione z pełnej wersji w celach dydaktycznych i eksportowych :PL
+Wyodrębnione z pełnej wersji w celach dydaktycznych i eksportowych.
+
 
 **HISTORY**
 
+The Simulation Shell library project for C/C++ was started over 20 years ago (around 1995) to facilitate the development of simulation programs easily portable between systems and different C/C++ compilers, which were then much more varied than today. It included basic graphics and portable semigraphics under unix, linux (X11), windows and DOS (under GO32) and modules for managing simulation results and their visualization.
+
 PL: Projekt biblioteki Simulation Shell dla C/C++ został rozpoczęty ponad 20 lat temu (około roku 1995) w celu ułatwienia tworzenia programów symulacyjnych łatwych do przenoszenia pomiędzy systemami i różnymi kompilatorami C/C++, które były wtedy dużo bardziej zróżnicowane niż dzisiaj. Zawierał podstawową grafikę oraz semigrafikę przenośna pod unix, linux (X11), windows oraz DOS (pod GO32) oraz moduły do zarządzania wynikami symulacji i ich wizualizacji. :PL
 
-The Simulation Shell library project for C/C++ was started over 20 years ago (around 1995) to facilitate the development of simulation programs easily portable between systems and different C/C++ compilers, which were then much more varied than today. It included basic graphics and portable semigraphics under unix, linux (X11), windows and DOS (under GO32) and modules for managing simulation results and their visualization.
+[image](DOC/symshell.svg)
 
 **Quick start**
 

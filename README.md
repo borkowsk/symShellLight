@@ -31,7 +31,7 @@ You can also compile tests:
 ```
 
 It was tested on UBUNTU 16.04 with gcc, UBUNTU 18.04 with gcc & UBUNTU 20.04 with gcc/g++
-Current version does not work under Windows. Many functions are missed!!! 
+Current version does not work fully under Windows. Some functions are missed!!! 
 
 **ADDITIONAL REQUIREMENTS**
 

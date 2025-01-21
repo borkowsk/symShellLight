@@ -1,6 +1,8 @@
 #  SymShellLight - basic graphics for Unix/Window simulations
 ## @date 2024-10-01 (last change)
 
+ [//]: # (date is updated automatically by git preprocessing script) 
+
 Light version of __Simulation Shell__. Mostly basic graphic for _X11_,_MS Windows_ & _SVG_ for educational purpose
 
 PL: Lekka wersja grafiki __SYMSHELL__'a dla _X11_, _MS Windows_ & _SVG_ z niektórymi podstawowymi funkcjonalnościami czasu wykonania. 

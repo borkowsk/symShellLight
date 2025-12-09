@@ -6,11 +6,11 @@
 # Manually define WITHTESTS=true, if you want build test applications!
 #
 # (c)ISS UW, @author Wojciech Borkowski
-# @date 2024-02-09 (last update)
+# @date 2025-12-09 (last update)
 ##################################################################################
 
 project(symshelllight)
-cmake_minimum_required(VERSION 2.9)
+cmake_minimum_required(VERSION 3.6)
 set(CMAKE_CXX_STANDARD 11) # See: https://matgomes.com/setting-cpp-standard-cmake/
 
 # Define WITHTESTS if you want build test applications!

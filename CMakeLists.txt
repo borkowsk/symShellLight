@@ -6,7 +6,7 @@
 # Manually define WITHTESTS=true, if you want build test applications!
 #
 # (c)ISS UW, @author Wojciech Borkowski
-# @date 2025-12-09 (last update)
+# @date 2026-01-06 (last update)
 ##################################################################################
 
 project(symshelllight)
@@ -208,7 +208,7 @@ endif()
 endif()
 #KONIEC - THE END
 #********************************************************************/
-#*              SYMSHELLLIGHT  version 2023                         */
+#*              SYMSHELLLIGHT  version 2025                         */
 #********************************************************************/
 #*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
 #*            W O J C I E C H   B O R K O W S K I                   */

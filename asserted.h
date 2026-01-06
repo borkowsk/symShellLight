@@ -1,6 +1,6 @@
 /// @file
 /// Created by borkowsk on 06.01.26.
-/// @date 2026 (last modification)
+/// @date 2026-01-06 (last modification)
 
 #ifndef SYMSHELL_ASSERTED_H
 #define SYMSHELL_ASSERTED_H

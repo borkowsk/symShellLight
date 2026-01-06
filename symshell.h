@@ -4,11 +4,16 @@
  * \details
  *             Whole file changed massively: 15.11.2020
  *             Comments changed massively: 3-4.01.2022
- * \author borkowsk - W.Borkowski from University of Warsaw
+ *
  * \note
  *      - https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI
  *      - https://github.com/borkowsk
- * \n :atom_symbol:
+ *
+ ** \author     Designed by W.Borkowski from University of Warsaw
+ **
+ ** \library    SYMSHELLLIGHT  version 2026a
+ ** 
+* @date 2026-01-06 (last modification)
  */
 
 #ifndef _SYMSHELL_H_
@@ -118,24 +123,25 @@ extern int WB_error_enter_before_clean/* =0 */;
 /* OPERACJE DOTYCZĄCE CAŁEGO OKNA GRAFICZNEGO */
 /* ****************************************** */
 
-/** \brief Wymuszenie oczekiwania przez pewną liczbę milli seconds */
+/** \brief Wymuszenie oczekiwania przez pewną liczbę "milli-seconds" */
 void delay_ms(ssh_natural ms);
 
-/** \brief  Wymuszenie oczekiwania przez pewną liczbę micro seconds */
+/** \brief  Wymuszenie oczekiwania przez pewną liczbę "micro-seconds" */
 void delay_us(ssh_natural us);
 
-/** \brief  Ostateczne uzgodnienie zawartości ekranu z zawartością pamięci */
+/** \brief Ostateczne uzgodnienie zawartości ekranu z poprzednio zleconymi akcjami.
+ *  \note Przy działaniu X11 przez sieć gwarantuje wysyłkę, może przelać ekran wirtualny na aktualny itp. */
 void flush_plot();
 
-/**  \brief  Czyści ekran lub ekran wirtualny */
+/**  \brief  Bezwzględnie czyści ekran/okno lub ekran wirtualny. Może być czasochłonne. */
 void clear_screen();
 
 /** \brief  W sposób ukryty zapomina poprzednią zawartość ekranu.
- * gdy liczymy, że i tak zostałaby zamazana.
+ * \note Używany, gdy liczymy, że i tak zawartość zostałaby zamazana, a taka akcja jest tania (zwłaszcza gdy moduł wektorowy).
  * \return Zwraca 1, jeśli zadziałał poprawnie */
 ssh_stat  invalidate_screen();
 
-/** \brief Zapisuje zawartość ekranu do pliku graficznego w naturalnym formacie platformy: BMP, XBM itp.
+/** \brief Zapisuje zawartość ekranu do pliku graficznego w naturalnym formacie platformy: BMP, XBM, SVG itp.
 * Może nie działać w trybie bez buforowania okna/ekranu. \return Zwraca 1, jeśli zadziałał poprawnie */
 ssh_stat  dump_screen(const char* Filename);
 
@@ -166,7 +172,7 @@ void set_pen_rgb(ssh_intensity r,                              /**< składowa re
                  ssh_intensity g,                              /**< składowa green */
                  ssh_intensity b,                              /**< składowa blue */
                  ssh_natural width,                            /**< grubość linii */
-                 ssh_mode style                                /**< styl rysowania linii jak w \see line_style */
+                 ssh_mode style                                /**< styl rysowania linii jak w `line_style` */
                 );
 
 /** \brief Ustala aktualny kolor i przeźroczystość linii za pomocą składowych RGBA oraz styl i grubość */
@@ -175,7 +181,7 @@ void set_pen_rgba(ssh_intensity r,                             /**< składowa re
                   ssh_intensity b,                             /**< składowa blue */
                   ssh_intensity a,                             /**< kanał alfa */
                   ssh_natural width,                           /**< grubość linii */
-                  ssh_mode style                               /**< styl rysowania linii jak w \see line_style */
+                  ssh_mode style                               /**< styl rysowania linii jak w `line_style` */
                   );
 
 /** \brief Ustala aktualny kolor wypełnień za pomocą składowych RGB */
@@ -196,7 +202,7 @@ void set_brush_rgba(ssh_intensity r,                            /**< składowa r
 /** \brief Sprawdza buforowanie. \return Zwraca 1, jeśli buforowane */
 ssh_mode  buffered();
 
-/** \brief Sprawdza czy okno ma zafiksowana wielkość? \return Zwraca 1, jeśli TAK */
+/** \brief Sprawdza, czy okno ma zafiksowana wielkość? \return Zwraca 1, jeśli TAK */
 ssh_mode  fixed();
 
 /** \brief Jakie są ustawienia RGB konkretnego kolorku w palecie */
@@ -230,11 +236,11 @@ ssh_natural  char_width(char znak);                             /**< Szerokość
 ssh_natural  string_height(const char* str);                    /**< Wysokość łańcucha tekstowego na ekranie */
 ssh_natural  string_width(const char* str);                     /**< Szerokość łańcucha tekstowego na ekranie */
 
-/**  \brief  od zadanych koordynatów. Po za tym działa jak zwykłe \see printf */
+/**  \brief  Rysuje napis od zadanych koordynatów graficznych. Poza tym działa jak zwykłe `printf` */
 /**  \details Domyślna wersja daje tekst w oknie czarno na białym */
 void printbw(ssh_coordinate x,ssh_coordinate y,const char* format,...);
 
-/**  \brief Wyprowadzanie tekstu w oknie w kolorystyce domyślnej */
+/**  \brief  Rysuje napis w oknie w kolorystyce domyślnej */
 void print_d(ssh_coordinate x,ssh_coordinate y,const char* format,...);
 
 /** \brief Wyprowadzanie tekstu na ekran/okno od zadanych koordynatów w zadanych kolorach */
@@ -516,11 +522,11 @@ void fill_poly(ssh_coordinate vx,                                    /**< poziom
 ssh_mode  input_ready(); /**< \brief Funkcja sprawdzająca, czy jest coś do wzięcia z wejścia */
 
 ssh_msg   get_char();    /**< \brief Funkcja odczytywania znaków sterowania i zdarzeń
-                          * \return  indeks znaku z klawiatury lub znak specjalny:
-                          * '/r' : Wymagane odrysowanie co najmniej fragmentu ekranu
-                          * '/b' : Jest zdarzenie myszy do przetworzenia
-                          *  EOF : Zamknięto okno graficzne
-                          *  /n   Albo liczbę reprezentującą komendę z menu (zazwyczaj dużą)
+                          * \return  indeks znaku z klawiatury, znak specjalny lub kod z menu.
+                          * '/r' : Wymagane odrysowanie co najmniej fragmentu ekranu.
+                          * '/b' : Jest zdarzenie myszy do przetworzenia.
+                          *  EOF : Zamknięto okno graficzne.
+                          *  NNN : Liczba reprezentującą komendę z menu (zazwyczaj duża).
                           *  */
 
 ssh_stat  set_char(ssh_msg ch); /**< \brief Odesłanie znaku na wejście. \return Zwraca 0, jeśli nie ma miejsca

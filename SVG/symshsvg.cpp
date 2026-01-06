@@ -17,9 +17,10 @@
  ** \n          https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI
  ** \n          https://github.com/borkowsk
  **
- ** \library    SYMSHELLLIGHT  version 2023b
- **
- * */
+ ** \library    SYMSHELLLIGHT  version 2026a
+ ** 
+* @date 2026-01-06 (last modification)
+ */
 #include <iostream>
 #include <fstream>
 #include <cassert>
@@ -504,8 +505,12 @@ void clear_screen()
     GrListPosition = -1; //Pusto
 }
 
-/// Czyszczenie optymalizujące. Specjalnie dla tego modułu. W innych nie robi nic.
-/// Cały ekran/okno zostanie wirtualnie "wymazany/e"
+/// Czyszczenie optymalizujące.
+/// Cały ekran/okno zostanie wirtualnie "wymazany/e".
+/// @note
+///   Specjalnie dla tego modułu, bo tu jest bardzo tanie. W innych nie robi nic, bo czyszczenie jest tam
+///   kosztowne, i zwykle staramy się go unikać, a tylko zamazywać nową treścią.
+///
 int invalidate_screen()
 {
     if(ssh_trace_level) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;
@@ -521,9 +526,9 @@ ssh_mode     print_transparently(ssh_mode Yes)
 {
     if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//print_transparently
     if(ssh_trace_level>2) cout << Yes << endl;
-	int old = GrPrintTransparently;
+    int old = GrPrintTransparently;
     GrPrintTransparently = Yes;
-	return old;
+    return old;
 }
 
 /// Ustala szerokość linii. Może byc kosztowne (?). Zwraca ustawienie poprzednie.
@@ -531,9 +536,9 @@ ssh_natural     line_width(ssh_natural width)
 {
     if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//line_width
     if(ssh_trace_level>2) cout << width << endl;
-	int old = GrLineWidth;
+    int old = GrLineWidth;
 
-	GrLineWidth = width;
+    GrLineWidth = width;
     if(GrLineWidth<0)
         GrLineWidth=1;  // WHY NOT 0!!!
     if(GrLineWidth>3)
@@ -546,7 +551,7 @@ ssh_natural     line_width(ssh_natural width)
             first_time=0;
         }
     }
-	return old;
+    return old;
 }
 
 /// \brief Ustala styl rysowania linii: `SSH_LINE_SOLID`, `SSH_LINE_DOTTED`, `SSH_LINE_DASHED`
@@ -614,7 +619,7 @@ void set_gray(ssh_color shade,ssh_intensity intensity)
 /// \param Style
 ///
 /// Ustala aktualny kolor linii za pomocą typu ssh_color (koloru indeksowanego)
-/// ssh_color c - jest jak dotąd zawsze traktowany jako indeks do tabeli kolorów[1]
+/// ssh_color c — jest jak dotąd zawsze traktowany jako indeks do tabeli kolorów[1]
 /// w których pierwsze 256 ustala się wg. jakiejś skali,
 /// a następne 256 są odcieniami szarości, domyślnie od czarnego do białego
 /// Kolory indeksowane w _symshwin_ i _symshx11_ korzystają z cache'owania systemowych pisaków,
@@ -653,7 +658,7 @@ void set_pen(ssh_color c,ssh_natural line_width, ssh_mode Style)
 /// \param width
 /// \param Style
 ///
-/// Poza kolorem linii za pomocą składowych RGB, ustala też od razu styl, żeby nie mnożyć wywołań
+/// Poza kolorem linii za pomocą składowych RGB ustala też od razu styl, żeby nie mnożyć wywołań.
 /// \internal
 ///     Jeżeli kolory indeksowane korzystają z cache'owania tego samego pisaka to
 ///     należy ustalić kolor aktualny na pusty np. curr_color=-1;
@@ -841,7 +846,7 @@ ssh_natural screen_width()
     return GrScreenWi;
 }
 
-/// Aktualne rozmiary znaku - wysokość.
+/// Aktualne rozmiary znaku — wysokość.
 /// ...potrzebne do pozycjonowania tekstu
 ssh_natural char_height(char znak)
 {
@@ -850,7 +855,7 @@ ssh_natural char_height(char znak)
     return GrFontHi;
 }
 
-/// Aktualne rozmiary znaku - szerokość.
+/// Aktualne rozmiary znaku — szerokość.
 /// ...potrzebne do pozycjonowania tekstu
 ssh_natural char_width(char znak)
 {
@@ -859,7 +864,7 @@ ssh_natural char_width(char znak)
     return GrFontWi;
 }
 
-/// Aktualne rozmiary wyświetlania całego łańcucha znaków - wysokość.
+/// Aktualne rozmiary wyświetlania całego łańcucha znaków — wysokość.
 /// Tu zazwyczaj może być to samo co char_height.
 ssh_natural string_height(const char* str)
 {
@@ -868,7 +873,7 @@ ssh_natural string_height(const char* str)
     return GrFontHi;
 }
 
-/// Aktualne rozmiary wyświetlania całego łańcucha znaków - szerokość.
+/// Aktualne rozmiary wyświetlania całego łańcucha znaków — szerokość.
 /// W najgorszym razie odpowiednia wielokrotność char_width
 /// ...potrzebne do jego pozycjonowania */
 ssh_natural string_width(const char* str)
@@ -992,7 +997,7 @@ void print_d(ssh_coordinate x,ssh_coordinate y,const char* format,...)
     char target[2048];
     va_list marker;
     va_start(marker, format);     /* Initialize variable arguments. */
-    vsprintf(target, format, marker);			assert(strlen(target) < 2046);
+    vsprintf(target, format, marker);			                                                  assert(strlen(target) < 2046);
     va_end(marker);              /* Reset variable arguments.      */
     //Op.text.txt.take(clone_str(target));
     //if(Op.text.txt != NULL)
@@ -1177,7 +1182,7 @@ void fill_flood_rgb(int x,int y,int rf,int gf,int bf,int rb,int gb,int bb)
 
 /* RYSOWANIE  */
 
-/// \brief Wyświetlenie linii w aktualnym kolorze domyślnym - także RGB.
+/// \brief Wyświetlenie linii w aktualnym kolorze domyślnym — także RGB.
 /// \param x1 : pozioma współrzędna startowa
 /// \param y1 : pionowa współrzędna startowa
 /// \param x2 : pozioma współrzędna końcowa
@@ -1331,7 +1336,7 @@ void circle(ssh_coordinate x,ssh_coordinate y,ssh_natural r,ssh_color c)
     Op.circle.ry = r;
 }
 
-/// Wyświetlenie koła w kolorach domyślnych (pen & fill - także rgb).
+/// Wyświetlenie koła w kolorach domyślnych (pen & fill — także rgb).
 /// \param x
 /// \param y
 /// \param r : promień okręgu
@@ -1754,7 +1759,7 @@ elastyczny byłby "named pipe" o nazwie zależnej od PID
 i nazwy pliku wykonywalnego
  **/
 
-/// \brief Funkcja sprawdza czy jest do odczytania jakieś zdarzenie wejściowe
+/// \brief Funkcja sprawdza, czy jest do odczytania jakieś zdarzenie wejściowe
 /// \return SSH_YES or SSH_NO
 ssh_mode input_ready()
 {
@@ -1768,7 +1773,7 @@ ssh_mode input_ready()
 /// Funkcja odczytywania znaków sterowania i zdarzeń.
 /// \return znak, jak nie ma czego zwrócić to zwraca neutralne 0.
 /// \details
-/// W module SVG nigdy nie staje na tej funkcji, jak przy zwykłym oknie
+/// W tym module SVG nigdy nie staje na tej funkcji jak przy zwykłym oknie
 ssh_msg get_char()
 {
     if(ssh_trace_level>2) cout <<"SVG: " << _FUNCTION_NAME_ << SEP << GrCharMessage << endl;//get_char
@@ -1780,12 +1785,12 @@ ssh_msg get_char()
     }
     else
         return 0;//Nigdy nie staje na tej funkcji, jak przy zwykłym oknie
-    //return -1;//-1 oznacza koniec wejścia - np. kliknięcie w "zamykacz okna" - co się tu normalnie nie zdarza
+    //return -1;//-1 oznacza koniec wejścia — np. kliknięcie w "zamykacz okna" - co się tu normalnie nie zdarza
 }
 
 /// Odesłanie znaku na wejście
 /// \param c : znak
-/// \return  Zwraca 0 jeśli nie ma miejsca
+/// \return  Zwraca 0, jeśli nie ma miejsca
 /// \details Pewne jest tylko odesłanie jednego znaku
 ssh_stat set_char(ssh_msg c)
 {
@@ -2101,7 +2106,7 @@ static int _writeSVG(ostream& o)
 			//o << "<line x1 =\"0\" y1=\"0\" x2=\"100\" y2=\"50\" stroke=\"blue\" stroke-width=\"6\" />" << endl;
 			o << "<line x1=\"" << pr.x1 << "px\" y1=\"" << pr.y1 << "px\" x2=\"" << pr.x2 << "px\" y2=\"" << pr.y2 << "px\" ";
 			if(pr.wi>0) o << "stroke-width=\"" << pr.wi << "px\" ";
-			o << "stroke=\"rgb(" << pr.r << ',' << pr.g << ',' << pr.b << ")\" ";//COLOR
+			o << "stroke=\"rgb(" << pr.r << ',' << pr.g << ',' << pr.b << ")\" "; //COLOR
 			//<< "; 0x" << hex << pr.mode << dec << "; ";
 			o << "/>" << endl;
 		};  break;
@@ -2109,7 +2114,7 @@ static int _writeSVG(ostream& o)
 			struct Circle &pr = (GrList[i].circle);
 			//o << "<circle cx=\"120\" cy=\"120\" r=\"80\" fill=\"red\" stroke=\"black\" stroke-width=\"5\" />" << endl;
 			//o << "<ellipse cx=\"200\" cy=\"200\" rx=\"20\" ry=\"7\" fill=\"none\" stroke=\"black\" stroke-width=\"6\" />" << endl;
-            if (pr.rx == pr.ry)//Koło - circle
+            if (pr.rx == pr.ry) //Koło — circle
 				o << "<circle r=\"" << pr.ry << "px\" ";
 			else
 				o << "<ellipse rx=" << pr.rx << "px\" ry=\"" << pr.ry << "px\" ";
@@ -2149,10 +2154,10 @@ static int _writeSVG(ostream& o)
             struct Text& pr = (GrList[i].text);                                                     //assert(pr.txt != NULL);
             //cerr << '\t' << i << '\t' << pr.type << ' ' << pr.x << ' ' << pr.y;
             //cerr << ' ' << (pr.txt?pr.txt:"NULL") << endl;
-            if (pr.txt == NULL) // TO SIĘ NIE POWINNO ZDAŻAĆ ALE JEDNAK SIĘ ZDAŻAŁO!!!
+            if (pr.txt == nullptr) // TO SIĘ NIE POWINNO ZDAŻAĆ ALE JEDNAK SIĘ ZDAŻAŁO!!!
             {
                 cerr << '\t' << i << '\t' << pr.type << ' ' << pr.x << ' ' << pr.y << " NULL" << endl;
-                pr.txt = clone_str("@?@-NULL-@?@");                                                  assert(pr.txt != NULL);
+                pr.txt = clone_str("@?@-NULL-@?@");                                                  assert(pr.txt != nullptr);
                 //exit(-1);
             }
 
@@ -2210,7 +2215,7 @@ void flush_plot()
 {
     if(GrClosed)
     {
-        cerr<<"SYMSHELL graphics not initialised"<<endl;
+        cerr<<"SYMSHELL graphic is not initialized"<<endl;
         return;
     }
 
@@ -2274,7 +2279,7 @@ ssh_stat	dump_screen(const char* Filename)
 }
 
 /* *******************************************************************/
-/*              SYMSHELLLIGHT  version 2023-03-14                    */
+/*              SYMSHELLLIGHT  version 2026-01-o5                    */
 /* *******************************************************************/
 /*            THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
 /*             W O J C I E C H   B O R K O W S K I                   */

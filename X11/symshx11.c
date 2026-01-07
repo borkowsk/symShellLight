@@ -18,8 +18,11 @@
  *  WCIĄŻ Z BŁĘDEM NA EXPOSE! TODO , choć raz go już gdzieś usunąłem :-/*
  *                                                                      *
  ************************************************************************
- *               SYMSHELLLIGHT  version 2024-02                         *
- ************************************************************************ */
+ *                           SYMSHELLLIGHT                              *
+ ************************************************************************
+ */
+/// @date 2026-01-07 (last modifications)
+
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -35,11 +38,11 @@
 #include "../symshell.h"
 #include "icon.h"
 
-#define BITMAPDEPTH 1
+//#define BITMAPDEPTH 1
 #define TOO_SMALL 0
 #define BIG_ENOUGH 1
 
-#define FALSE 0
+//#define FALSE 0
 #define NODATA '\0'
 
 /* For transparencies to work use: (TODO CHECK?) */
@@ -49,8 +52,18 @@
 #define NULL __null
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+const char *_ssh_grx_module_name="SVG";
+
 /** Maska poziomów śledzenia 1-msgs 2-grafika 3-grafika detaliczna 4-alokacje/zwalnianie */
  int                    ssh_trace_level = 0;
+
+#ifdef __cplusplus
+}
+#endif
 
 /** Dla \ref close_plot.\brief Czy zamykać okno od razu, czy dawać "enter"? */
  extern int             WB_error_enter_before_clean;
@@ -73,7 +86,7 @@
  static int             isbuffered=0;       /**< Czy okno jest buforowane mapą pikseli? */
  static int             animate=0;          /**< Czy odświeżanie, tylko gdy flush_plot, czy na bieżąco? */
  static int             ScreenClip=1;       /**< Czy przycinać okno do wielkości ekranu? */
- static int             UseGrayScale=0;     /**< Czy mapowac kolory indeksowane na odcienie szarości? */
+ static int             UseGrayScale=0;     /**< Czy mapować kolory indeksowane na odcienie szarości? */
 
  /* These are used as arguments to nearly every Xlib routine, so it
    * saves routine arguments to declare them global; if there were
@@ -106,10 +119,10 @@
  static unsigned int    border_width = 4;           /* Four pixels margin */
  static int             window_size = TOO_SMALL;    /* BIG_ENOUGH or TOO_SMALL to display contents */
 
- static unsigned int    icon_width, icon_height;/* the height and width of the program icon */
+ static unsigned int    icon_width, icon_height;    /* the height and width of the program icon */
  static Pixmap          icon_pixmap;       /* program icon handle */
- static unsigned short  alloc_cont=0;      /* Flag that pixmap has been allocated */
 
+ static unsigned short  alloc_cont=0;      /* Flag that pixmap has been allocated */
  static Pixmap          cont_pixmap=0;     /* Handle for pixmap replacing / mirroring a window */
 
  static XTextProperty    windowName;
@@ -118,7 +131,7 @@
  static GC               gc=NULL;          /* GRAPHIC CONTEXT */
 
  /* FONT */
- static int              ResizeFont=0;     /* Czy probuje zmieniać rozmiar fontu. TODO? */
+ static int              ResizeFont=0;     /* Czy spróbuje zmieniać rozmiar fontu. TODO? */
  static XFontStruct     *font_info=NULL;   /* Current font */
  static unsigned         ori_font_width = 8;
  static unsigned         ori_font_height = 16;
@@ -139,17 +152,17 @@
  static unsigned        bacground=0;       /* Index koloru tla */
 
  /* PALETA */
- static unsigned        NumberOfColors=512; /* */
+ static unsigned        NumberOfColors=512; /* ??? */
  static unsigned long   Scale[514];
  static unsigned long   PenColor=-1;
  static unsigned long   BrushColor=-1;
  static XColor          ColorArray[512];
- static void SetScale(XColor RGBarray[512]);//Ustawianie kolorów
+ static void SetScale(XColor RGBarray[512]); /* Ustawianie kolorów */
 
  /* Parametry rysowania */
- static unsigned        default_line_width=2;/* grubość linii */
- static int             transparent_print=0; /* czy napisy transparentne */
- static int             pieMode=-1;/* Tryb wypełniania fragmentu okręgu lub elipsy */
+ static unsigned        default_line_width=2; /* grubość linii */
+ static int             transparent_print=0;  /* czy napisy transparentne */
+ static int             pieMode=-1;           /* Tryb wypełniania fragmentu okręgu lub elipsy */
 
  /* Wejście znakowe? */
  static KeySym           thekey;
@@ -157,7 +170,7 @@
  //static char bfirst=0;             /* Zmienne na implementacje cykliczną bufora */
  //static char blast=0;              /* aktualnie nie używane... */
 
- /* Wejście myszowe */
+ /* Wejście myszowe? */
  static int              mouse=0;
 
  static
@@ -199,8 +212,8 @@
      pipe_break=1; //Process finished with after window close should be treated as normal situation!
 
      fprintf(stderr,"\nX11-SYMSHELL GOT A IOError\n");
-     XSetIOErrorHandler(NULL);/* Kasowanie dotychczasowej funkcji obsługi błędów z wywołania XSetIOErrorHandler(MyXIOHandler); */
-     exit( 0 );//-11);//245 was my choice??? !!!
+     XSetIOErrorHandler(NULL); /* Kasowanie dotychczasowej funkcji obsługi błędów z wywołania XSetIOErrorHandler(MyXIOHandler); */
+     exit( 0 ); //-11);//245 was my choice??? !!!
 
      return -11;
  }
@@ -253,7 +266,7 @@
      return pom;
  }
 
-/** Zwraca aktualny kolor tła - nowa wersja? */
+/** Zwraca aktualny kolor tła — nowa wersja? */
  ssh_color background()
  {
      return bacground;
@@ -275,7 +288,7 @@ void buffering_setup(int _n)
         animate=1;
     else
         animate=0;
-    if(animate)        /* Musi byc włączona bitmapa buforująca */
+    if(animate)         /* Musi byc włączona bitmapa buforująca */
          isbuffered=1;  /* żeby można było na nia pisać */
  }
 

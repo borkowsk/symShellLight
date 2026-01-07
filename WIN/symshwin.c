@@ -1,14 +1,18 @@
-static char* Copyright=	"SYMSHELL LIBRARY(c)1997-2014 ;\n"
-						"By Wojciech Borkowski, Warsaw University\n("
-						__DATE__" - compilation timestamp)\n";
-//Partially based on Borland and Microsoft examples
 /*****************************************************************************************
+/// @file
 * Implementacja najprostrzego interface'u wizualizacyjnego dla MS Windows 32.
 * U¿ywano w of 1997 roku w ró¿nych kompilatorach C++ Borland i Microsoftu oraz w GCC na Windows
 * Ostatnia modyfikacja/Last modification: 28.10.2014
 UWAGA ProcessMsg u¿ywa teraz zamiast NULL uchwytu okna pobierajac komunikat - to powinno
 dzia³aæ lepiej, ale pewnoœci nie ma.
 ******************************************************************************************/
+/// @date 2026-01-07 (last modification)
+
+static char* Copyright=	"SYMSHELL LIBRARY(c)1997-2014 ;\n"
+
+						"By Wojciech Borkowski, Warsaw University\n("
+						__DATE__" - compilation timestamp)\n";
+//Partially based on Borland and Microsoft examples
 //Define EXTERN_WB_ABOUT and function of following prototype for redefine usage of ShellAbout
 //int wb_about(const char* window_name);//Z biblioteki albo dostarczona z programem
 
@@ -26,11 +30,11 @@ extern int WB_error_enter_before_clean;/* For controling closing graphics window
 #include <errno.h>
 #include <setjmp.h>
 
-#include "symshell.h"		// prototypes of symshell graphix primitives
+#include "symshell.h"       // prototypes of symshell graphix primitives
 
 #include <process.h>
-#include "_sig_msg.h"			// for compatibility with wb_posix.
-#include "symshwin.h"			// prototypes specific to this application
+#include "_sig_msg.h"       // for compatibility with wb_posix.
+#include "symshwin.h"       // prototypes specific to this application
 
 #define OLD_COLOUR_SCALE (0)   //Skala kolorów jak na mapie fizycznej
 
@@ -47,6 +51,7 @@ extern int WB_error_enter_before_clean;/* For controling closing graphics window
 #define MINUSERCOMMAND  IDM_EXIT  //*Komenda uzytkownika o najnizszym numerze */
 
 /* FOR OTHER MODULES */
+const char *_ssh_grx_module_name="WINDOWS";
 HINSTANCE	WB_Instance=0;
 HINSTANCE	WB_PrevInstance=0;
 HWND		WB_Hwnd=0;					  ///< ???

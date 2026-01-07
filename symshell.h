@@ -13,7 +13,7 @@
  **
  ** \library    SYMSHELLLIGHT  version 2026a
  ** 
-* @date 2026-01-06 (last modification)
+/// @date 2026-01-07 (last modification)
  */
 
 #ifndef _SYMSHELL_H_
@@ -23,7 +23,7 @@
 * @defgroup	GrxInterface Podstawowe funkcje interfejsu graficznego
 * @brief	przenośne między X11 i Windows funkcje rysujące i stowarzyszone
 * @details
-*	        Większość to moduły w języku C a przynajmniej z takim interfejsem.
+*	        Większość to moduły w języku C, a przynajmniej z takim interfejsem.
 *	        Działa też implementowana w C++ wersja zapisująca do plików SVG.
 */
 ///@{
@@ -69,6 +69,19 @@ typedef struct ssh_rgb   {uchar8b r,g,b;}       ssh_rgb;       /**< \brief RGB t
 typedef unsigned int                            ssh_color;     /**< \brief Indexed color. TODO change name to ssh_color_index? */
 typedef float                                   ssh_radian;    /**< \brief katy w radianach dla łuków */
 
+/* ZMIENNE I STAŁE ZALEŻNE OD MODUŁU
+ * ================================= */
+/** \brief Name of the currently used implementation for graphic.
+ *  Could be "X11", "WINDOWS" or "SVG". */
+extern const char*  _ssh_grx_module_name;
+
+/** \brief If not 0 the window is usable */
+extern unsigned long _ssh_window;
+
+/** Czy zamykać od razu, czy dać szanse na przejrzenie zawartości.
+* Do sterowania close_plot() - czy wymaga ono potwierdzenia od użytkownika */
+extern int WB_error_enter_before_clean/* =0 */;
+
 /* OTWIERANIE i ZAMYKANIE TRYBU (OKNA) GRAFICZNEGO */
 /* Operacje konfiguracyjne o działaniu gwarantowanym przed inicjacją */
 
@@ -113,15 +126,8 @@ ssh_stat  init_plot(ssh_natural  a,                            /**< ile pikseli 
 *  \details Automatycznie instalowana w atexit(), stąd durne (void), żeby uniknąć warning-u */
 void close_plot(void);
 
-/** \brief If not 0 the window is usable */
-extern unsigned long _ssh_window;
-
-/** Czy zamykać od razu, czy dać szanse na przejrzenie zawartości.
-* Do sterowania close_plot() - czy wymaga ono potwierdzenia od użytkownika */
-extern int WB_error_enter_before_clean/* =0 */;
-
-/* OPERACJE DOTYCZĄCE CAŁEGO OKNA GRAFICZNEGO */
-/* ****************************************** */
+/* OPERACJE DOTYCZĄCE CAŁEGO OKNA GRAFICZNEGO
+ * ========================================== */
 
 /** \brief Wymuszenie oczekiwania przez pewną liczbę "milli-seconds" */
 void delay_ms(ssh_natural ms);
@@ -145,7 +151,9 @@ ssh_stat  invalidate_screen();
 * Może nie działać w trybie bez buforowania okna/ekranu. \return Zwraca 1, jeśli zadziałał poprawnie */
 ssh_stat  dump_screen(const char* Filename);
 
-/* Operacje przestawiania własności pracy okna graficznego */
+/* Operacje przestawiania własności pracy okna graficznego
+ * ======================================================= */
+
 /** \brief Ustala czy mysz ma byc obsługiwana. \return poprzedni stan flagi */
 ssh_mode    mouse_activity(ssh_mode Yes);
 
@@ -197,7 +205,8 @@ void set_brush_rgba(ssh_intensity r,                            /**< składowa r
                     ssh_intensity a                             /**< kanał alfa */
                     );
 
-/* ODCZYTYWYWANIE AKTUALNYCH USTAWIEŃ OKNA GRAFICZNEGO*/
+/* ODCZYTYWYWANIE AKTUALNYCH USTAWIEŃ OKNA GRAFICZNEGO
+ * =================================================== */
 
 /** \brief Sprawdza buforowanie. \return Zwraca 1, jeśli buforowane */
 ssh_mode  buffered();
@@ -235,6 +244,9 @@ ssh_natural  char_height(char znak);                            /**< Wysokość 
 ssh_natural  char_width(char znak);                             /**< Szerokość znaku */
 ssh_natural  string_height(const char* str);                    /**< Wysokość łańcucha tekstowego na ekranie */
 ssh_natural  string_width(const char* str);                     /**< Szerokość łańcucha tekstowego na ekranie */
+
+/* DRUKOWANIE NA EKRANIE
+ * ===================== */
 
 /**  \brief  Rysuje napis od zadanych koordynatów graficznych. Poza tym działa jak zwykłe `printf` */
 /**  \details Domyślna wersja daje tekst w oknie czarno na białym */
@@ -533,19 +545,19 @@ ssh_stat  set_char(ssh_msg ch); /**< \brief Odesłanie znaku na wejście. \retur
                                 * \details Gwarantowane jest tylko odesłanie jednego znaku! */
 
 /** \brief Funkcja odczytująca ostatnie zdarzenie myszy. \return ??? */
-ssh_stat  get_mouse_event(ssh_coordinate* x_pos,            /**< [out] adres na który wpisze poziome położenie kursora */
-                          ssh_coordinate* y_pos,            /**< [out] adres na który wpisze pionowe położenie kursora */
-                          ssh_coordinate* click             /**< [out] adres na który wpisze informacje o kliku lub 0  */
+ssh_stat  get_mouse_event(ssh_coordinate* x_pos,            /**< [out] adres, na który wpisze poziome położenie kursora */
+                          ssh_coordinate* y_pos,            /**< [out] adres, na który wpisze pionowe położenie kursora */
+                          ssh_coordinate* click             /**< [out] adres, na który wpisze informacje o kliku lub 0  */
                           );
 
 /** \brief Funkcja podaje obszar, który ma być odnowiony na żądanie '/r'.
  * \return  zwraca 0 jak poprawnie (TODO?)
  *          Jeśli zwraca -1 to brak danych lub brak implementacji. Należy odrysować całość.
  *          Jeśli zwraca -2 to znaczy, że dane już były odczytane. Należy zignorować. */
-ssh_stat  repaint_area(ssh_coordinate* x,                 /**< [out] adres na który wpisze poziomą współrzędną rogu obszaru */
-                       ssh_coordinate* y,                 /**< [out] adres na który wpisze pionową współrzędną rogu obszaru */
-                       ssh_natural* width,                /**< [out] adres na który wpisze szerokość obszaru */
-                       ssh_natural* height                /**< [out] adres na który wpisze wysokość obszaru */
+ssh_stat  repaint_area(ssh_coordinate* x,                 /**< [out] adres, na który wpisze poziomą współrzędną rogu obszaru */
+                       ssh_coordinate* y,                 /**< [out] adres, na który wpisze pionową współrzędną rogu obszaru */
+                       ssh_natural* width,                /**< [out] adres, na który wpisze szerokość obszaru */
+                       ssh_natural* height                /**< [out] adres, na który wpisze wysokość obszaru */
                        );
 
 #ifdef __cplusplus
@@ -597,7 +609,7 @@ inline ssh_color  get_background(void){ return background(); }  /**< Aktualny ko
 
 ///@}
 /* ****************************************************************** */
-/*              SYMSHELLLIGHT  version 2024-06-24                     */
+/*                         SYMSHELLLIGHT                              */
 /* ****************************************************************** */
 /*            THIS CODE IS DESIGNED & COPYRIGHT  BY:                  */
 /*             W O J C I E C H   B O R K O W S K I                    */

@@ -19,7 +19,7 @@
  **
  ** \library    SYMSHELLLIGHT  version 2026a
  ** 
-* @date 2026-01-06 (last modification)
+/// @date 2026-01-07 (last modification)
  */
 #include <iostream>
 #include <fstream>
@@ -81,6 +81,9 @@ using namespace wbrtm;
 
 /* Zmienne eksportowane na zewnątrz
  * ********************************** */
+extern "C" {
+    const char *_ssh_grx_module_name="SVG";
+}
 
 /// Pid procesu. Przydaje się
 unsigned long     PID=_getpid();

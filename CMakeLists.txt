@@ -6,7 +6,7 @@
 # Manually define WITHTESTS=true, if you want build test applications!
 #
 # (c)ISS UW, @author Wojciech Borkowski
-# @date 2026-01-06 (last update)
+# @date 2026-01-28 (last update)
 ##################################################################################
 
 project(symshelllight)
@@ -31,7 +31,7 @@ ELSE()
   #add_compile_options( -Wall )
 ENDIF()
 
-include_directories("./" "./INCL")
+include_directories("./INCL")
 #see -> https://cmake.org/cmake/help/v3.16/manual/cmake-compile-features.7.html#manual:cmake-compile-features(7)
 #message("C++ compiler flags: ${CMAKE_CXX_FLAGS}")
 

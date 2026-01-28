@@ -8,5 +8,5 @@
 /// Jest używana w bibliotece SymShell i wb_rtm, w tym w wb_ptr.
 /// Powinna być definiowana w programie głównym, ale w razie
 /// zapomnienia może byc pobrana z biblioteki.
-int WB_error_enter_before_clean=0;
+int WB_error_enter_before_clean=1;
 

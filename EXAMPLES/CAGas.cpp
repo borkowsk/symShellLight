@@ -1,5 +1,6 @@
-﻿////////////////////////////////////////////////////////////////////////////////
-///  Szablon automatu komórkowego zastosowany do algorytmu dyfuzji
+﻿//-//////////////////////////////////////////////////////////////////////////////
+/// @file
+///  Szablon automatu komórkowego zastosowany do algorytmu dyfuzji.
 ///                   (przykładowy program SYMSHELL'a)
 ///------------------------------------------------------------------------------
 /// Prosta obsługa grafiki, ale z odtwarzaniem ekranu i obsługą zdarzeń.
@@ -9,7 +10,8 @@
 ///     VC++ linkuje biblioteki Windows automatycznie
 ///     Dev-Cpp potrzebne są dwie bibloteki:
 ///     ".../Dev-Cpp/lib/libgdi32.a" oraz "...Dev-Cpp/lib/libcomdlg32.a"
-////////////////////////////////////////////////////////////////////////////////
+/// @date 2026-01-27 (last update)
+//-//////////////////////////////////////////////////////////////////////////////
 //#define MULTITR (1)  //Jeśli chcemy użyć wielowątkowości
 
 #include <cassert>

@@ -1,9 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////////////////
-///	                          Przykładowy program SYMSHELLA
+/// @file
+///	                          Przykładowy program SYMSHELLA.
 ///----------------------------------------------------------------------------------------
 /// Demonstruje obsługę zdarzeń myszowych.
 /// Zapamiętuje punkty kliknięć i potrafi odrysować po naciśnięciu ENTER
 /// W tle miga napisem "Klikaj!"
+/// @date 2026-01-27 (last update)
 ///////////////////////////////////////////////////////////////////////////////////////////
 #include <iostream>
 

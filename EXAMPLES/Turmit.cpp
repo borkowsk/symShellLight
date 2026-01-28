@@ -1,12 +1,14 @@
-////////////////////////////////////////////////////////////////////////////////////
-///     Turmit prototypowy - "Mrówka Langtona" z możliwością wariacji na temat
+//-//////////////////////////////////////////////////////////////////////////////////
+/// @file
+///     Turmit prototypowy - "Mrówka Langtona" z możliwością wariacji na temat.
 ///                   (przykładowy program SYMSHELL'a)
 ///------------------------------------------------------------------------------
 /// Prosta obsługa grafiki, ale z odtwarzaniem ekranu i obsługą zdarzeń.
 ///
 /// Turmit ma element aktywny i środowisko, tzw. "głowicę" albo "czoło" oraz pamięć
-/// ponieważ turmit jest tak naprawdę 2 wymiarowym uogólnieniem maszyny Turinga
-////////////////////////////////////////////////////////////////////////////////////
+/// , ponieważ turmit jest tak naprawdę 2 wymiarowym uogólnieniem maszyny Turinga
+/// @date 2026-01-27 (last update)
+//-//////////////////////////////////////////////////////////////////////////////////
 
 
 #include <stdio.h> //Wyjście na konsole a la język C - printf(....)
@@ -140,11 +142,11 @@ int main(int argc,const char* argv[])//Potrzebne są parametry wywołania progra
             case '\b': read_mouse();break;//Jest zdarzenie myszy
             case EOF:  //Typowe zakończenie
             case  27:  //ESC
-            case 'q':  //Zakończenie zdefiniowane przez programiste
+            case 'q':  //Zakończenie zdefiniowane przez programistę
             case 'Q': not_finished=false;break;
             default:
-                printbw(0,screen_height()-char_height('N'),"Nie wiem co znaczy %c [%d] ",pom,pom);
-                printf("Nie wiem co znaczy %c [%d] ",pom,pom);
+                printbw(0,screen_height()-char_height('N'),"Nie wiem, co znaczy %c [%d] ",pom,pom);
+                printf("Nie wiem, co znaczy %c [%d] ",pom,pom);
                 flush_plot();	// Grafika gotowa
                 break;
             }

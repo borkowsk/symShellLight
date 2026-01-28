@@ -1,7 +1,7 @@
 /** Setting this variable configure SYMSHELL
 **  for forcing stop before starting cleanup on exit
 ************************************************************************* */
-#include "symshell.h"		// prototypes of symshell graphics primitives
+#include "symshell.h"        // prototypes of symshell graphics primitives
 
 
 #ifdef __cplusplus

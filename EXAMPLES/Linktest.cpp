@@ -1,5 +1,5 @@
 /// @file
-/// @brief (Przykładowy program SYMSHELL'A) 
+/// @brief Test linkowania podprogramów SYMSHELL'a.
 /// @details Linking test for:
 /// SYMSHELL.H - SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++
 ///*******************************************************************
@@ -7,7 +7,7 @@
 /// - Last changed massively: 22.06.2007
 /// - Comments edition:       19.11.2021
 /// - Small changes:          06.02.2023
-/// 
+/// @date 2026-01-27 (last update)
 
 #include "symshell.h"
 

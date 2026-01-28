@@ -31,7 +31,7 @@ ELSE()
   #add_compile_options( -Wall )
 ENDIF()
 
-include_directories("./")
+include_directories("./" "./INCL")
 #see -> https://cmake.org/cmake/help/v3.16/manual/cmake-compile-features.7.html#manual:cmake-compile-features(7)
 #message("C++ compiler flags: ${CMAKE_CXX_FLAGS}")
 
@@ -208,7 +208,7 @@ endif()
 endif()
 #KONIEC - THE END
 #********************************************************************/
-#*              SYMSHELLLIGHT  version 2025                         */
+#*              SYMSHELLLIGHT  version 2026                         */
 #********************************************************************/
 #*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
 #*            W O J C I E C H   B O R K O W S K I                   */

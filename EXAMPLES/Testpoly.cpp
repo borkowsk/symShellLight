@@ -1,12 +1,14 @@
-///////////////////////////////////////////////////////////////////////////////////////////
-///							Przykładowy program SYMSHELL'A
+//-/////////////////////////////////////////////////////////////////////////////////////////
+/// @file
+///							Przykładowy program SYMSHELL'A.
 ///-----------------------------------------------------------------------------------------
 /// Demonstracja użycia poligonów i pseudo 3D słupków. Klikanie myszą powoduje
 /// cykliczne dodawanie wieloboków do listy. Funkcja replot() odrysowuje słupki
 /// i poligony.
 /// Pętla obsługi podobna do tej w 'testsyms.cpp', ale oczekuje na zdarzenia
 /// i nie umożliwia pracy w tle (nie używa input_ready() )
-///////////////////////////////////////////////////////////////////////////////////////////
+/// @date 2026-01-27 (last update)
+//-/////////////////////////////////////////////////////////////////////////////////////////
 #include "symshell.h"
 #include <cstdio>
 #include <cstdlib>

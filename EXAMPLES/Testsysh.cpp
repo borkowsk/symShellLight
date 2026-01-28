@@ -4,7 +4,7 @@
 /// Bardzo prosty test bez funkcji odtwarzania ekranu. Następuje odtwarzanie z bitmapy,
 /// ale po zmianie rozmiaru okna ekran będzie czarny!
 ///////////////////////////////////////////////////////////////////////////////////////////
-#include "../symshell.h"
+#include "symshell.h"
 #include <stdio.h>
 
 int main(int argc,const char* argv[])

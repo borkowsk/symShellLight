@@ -35,7 +35,7 @@
 #include <X11/Xos.h>
 #include <X11/Xatom.h>
 
-#include "../symshell.h"
+#include "symshell.h"
 #include "icon.h"
 
 //#define BITMAPDEPTH 1

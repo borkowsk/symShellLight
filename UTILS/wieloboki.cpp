@@ -7,10 +7,10 @@
 
 #include <cstring> //stricmp() raz jest a raz go nie ma :-) zależnie od systemu
 
-using namespace std;//Trochę to niebezpieczne, ale skraca zapis
+using namespace std; //Trochę to niebezpieczne, ale skraca zapis
 #include "wieloboki.hpp"
 
-//  Definicja kontur�w r�nych figur
+//  Definicja konturów różnych figur
 //*//////////////////////////////////////////
 
 //S� "static" tzn. �e nie b�d� widoczne poza tym modu�em.

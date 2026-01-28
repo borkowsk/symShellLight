@@ -5,15 +5,15 @@
 
 using namespace std;
 
-//Funkcja interpretuj¹ca string jako wartoœæ RGB
-//Dopuszczalne formaty to: xFFFFFF  b111111111111111111111111  rgb(255,255,255) RGB(255,255,255) oraz dziesiêtny oczywiœcie
-
+//Funkcja interpretujÄ…ca string jako wartoÅ›Ä‡ RGB
+//Dopuszczalne formaty to: xFFFFFF  b111111111111111111111111  rgb(255,255,255) RGB(255,255,255)
+//oraz dziesiÄ™tny oczywiÅ›cie
 unsigned strtorgb(const char *s, char **endptr)
 {
 #ifdef _MSC_VER
    char* next_token = NULL;
 #endif
-   while(isspace(*s)) s++;   //isblank() Usun biale       ?
+   while(isspace(*s)) s++;   //isblank() Usun biaÅ‚e       ?
 
    if(s[0]=='0' && tolower(s[1])=='x' )
 		return  strtoul(s,endptr,16);

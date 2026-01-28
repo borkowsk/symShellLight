@@ -2,12 +2,12 @@
 (wymagane dla prawidłowego linkowania pod X11, gdzie teraz nie ma menu)
 ************************************************************************ */
 
-#include "../sshmenuf.h"
+#include "sshmenuf.h"
 
 /// Ustala tekst nazwy okna w jego belce
 /// \param WindowName
 /// \return TRUE - success!
-/// \note Wygląda że stało się redundantne z nowszą funkcją set_title()
+/// \note Wygląda, że stało się redundantne z nowszą funkcją set_title()
 int ssh_set_window_name(const char* WindowName)
 {
 	return 0;

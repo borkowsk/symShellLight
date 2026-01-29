@@ -1,4 +1,6 @@
 #!/bin/bash
+# @date 2026-01-29 (last update)
+
 if [ $# -ne 0 ]; 
 then
    echo "No parameters expected!" 1>&2
@@ -12,5 +14,10 @@ rm -f CMakeCache.txt
 rm -f CMakeLists.txt.user
 rm -f Makefile
 rm -f cmake_install.cmake
-rm -Rf CMakeFiles
-rm -R cmake-build-debug
+rm *.cbp
+
+rm -Rf CMakeFiles/
+rm -Rf bin/CMakeFiles/
+rm -R cmake-build-*/
+
+

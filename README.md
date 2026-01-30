@@ -10,13 +10,13 @@ PL: Lekka wersja grafiki __SYMSHELL__'a dla _X11_, _MS Windows_ & _SVG_
 z niektórymi podstawowymi funkcjonalnościami czasu wykonania. 
 Wyodrębnione z pełnej wersji w celach dydaktycznych i naukowych.
 
-| **WARNING**                                                                                                                                                                      |
-|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Header files previously located in the repository's root directory have been moved to the INCL directory as of January 2026. You must correct this path in your projects!        |
+>[!NOTE]
+>Header files previously located in the repository's root directory have been moved to the INCL directory as of January 2026.
+>You must correct this path in your projects!
 
-[!IMPORTANT]
-PL: Pliki nagłówkowe, umieszczone dotychczas w katalogu głównym repozytorium zostały od stycznia 2026 przeniesione 
-do katalogu INCL. Musicie poprawić tę ścieżkę w waszych projektach!
+>[!IMPORTANT]
+>PL: Pliki nagłówkowe, umieszczone dotychczas w katalogu głównym repozytorium zostały od stycznia 2026 przeniesione 
+>do katalogu INCL. Musicie poprawić tę ścieżkę w waszych projektach!
 
 **HISTORY**
 

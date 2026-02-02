@@ -7,7 +7,7 @@
 /// - Last changed massively: 22.06.2007
 /// - Comments edition:       19.11.2021
 /// - Small changes:          06.02.2023
-/// @date 2026-01-27 (last update)
+/// @date 2026-02-02 (last update)
 
 #include "symshell.h"
 
@@ -26,24 +26,24 @@ void test()
     set_background(256+128);		     /* Ustala index koloru do czyszczenia okna. Może nie działać po inicjacji*/
     mouse_activity(1);		             /* Ustala czy mysz ma byc obsługiwana. Zwraca poprzedni stan flagi */
     init_plot(400, 400, 1, 1);           /* inicjacja grafiki (kiedyś też semigrafiki) */
-    set_title("LINK TEST FOR SYMSHELL"); /* Ustawienie tytułu okna. Może nie być możliwe na niektorych platformach. */
+    set_title("LINK TEST FOR SYMSHELL"); /* Ustawienie tytułu okna. Może nie być możliwe na niektórych platformach. */
 
     /* Operacje przestawiania własności pracy okna graficznego */
-    print_transparently(1);	             /* Włącza drukowanie tekstu bez zamazywania t�a. Zwraca stan poprzedni */
+    print_transparently(1);	             /* Włącza drukowanie tekstu bez zamazywania tła. Zwraca stan poprzedni */
     line_width(2);		                 /* Ustala szerokość linii. Może być trochę kosztowne. Zwraca stan poprzedni */
-    line_style(SSH_LINE_SOLID);          /* Ustala styl rysowania linii: SSH_LINE_SOLID, SSH_LINE_DOTTED, SSH_LINE_DASHED */
-    put_style(SSH_SOLID_PUT);            /* Ustala stosunek nowego rysowania do starej zawartości ekranu: SSH_SOLID_PUT,SSH_XOR_PUT */
+    line_style(SSH_LINE_SOLID);            /* Ustala styl rysowania linii: SSH_LINE_SOLID, SSH_LINE_DOTTED, SSH_LINE_DASHED */
+    put_style(SSH_SOLID_PUT);              /* Ustala stosunek nowego rysowania do starej zawartości ekranu: SSH_SOLID_PUT,SSH_XOR_PUT */
     
-    set_rgb(1, 10, 100, 200);            /* Zmienia definicje koloru w palecie kolorów. Indeksy 0..255 */
-    set_gray(511, 250);                  /* Zmienia definicje odcienia szarości w palecie szarości. Indeksy 256..511 */
+    set_rgb(1, 10, 100, 200);       /* Zmienia definicje koloru w palecie kolorów. Indeksy 0..255 */
+    set_gray(511, 250);            /* Zmienia definicje odcienia szarości w palecie szarości. Indeksy 256..511 */
     
-    set_pen(100, 1, SSH_SOLID_PUT);	     /* Ustala aktualny kolor linii za pomocą typu ssh_color */
-    set_brush(100);                      /* Ustala aktualny kolor wypełnień za pomocą typu ssh_color */
-    set_pen_rgb(r, g, b, 2, SSH_SOLID_PUT);  /* Ustala aktualny kolor linii za pomocą składowych RGB */
-    set_brush_rgb(r, g, b);              /* Ustala aktualny kolor wypełnień za pomocą składowych RGB */
+    set_pen(100, 1, SSH_SOLID_PUT); /* Ustala aktualny kolor linii za pomocą typu ssh_color */
+    set_brush(100); /* Ustala aktualny kolor wypełnień za pomocą typu ssh_color */
+    set_pen_rgb(r, g, b, 2, SSH_SOLID_PUT); /* Ustala aktualny kolor linii za pomocą składowych RGB */
+    set_brush_rgb(r, g, b); /* Ustala aktualny kolor wypełnień za pomocą składowych RGB */
 
-    set_pen_rgba(200, g, b, 64, 2, SSH_SOLID_PUT);  /* Ustala aktualny kolor linii za pomocą składowych RGBA(-lpha) */
-    set_brush_rgba(150, g, b, 64 );       /* Ustala aktualny kolor wypełnień za pomocą składowych RGBA(-lpha) */
+    set_pen_rgba(200, g, b, 64, 2, SSH_SOLID_PUT); /* Ustala aktualny kolor linii za pomocą składowych RGBA(-lpha) */
+    set_brush_rgba(150, g, b, 64 ); /* Ustala aktualny kolor wypełnień za pomocą składowych RGBA(-lpha) */
                
 
     /* ODCZYTYWANIE AKTUALNYCH USTAWIEŃ OKNA GRAFICZNEGO*/
@@ -63,29 +63,29 @@ void test()
 #ifdef Z_RYSOWANIEM
     /* TE FUNKCJE RACZEJ ZAWSZE SĄ ZAIMPLEMENTOWANE BO TO PODSTAWA */
     /* PUNKTOWANIE  */
-    plot(100,150, 254 );		        /* Wyświetlenie punktu na ekraniew kolorze indeksowanym c=254 */
+    plot(100,150, 254 );		        /* Wyświetlenie punktu na ekranie w kolorze indeksowanym c=254 */
     plot_rgb(100,152,200,100,250);
 
     /* MALOWANIE */
-    fill_circle_d(100,300,100);	        /* Wyswietlenie kola w kolorach domyslnych*/
-    fill_rect_d(300, 300, 350, 320);       /* Wyswietla prostokat w kolorach domyslnych*/
+    fill_circle_d(100,300,100);	        /* Wyświetlenie kola w kolorach domyślnych*/
+    fill_rect_d(300, 300, 350, 320);       /* Wyświetla prostokąt w kolorach domyślnych*/
     static const ssh_point points[] = { { 10,0 },{0,-10},{-10,0},{0,10} };
-    fill_poly_d(250, 250, points, 4);      /* Wypelnia wielokat przesuniety o vx,vy w kolorach domyslnych */
+    fill_poly_d(250, 250, points, 4);      /* Wypełnia wielokąt przesunięty o vx,vy w kolorach domyślnych */
 
-    fill_circle(100, 300, 10,254);		/* Wyswietlenie kola w kolorze indeksowanym c=254 */
-    fill_rect(350,320,380,350,253);		/* Wyswietla prostokat w kolorze c=253 */
-    fill_poly(300, 250, points, 4, 128);	/* Wypelnia wielokat przesuniety o vx,vy w kolorze c */
+    fill_circle(100, 300, 10,254);		/* Wyświetlenie kola w kolorze indeksowanym c=254 */
+    fill_rect(350,320,380,350,253);		/* Wyświetla prostokąt w kolorze c=253 */
+    fill_poly(300, 250, points, 4, 128);	/* Wypełnia wielokąt przesunięty o vx,vy w kolorze c */
 
     /* RYSOWANIE  */
-    line_d(0, 20, 500, 500);            /* Wyswietlenie lini w kolorze domyslnym */
-    circle_d(200, 200, 50);		        /* Wyswietlenie okręgu o promieniu 50 w kolorze domyslnym */
+    line_d(0, 20, 500, 500);            /* Wyświetlenie linii w kolorze domyślnym */
+    circle_d(200, 200, 50);		             /* Wyświetlenie okręgu o promieniu 50 w kolorze domyślnym */
 
-    line(0, 25, 250, 500,128);			/* Wyswietlenie lini w kolorze indeksowanym c=128 */
-    circle(200, 200, 75, 254);			/* Wyswietlenie okregu w kolorze indeksowanym c=254 */
+    line(0, 25, 250, 500,128);		 /* Wyświetlenie linii w kolorze indeksowanym c=128 */
+    circle(200, 200, 75, 254);			 /* Wyświetlenie okręgu w kolorze indeksowanym c=254 */
 
 
 /*    fill_flood(int x, int y,
-        ssh_color fill, ssh_color border); // Wypelnia powodziowo lub algorytmem siania 
+        ssh_color fill, ssh_color border); // Wypełnia powodziowo lub algorytmem siania
     fill_flood_rgb(int x, int y,
         int rf, int gf, int bf, int rb, int gb, int bb); */
 #endif
@@ -105,11 +105,12 @@ void test()
         if( input_ready() ) 	            /* Funkcja sprawdzająca, czy jest cos do wzięcia z wejścia */
         {
             int c = get_char();    	        /* Funkcja odczytywania znaków sterowania */
-            if( c==0 )
-                set_char(c);		        /* Odesłanie znaku na wejście. Zwraca 0, jeśli nie ma miejsca */
-
-            /* Pewne jest tylko odesłanie jednego znaku. */
-            if (c == '\b')
+            if( c=='a' )
+                set_char('b');          /* Odesłanie znaku na wejście. Zwraca 0, jeśli nie ma miejsca */
+                                            /* Pewne jest tylko odesłanie jednego znaku. */
+            if( c==0)
+            { /*Nic do zrobienia*/ }
+            else if (c == '\b')
             {
                 int xpos, ypos, click;
                 get_mouse_event(xpos, ypos, click); /* Funkcja odczytująca ostatnie zdarzenie myszy */
@@ -127,33 +128,32 @@ void test()
             {
                 dump_screen("LINK TEST FOR SYMSHELL");
             }
-            else if ( c == 0 || c == -1 || c == 27)
+            else if ( c == -1 || c == 27 )
                 return; // KONIEC TESTU
 
         }
-        delay_ms(100);
+        delay_ms(100); //W module SVG to może być jedynie 1 ms.
     }
-    /* DLA close_plot() */
-    WB_error_enter_before_clean/* =0 */; /* Czy zamykać od razu, czy dać szanse na przejrzenie zawartości */
-
-    close_plot(); 					     /* zamkniecie grafiki (kiedyś też semigrafiki) */
-    /* Automatycznie instalowana w atexit() */
 }
+
+/* DLA close_plot() */
+//WB_error_enter_before_clean = 0; /* Czy zamykać od razu, czy dać szanse na przejrzenie zawartości */
 
 int main()
 {
     test();
+    close_plot();  /* zamkniecie grafiki (kiedyś też semigrafiki) */
     return 0;
 }
 
-/********************************************************************/
-/*              SYMSHELLLIGHT  version 2024-06-25                   */
-/********************************************************************/
-/*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
-/*            W O J C I E C H   B O R K O W S K I                   */
-/*    Instytut Studiów Spolecznych Uniwersytetu Warszawskiego       */
-/*    WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI  */
-/*    GITHUB: https://github.com/borkowsk                           */
-/*                                                                  */
-/*                               (Don't change or remove this note) */
-/********************************************************************/
+/* *******************************************************************/
+/*               SYMSHELLLIGHT  version 2026                         */
+/* *******************************************************************/
+/*            THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
+/*             W O J C I E C H   B O R K O W S K I                   */
+/*     Instytut Studiów Spolecznych Uniwersytetu Warszawskiego       */
+/*     WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI  */
+/*     GITHUB: https://github.com/borkowsk                           */
+/*                                                                   */
+/*                                (Don't change or remove this note) */
+/* *******************************************************************/

@@ -13,15 +13,15 @@
  * 	- https://github.com/borkowsk                                   *
  *                                                                      *
  *      File changed massively: 21.10.2020                              *
- * \date 2024-02-13 (last modifications)                                *
+ * @date 2026-02-02 (last modifications)                                *
  * \note                                                                *
- *  WCIĄŻ Z BŁĘDEM NA EXPOSE! TODO , choć raz go już gdzieś usunąłem :-/*
+ *  WCIĄŻ Z BŁĘDEM NA EXPOSE! TODO , choć raz go już gdzieś usunąłem    *
  *                                                                      *
  ************************************************************************
  *                           SYMSHELLLIGHT                              *
  ************************************************************************
  */
-/// @date 2026-01-07 (last modifications)
+/// @date 2026-02-02 (last modifications)
 
 
 #include <stdlib.h>
@@ -80,7 +80,7 @@ const char *_ssh_grx_module_name="SVG";
 
 /** Zmienne do zapamiętania wskaźników przekazanych przez funkcje setup*/
  static unsigned        largc=0;            /**< liczna parametrów wywołania */
- static const char**    largv=NULL;         /**< wartości paramtrów wywołania */
+ static const char**    largv=NULL;         /**< wartości parametrów wywołania */
 
 /** Parametry z inicjalizacji modułu (shell setup) */
  static int             isbuffered=0;       /**< Czy okno jest buforowane mapą pikseli? */
@@ -94,8 +94,8 @@ const char *_ssh_grx_module_name="SVG";
  static Display         *display=0; /* HANDLER TO Display */
  static int             screen_num; /* SCREEN NUMBER */
  static char            *display_name = NULL;/* Display name. To be read. */
- static unsigned int    display_width=0;   /* Will be filled during initialisation */
- static unsigned int    display_height=0;  /* Will be filled during initialisation */
+ static unsigned int    display_width=0;   /* Will be filled during initialization */
+ static unsigned int    display_height=0;  /* Will be filled during initialization */
  static XSizeHints      *size_hints;       /* To jest jeszcze gdzieś używane poza init_plot() Chyba do resize? TODO? */
 
  static unsigned int    mulx=1,muly=1;             /* Multiplication of x & y */
@@ -137,6 +137,9 @@ const char *_ssh_grx_module_name="SVG";
  static unsigned         ori_font_height = 16;
  static unsigned         font_width = 0;
  static unsigned         font_height = 0;
+
+const char* event_name(int code);
+const char* get_xevent_name(int type);
 
  /* REPAINT DATA */
  static struct XRect {
@@ -184,7 +187,7 @@ const char *_ssh_grx_module_name="SVG";
  static int             DelayAction=0;             /* Sterowanie zasypianiem, jeśli program czeka */
  static int             pipe_break=0;              /* Informacja o zerwaniu połączenia z X serwerem */
 
- /// Default signal handler
+ /// Default signal handler.
  void SigPipe(int num)
  {
      pipe_break=1;
@@ -194,7 +197,7 @@ const char *_ssh_grx_module_name="SVG";
      exit(num);
  }
 
- /// Default X IO handler
+ /// Default X IO handler.
  /// \warning TODO: How to distinguish X11 network error from window shutdown?
  int MyXIOHandler(Display* d)
  /*
@@ -218,7 +221,7 @@ const char *_ssh_grx_module_name="SVG";
      return -11;
  }
 
- /// Default X Error handler
+ /// Default X Error handler.
  /// \return 0 or never return because of exit() call.
  int MyErrorHandler(Display *xDisplay, XErrorEvent *event)
  {
@@ -242,15 +245,15 @@ const char *_ssh_grx_module_name="SVG";
      return 0;
  }
 
-/** Włącza drukowanie tekstu bez zamazywania tla. Zwraca stan poprzedni */
- int	print_transparently(int yes)
+/** Włącza drukowanie tekstu bez zamazywania tla. Zwraca stan poprzedni. */
+ int print_transparently(int yes)
  {
      int ret=transparent_print;
      transparent_print=yes;
      return ret;
  }
 
-/** Czy symulować niezmienność rozmiarów okna */
+/** Czy symulować niezmienność rozmiarów okna. */
  void fix_size(int Yes)
  {
      if(ssh_trace_level)
@@ -258,7 +261,7 @@ const char *_ssh_grx_module_name="SVG";
  }
 
 /** Ustala czy mysz ma być obsługiwana.
-   \details W X11 zawsze jest, ale można ją ignorować */
+   \details W X11 zawsze jest, ale można ją ignorować. */
  int mouse_activity(int yes)
  {
      int pom=mouse;
@@ -266,13 +269,13 @@ const char *_ssh_grx_module_name="SVG";
      return pom;
  }
 
-/** Zwraca aktualny kolor tła — nowa wersja? */
+/** Zwraca aktualny kolor tła — nowa wersja. */
  ssh_color background()
  {
      return bacground;
  }
 
-/** Ustala index koloru do czyszczenia okna itp */
+/** Ustala index koloru do czyszczenia okna itp. */
  void set_background(ssh_color c)
  {
     if(c>=0 && c<=NumberOfColors)
@@ -281,7 +284,7 @@ const char *_ssh_grx_module_name="SVG";
        bacground=0;
  }
 
-/** Ustala czy ma być buforowanie okna */
+/** Ustala czy ma być buforowanie okna. */
 void buffering_setup(int _n)
 {
     if(_n)
@@ -292,13 +295,13 @@ void buffering_setup(int _n)
          isbuffered=1;  /* żeby można było na nia pisać */
  }
 
- /** Czy jest buforowane? */
+ /** Podaje, czy jest buforowanie. */
  unsigned get_buffering()
  {
      return animate;
  }
 
- /** Zamykanie i zwalnianie zasobów */
+ /** Zamykanie i zwalnianie zasobów. */
  static void CloseAll()
  {
      if(display==0)
@@ -355,10 +358,10 @@ void buffering_setup(int _n)
      display=0;
  }
 
-/** Zabezpiecza przed ukrytą rekurencją w close_plot */
+/** Zabezpiecza przed ukrytą rekurencją w `close_plot`. */
 static int inside_close_plot=0;
 
-/** Closing graphics / virtual graphics / semigraphics */
+/** Closing graphics / virtual graphics / semigraphics. */
 void close_plot()
 {
     if(inside_close_plot)
@@ -406,7 +409,7 @@ void close_plot()
     }
 }
 
-/** Allocates a pixmap of the appropriate size to the contents of the window */
+/** Allocates a pixmap of the appropriate size to the contents of the window. */
 static void ResizeBuffer(unsigned int nwidth,unsigned int nheight)
 {
     if(alloc_cont && cont_pixmap!=0)
@@ -442,7 +445,7 @@ static void ResizeBuffer(unsigned int nwidth,unsigned int nheight)
     }
 }
 
-/** Ładowanie jakiegoś fontu */
+/** Ładowanie jakiegoś fontu. */
 static void load_font(XFontStruct **font_info, GC *gc)
 {
     char fontname[256];
@@ -478,7 +481,7 @@ static void load_font(XFontStruct **font_info, GC *gc)
         fprintf(stderr,"X11: %s:font %ux%u\n",icon_name,font_width,font_height);
 }
 
-/** Awaryjna zawartość okna, gdy jest za małe */
+/** Awaryjna zawartość okna, gdy jest za małe. */
 static void _tooSmall(Window win, GC gc, XFontStruct* font_info)
 {
     char *string1 = "Too Small";
@@ -491,7 +494,7 @@ static void _tooSmall(Window win, GC gc, XFontStruct* font_info)
                 strlen(string1));
 }
 
-/** Kopiuje fragment mapy okna na okno */
+/** Kopiuje fragment mapy okna na okno. */
 inline
 static void _place_graphics(Window win,GC gc,
                            int      area_x,int          area_y,
@@ -503,7 +506,7 @@ static void _place_graphics(Window win,GC gc,
               area_x/*dest_x*/, area_y/*dest_y*/);
 }
 
-/** Obsługa zdarzeń X11 */
+/** Obsługa zdarzeń X11. */
 static void _read_XInput()
 {
     static int buffer_empty=1;
@@ -516,12 +519,24 @@ static void _read_XInput()
         return ;
     }
 
-    /* Get events, use first to display text and graphics */
-
-    XNextEvent(display, &report);
+    /* Get events, use first to display text and graphics
+     *    display 	Specifies the connection to the X server.
+     *    event_return 	Returns the next event in the queue.
+     * The XNextEvent() function copies the first event from the event queue into the specified
+     * XEvent structure and then removes it from the queue. If the event queue is empty,
+     * XNextEvent() flushes the output buffer and _b_l_o_c_k_s_ until an event is received.
+     * See: https://tronche.com/gui/x/xlib/event-handling/manipulating-event-queue/XNextEvent.html */
+    int ret=0;
+    GET_AGAIN:
+    ret=XNextEvent(display, &report);
+    if(ret<0)
+        fprintf(stderr,"XNextEvent has retuned error code: %i\n",ret);
 
     switch  (report.type) {
-
+    case NoExpose: //To nie wymaga żadnej obsługi.
+            delay_ms(1);
+            //goto GET_AGAIN; /* Nic się nie zmieniło... TODO SPRYTNE ALE ROBI PROBLEM*/
+            break;
     case Expose:
         if(ssh_trace_level)
             fprintf(stderr,"X11: EXPOSE: %s #%d x=%d y=%d %dx%d\n",
@@ -537,7 +552,7 @@ static void _read_XInput()
         /* if (!isbuffered && report.xexpose.count != 0)
                          break;  */
 
-        /* If window too small to use */
+        /* If the main window is too small to use */
         if(window_size == TOO_SMALL)
             _tooSmall(win, gc, font_info);
         else
@@ -567,16 +582,16 @@ static void _read_XInput()
                 if(last_repaint_data.height<report.xexpose.height)
                     last_repaint_data.height+=report.xexpose.height;
 
-                repaint_flag=1;/* Są już dane dla repaint */
+                repaint_flag=1; /* Są już dane dla repaint */
 
-                /* Set information for main program about refresh screen */
+                /* Set information for the main program about refresh screen */
                 if(report.xexpose.count == 0 ||  buffer_empty )
                 {
                     if(ssh_trace_level)
                         fprintf(stderr,"X11: EXPOSE force repaint\n");
                     buforek[0]='\r';
                     buffer_empty=0;
-
+                    break;
                 }
             }
             else
@@ -605,7 +620,7 @@ static void _read_XInput()
                     icon_name,
                     width,height,mulx,muly);
 
-        /* Window has been resized; change width
+        /* The Window has been resized; change width
            * and height for next Expose */
 
         if( width== report.xconfigure.width &&
@@ -613,7 +628,8 @@ static void _read_XInput()
         {
             if(ssh_trace_level)
                 fprintf(stderr,"The same.\n");
-            break; /* Nic się nie zmieniło */
+            //goto GET_AGAIN; /* Nic się nie zmieniło... TODO SPRYTNE ALE ROBI PROBLEM*/
+            break;
         }
 
         width = report.xconfigure.width;
@@ -650,7 +666,7 @@ static void _read_XInput()
         break;
 
     case ButtonPress:
-        DelayAction=0;/* Pojawiła się aktywność. Nie należy spać! */
+        DelayAction=0; /* Pojawiła się aktywność. Nie należy spać! */
         if(mouse)
         {
             buforek[0]='\b';
@@ -708,18 +724,16 @@ static void _read_XInput()
     } break;
 
     default:
-#	ifdef XDEBUG
         if(ssh_trace_level)
             fprintf(stderr,"Message %d=\"%s\" arrived but ignored \n ",
-                    report.type,event_name(report.type) );y2
-#	endif
+                    report.type, event_name(report.type) );
         break;
     } /* End switch */
 
 }
 
 
-/** Tworzy Graphics Contex */
+/** Tworzy Graphics Contex. */
 static void makeGC(Window win,GC* gc,XFontStruct* font_info)
 {
     //XColor pom;//??? TODO
@@ -802,7 +816,7 @@ static void makeGC(Window win,GC* gc,XFontStruct* font_info)
 */
 }
 
-/** Zmienia napis w belce okna */
+/** Zmienia napis w belce okna. */
 void set_title(const char* window_name)
 {
     /* Change window title bar */
@@ -810,7 +824,7 @@ void set_title(const char* window_name)
     XStoreName(display,win, window_name);
 }
 
-/** Przekazanie parametrów wywołania do konfiguracji symmshella */
+/** Przekazanie parametrów wywołania do konfiguracji symmshell-a. */
 void shell_setup(const char* title,int iargc,const char* iargv[])
 {
     int i;
@@ -882,7 +896,7 @@ void shell_setup(const char* title,int iargc,const char* iargv[])
     }
 }
 
-/** Właściwa dla platformy inicjacja grafiki/semigrafiki/grafiki wirtualnej */
+/** Właściwa dla platformy inicjacja grafiki/semigrafiki/grafiki wirtualnej. */
 ssh_stat init_plot(ssh_natural a,ssh_natural b,ssh_natural ca,ssh_natural cb)
 {
     int* disp_depht;
@@ -1199,15 +1213,15 @@ ssh_natural  char_width(char znak)
     return width;
 }
 
-/** Aktualne rozmiary łańcucha */
+/** Aktualne rozmiary łańcucha — wysokość. */
 /** \details ...potrzebne do jego pozycjonowania */
-/** wysokość - LICZONA BARDZO PRYMITYWNIE - jako wysokość pierwszego znaku */
+/** wysokość jest LICZONA BARDZO PRYMITYWNIE, jako wysokość pierwszego znaku */
 ssh_natural  string_height(const char* str)
 {
     return char_height(*str); /* Pierwszy znak! */
 }
 
-/** Aktualne rozmiary łańcucha */
+/** Aktualne rozmiary łańcucha — długość. */
 /** \details ...potrzebne do jego pozycjonowania */
 /** szerokość liczona porządnie przez XTextWidth z Xlib */
 ssh_natural  string_width(const char* str)
@@ -1250,11 +1264,10 @@ void flush_plot()
 
 /* GETTING INPUT */
 
-/** Za pierwszym razem zwraca '\r'
-żeby zasygnalizować ze trzeba wyrysować ekran */
+/** Za pierwszym razem zwraca '\r', żeby zasygnalizować, że trzeba wyrysować ekran. */
 static int first_to_read=0;
 
-/** Bardzo zależna od platformy funkcja sprawdzająca, czy jest jakieś wejście "z okna grafiki" */
+/** Bardzo zależna od platformy funkcja sprawdzająca, czy jest jakieś wejście "z okna grafiki". */
 int  input_ready()
 {
     if(first_to_read)
@@ -1267,10 +1280,11 @@ int  input_ready()
         return EOF;
     }
 
+    /* TODO: Można rozróżnić zdarzenia wymagające uwagi "użytkownika" od przetworzonych przez `_read_XInput` ! */
     if(XPending(display)!=0) 	/* Sprawdzenie, czy nie ma zdarzeń */
     {			                /*SĄ JAKIEŚ!*/
         buforek[0]=NODATA; 	    /*Asekuranctwo ? */
-        _read_XInput(); 		    /* Przetwarzanie zdarzeń */
+        /*bool ret=*/_read_XInput(); /* Przetwarzanie zdarzeń */
         if(buforek[0]!=NODATA)	/* Czy jest cos do zwrócenia jako znak? */
         {
             first_to_read=buforek[0]; /*Zostanie przeczytane przez get_char() */
@@ -1282,7 +1296,7 @@ int  input_ready()
     return 0;
 }
 
-/** Odesłanie znaku na wejście. Zwraca 0 jeśli nie ma miejsca */
+/** Odesłanie znaku na wejście. Zwraca 0 jeśli nie ma miejsca. */
 ssh_stat  set_char(int c)
 {
     if(first_to_read!=0)/* Nie odebrano */
@@ -1292,7 +1306,7 @@ ssh_stat  set_char(int c)
     return 1;
 }
 
-/** Odczytywanie znaków sterowania */
+/** Odczytywanie znaków sterowania. */
 int  get_char()
 {
     int pom;
@@ -1327,7 +1341,7 @@ static char bufor[1024];
 static char straznik2=0x77;
 static int ox,oy;
 
-/** Wyprowadzenie tekstu na ekran (bw) */
+/** Wyprowadzenie tekstu na ekran (bw). */
 void printbw(ssh_coordinate x,ssh_coordinate y,const char* format,...)
 {
     size_t len=0;
@@ -1383,7 +1397,7 @@ void printbw(ssh_coordinate x,ssh_coordinate y,const char* format,...)
     }
 }
 
-/** Wyprowadzenie tekstu na ekran (index colors) */
+/** Wyprowadzenie tekstu na ekran (index colors). */
 void printc(ssh_coordinate x,ssh_coordinate y,
             ssh_color fore,ssh_color back,
             const char* format,...)
@@ -1441,7 +1455,7 @@ void printc(ssh_coordinate x,ssh_coordinate y,
     }
 }
 
-/** Wyprowadzenie tekstu na ekran (default colors) */
+/** Wyprowadzenie tekstu na ekran (default colors). */
 void print_d(ssh_coordinate x,ssh_coordinate y,const char* format,...)
 {
     size_t len=0;
@@ -1500,7 +1514,7 @@ void print_d(ssh_coordinate x,ssh_coordinate y,const char* format,...)
 
 /** BUDOWANIE WEWNĘTRZNYCH KOLORÓW W X11 - TODO CHECK
  *  \brief Tworzenie kolory RBG w X11
- *  \details Funkcja jest inline i tylko dla tego pliku źródłówego
+ *  \details Funkcja jest inline i tylko dla tego pliku źródłowego
  *  \see https://www.geeksforgeeks.org/inline-function-in-c/
  * */
 static inline
@@ -1511,7 +1525,7 @@ unsigned long buildColor(unsigned char red, unsigned char green, unsigned char b
            ( (unsigned long)(blue) ) ;
 }
 
-/** BUDOWANIE WEWNĘTRZNYCH KOLORÓW W X11 - TODO CHECK
+/** BUDOWANIE WEWNĘTRZNYCH KOLORÓW W X11. TODO CHECK
  *  \brief Tworzenie kolory RBGA w X11
  *  \details Funkcja jest inline i tylko dla tego pliku źródłówego
  *  \see https://www.geeksforgeeks.org/inline-function-in-c/
@@ -1525,7 +1539,7 @@ unsigned long buildTransparentColor(unsigned char red, unsigned char green, unsi
            ( (unsigned long)(blue) ) ;
 }
 
-/** Drukuje z możliwością ustawienia tuszu poprzez RGB */
+/** Drukuje z możliwością ustawienia tuszu poprzez RGB. */
 void print_rgb(ssh_coordinate x,ssh_coordinate y,
                ssh_intensity r,ssh_intensity g,ssh_intensity b,            /*- składowe koloru tekstu */
                ssh_color back,const char* format,...)
@@ -1583,7 +1597,7 @@ void print_rgb(ssh_coordinate x,ssh_coordinate y,
     }
 }
 
-/** Wyświetlenie punktu na ekranie w kolorze rgb ustawionym ze składowych */
+/** Wyświetlenie punktu na ekranie w kolorze rgb ustawionym ze składowych. */
 void plot_rgb(ssh_coordinate x,ssh_coordinate y,ssh_intensity r,ssh_intensity g,ssh_intensity b)
 {
     x*=mulx; /* Multiplication of coordinates */
@@ -1608,7 +1622,7 @@ void plot_rgb(ssh_coordinate x,ssh_coordinate y,ssh_intensity r,ssh_intensity g,
     }
 }
 
-/** Wyświetlenie punktu na ekranie w kolorze domyślnym */
+/** Wyświetlenie punktu na ekranie w kolorze domyślnym. */
 void plot_d(ssh_coordinate x,ssh_coordinate y)
 {
     x*=mulx; /* Multiplication of coordinates */
@@ -1636,7 +1650,7 @@ void plot_d(ssh_coordinate x,ssh_coordinate y)
     }
 }
 
-/** Wyświetlenie punktu na ekranie w kolorze indeksowanym */
+/** Wyświetlenie punktu na ekranie w kolorze indeksowanym. */
 void plot(ssh_coordinate x,ssh_coordinate y,ssh_color c)
 {
     x*=mulx; /* Multiplication of coordinates */
@@ -1664,7 +1678,7 @@ void plot(ssh_coordinate x,ssh_coordinate y,ssh_color c)
     }
 }
 
-/** Ustala styl rysowania linii
+/** Ustala styl rysowania linii.
  * \details possible values: SSH_LINE_SOLID, SSH_LINE_DOTTED, SSH_LINE_DASHED
  * \warning NOT IMPLEMENTED!
  * */
@@ -2909,6 +2923,49 @@ ssh_stat dump_screen(const char* Filename)
 
     return 0;
 }
+
+#include <X11/Xlib.h>
+
+const char* get_xevent_name(int type) {
+    switch (type) {
+        case KeyPress:         return "KeyPress";
+        case KeyRelease:       return "KeyRelease";
+        case ButtonPress:      return "ButtonPress";
+        case ButtonRelease:    return "ButtonRelease";
+        case MotionNotify:     return "MotionNotify";
+        case EnterNotify:      return "EnterNotify";
+        case LeaveNotify:      return "LeaveNotify";
+        case FocusIn:          return "FocusIn";
+        case FocusOut:         return "FocusOut";
+        case KeymapNotify:     return "KeymapNotify";
+        case Expose:           return "Expose";
+        case GraphicsExpose:   return "GraphicsExpose";
+        case NoExpose:         return "NoExpose";
+        case VisibilityNotify: return "VisibilityNotify";
+        case CreateNotify:     return "CreateNotify";
+        case DestroyNotify:    return "DestroyNotify";
+        case UnmapNotify:      return "UnmapNotify";
+        case MapNotify:        return "MapNotify";
+        case MapRequest:       return "MapRequest";
+        case ReparentNotify:   return "ReparentNotify";
+        case ConfigureNotify:  return "ConfigureNotify";
+        case ConfigureRequest: return "ConfigureRequest";
+        case GravityNotify:    return "GravityNotify";
+        case ResizeRequest:    return "ResizeRequest";
+        case CirculateNotify:  return "CirculateNotify";
+        case CirculateRequest: return "CirculateRequest";
+        case PropertyNotify:   return "PropertyNotify";
+        case SelectionClear:   return "SelectionClear";
+        case SelectionRequest: return "SelectionRequest";
+        case SelectionNotify:  return "SelectionNotify";
+        case ColormapNotify:   return "ColormapNotify";
+        case ClientMessage:    return "ClientMessage";
+        case MappingNotify:    return "MappingNotify";
+        case GenericEvent:     return "GenericEvent";
+        default:               return "Unknown Event";
+    }
+}
+
 /*#pragma exit close_plot*/
 /*v******************************************************************/
 /*              SYMSHELLLIGHT  version 2023-03...                   */

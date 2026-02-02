@@ -1,29 +1,33 @@
 //-/////////////////////////////////////////////////////////////////////////////////////////
-/// @file
-///							Przykładowy program SYMSHELL'A.
-///-----------------------------------------------------------------------------------------
+/// @page page_e3_bars_and_polygons SYMSHELL TEST FOR 3D bars and polygons
+/// @brief Program SYMSHELL'A rysujący słupki 3D i poligony na klikanie myszką
+///
+/// @section intro_sec_e3 Opis przykładu "3D BARS & POLYGONS"
 /// Demonstracja użycia poligonów i pseudo 3D słupków. Klikanie myszą powoduje
 /// cykliczne dodawanie wieloboków do listy. Funkcja replot() odrysowuje słupki
 /// i poligony.
 /// Pętla obsługi podobna do tej w 'testsyms.cpp', ale oczekuje na zdarzenia
 /// i nie umożliwia pracy w tle (nie używa input_ready() )
-/// @date 2026-01-27 (last update)
+/// @include Testpoly.cpp
+///
+/// @file
+/// @brief Przykładowy program SYMSHELLA demonstrujący rysowanie słupków i wielokątów.
+/// @date 2026-02-02 (last update)
 //-/////////////////////////////////////////////////////////////////////////////////////////
+
 #include "symshell.h"
 #include <cstdio>
 #include <cstdlib>
 
-//int x,y,vx,vy;
-/* For close_plot() */
-int WB_error_enter_before_clean=1;
-
-//BAR3D
+// BAR3D == column
+// ---------------
 const int a=10;
 const int b=10;
 const int c=6;
 const int WHITE=255;
+const int YELLO=254;
 
-void slupek(int x,int y,int h,unsigned char col1,unsigned char col2)
+void column(int x, int y, int h, unsigned char col1, unsigned char col2)
 {
     ssh_point romb[7];
                                            /*      6 -----  5    */
@@ -42,29 +46,41 @@ void slupek(int x,int y,int h,unsigned char col1,unsigned char col2)
 
     fill_rect(x,y-h,x+a,y,col1);               /*front*/
 
-    fill_poly(0,0,romb+1,6,col2);              /*bok i gora*/
+    fill_poly(0,0,romb+1,6,col2);        /*bok i góra*/
+
+    line(romb[6].x,romb[6].y,romb[5].x,romb[5].y,YELLO); /*góra tył*/
+
+    line(romb[2].x,romb[2].y,romb[5].x,romb[5].y,YELLO); /*góra prawa*/
+
+    line(romb[1].x,romb[1].y,romb[6].x,romb[6].y,WHITE); /*góra lewa*/
 
     line(x,y,romb[1].x,romb[1].y,WHITE);       /*lewy pion*/
 
-    line(x,y,romb[3].x,romb[3].y,WHITE);       /*doln poziom*/
+    line(romb[1].x,romb[1].y,romb[2].x,romb[2].y,WHITE); /* górny poziom */
 
-    line(romb[2].x,romb[2].y,romb[5].x,romb[5].y,WHITE); /*blik*/
+    line(x,y,romb[3].x,romb[3].y,WHITE);       /*dolny poziom*/
 
     //plot(romb[5].x,romb[5].y,WHITE-1);
 
     line(romb[2].x,romb[2].y,romb[3].x,romb[3].y,WHITE);
 
-} /* end  slupek() */
+} /* end  column() */
 
 
-//Table for point list
-const int numi=100;
+
+/// Struct for clicked points.
 struct polydata{
 		ssh_point p;
         unsigned char color;
       };
+
+/// Size of clicked point list.
+const int numi=100;
+
+/// Clicked point list.
 polydata list[numi];
 
+/// Redrawing fixed columns and pentagons at click locations.
 void replot()
 {
     static const ssh_point points[]={{-10,-10},{13,-13},{13,13},{-10,10},{-15,0}};
@@ -72,37 +88,39 @@ void replot()
     unsigned int i;
     int old=mouse_activity(0);
     clear_screen();
+
     for(i=0;i<numi;i++)
     {
         if(list[i].p.x==0) break;
         //fill_circle(list[i].p.x, list[i].p.y,30,list[i].color);
         fill_poly(list[i].p.x, list[i].p.y,points,pnumber,list[i].color);
     }
+
     for(i=0;i<16;i++)
     {
-        slupek(i*12,255,i*10+10,i*16,i*16-8);
+        column(i * 12, 255, i * 10 + 10, i * 16, i * 16 - 8);
     }
+
     printbw(0,screen_height()-char_height('X'),"%s","ST:");
-    printc(char_width('X')*3,screen_height()-char_height('X'),1,140,"POLYGON & BAR3D TEST");
+    printc(char_width('X')*3,screen_height()-char_height('X'),255,140,"POLYGON & BAR3D TEST");
 
     printbw(screen_width()-char_width('X'),screen_height()-char_height('X'),"X");
     flush_plot();
     mouse_activity(old);
 }
 
-/*  OGÓLNA FUNKCJA MAIN  */
-/* ********************** */
-
+///  GENERAL MAIN FUNCTION.
+//   **********************
 int main(int argc,const char* argv[])
 {
-    int i=0,xpos=0,ypos=0,click=0;//Myszowate
+    int i=0,xpos=0,ypos=0,click=0; //for mouse data
     int cont=1;//flaga kontynuacji
     int std=0;
 
     mouse_activity(1);
     set_background(128);
-    buffering_setup(1);/* Włączona animacja */
-    shell_setup("SYMSHELL TEST",argc,argv);
+    buffering_setup(1); // WARNING! Animation enabled.
+    shell_setup("3D BARS & POLYGONS SYMSHELL TEST ",argc,argv);
     printf("COLORS= 256 q-quit s-switch stdout on/off\n"
            "setup options:\n"
            " -mapped -buffered -bestfont -traceevt\n"
@@ -118,12 +136,19 @@ int main(int argc,const char* argv[])
 
     while(cont) //PĘTLA GŁÓWNA
     {
-        char znak;
-
-        znak=get_char();/* Tutaj czeka na zdarzenia, więc nie ma pracy w tle */
+        delay_ms(10); //We limit the frequency of this almost empty loop!
+        // Here it waits for events, so theoretically there is no
+        // background work.
+        // However, some implementations may have active waiting, or they may return
+        // a lot of events that don't need handling, and in this example each event triggers
+        // a flush_plot, which is expensive.
+        int znak=get_char(); //printf("%c [%i]\n",znak,znak);
 
         switch(znak)
         {
+        case '\0':
+            //printf("(N)"); //Any event handled internally or requiring no handling
+            break;
         case '@':
         case '\r':replot();break;
         case '\b':get_mouse_event(&xpos,&ypos,&click);
@@ -137,6 +162,9 @@ int main(int argc,const char* argv[])
         case EOF:
             cont=0;
             break;
+        default: //Unsupported input
+            printbw(0,100,"What??? %c [%i]  ",znak,znak);
+            break;
         }
 
         if(std)
@@ -144,20 +172,27 @@ int main(int argc,const char* argv[])
             printf("stdout<<%c\n",znak);
             fflush(stdout);
         }
+
         printc(screen_width()-char_width('X'),
                screen_height()-char_height('X'),
                34,255,"%c",znak);
-        flush_plot();
+
+        flush_plot(); /// When there is an animation, flush plot costs CPU time,
+                      /// even if there were no changes!
     }
 
+    //Terminating this application
     close_plot();
-    printf("Do widzenia!!!\n");
+    printf("Do widzenia!!! / Goodbye!!!\n");
     return 0;
 }
 
-/********************************************************************/
-/*              SYMSHELLLIGHT  version 2021-11-24                   */
-/********************************************************************/
+/// For close_plot() - maybe also linked from the library with default value "0".
+int WB_error_enter_before_clean=0;
+
+/* **************************************************************** */
+/*                  SYMSHELLLIGHT  version 2026                     */
+/* **************************************************************** */
 /*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
 /*            W O J C I E C H   B O R K O W S K I                   */
 /*    Instytut Studiów Społecznych Uniwersytetu Warszawskiego       */
@@ -165,4 +200,5 @@ int main(int argc,const char* argv[])
 /*    GITHUB: https://github.com/borkowsk                           */
 /*                                                                  */
 /*                               (Don't change or remove this note) */
-/********************************************************************/
+/* **************************************************************** */
+

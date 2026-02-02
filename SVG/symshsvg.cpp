@@ -5,9 +5,9 @@
  **             ==================================================================
  **
  **             Simplest graphics interface implemented for SVG vector graphics.
- **             All graphic operation are buffered in a large list, and write
- **             into SVG file when flush_screen() is called.
- **             Also dump_screen() produces SVG file.
+ **             All graphic operations are buffered in a large list, and write
+ **             into an SVG file when flush_screen() is called.
+ **             Also dump_screen() produces an SVG file.
  **
  ** \note       This source file was changed massively: 17.11.2020, then 17.12.2021.
  **
@@ -19,7 +19,7 @@
  **
  ** \library    SYMSHELLLIGHT  version 2026a
  ** 
-/// @date 2026-01-07 (last modification)
+/// @date 2026-02-02 (last modification)
  */
 #include <iostream>
 #include <fstream>
@@ -92,7 +92,7 @@ unsigned long     PID=_getpid();
 int         ssh_trace_level = 0;
 
 /// Jakiej długości inicjujemy tablice operacji graficznych (mnożone przez liczbę pikseli ekranu).
-double      INITIAL_LENGH_RATIO = 0.001;
+double      INITIAL_LENGH_RATIO = 0.005;
 
 /// Ile maksymalnie rekordów jest dopuszczalnych?//(mnożone przez liczbę pikseli ekranu).
 double      MAXIMAL_LENGH_RATIO = 0.999;
@@ -132,7 +132,7 @@ static const char*  ScreenTitle = "SSHSVG";
 static char ScreenHeader[1024]="SSH SVG WINDOW";
 
 // Ustawienia grafiki
-static int         GrPrintTransparently = 0;
+static int          GrPrintTransparently = 0;
 
 static int          GrLineWidth = 1;
 static int          GrLineStyle = SSH_LINE_SOLID;
@@ -157,88 +157,163 @@ static bool         GrClosed = true;
 
 /* IMPLEMENTACJA
  * ************** */
+namespace {
+    enum GrType {
+        Empty = 0, Point = 1, LineTo = 2, Line = 3, Circle = 4, Rect = 5, Text = 6, Poly = 7, Arc = 8
+    }; // Typy rekordów
 
-enum  GrType { Empty = 0, Point=1,LineTo=2,Line=3,Circle=4,Rect=5,Text=6,Poly=7,Arc=8 }; // Typy rekordów
-
-struct Empty { unsigned type : 4; unsigned mode : 2; };
-struct Point { unsigned type : 4; unsigned mode : 2; unsigned wi: 2; unsigned x :16; unsigned y :16; // weight & coordinates
-                                                     unsigned r : 8; unsigned g : 8; unsigned b : 8; /* main color */
-                                                     unsigned rb: 8; unsigned gb: 8; unsigned bb: 8; /* background color */ };
-struct LineTo{ unsigned type : 4; unsigned mode : 2; unsigned wi: 2; unsigned x :16; unsigned y :16; // weight & coordinates
-                                                     unsigned r : 8; unsigned g : 8; unsigned b : 8; /* main color */ };
-struct Line  { unsigned type : 4; unsigned mode : 2; unsigned wi: 2; unsigned x1:16; unsigned y1:16; // weight & coordinates
-                                                     unsigned r : 8; unsigned g : 8; unsigned b : 8; // main color
-                                                                     unsigned x2:16; unsigned y2:16; /* end point */ };
-struct Circle{ unsigned type : 4; unsigned mode : 2; unsigned wi: 2; unsigned x :16; unsigned y :16; // weight & coordinates
-                                                     unsigned r : 8; unsigned g : 8; unsigned b : 8; // main color
-                                                                     unsigned rx:16; unsigned ry:16; // the semi-axis of the ellipse
-                                                     unsigned rf: 8; unsigned gf: 8; unsigned bf: 8; /* secondary color */ };
-struct Arc   { unsigned type : 4; unsigned mode : 2; unsigned wi: 2; unsigned x :16; unsigned y :16; // weight & coordinates
-                                                     unsigned r : 8; unsigned g : 8; unsigned b : 8; // main color
-                                                                     unsigned rx:16; unsigned ry:16; // the semi-axis of the ellipse
-                                                                     unsigned as:16; unsigned ae:16; // start & end angles
-                                                     unsigned rf: 8; unsigned gf: 8; unsigned bf: 8; /* secondary color */ };
-struct Rect  { unsigned type : 4; unsigned mode : 2; unsigned wi: 2; unsigned x1:16; unsigned y1:16; // weight & coordinates
-                                                     unsigned r : 8; unsigned g : 8; unsigned b : 8; // main color
-                                                                     unsigned x2:16; unsigned y2:16; // end point
-                                                     unsigned rf: 8; unsigned gf: 8; unsigned bf: 8; /* secondary color */ };
-struct Poly  { unsigned type : 4; unsigned mode : 2; unsigned wi: 2; /*weight*/      unsigned si:16; // array size
-                                                     unsigned r : 8; unsigned g : 8; unsigned b : 8; // main color
-                                                     unsigned rf: 8; unsigned gf: 8; unsigned bf: 8; /* secondary color */
-                                                     ssh_point* points; };
-struct Text  { unsigned type : 4; unsigned mode : 1; unsigned sc: 3; unsigned x :16; unsigned y :16; // height & coordinates
-                                                     unsigned r : 8; unsigned g : 8; unsigned b : 8; // main color
-                                                     unsigned rf: 8; unsigned gf: 8; unsigned bf: 8; /* secondary color */
-                                                     char* txt; };
+    struct Empty {
+        unsigned type: 4;
+        unsigned mode: 2;
+    };
+    struct Point {
+        unsigned type: 4;
+        unsigned mode: 2;
+        unsigned wi: 2;
+        unsigned x: 16;
+        unsigned y: 16; // weight & coordinates
+        unsigned r: 8;
+        unsigned g: 8;
+        unsigned b: 8; /* main color */
+        unsigned rb: 8;
+        unsigned gb: 8;
+        unsigned bb: 8; /* background color */ };
+    struct LineTo {
+        unsigned type: 4;
+        unsigned mode: 2;
+        unsigned wi: 2;
+        unsigned x: 16;
+        unsigned y: 16; // weight & coordinates
+        unsigned r: 8;
+        unsigned g: 8;
+        unsigned b: 8; /* main color */ };
+    struct Line {
+        unsigned type: 4;
+        unsigned mode: 2;
+        unsigned wi: 2;
+        unsigned x1: 16;
+        unsigned y1: 16; // weight & coordinates
+        unsigned r: 8;
+        unsigned g: 8;
+        unsigned b: 8; // main color
+        unsigned x2: 16;
+        unsigned y2: 16; /* end point */ };
+    struct Ellipse {
+        unsigned type: 4;
+        unsigned mode: 2;
+        unsigned wi: 2;
+        unsigned x: 16;
+        unsigned y: 16; // weight & coordinates
+        unsigned r: 8;
+        unsigned g: 8;
+        unsigned b: 8; // main color
+        unsigned rx: 16;
+        unsigned ry: 16; // the semi-axis of the ellipse
+        unsigned rf: 8;
+        unsigned gf: 8;
+        unsigned bf: 8; /* secondary color */ };
+    struct Arc {
+        unsigned type: 4;
+        unsigned mode: 2;
+        unsigned wi: 2;
+        unsigned x: 16;
+        unsigned y: 16; // weight & coordinates
+        unsigned r: 8;
+        unsigned g: 8;
+        unsigned b: 8; // main color
+        unsigned rx: 16;
+        unsigned ry: 16; // the semi-axis of the ellipse
+        unsigned as: 16;
+        unsigned ae: 16; // start & end angles
+        unsigned rf: 8;
+        unsigned gf: 8;
+        unsigned bf: 8; /* secondary color */ };
+    struct Rect {
+        unsigned type: 4;
+        unsigned mode: 2;
+        unsigned wi: 2;
+        unsigned x1: 16;
+        unsigned y1: 16; // weight & coordinates
+        unsigned r: 8;
+        unsigned g: 8;
+        unsigned b: 8; // main color
+        unsigned x2: 16;
+        unsigned y2: 16; // end point
+        unsigned rf: 8;
+        unsigned gf: 8;
+        unsigned bf: 8; /* secondary color */ };
+    struct Poly {
+        unsigned type: 4;
+        unsigned mode: 2;
+        unsigned wi: 2; /*weight*/      unsigned si: 16; // array size
+        unsigned r: 8;
+        unsigned g: 8;
+        unsigned b: 8; // main color
+        unsigned rf: 8;
+        unsigned gf: 8;
+        unsigned bf: 8; /* secondary color */
+        ssh_point *points;
+    };
+    struct Text {
+        unsigned type: 4;
+        unsigned mode: 1;
+        unsigned sc: 3;
+        unsigned x: 16;
+        unsigned y: 16; // height & coordinates
+        unsigned r: 8;
+        unsigned g: 8;
+        unsigned b: 8; // main color
+        unsigned rf: 8;
+        unsigned gf: 8;
+        unsigned bf: 8; /* secondary color */
+        char *txt;
+    };
 
 /// Struktura do przechowywania operacji rysowania.
 ///\see \n "https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths"
-union GrOperation
-{
-    struct Empty  empty;
-    struct Point  point;
-    struct LineTo lineTo;
-    struct Line   line;
-    struct Circle circle;
-    struct Arc    arc;
-    struct Rect   rect;
-    struct Poly   poly;
-    struct Text   text;
+    union GrOperation {
+        struct Empty empty;
+        struct Point point;
+        struct LineTo lineTo;
+        struct Line line;
+        struct Ellipse circle;
+        struct Arc arc;
+        struct Rect rect;
+        struct Poly poly;
+        struct Text text;
 
-    /// Konstruktor domyślny.
-    GrOperation()
-    {
-        memset(this, 0, sizeof(GrOperation));//Wypełnianie zerami
-                                                                                    //Powinno być oczywiste, ale...
-                                                                                    assert(empty.type == GrType::Empty);
-                                                                                    assert(text.txt == NULL);
-                                                                                    assert(poly.points == NULL);
-    }
+        /// Konstruktor domyślny.
+        GrOperation() {
+            memset(this, 0, sizeof(GrOperation));//Wypełnianie zerami
+            //Powinno być oczywiste, ale...
+            assert(empty.type == GrType::Empty);
+            assert(text.txt == NULL);
+            assert(poly.points == NULL);
+        }
 
-    /// Konstruktor kopiujący.
-    GrOperation(GrOperation& From)
-    {
-        memcpy(this,&From, sizeof(GrOperation));
-        if (empty.type == GrType::Text || empty.type == GrType::Poly)
-            memset(&From, 0, sizeof(GrOperation));//Wypełnianie zerami
-    }
+        /// Konstruktor kopiujący.
+        GrOperation(GrOperation &From) {
+            memcpy(this, &From, sizeof(GrOperation));
+            if (empty.type == GrType::Text || empty.type == GrType::Poly)
+                memset(&From, 0, sizeof(GrOperation));//Wypełnianie zerami
+        }
 
-    /// Czyści stare operacje, np. gdy uznano, że efekt i tak jest zasłonięty, albo clear_screen(), albo end.
-    void clean()
-    {
-        if (empty.type == GrType::Text && text.txt!=NULL )
-            delete text.txt;
-        else if (empty.type == GrType::Poly && poly.points!=NULL)
-            delete [] poly.points;
-        empty.type = GrType::Empty;
-    }
+        /// Czyści stare operacje, np. gdy uznano, że efekt i tak jest zasłonięty, albo clear_screen(), albo end.
+        void clean() {
+            if (empty.type == GrType::Text && text.txt != NULL)
+                delete text.txt;
+            else if (empty.type == GrType::Poly && poly.points != NULL)
+                delete[] poly.points;
+            empty.type = GrType::Empty;
+        }
 
-    /// Destruktor. Jeżeli jest zapisany obiekt z danymi dynamicznymi to trzeba zwolnić
-    ~GrOperation()
-    {
-        clean();
-    }
-};
+        /// Destruktor. Jeżeli jest zapisany obiekt z danymi dynamicznymi to trzeba zwolnić
+        ~GrOperation() {
+            clean();
+        }
+    };
+
+} //namespace
 
 static wb_dynarray<GrOperation> GrList; // Lista operacji rysowania
 static int GrListPosition = -1;         // Aktualna pozycja na liście
@@ -348,7 +423,7 @@ void shell_setup(const char* title,int iargc,const char* iargv[])
 
 static void SetScale();  //Gdzieś tam jest funkcja ustalająca domyślną paletę kolorów indeksowanych
 
-/// \brief inicjacja grafiki/semigrafiki - początek pracy okna/ekranu graficznego (lub wirtualnego)
+/// \brief inicjacja grafiki/semigrafiki - początek pracy okna/ekranu graficznego (lub wirtualnego).
 /// \param a : to szerokość okna
 /// \param b : to wysokość okna
 /// \param ca : to miejsce na dodatkowe kolumny tekstu
@@ -374,14 +449,14 @@ ssh_stat init_plot(ssh_natural  a, ssh_natural   b,                 /* ile pikse
     unsigned N = (unsigned)( ((a + ca)*(b + cb))*INITIAL_LENGH_RATIO ); //Potem jest sprawdzane, czy nie za małe, warning zbędny
     maxN=(int)( ((a + ca)*(b + cb))*MAXIMAL_LENGH_RATIO );				//Potem jest sprawdzane, czy nie za małe, warning zbędny
 
-    if(N<1 || maxN<1 || N>maxN )//N lub maxN, mniejsze od 1 to ewidentny błąd
+    if(N<1 || maxN<1 || N>maxN )//N lub maxN, mniejsze od 1 to prawdopodobnie w inicjalizacji ekranu jest błąd
     {
         cerr<<__FUNCTION__<<": WARNING! : "
             <<"((a + ca)*(b + cb))*INITIAL_LENGH_RATIO="
             <<"(("<<a<<" + "<<ca<<")*("<<b<<" + "<<cb<<"))*"<<INITIAL_LENGH_RATIO
             <<"="<<N<<endl;
 
-        N=100;
+        N=100; //Awaryjna poprawka
 
         if(maxN<N)
             maxN=10000;
@@ -393,14 +468,14 @@ ssh_stat init_plot(ssh_natural  a, ssh_natural   b,                 /* ile pikse
 
     GrClosed = false;
 
-    _ssh_window=(unsigned long int)&GrList;//Czy to użyteczne to nie wiadomo, ale przynajmniej nie jest 0
-                                           //co by wskazywało że inicjacja grafiki się nie powiodła
+    _ssh_window=(unsigned long int)&GrList; //Czy to użyteczne to nie wiadomo, ale przynajmniej nie jest 0
+                                            //, co by wskazywało, że inicjacja grafiki się nie powiodła.
     cerr<<GrScreenWi<<"x"<<GrScreenHi<<"-N:"<<N<<":"<<maxN<<endl;
 
-    return 1;//OK
+    return 1; //OK
 }
 
-/// \brief Koniec pracy z grafiką
+/// \brief Koniec pracy z grafiką.
 ///
 /// Funkcja wykonuje zamkniecie grafiki/grafiki wirtualnej/semigrafiki.
 /// Normalnie wypada ją wywołać, ale jest też automatycznie instalowana w atexit()
@@ -415,7 +490,7 @@ void close_plot()
     _ssh_window=0;
 }
 
-/// \brief Przełączanie buforowanie okna. Może nie zadziałać wywołane po inicjacji
+/// \brief Przełączanie buforowanie okna. Może nie zadziałać wywołane po inicjacji.
 /// \param Yes (or No)
 /// \details
 /// W grafikach rastrowych zawartość pojawia się na ekranie albo od razu, albo po wywołaniu "flush_plot".
@@ -432,15 +507,15 @@ void buffering_setup(int Yes)
 ///
 /// W takim trybie zmiana wielkości okna powiększa piksele o całkowitą wielokrotność
 /// \implementation W module SVG aktualnie nie robi nic poza ewentualnym wyświetleniem na konsolę śladu użycia.
-/// Ponieważ zapisujemy tylko plik graficzny to funkcja nie ma znaczenia,
+/// Ponieważ zapisujemy tylko plik graficzny, to funkcja nie ma znaczenia,
 /// bo raczej nie zwiększamy rozmiaru "ekranu" spoza programu (TODO ?)
 void fix_size(int Yes)
 {
-    if(ssh_trace_level>1) cout <<"SVG: " << _FUNCTION_NAME_ << SEP;//fix_size
-    if(ssh_trace_level>1) cout << Yes << SEP << "IGNORED!" << endl;//Nie ma sensu, bo zapis i tak jest wektorowy i nie ma okna
+    if(ssh_trace_level>1) cout <<"SVG: " << _FUNCTION_NAME_ << SEP; //fix_size
+    if(ssh_trace_level>1) cout << Yes << SEP << "IGNORED!" << endl; //Nie ma sensu, bo zapis i tak jest wektorowy i nie ma okna
 }
 
-/// \brief Zawieszenie wykonania programu na pewną liczbę milisekund
+/// \brief Zawieszenie wykonania programu na pewną liczbę milisekund.
 /// \param ms
 ///
 /// \implementation W module SVG nie ma sensu, bo taki program raczej działa w tle!
@@ -454,7 +529,7 @@ void delay_ms(unsigned ms)
     usleep(10); //(ms*10)
 }
 
-/// \brief Zawieszenie wykonania programu na pewną liczbę mikrosekund
+/// \brief Zawieszenie wykonania programu na pewną liczbę mikrosekund.
 /// \param us
 ///
 /// \implementation W module SVG nie ma to sensu, bo taki program raczej działa w tle!
@@ -1967,7 +2042,7 @@ static int _writeSTR(ostream& o)
 		};  break;
 		case GrType::Circle: {
 			o << "Circle" << "\t{\t";
-			struct Circle &pr = (GrList[i].circle);
+			struct Ellipse &pr = (GrList[i].circle);
 			o << pr.x << "; " << pr.y << "; " << pr.rx << "; " << pr.ry << "; " << pr.wi << "; 0x" << hex << pr.mode << dec << "; ";
 			o << "(" << pr.r << ',' << pr.g << ',' << pr.b << "); ";
 			if (pr.mode == 1)//FILL
@@ -2114,7 +2189,7 @@ static int _writeSVG(ostream& o)
 			o << "/>" << endl;
 		};  break;
 		case GrType::Circle: {
-			struct Circle &pr = (GrList[i].circle);
+			struct Ellipse &pr = (GrList[i].circle);
 			//o << "<circle cx=\"120\" cy=\"120\" r=\"80\" fill=\"red\" stroke=\"black\" stroke-width=\"5\" />" << endl;
 			//o << "<ellipse cx=\"200\" cy=\"200\" rx=\"20\" ry=\"7\" fill=\"none\" stroke=\"black\" stroke-width=\"6\" />" << endl;
             if (pr.rx == pr.ry) //Koło — circle

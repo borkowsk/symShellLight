@@ -10,9 +10,9 @@
 ///     VC++ linkuje biblioteki Windows automatycznie
 ///     Dev-Cpp potrzebne są dwie bibloteki:
 ///     ".../Dev-Cpp/lib/libgdi32.a" oraz "...Dev-Cpp/lib/libcomdlg32.a"
-/// @date 2026-01-27 (last update)
+/// @date 2026-02-02 (last update)
 //-//////////////////////////////////////////////////////////////////////////////
-//#define MULTITR (1)  //Jeśli chcemy użyć wielowątkowości
+//#define MULTITR (1)  //Jeśli chcemy użyć wielowątkowości, ale nie działa, bo jakieś niezdefiniowane "size"
 
 #include <cassert>
 #include <cstdio>    //Wyjście na konsole w stylu języka C - printf(....)
@@ -54,17 +54,17 @@ int myrand()//Na wzór rand() Microsoftu
 #include "optParam.hpp"
 cticker MyCPUClock;         //Czas od startu programu do liczenia "średniego czasu kroku brutto"
 
-#define NAZWAMODELU  "2x2 gas v1.0mt " //Użycie define, a nie const char* ułatwia montowanie stałych łańcuchów
+#define NAZWA_MODELU  "2x2 gas v1.0mt " //Użycie define, a nie const char* ułatwia montowanie stałych łańcuchów
 
 //Wyjściowy rozmiar świata i "ekranu" symulacji
 const int MAXSIDE=1000;
-int     curr_side=500;//Raczej powinno być parzyste!
+int     curr_side=500; //Raczej powinno być parzyste!
 
 //Do wizualizacji obsługi zdarzeń
 const char* CZEKAM="?>"; //Monit w pętli zdarzeń
-const int DELA=0;//Jak długie oczekiwanie w obrębie pętli zdarzeń
-unsigned VISUAL=1;//Co ile kroków symulacji odrysowywać widok
-int xmouse=10,ymouse=10;//Pozycja ostatniego "kliku" myszy 
+const int DELA=0; //Jak długie oczekiwanie w obrębie pętli zdarzeń
+unsigned VISUAL=1; //Co ile kroków symulacji odrysowywać widok
+int xmouse=10,ymouse=10; //Pozycja ostatniego "kliku" myszy
 
 time_t RANDOM_SEED=time(NULL);    //Zarodek generatora pseudolosowego 
 unsigned DENSITY=(curr_side*curr_side)/100; //Musi być tyle, żeby były miejsca z komórkami obok siebie
@@ -182,7 +182,7 @@ void RegulaIZmiana( unsigned i, //Wiersz startowej komórki bloku
 #ifdef MULTITR
     unsigned randVal=myrand(); //używa wielowątkowo specyficznego stanu czyi każdy watek ma inny ciąg pseudolosowy
 #else
-    unsigned randVal=rand();   //Czy rand() jest jakoś zabezpieczone względem wątków? OGÓLNIE WĄTPIE. W  MSVC++ nie
+    unsigned randVal=rand();   //Czy `rand()` jest jakoś zabezpieczone względem wątków? OGÓLNIE WĄTPIE. W  MSVC++ nie
 #endif
 
     unsigned char nex=old==0?0:old==15?15:Rules[old][1+randVal%6];//Sprawdzenie stanu, ale 0 i 15 nie mają szans na zmianę
@@ -310,8 +310,7 @@ void read_mouse(); // Obsługa myszy. Używać tylko gdy potrzebne (spowalnia)
 void write_to_file(); // Obsługa zapisu do pliku.  Używać tylko gdy potrzebne (spowalnia)
 void screen_to_file(); //Zapis ekranu do pliku
 
-void replot()
-//Rysuje coś na ekranie
+void replot() //Rysuje coś na ekranie
 {
     for(int x=0;x<curr_side-1;x++)
         for(int y=0;y<curr_side-1;y++)
@@ -330,9 +329,9 @@ void replot()
 }
 
 
-int main(int argc,const char* argv[])//Potrzebne są parametry wywołania programu
+int main(int argc,const char* argv[]) //Potrzebne są parametry wywołania programu
 {
-    printf("Model \"%s\". File version %s\n",NAZWAMODELU,__TIMESTAMP__);
+    printf("Model \"%s\". File version %s\n", NAZWA_MODELU, __TIMESTAMP__);
     if(wbrtm::OptionalParameterBase::parse_options(argc,argv,Parameters,sizeof(Parameters)/sizeof(Parameters[0])))
     {
         exit(222);
@@ -345,7 +344,7 @@ int main(int argc,const char* argv[])//Potrzebne są parametry wywołania progra
     fix_size(1);       // Czy udajemy, że ekran ma zawsze taki sam rozmiar?
     mouse_activity(0); // Czy mysz będzie obsługiwana?
     buffering_setup(1);// Czy będzie rysować poprzez bitmapę z zawartością ekranu?
-    shell_setup(NAZWAMODELU,argc,argv);// Przygotowanie okna z użyciem parametrów wywołania
+    shell_setup(NAZWA_MODELU, argc, argv);// Przygotowanie okna z użyciem parametrów wywołania
     init_plot(curr_side,curr_side,0,1);// Otwarcie okna SIZExSIZE pikseli + 1 wiersz znaków za pikselami
 
     // Teraz można rysować i pisać w oknie
@@ -366,15 +365,16 @@ int main(int argc,const char* argv[])//Potrzebne są parametry wywołania progra
             pom=get_char(); //Przeczytaj nadesłany znak
             switch(pom)
             {
-            case 'd': screen_to_file();break;//Zrzut grafiki
-            case 'p': write_to_file();break;//Zapis do pliku tekstowego
-            case '\r': replot();break;//Wymagane odrysowanie
-            case '\b': read_mouse();break;//Jest zdarzenie myszy
+            case '\0': /* do nothing */ break;
+            case 'd': screen_to_file();break; //Zrzut grafiki
+            case 'p': write_to_file();break; //Zapis do pliku tekstowego
+            case '\r': replot();break; //Wymagane odrysowanie
+            case '\b': read_mouse();break; //Jest zdarzenie myszy
             case EOF:  //Typowe zakończenie
             case  27:  //ESC
             case 'q':  //Zakończenie zdefiniowane przez programistę
             case 'Q':
-                        not_finished=false;break;// Wymuszenie zakończenia pętli
+                        not_finished=false;break; // Wymuszenie zakończenia pętli
             default:
                 printbw(0,screen_height()-char_height('N'),"Nie wiem co znaczy %c [%d] ",pom,pom);
                 printf("Nie wiem co znaczy %c [%d] ",pom,pom);
@@ -408,7 +408,7 @@ int main(int argc,const char* argv[])//Potrzebne są parametry wywołania progra
     return 0;
 }
 
-void read_mouse() //Procedura obsługi myszy
+void read_mouse() //Procedura obsługi myszy. SZKIELETOWA!
 { 
    int xpos,ypos,click;
    if(get_mouse_event(&xpos,&ypos,&click)!=-1)//Operator & - pobranie adresu
@@ -416,12 +416,12 @@ void read_mouse() //Procedura obsługi myszy
       xmouse=xpos;ymouse=ypos;
       //TODO - zaimplementować jeśli będzie potrzebne
       //...
-   }                      
+   }
 }
 
 void write_to_file()
 {
-    const char* NazwaPliku=NAZWAMODELU ".out";//Używamy sztuczki ze zlepianiem stałych
+    const char* NazwaPliku= NAZWA_MODELU ".out";//Używamy sztuczki ze zlepianiem stałych
                                               //łańcuchowych przez kompilator
     std::cout<<"Zapis stanu do pliku \""<<NazwaPliku<<'"';
     std::ofstream out(NazwaPliku); //Nazwa na razie ustalona z góry
@@ -442,28 +442,28 @@ void write_to_file()
     std::cout<<std::endl;
 }
 
-void screen_to_file()
-//Zapis ekranu do pliku (tylko Windows!)
+void screen_to_file() //Zapis ekranu do pliku (tylko Windows!)
 {  
     char bufor[255];//Tymczasowe miejsce na utworzenie nazwy pliku
 #ifdef _MSC_VER /*MSVC*/
-    _snprintf_s(bufor,255,"%s%06u",NAZWAMODELU,step_counter);//Nazwa + Numer kroku na 6 polach
+    _snprintf_s(bufor,255,"%s%06u",NAZWA_MODELU,step_counter);//Nazwa + Numer kroku na 6 polach
 #else
-    sprintf(bufor,"%s%06u",NAZWAMODELU,step_counter);//Nazwa + Numer kroku na 6 polach
+    sprintf(bufor, "%s%06u", NAZWA_MODELU, step_counter);//Nazwa + Numer kroku na 6 polach
 #endif
     std::cout<<"Zapis ekranu do pliku \""<<bufor<<'"';
     dump_screen(bufor);
     std::cout<<std::endl;
 }
 
-/********************************************************************/
-/*              SYMSHELLLIGHT  version 2021-11-19                   */
-/********************************************************************/
-/*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
-/*            W O J C I E C H   B O R K O W S K I                   */
-/*    Instytut Studiów Społecznych Uniwersytetu Warszawskiego       */
-/*    WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI  */
-/*    GITHUB: https://github.com/borkowsk                           */
-/*                                                                  */
-/*                               (Don't change or remove this note) */
-/********************************************************************/
+/* *******************************************************************/
+/*                 SYMSHELLLIGHT  version 2026                       */
+/* *******************************************************************/
+/*            THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
+/*             W O J C I E C H   B O R K O W S K I                   */
+/*     Instytut Studiów Społecznych Uniwersytetu Warszawskiego       */
+/*     WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI  */
+/*     GITHUB: https://github.com/borkowsk                           */
+/*                                                                   */
+/*                                (Don't change or remove this note) */
+/* *******************************************************************/
+

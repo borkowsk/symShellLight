@@ -4,7 +4,7 @@
 ///-------------------------------------------------------------------------
 /// Demonstruje skalowanie okna niezależne od aplikacyjnej strony programu
 /// i robione w funkcjach symshell'a.
-/// @date 2026-01-27 (last update)
+/// @date 2026-02-02 (last update)
 //-////////////////////////////////////////////////////////////////////////////
 #include "symshell.h"
 #include <cstdio>
@@ -90,6 +90,9 @@ int main(int argc,const char* argv[])
         inpt=get_char(); //Jest wejście. Trzeba przetworzyć.
         switch(inpt)
         {
+        default:
+        case '\r':
+        case '\0': /* do nothing */ break;
         case 's':std=!std;break;
         case 'q':
         case EOF:
@@ -111,14 +114,15 @@ int main(int argc,const char* argv[])
     printf("Do widzenia!!!\n");
     return 0;
 }
-/********************************************************************/
-/*              SYMSHELLLIGHT  version 2020-11-19                   */
-/********************************************************************/
-/*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
-/*            W O J C I E C H   B O R K O W S K I                   */
-/*    Instytut Studiów Społecznych Uniwersytetu Warszawskiego       */
-/*    WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI  */
-/*    GITHUB: https://github.com/borkowsk                           */
-/*                                                                  */
-/*                               (Don't change or remove this note) */
-/********************************************************************/
+
+/* *******************************************************************/
+/*              SYMSHELLLIGHT  version 2026                          */
+/* *******************************************************************/
+/*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                  */
+/*            W O J C I E C H   B O R K O W S K I                    */
+/*    Instytut Studiów Społecznych Uniwersytetu Warszawskiego        */
+/*    WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI   */
+/*    GITHUB: https://github.com/borkowsk                            */
+/*                                                                   */
+/*                               (Don't change or remove this note)  */
+/* *******************************************************************/

@@ -7,7 +7,7 @@
 ///
 /// Turmit ma element aktywny i środowisko, tzw. "głowicę" albo "czoło" oraz pamięć
 /// , ponieważ turmit jest tak naprawdę 2 wymiarowym uogólnieniem maszyny Turinga
-/// @date 2026-01-27 (last update)
+/// @date 2026-02-02 (last update)
 //-//////////////////////////////////////////////////////////////////////////////////
 
 
@@ -26,21 +26,24 @@
 #endif
 #include "symshell.h"
 
-#define NAZWAMODELU  "Turmit_przyspieszony" //Użycie define ułatwia montowanie stałych łańcuchów
+#define NAZWA_MODELU  "Turmit_przyspieszony" //Użycie define ułatwia montowanie stałych łańcuchów
 
-//Wyjściowy rozmiar świata i "ekranu" symulacji
+/// Wyjściowy rozmiar świata i "ekranu" symulacji.
 const int size=700;
 
-unsigned char World[size][size];//Tablica świata: wyzerowana na początku, bo globalna
-                                //unsigned char, żeby było od 0 do 255, bo typ char bywa też "signed" (zależnie od kompilatora)
-unsigned step_counter=0;//Licznik realnych kroków modelu
+unsigned char World[size][size]; ///< Tablica świata: wyzerowana na początku, bo globalna
+                                 ///< unsigned char, żeby było od 0 do 255, bo typ char bywa też "signed"
+                                 ///< (zależnie od kompilatora)
 
-void init_world()//Funkcja do zapoczątkowania świata
+unsigned step_counter=0; ///< Licznik realnych kroków modelu
+
+void init_world() ///< Funkcja do zapoczątkowania świata.
 {
     //World[0][0]=255;//TODO: ewentualna inicjalizacja losowa świata
 }
 
-struct Turmit //Struktura definiująca stan turmita
+/// Struktura definiująca stan turmita.
+struct Turmit
 {
     int x,y;//położenie
     int stan;//I pamięć robocza. Np. aktualny kierunek
@@ -48,7 +51,8 @@ struct Turmit //Struktura definiująca stan turmita
     {}
 };
 
-struct //Struktura anonimowa dla kierunków ruchu
+/// Struktura anonimowa dla kierunków ruchu.
+struct
 {
     int dx,dy;
 } Directions[4]={{0,-1},{1,0},{0,1},{-1,0}}; //góra,prawo,dół,lewo
@@ -78,16 +82,16 @@ void single_step() //Funkcja robiąca jeden krok symulacji
     step_counter++;//Licznik kroków mrówki
 }
 
-void stats() //Funkcja do obliczenia statystyk
+void stats() ///< Funkcja do obliczenia statystyk
 {
   //TODO: Np średniej liczny odwiedzeń już odwiedzonych oraz liczby pustych
 }
 
 //Do wizualizacji obsługi zdarzeń
-const int DELA=0;//Jak długie oczekiwanie w obrębie pętli zdarzeń
-const int VISUAL=1000;//Co ile kroków symulacji odrysowywać widok
+const int DELA=0; //Jak długie oczekiwanie w obrębie pętli zdarzeń
+const int VISUAL=1000; //Co ile kroków symulacji odrysowywać widok
 const char* CZEKAM="Tylko patrz! "; //Monit w pętli zdarzeń
-int xmouse=10,ymouse=10;//Pozycja ostatniego "kliku" myszy
+int xmouse=10,ymouse=10; //Pozycja ostatniego "kliku" myszy
 
 //Kilka deklaracji zapowiadających inne funkcje obsługujące model
 void replot(); //Funkcja odrysowująca
@@ -100,10 +104,10 @@ void replot() //Rysuje na ekranie
     for(int x=0;x<size;x++)
         for(int y=0;y<size;y++)
         {
-            unsigned z=World[y][x]*20;//Co tam było? Wzmocnione
+            unsigned z=World[y][x]*20; //Co tam było? Wzmocnione
             z%=256; //Żeby nie przekroczyć kolorów
             //z%=512; //Albo wersja  z szarościami
-            plot(x,y,z);//Rysowanie punktu "świata"
+            plot(x,y,z); //Rysowanie punktu "świata"
         }
     printc(size/2,size,128,255,"%06u  ",step_counter);//Licznik kroków
     //Ostatnie położenie kliku - biały krzyżyk
@@ -113,20 +117,21 @@ void replot() //Rysuje na ekranie
 
 int main(int argc,const char* argv[])//Potrzebne są parametry wywołania programu
 {
-    fix_size(1);       // Czy udajemy, że ekran ma zawsze taki sam rozmiar?
-    mouse_activity(0); // Czy mysz będzie obsługiwana?
-    buffering_setup(1);// Czy będzie pamiętać w bitmapie zawartość ekranu? PAMIĘTANIE PRZYŚPIESZA!
-    shell_setup(NAZWAMODELU,argc,argv);// Przygotowanie okna z użyciem parametrów wywołania
-    init_plot(size,size,0,1);// Otwarcie okna SIZExSIZE pikseli + 1 wiersz znaków za pikselami
+    fix_size(1);        // Czy udajemy, że ekran ma zawsze taki sam rozmiar?
+    mouse_activity(0);  // Czy mysz będzie obsługiwana?
+    buffering_setup(1); // Czy będzie pamiętać w bitmapie zawartość ekranu? PAMIĘTANIE PRZYŚPIESZA!
+    shell_setup(NAZWA_MODELU, argc, argv); // Przygotowanie okna z użyciem parametrów wywołania
+    init_plot(size,size,0,1); // Otwarcie okna SIZExSIZE pikseli + 1 wiersz znaków za pikselami
 
     // Teraz można rysować i pisać w oknie
     init_world();
     replot();
     flush_plot();	// Ekran lub bitmapa po inicjalizacji jest gotowa
 
-    bool not_finished=true;//Zmienna sterująca zakończeniem programu
-    unsigned loop=0;    //Do zliczania nawrotów pętli zdarzeń
-    while(not_finished) //PĘTLA OBSŁUGI ZDARZEŃ
+    bool not_finished=true; //Zmienna sterująca zakończeniem programu
+    unsigned loop=0;        //Do zliczania nawrotów pętli zdarzeń
+
+    while(not_finished)    //PĘTLA OBSŁUGI ZDARZEŃ
     {
         int pom; //NA ZNAK Z WEJŚCIE OKNA GRAFICZNEGO
         loop++;
@@ -136,6 +141,7 @@ int main(int argc,const char* argv[])//Potrzebne są parametry wywołania progra
             pom=get_char(); //Przeczytaj nadesłany znak
             switch(pom)
             {
+            case '\0': /* do nothing */ break;
             case 'd': screen_to_file();break; //"Zrzut" grafiki
             case 'p': write_to_file();break; //Zapis do pliku tekstowego
             case '\r': replot(); flush_plot();break;//Wymagane odrysowanie
@@ -171,7 +177,7 @@ int main(int argc,const char* argv[])//Potrzebne są parametry wywołania progra
     return 0;
 }
 
-void read_mouse() //Procedura obsługi myszy. SZKIELET
+void read_mouse() ///< Procedura obsługi myszy. SZKIELETOWA!
 { 
     int xpos,ypos,click;
     if(get_mouse_event(&xpos,&ypos,&click)!=-1)//Operator & - pobranie adresu
@@ -182,9 +188,9 @@ void read_mouse() //Procedura obsługi myszy. SZKIELET
     }
 }
 
-void write_to_file() // Zapis stanu modelu do pliku. SZKIELET!
+void write_to_file() ///< Zapis stanu modelu do pliku. SZKIELET!
 {
-    const char* NazwaPliku=NAZWAMODELU ".out";//Używamy sztuczki ze zlepianiem stałych
+    const char* NazwaPliku= NAZWA_MODELU ".out";//Używamy sztuczki ze zlepianiem stałych
     //łańcuchowych przez kompilator
     std::ofstream out(NazwaPliku); //Nazwa na razie ustalona z góry
     //TODO - funkcja powinna zapisać wyniki modelu do pliku zamiast wyrysowaywać na ekranie
@@ -194,20 +200,21 @@ void write_to_file() // Zapis stanu modelu do pliku. SZKIELET!
     out.close();
 }
 
-void screen_to_file() //Zapis ekranu do pliku
+void screen_to_file() ///< Zapis ekranu do pliku.
 {
     char bufor[255];//Tymczasowe miejsce na utworzenie nazwy pliku
-    sprintf(bufor,"%s%06u",NAZWAMODELU,step_counter);//Nazwa + Numer kroku na 6 polach
+    sprintf(bufor, "%s%06u", NAZWA_MODELU, step_counter);//Nazwa + Numer kroku na 6 polach
     dump_screen(bufor);
 }
-/********************************************************************/
-/*              SYMSHELLLIGHT  version 2021-11-19                   */
-/********************************************************************/
-/*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
-/*            W O J C I E C H   B O R K O W S K I                   */
-/*    Instytut Studiów Społecznych Uniwersytetu Warszawskiego       */
-/*    WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI  */
-/*    GITHUB: https://github.com/borkowsk                           */
-/*                                                                  */
-/*                               (Don't change or remove this note) */
-/********************************************************************/
+
+/* *******************************************************************/
+/*                SYMSHELLLIGHT  version 2026                        */
+/* *******************************************************************/
+/*            THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
+/*             W O J C I E C H   B O R K O W S K I                   */
+/*     Instytut Studiów Społecznych Uniwersytetu Warszawskiego       */
+/*     WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI  */
+/*     GITHUB: https://github.com/borkowsk                           */
+/*                                                                   */
+/*                                (Don't change or remove this note) */
+/* *******************************************************************/

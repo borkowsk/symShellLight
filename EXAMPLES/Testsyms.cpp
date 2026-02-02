@@ -1,35 +1,38 @@
 //-/////////////////////////////////////////////////////////////////////////////////////////
-/// @file
-///                      Przykładowy program SYMSHELL'A.
-///-----------------------------------------------------------------------------------------
-/// Zawiera funkcje replot() odrysowująca główny wzorek oraz symulacje symulacji ;-)
+/// @page page_e5_replot SYMSHELL TEST WITH Replot
+/// @brief Program SYMSHELL'A z dużą funkcją odrysowywania
+///
+/// @section intro_sec_e5 Opis przykładu "Użycie replot()"
+/// Zawiera funkcje `replot()` odrysowująca główny wzorek oraz symulacje symulacji ;-)
 /// w postaci rysowania rosnących kołek przerywanego akcjami użytkownika.
-/// @date 2026-01-27 (last update)
+/// @include Testsyms.cpp
+///
+/// @file
+/// @brief Przykładowy program SYMSHELL'A z funkcją "replot"
+/// @date 2026-02-02 (last update)
 //-/////////////////////////////////////////////////////////////////////////////////////////
+
 #include "symshell.h"
 #include <cstdlib>
 #include <cstdio>
 
-int x,y,vx,vy;//Współrzędne i wektory prędkości
-
-int WB_error_enter_before_clean=1;// Wait for user in close_plot() 
-
-void replot()//Repaint all screen - prymitywne ale skuteczne
+/// Repaint all screen - primitive but effective.
+void replot()
 {
     unsigned int i,j;
     unsigned char pom;
-    int old=mouse_activity(0);//Ewentualna dezaktywacja myszy na czas odrysowywania
+    int old=mouse_activity(0); //Possible mouse deactivation during redrawing
     clear_screen();
 
-    //Odrysowywanie "bitmapy"
+    // Redrawing the "bit-picture" content
     for(i=0;i<256U; i++)
         for(j=0;j<256U; j++)
         {
-            pom=(unsigned char)(i&j);
+            pom=(unsigned char)( i&j );
             plot(j,i,pom);
         }
 
-    //Odrysowywanie reszty
+    //Drawing the rest of the scene figures
     printbw(0,screen_height()-char_height('X'),"%s","ST:");
     printc(char_width('X')*3,screen_height()-char_height('X'),1,140,"TEST ONLY");
     fill_circle(screen_width(),0,10,240);
@@ -39,24 +42,23 @@ void replot()//Repaint all screen - prymitywne ale skuteczne
     fill_circle(128,128,30,140);
     printbw(screen_width()-char_width('X'),screen_height()-char_height('X'),"X");
 
-    flush_plot();       //Koniec rysowania
-    mouse_activity(old);//Ewentualna aktywacja myszy
+    flush_plot(); //End of drawing
+    mouse_activity(old); //Possible reactivation of the mouse
 }
 
-/*  OGÓLNA FUNKCJA MAIN */
-/************************/
-
+///  GENERAL MAIN FUNCTION.
+//   **********************
 int main(int argc,const char* argv[])
 {
-    int i=0,xpos=0,ypos=0,click=0;//Myszowate
-    int cont=1;//flaga kontynuacji
+    int i=0,xpos=0,ypos=0,click=0; //Variables for reading mouse data
+    int cont=1; //continue processing flag
     int std=0;
 
-    //INICJACJA APLIKACJI
+    //APPLICATION INITIATION
     mouse_activity(1);
     set_background(128);
-    buffering_setup(0);/* Wyłączona animacja, bo tu niekonieczna */
-    shell_setup("SYMSHELL TEST",argc,argv);
+    buffering_setup(0); //Animation can be turned off as it is not necessary here.
+    shell_setup("SYMSHELL TEST WITH Replot",argc,argv);
     printf("COLORS= 256 q-quit s-switch stdout on/off\n"
            "setup options:\n"
            " -mapped -buffered -bestfont -traceevt\n"
@@ -72,26 +74,29 @@ int main(int argc,const char* argv[])
     {
         int tab;
 
-        if(input_ready())//Jeśli nie ma wejścia to robi swoje
+        if(input_ready()) //Are there any input events to be processed?
         {
-            tab=get_char();//Jest wejście. Nie powinien się tu zatrzymać. Odczytuje.
+            tab=get_char(); //There's an entrance. It reads. It shouldn't stop here because availability was checked earlier.
             switch(tab)
             {
-            case '@':					//Ręczne odpalanie replot()
-            case '\r':replot();break;	//Systemowe odpalanie replot()
-            case '\b':get_mouse_event(&xpos,&ypos,&click);//Obsługa zdarzenia myszy
+            case '\0': /* do nothing */ break;
+            case '@':					//Manual spell to fire replot()
+            case '\r':replot();break;	//Systematic code to fire of replot()
+            case '\b':get_mouse_event(&xpos,&ypos,&click); //Handling a mouse event
                 if(click&0x1)
                     set_char('X');
                 break;
-            case 's':std=!std;break;	//Obsługa echa.
-            case 'q':					//Ręczne zakończenie aplikacji
-            case EOF:					//Systemowe zakończenie aplikacji (Close w MSWin, Ctrl-C wX11)
+            case 's':std=!std;break;	//Echo on console on/off
+            case 'q':					//Manual code at application termination
+            case EOF:					//System application termination (Close in MSWin, Ctrl-C in X11 or closing the window)
                 cont=0;
+                break;
+            default:
                 break;
             }
 
-            i=0;//Reset promienia okręgu
-            if(std)//Implementacja echa
+            i=0; //Resetting the circle radius
+            if(std) //Implementing command echoing on the console
             {
                 printf("stdout<<%c\n",tab);
                 fflush(stdout);
@@ -102,20 +107,24 @@ int main(int argc,const char* argv[])
                    34,255,"%c",tab);
         }
 
-        //Róbmy swoje!!!
+        //Let's keep doing our thing!!!
         fill_circle(xpos,ypos,(i%256+2)/2,i%256);
         i++;
         flush_plot();
     }
 
-    //Zakończenie działania aplikacji
+    //Terminating this application
     close_plot();
-    printf("Do widzenia!!!\n");
+    printf("Do widzenia!!! / Goodbye!!!\n");
     return 0;
 }
-/********************************************************************/
-/*              SYMSHELLLIGHT  version 2021-11-19                   */
-/********************************************************************/
+
+/// For close_plot() - maybe also linked from the library with default value "0".
+int WB_error_enter_before_clean=0;
+
+/* **************************************************************** */
+/*                  SYMSHELLLIGHT  version 2026                     */
+/* **************************************************************** */
 /*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
 /*            W O J C I E C H   B O R K O W S K I                   */
 /*    Instytut Studiów Społecznych Uniwersytetu Warszawskiego       */
@@ -123,4 +132,4 @@ int main(int argc,const char* argv[])
 /*    GITHUB: https://github.com/borkowsk                           */
 /*                                                                  */
 /*                               (Don't change or remove this note) */
-/********************************************************************/
+/* **************************************************************** */

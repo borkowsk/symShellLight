@@ -9,19 +9,19 @@
  *                  `libx11-dev` i `libxpm-dev`                         *
  *                                                                      *
  * \author W.Borkowski from University of Warsaw                        *
- * 	- https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI       *
- * 	- https://github.com/borkowsk                                   *
+ * 	- https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI           *
+ * 	- https://github.com/borkowsk                                       *
  *                                                                      *
  *      File changed massively: 21.10.2020                              *
- * @date 2026-02-02 (last modifications)                                *
+ * @date 2026-02-16 (last modifications)                                *
  * \note                                                                *
- *  WCIĄŻ Z BŁĘDEM NA EXPOSE! TODO , choć raz go już gdzieś usunąłem    *
+ *  WCIĄŻ Z BŁĘDEM NA EXPOSE! TODO, choć raz go już gdzieś usunąłem     *
  *                                                                      *
  ************************************************************************
  *                           SYMSHELLLIGHT                              *
  ************************************************************************
  */
-/// @date 2026-02-02 (last modifications)
+/// @date 2026-02-16 (last modifications)
 
 
 #include <stdlib.h>
@@ -33,7 +33,7 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/Xos.h>
-#include <X11/Xatom.h>
+//#include <X11/Xatom.h>
 
 #include "symshell.h"
 #include "icon.h"
@@ -52,10 +52,13 @@
 #define NULL __null
 #endif
 
+#define UNUSED_ATTR_ __attribute__((unused))
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+UNUSED_ATTR_
 const char *_ssh_grx_module_name="SVG";
 
 /** Maska poziomów śledzenia 1-msgs 2-grafika 3-grafika detaliczna 4-alokacje/zwalnianie */
@@ -74,13 +77,13 @@ const char *_ssh_grx_module_name="SVG";
 /** Domyślna nazwa programu, okna i ikony */
  static char            progname[1024]="WB SIMULATION NAME NOT SET";
 /** Domyślna nazwa okna */
- static char            window_name[1024] = "WB-sym-shell";//"WB X-window simulation shell";
+ static char            window_name[1024] = "WB-sym-shell"; /* "WB X-window simulation shell" */
 /** Domyślna nazwa ikony */
  static char            icon_name[1024] = "WB-sym-shell";
 
 /** Zmienne do zapamiętania wskaźników przekazanych przez funkcje setup*/
- static unsigned        largc=0;            /**< liczna parametrów wywołania */
- static const char**    largv=NULL;         /**< wartości parametrów wywołania */
+ static unsigned        largc=0;            /**< Liczba parametrów wywołania */
+ static const char**    largv=NULL;         /**< Wartości parametrów wywołania */
 
 /** Parametry z inicjalizacji modułu (shell setup) */
  static int             isbuffered=0;       /**< Czy okno jest buforowane mapą pikseli? */
@@ -90,24 +93,25 @@ const char *_ssh_grx_module_name="SVG";
 
  /* These are used as arguments to nearly every Xlib routine, so it
    * saves routine arguments to declare them global; if there were
-   * additional source files, they would be declared extern there */
- static Display         *display=0; /* HANDLER TO Display */
- static int             screen_num; /* SCREEN NUMBER */
- static char            *display_name = NULL;/* Display name. To be read. */
- static unsigned int    display_width=0;   /* Will be filled during initialization */
- static unsigned int    display_height=0;  /* Will be filled during initialization */
- static XSizeHints      *size_hints;       /* To jest jeszcze gdzieś używane poza init_plot() Chyba do resize? TODO? */
+   * additional source files, they would be declared `extern` there */
+ static Display         *display=0; /**< HANDLER TO Display */
+ static int             screen_num; /**< SCREEN NUMBER */
+ static char            *display_name = NULL;      /**< Display name. To be read. */
+ static unsigned int    display_width=0;           /**< Will be filled during initialization */
+ static unsigned int    display_height=0;          /**< Will be filled during initialization */
+ static XSizeHints      *size_hints;               /**< To jest jeszcze gdzieś używane poza init_plot() Chyba do resize? TODO? */
 
- static unsigned int    mulx=1,muly=1;             /* Multiplication of x & y */
- static unsigned int    org_width,org_height;      /* Starting Window size */
- static int             ini_a,ini_b,ini_ca,ini_cb; /* Konieczne do działania */
-                                                   /* screen_width() i screen_height() i zmiany rozmiaru */
+ static unsigned int    mulx=1,muly=1;             /**< Multiplication of x & y */
+ static unsigned int    org_width,org_height;      /**< Starting Window size */
+ static int             ini_a,ini_b,ini_ca,ini_cb; /**< Konieczne do działania */
+                                                   /**< `screen_width()` i `screen_height()` i zmiany rozmiaru */
 
- static Window          win;               /* HANDLER TO MAIN WINDOW */
-        XID             _ssh_window=0;     /* Handler for check and external use */
+UNUSED_ATTR_
+        XID             _ssh_window=0;     /**< Handler for check and external use */
+ static Window          win;               /**< HANDLER TO MAIN WINDOW */
 
- static unsigned int    width,height;      /* Window size */
- static int             iniX, iniY;        /* Window position */
+ static unsigned int    width,height;      /**< Window size */
+ static int             iniX, iniY;        /**< Window position */
 
  /* For transparencies to work use: */
  //#define CREATE_FULL_WINDOW 32 TODO CHECK?
@@ -116,29 +120,32 @@ const char *_ssh_grx_module_name="SVG";
 #else
  static unsigned int    default_depth = 24;         /**< CURRENTLY 24bit deph WORK, BUT 32 NOT (TODO!) */
 #endif
- static unsigned int    border_width = 4;           /* Four pixels margin */
- static int             window_size = TOO_SMALL;    /* BIG_ENOUGH or TOO_SMALL to display contents */
+ static unsigned int    border_width = 4;           /**< Four pixels margin */
+ static int             window_size = TOO_SMALL;    /**< BIG_ENOUGH or TOO_SMALL to display contents */
 
- static unsigned int    icon_width, icon_height;    /* the height and width of the program icon */
- static Pixmap          icon_pixmap;       /* program icon handle */
+UNUSED_ATTR_
+ static unsigned int    icon_width, icon_height;    /**< the height and width of the program icon */
+ static Pixmap          icon_pixmap;                /**< program icon handle */
 
- static unsigned short  alloc_cont=0;      /* Flag that pixmap has been allocated */
- static Pixmap          cont_pixmap=0;     /* Handle for pixmap replacing / mirroring a window */
+ static unsigned short  alloc_cont=0;               /**< Flag that pixmap has been allocated */
+ static Pixmap          cont_pixmap=0;              /**< Handle for pixmap replacing / mirroring a window */
 
  static XTextProperty    windowName;
  static XTextProperty    iconName;
 
- static GC               gc=NULL;          /* GRAPHIC CONTEXT */
+ static GC               gc=NULL;                   /**< GRAPHIC CONTEXT */
 
  /* FONT */
- static int              ResizeFont=0;     /* Czy spróbuje zmieniać rozmiar fontu. TODO? */
- static XFontStruct     *font_info=NULL;   /* Current font */
+ static int              ResizeFont=0;              /**< Czy spróbuje zmieniać rozmiar fontu. TODO? */
+ static XFontStruct     *font_info=NULL;            /**< Current font */
  static unsigned         ori_font_width = 8;
  static unsigned         ori_font_height = 16;
  static unsigned         font_width = 0;
  static unsigned         font_height = 0;
 
+UNUSED_ATTR_
 const char* event_name(int code);
+UNUSED_ATTR_
 const char* get_xevent_name(int type);
 
  /* REPAINT DATA */
@@ -146,13 +153,15 @@ const char* get_xevent_name(int type);
      int x,y,width,height;
  } last_repaint_data;
 
- static int             repaint_flag=0;     /* Trzeba odrysować? */
+ static int             repaint_flag=0;            /**< Czy trzeba odrysować? */
 
  /* TŁO */
- static unsigned long   Black,White;
+ static unsigned long   Black;
+UNUSED_ATTR_
+ static unsigned long   White;                     /**< NIE UŻYWANE??? */
  static Colormap        colormap=0;
- static int             CurrForeground=-1; /* Index to last set color */
- static unsigned        bacground=0;       /* Index koloru tla */
+ static int             CurrForeground=-1;         /**< Index to last set color. */
+ static unsigned        CurrBackground=0;          /**< Index koloru tła. */
 
  /* PALETA */
  static unsigned        NumberOfColors=512; /* ??? */
@@ -160,21 +169,22 @@ const char* get_xevent_name(int type);
  static unsigned long   PenColor=-1;
  static unsigned long   BrushColor=-1;
  static XColor          ColorArray[512];
- static void SetScale(XColor RGBarray[512]); /* Ustawianie kolorów */
+ static void SetScale(XColor RGBarray[512]);      /**< Ustawianie RGB kolorów indeksowanych. */
 
  /* Parametry rysowania */
- static unsigned        default_line_width=2; /* grubość linii */
- static int             transparent_print=0;  /* czy napisy transparentne */
- static int             pieMode=-1;           /* Tryb wypełniania fragmentu okręgu lub elipsy */
+ static unsigned        default_line_width=2;     /**< Grubość linii. */
+ static int             transparent_print=0;      /**< Czy napisy transparentne... */
+ static int             pieMode=-1;               /**< Tryb wypełniania fragmentu okręgu lub elipsy. */
 
  /* Wejście znakowe? */
- static KeySym           thekey;
- static int              buforek[2]; /* Bufor na znaki z klawiatury. Tylko zerowy znak jest przekazywany */
- //static char bfirst=0;             /* Zmienne na implementacje cykliczną bufora */
- //static char blast=0;              /* aktualnie nie używane... */
+ static KeySym           theKeyXID;
+ static int              buforek[2];            /**< Bufor na znaki z klawiatury. Tylko zerowy znak jest przekazywany */
 
- /* Wejście myszowe? */
- static int              mouse=0;
+ //static char bfirst=0;             /*< Zmienne na implementacje cykliczną bufora */
+ //static char blast=0;              /*< aktualnie nieużywane... */
+
+ /** Czy sprawdzamy wejście myszy? */
+ static int              use_mouse=0;
 
  static
  struct { int  flags, x, y;
@@ -182,12 +192,12 @@ const char* get_xevent_name(int type);
 
  /* OBSŁUGA SYGNAŁÓW */
  const  int             error_limit=3;             /**< Limit odesłanych błędów od x-serwera */
- static int             error_count=3;             /* antylicznik błędów. Gdy osiąga 0 - koniec programu */
+ static int             error_count=3;             /**< Antylicznik błędów. Gdy osiąga 0 - koniec programu */
+UNUSED_ATTR_
+ static int             DelayAction=0;             /**< Sterowanie zasypianiem, jeśli program czeka. NIEUŻYWANE. TODO? */
+ static int             pipe_break=0;              /**< Informacja o zerwaniu połączenia z X serwerem */
 
- static int             DelayAction=0;             /* Sterowanie zasypianiem, jeśli program czeka */
- static int             pipe_break=0;              /* Informacja o zerwaniu połączenia z X serwerem */
-
- /// Default signal handler.
+ /** Default signal handler. */
  void SigPipe(int num)
  {
      pipe_break=1;
@@ -197,8 +207,8 @@ const char* get_xevent_name(int type);
      exit(num);
  }
 
- /// Default X IO handler.
- /// \warning TODO: How to distinguish X11 network error from window shutdown?
+ /** Default X IO handler.
+  * \warning TODO: How to distinguish X11 network error from the window shutdown? */
  int MyXIOHandler(Display* d)
  /*
     int (*XSetIOErrorHandler(handler))()
@@ -212,17 +222,17 @@ const char* get_xevent_name(int type);
     Note that the previous error handler is returned.
   */
  {
-     pipe_break=1; //Process finished with after window close should be treated as normal situation!
+     pipe_break=1; /* Process finished with after window close should be treated as normal situation! */
 
      fprintf(stderr,"\nX11-SYMSHELL GOT A IOError\n");
      XSetIOErrorHandler(NULL); /* Kasowanie dotychczasowej funkcji obsługi błędów z wywołania XSetIOErrorHandler(MyXIOHandler); */
-     exit( 0 ); //-11);//245 was my choice??? !!!
+     exit( -1 );         /* 245 was my choice??? !!! */
 
      return -11;
  }
 
- /// Default X Error handler.
- /// \return 0 or never return because of exit() call.
+ /** Default X Error handler.
+  * \return 0 or never return because of exit() call. */
  int MyErrorHandler(Display *xDisplay, XErrorEvent *event)
  {
      char buf[80];
@@ -246,6 +256,7 @@ const char* get_xevent_name(int type);
  }
 
 /** Włącza drukowanie tekstu bez zamazywania tla. Zwraca stan poprzedni. */
+UNUSED_ATTR_
  int print_transparently(int yes)
  {
      int ret=transparent_print;
@@ -254,6 +265,7 @@ const char* get_xevent_name(int type);
  }
 
 /** Czy symulować niezmienność rozmiarów okna. */
+UNUSED_ATTR_
  void fix_size(int Yes)
  {
      if(ssh_trace_level)
@@ -262,29 +274,33 @@ const char* get_xevent_name(int type);
 
 /** Ustala czy mysz ma być obsługiwana.
    \details W X11 zawsze jest, ale można ją ignorować. */
+UNUSED_ATTR_
  int mouse_activity(int yes)
  {
-     int pom=mouse;
-     mouse=yes;
+     int pom=use_mouse;
+     use_mouse=yes;
      return pom;
  }
 
 /** Zwraca aktualny kolor tła — nowa wersja. */
+UNUSED_ATTR_
  ssh_color background()
  {
-     return bacground;
+     return CurrBackground;
  }
 
 /** Ustala index koloru do czyszczenia okna itp. */
+UNUSED_ATTR_
  void set_background(ssh_color c)
  {
     if(c>=0 && c<=NumberOfColors)
-       bacground=c;
+        CurrBackground=c;
     else
-       bacground=0;
+        CurrBackground=0;
  }
 
 /** Ustala czy ma być buforowanie okna. */
+UNUSED_ATTR_
 void buffering_setup(int _n)
 {
     if(_n)
@@ -296,6 +312,7 @@ void buffering_setup(int _n)
  }
 
  /** Podaje, czy jest buforowanie. */
+UNUSED_ATTR_
  unsigned get_buffering()
  {
      return animate;
@@ -332,7 +349,7 @@ void buffering_setup(int _n)
      {
          XFreePixmap(display,cont_pixmap);
          if(ssh_trace_level)
-             fprintf(stderr,"X11: %s %lx\n","FREE PIXMAP",cont_pixmap);//??? xl?
+             fprintf(stderr,"X11: %s %lx\n","FREE PIXMAP",cont_pixmap);
          cont_pixmap=0;
      }
 
@@ -388,19 +405,19 @@ void close_plot()
             }
 
             if(!pipe_break)
-                get_char();//X window
+                get_char(); /* From X window */
             else
             {
                 fprintf(stderr,"Window \"%s\" closed. PRESS ENTER\n",window_name);
                 fflush(stderr);
-                getchar();//Console
+                getchar(); /* From stdio */
             }
 
 
             WB_error_enter_before_clean=0;
         }
 
-        //CLOSE:
+        /* CLOSING: */
         CloseAll();
         fflush(stderr);
         fflush(stdout);
@@ -520,20 +537,20 @@ static void _read_XInput()
     }
 
     /* Get events, use first to display text and graphics
-     *    display 	Specifies the connection to the X server.
-     *    event_return 	Returns the next event in the queue.
+     *    display - specifies the connection to the X server.
+     *    event_return - returns the next event in the queue.
      * The XNextEvent() function copies the first event from the event queue into the specified
      * XEvent structure and then removes it from the queue. If the event queue is empty,
      * XNextEvent() flushes the output buffer and _b_l_o_c_k_s_ until an event is received.
      * See: https://tronche.com/gui/x/xlib/event-handling/manipulating-event-queue/XNextEvent.html */
     int ret=0;
-    GET_AGAIN:
+    GET_AGAIN: //TODO BO TO NIE TAKIE PROSTE...
     ret=XNextEvent(display, &report);
     if(ret<0)
         fprintf(stderr,"XNextEvent has retuned error code: %i\n",ret);
 
     switch  (report.type) {
-    case NoExpose: //To nie wymaga żadnej obsługi.
+    case NoExpose: /* To nie wymaga żadnej obsługi. */
             delay_ms(1);
             //goto GET_AGAIN; /* Nic się nie zmieniło... TODO SPRYTNE ALE ROBI PROBLEM*/
             break;
@@ -557,7 +574,7 @@ static void _read_XInput()
             _tooSmall(win, gc, font_info);
         else
         {
-            XSetForeground(display, gc, Scale[bacground]);
+            XSetForeground(display, gc, Scale[CurrBackground]);
             CurrForeground=-1;
 
             XFillRectangle(display,win , gc,
@@ -649,7 +666,7 @@ static void _read_XInput()
             mulx=(width-ini_ca*font_width)/ini_a;
             muly=(height-ini_cb*font_height)/ini_b;
 
-            if(mulx<=0) mulx=1;//Gdy ekran przymusowo zmniejszony
+            if(mulx<=0) mulx=1; /* Gdy ekran przymusowo zmniejszony */
             if(muly<=0) muly=1;
 
             load_font(&font_info,&gc); /* New font - size changed */
@@ -667,7 +684,7 @@ static void _read_XInput()
 
     case ButtonPress:
         DelayAction=0; /* Pojawiła się aktywność. Nie należy spać! */
-        if(mouse)
+        if(use_mouse)
         {
             buforek[0]='\b';
             LastMouse.flags=1;
@@ -683,7 +700,7 @@ static void _read_XInput()
     case KeyPress:
     {
         char Bufor[8];
-        unsigned KeyCount=XLookupString((XKeyEvent *)&report,Bufor,sizeof(buforek),&thekey,0);
+        unsigned KeyCount=XLookupString((XKeyEvent *)&report, Bufor, sizeof(buforek), &theKeyXID, 0);
         DelayAction=0;/* Pojawiła się aktywność. Nie należy spać! */
 
         *buforek=*Bufor;/* Na zewnątrz widziane w zmiennej "buforek" */
@@ -736,7 +753,7 @@ static void _read_XInput()
 /** Tworzy Graphics Contex. */
 static void makeGC(Window win,GC* gc,XFontStruct* font_info)
 {
-    //XColor pom;//??? TODO
+    //XColor pom;//??? TODO?
     unsigned long valuemask = 0,i; /* Ignore XGCvalues and
                                     * use defaults */
     XGCValues values;
@@ -744,14 +761,16 @@ static void makeGC(Window win,GC* gc,XFontStruct* font_info)
     int line_style = LineOnOffDash;
     int cap_style = CapRound;
     int join_style = JoinRound;
-    //int dash_offset = 0;
-    //static char dash_list[] = {12, 24};
-    //int list_length = 2;
+    /*
+     int dash_offset = 0;
+     static char dash_list[] = {12, 24};
+     int list_length = 2;
+     */
 
     /* Create default Graphics Context */
     *gc = XCreateGC(display, win, valuemask, &values);
 
-    /* Specify black foreground since default window background
+    /* Specify black foreground since a default window background
      * is white and default foreground is undefined */
     Black=BlackPixel(display,screen_num);
     White=WhitePixel(display,screen_num);
@@ -773,11 +792,11 @@ static void makeGC(Window win,GC* gc,XFontStruct* font_info)
     BrushColor=-1;
 
     // TODO (borkowsk#1#): W tej chwili działa tylko na "wyświetlaczach" TRUE COLOR.
-    //Cała część na wyświetlacze o mniejszej głębi wymaga poprawienia i przetestowania,
-    //choć kiedyś działała poprawnie na 256 kolorach - ale to było prze 2000 rokiem!
-    /*
+    /* Cała część na wyświetlacze o mniejszej głębi wymaga poprawienia i przetestowania,
+     * choć kiedyś działała poprawnie na 256 kolorach - ale to było prze 2000 rokiem!
+
 #ifdef __MSDOS__
-    colormap=XDefaultColormap(display,screen_num); //* W tej emulacji nie ma map
+    colormap=XDefaultColormap(display,screen_num); * W tej emulacji nie ma map *
 #else
     colormap=XCreateColormap(display,win,DefaultVisual(display,screen_num),AllocNone);
 #endif
@@ -831,7 +850,7 @@ void shell_setup(const char* title,int iargc,const char* iargv[])
     largc=iargc;
     largv=iargv;
 
-    strncpy(progname,largv[0],1024);//TODO TEST
+    strncpy(progname,largv[0],1024); /* TODO TEST! */
     strncpy(window_name, title, 1024);
     strncpy(icon_name, title,1024);
 
@@ -849,7 +868,7 @@ void shell_setup(const char* title,int iargc,const char* iargv[])
                            "\n\t -gray[+/-] "
                            "\n");
             fprintf(stderr,"You can always gracefully break the program sending\n"
-                           " the  ^C  or  ^D  key	 to  g_r_a_p_h_i_c_s  w_i_n_d_o_w !\n"
+                           " the  ^C  or  ^D  key  to  g_r_a_p_h_i_c_s  w_i_n_d_o_w !\n"
                            "Other methods break the program immediately by exit call!\n");
             exit(-1);
         }
@@ -885,7 +904,7 @@ void shell_setup(const char* title,int iargc,const char* iargv[])
                             if(strncmp(largv[i],"-bestfont",9)==0)
                             {
                                 ResizeFont=(largv[i][9]=='+')?1:0;
-                                fprintf(stderr,"Search best font is %s\n",(ResizeFont?"ON":"OFF"));
+                                fprintf(stderr,"Search of the best font is %s\n",(ResizeFont?"ON":"OFF"));
                             }
                             else
                                 if(strncmp(largv[i],"-traceevt",9)==0)
@@ -897,39 +916,41 @@ void shell_setup(const char* title,int iargc,const char* iargv[])
 }
 
 /** Właściwa dla platformy inicjacja grafiki/semigrafiki/grafiki wirtualnej. */
-ssh_stat init_plot(ssh_natural a,ssh_natural b,ssh_natural ca,ssh_natural cb)
-{
-    int* disp_depht;
-    int  disp_depht_num=0,i;
-    int real_font_width=0;
+ssh_stat init_plot(ssh_natural a,ssh_natural b,ssh_natural ca,ssh_natural cb) {
+    int *disp_depht;
+    int disp_depht_num = 0, i;
+    int real_font_width = 0;
     XSetWindowAttributes attrs;
-    ini_a=a;
-    ini_b=b;
-    ini_ca=ca;
-    ini_cb=cb;
+    ini_a = a;
+    ini_b = b;
+    ini_ca = ca;
+    ini_cb = cb;
 
-    XWMHints        *wm_hints;
-    XClassHint      *class_hints;
+    XWMHints *wm_hints;
+    XClassHint *class_hints;
 
     if (!(size_hints = XAllocSizeHints())) {
-       fprintf(stderr, "X11: %s: failure allocating memory", progname);
-         exit(-2);  return 0;
+        fprintf(stderr, "X11: %s: failure allocating memory", progname);
+        exit(-2);
+        return 0;
     }
     if (!(wm_hints = XAllocWMHints())) {
-       fprintf(stderr, "X11: %s: failure allocating memory", progname);
-         exit(-2);  return 0;
+        fprintf(stderr, "X11: %s: failure allocating memory", progname);
+        exit(-2);
+        return 0;
     }
     if (!(class_hints = XAllocClassHint())) {
-       fprintf(stderr, "X11: %s: failure allocating memory", progname);
-         exit(-2); return 0;
+        fprintf(stderr, "X11: %s: failure allocating memory", progname);
+        exit(-2);
+        return 0;
     }
 
     /* Connect to X server */
-    if ( (display=XOpenDisplay(display_name)) == NULL )
-    {
-       fprintf( stderr, "X11: '%s': cannot connect to X server '%s'\n",
-             progname, XDisplayName(display_name));
-       exit( -1 );  return 0;
+    if ((display = XOpenDisplay(display_name)) == NULL) {
+        fprintf(stderr, "X11: '%s': cannot connect to X server '%s'\n",
+                progname, XDisplayName(display_name));
+        exit(-1);
+        return 0;
     }
 
     /* Get screen size from display structure macro */
@@ -937,122 +958,121 @@ ssh_stat init_plot(ssh_natural a,ssh_natural b,ssh_natural ca,ssh_natural cb)
     display_width = DisplayWidth(display, screen_num);
     display_height = DisplayHeight(display, screen_num);
 
-    if(ssh_trace_level)
-    {
-        fprintf(stderr,"X11: Screen: %u x %u ; %u\n",display_width,display_height,screen_num);
+    if (ssh_trace_level) {
+        fprintf(stderr, "X11: Screen: %u x %u ; %u\n", display_width, display_height, screen_num);
     }
 
     disp_depht = XListDepths(display, screen_num, &disp_depht_num);
 
-    if(ssh_trace_level)
-    {
-        fprintf(stderr,"X11: Available display depths:");
-    	for(i=0;i<disp_depht_num;i++)
-    		fprintf(stderr,"%d ",disp_depht[i]);
-        fprintf(stderr," Preferred depth:%d\n",default_depth);
+    if (ssh_trace_level) {
+        fprintf(stderr, "X11: Available display depths:");
+        for (i = 0; i < disp_depht_num; i++)
+            fprintf(stderr, "%d ", disp_depht[i]);
+        fprintf(stderr, " Preferred depth:%d\n", default_depth);
     }
 
     /* Search for depht */
-    for(i=0;i<disp_depht_num;i++)
-        if(disp_depht[i]>=default_depth)
-        {
-            default_depth=disp_depht[i];/*Pierwszy >= wymaganemu */
+    for (i = 0; i < disp_depht_num; i++)
+        if (disp_depht[i] >= default_depth) {
+            default_depth = disp_depht[i];/*Pierwszy >= wymaganemu */
             break;
         }
 
-    //default_deph=32;//??? NOT WORK! WHY???
+    //default_deph=32; //??? NOT WORK! WHY??? TODO!
 
-   if(ssh_trace_level)
-        fprintf(stderr,"X11: Select depth %d\n",default_depth);
+    if (ssh_trace_level)
+        fprintf(stderr, "X11: Select depth %d\n", default_depth);
 
     /* Note that in a real application, x and y would default
      * to 0 but would be settable from the command line or
      * resource database */
-   org_width = width = a+ca*ori_font_width;
-   org_height = height = b+cb*ori_font_height;
-   if(ScreenClip)
-   {
-       if(width>display_width)
+    org_width = width = a + ca * ori_font_width;
+    org_height = height = b + cb * ori_font_height;
+    if (ScreenClip) {
+        if (width > display_width)
             org_width = width = display_width;
-       if(height>display_height)
+        if (height > display_height)
             org_height = height = display_height;
-   }
+    }
 
-   iniX=iniY=0;
+    iniX = iniY = 0;
 
-   if(ssh_trace_level)
-        fprintf(stderr,"X11: %s=%dx%d\n",icon_name,width,height);
-   fflush(stderr);
+    if (ssh_trace_level)
+        fprintf(stderr, "X11: %s=%dx%d\n", icon_name, width, height);
+    fflush(stderr);
 
-   XSetErrorHandler(MyErrorHandler);
+    XSetErrorHandler(MyErrorHandler);
 
- /* Create opaque window */
- #ifdef CREATE_FULL_WINDOW
- {
-   //It work strange - backgrpound of window is transparent!
-   //https://stackoverflow.com/questions/3645632/how-to-create-a-window-with-a-bit-depth-of-32
+    /* Create an opaque window */
+#ifdef CREATE_FULL_WINDOW
+    {
+      /* It work strange - backgrpound of window is transparent!
+      https://stackoverflow.com/questions/3645632/how-to-create-a-window-with-a-bit-depth-of-32
 
-   int i,nxvisuals = 0;
-   XVisualInfo  vinfo;
-   XVisualInfo *visual_list;
-   XVisualInfo  visual_template;
-   Visual      *visual;
-   Window       parent;
-   visual_template.screen = DefaultScreen(display);
-   visual_list = XGetVisualInfo (display, VisualScreenMask, &visual_template, &nxvisuals);
-   //for (i = 0; i < nxvisuals; ++i)
-   //    fprintf(stderr,"X11: %3d: visual 0x%lx class %d (%s) depth %d\n",
-   //           i,visual_list[i].visualid,visual_list[i].class,
-   //           visual_list[i].class == TrueColor ? "TrueColor" : "unknown",visual_list[i].depth);
+      int i,nxvisuals = 0;
+      XVisualInfo  vinfo;
+      XVisualInfo *visual_list;
+      XVisualInfo  visual_template;
+      Visual      *visual;
+      Window       parent;
+      visual_template.screen = DefaultScreen(display);
+      visual_list = XGetVisualInfo (display, VisualScreenMask, &visual_template, &nxvisuals);
+      /// for (i = 0; i < nxvisuals; ++i)
+      ///    fprintf(stderr,"X11: %3d: visual 0x%lx class %d (%s) depth %d\n",
+      ///           i,visual_list[i].visualid,visual_list[i].class,
+      ///           visual_list[i].class == TrueColor ? "TrueColor" : "unknown",visual_list[i].depth);
 
-   if (!XMatchVisualInfo(display, XDefaultScreen(display), 32, TrueColor, &vinfo))
-     {
-       fprintf(stderr, "X11: no such visual\n");
-       return 0;
-     }
-     else
-     fprintf(stderr,"X11:Matched visual 0x%lx class %d (%s) depth %d\n",
-              vinfo.visualid,vinfo.class,
-              vinfo.class == TrueColor ? "TrueColor" : "unknown",vinfo.depth);
+      if (!XMatchVisualInfo(display, XDefaultScreen(display), 32, TrueColor, &vinfo))
+        {
+          fprintf(stderr, "X11: no such visual\n");
+          return 0;
+        }
+        else
+        fprintf(stderr,"X11:Matched visual 0x%lx class %d (%s) depth %d\n",
+                 vinfo.visualid,vinfo.class,
+                 vinfo.class == TrueColor ? "TrueColor" : "unknown",vinfo.depth);
 
-   parent = XDefaultRootWindow(display);
-   XSync(display, True);
+      parent = XDefaultRootWindow(display);
+      XSync(display, True);
 
-   visual = vinfo.visual;
-   default_depth = vinfo.depth;
-   attrs.background_pixel = 0xff000000;//0;//BlackPixel(display, screen_num);???
-   attrs.border_pixel = 0;
-   attrs.colormap = XCreateColormap(display, XDefaultRootWindow(display), visual, AllocNone);
+      visual = vinfo.visual;
+      default_depth = vinfo.depth;
+      attrs.background_pixel = 0xff000000;//0;//BlackPixel(display, screen_num);???
+      attrs.border_pixel = 0;
+      attrs.colormap = XCreateColormap(display, XDefaultRootWindow(display), visual, AllocNone);
 
-   win = XCreateWindow(display,
-            parent,
-            iniX, iniY, width, height,
-            border_width,
-            default_depth        /* Window deph */,
-            InputOutput          /* WindowClass*/,
-            visual               /* Visual */,
-            CWBackPixel | CWBorderPixel | CWColormap  /* Valuemask */,
-            &attrs                   /* Atributes */
-	 	);
-   XSync(display, True);
-
-   }
- #else
+      win = XCreateWindow(display,
+               parent,
+               iniX, iniY, width, height,
+               border_width,
+               default_depth        /* Window deph */,
+               InputOutput          /* WindowClass*/,
+               visual               /* Visual */,
+               CWBackPixel | CWBorderPixel | CWColormap  /* Valuemask */,
+               &attrs                   /* Atributes */
+            );
+      XSync(display, True);
+       */
+      }
+#else
     win = XCreateSimpleWindow(display,
-                            RootWindow(display,screen_num),
-                            iniX, iniY, width, height, border_width,
-                            BlackPixel(display, screen_num),
-                            WhitePixel(display, screen_num)
-                );
+                              RootWindow(display, screen_num),
+                              iniX, iniY, width, height, border_width,
+                              BlackPixel(display, screen_num),
+                              WhitePixel(display, screen_num)
+    );
     XSync(display, True);
- #endif
+#endif
 
-    if(win!=0)
-        window_size = BIG_ENOUGH ;
-    else //Czy to się w ogóle ma szansę zdarzyć? Raczej wyleci wcześniej na błędzie?!
-        fprintf( stderr, "X11: %s: Window not created! ", progname);
+    if (win != 0)
+        window_size = BIG_ENOUGH;
+    else /* Czy to się w ogóle ma szansę zdarzyć? Raczej wyleci wcześniej na błędzie?! A może nie? */
+    {
+        fprintf(stderr, "X11: %s: Window not created! ", progname);
+        exit(-2);
+    }
 
-    /* Get available icon sizes from window manager and create appropriate bitmap */
+    /* Get available icon sizes from window manager and create the appropriate bitmap */
     {   int              count;
         XIconSize       *size_list=NULL;
         if((XGetIconSizes(display, RootWindow(display,screen_num),&size_list, &count) == 0)  && ssh_trace_level )
@@ -1061,12 +1081,11 @@ ssh_stat init_plot(ssh_natural a,ssh_natural b,ssh_natural ca,ssh_natural cb)
                              "icon sizes - using default.\n", progname);
          }
         else {
-           ;
            /* A real application would search through size_list
             * here to find an acceptable icon size and then
             * create a pixmap of that size; this requires that
             * the application have data for several sizes of icons */
-            //...
+
             // WB_icon_bitmap_bits=;WB_icon_bitmap_width=;WB_icon_bitmap_height=;
             /* Create pixmap of depth 1 (bitmap) for icon */
             if(size_list!=NULL) XFree(size_list);
@@ -1087,16 +1106,16 @@ ssh_stat init_plot(ssh_natural a,ssh_natural b,ssh_natural ca,ssh_natural cb)
     /* These calls store window_name and icon_name into
      * XTextProperty structures and set their other fields
      * properly */
-    char* ptrName=window_name;// TODO CHECK!>!>!>
-    if ((XStringListToTextProperty(&ptrName, 1, &windowName) == 0) )// && ssh_trace_level )
+    char* ptrName=window_name; /** TODO CHECK!!! */
+    if ((XStringListToTextProperty(&ptrName, 1, &windowName) == 0) ) // && ssh_trace_level (TODO???)
     {
         fprintf( stderr, "X11: %s: structure allocation for "
                                "windowName failed.\n", progname);
        exit(-1);return 0;
     }
 
-    ptrName=icon_name;// TODO CHECK - icon is epty now!!!
-    if ((XStringListToTextProperty(&ptrName, 1, &iconName) == 0) )// && ssh_trace_level )
+    ptrName=icon_name; /** TODO CHECK - icon is empty now, but because of new windows managers probably */
+    if ((XStringListToTextProperty(&ptrName, 1, &iconName) == 0) ) // && ssh_trace_level (TODO???)
     {
         fprintf( stderr, "X11: %s: structure allocation for "
                          "iconName failed.\n", progname);
@@ -1132,14 +1151,14 @@ ssh_stat init_plot(ssh_natural a,ssh_natural b,ssh_natural ca,ssh_natural cb)
      */
     class_hints->res_name = progname;
     class_hints->res_class = "ssh_win";
-    //void XSetWMProperties(display, w, window_name, icon_name, argv, argc, normal_hints, wm_hints, class_hints);
+    /* HELP: void XSetWMProperties(display, w, window_name, icon_name, argv, argc, normal_hints, wm_hints, class_hints);*/
     XSetWMProperties( display, win,
                       &windowName,
                       &iconName,
-                      (char**)largv,largc,//Without cast is "passing argument 5 from incompatible pointer type" expected non const!!!
+                      (char**)largv,largc,/* Without cast is "passing argument 5 from incompatible pointer type" expected non const!!! */
                       size_hints,
                       wm_hints,
-                      class_hints);    /* ERRORS MAY APPEAR LATER! */
+                      class_hints);    /* ERRORS MAY APPEAR LATER ON! */
 
     /* Select event types wanted */
     XSelectInput(display, win,
@@ -1174,26 +1193,32 @@ ssh_stat init_plot(ssh_natural a,ssh_natural b,ssh_natural ca,ssh_natural cb)
 
     /* Czyści, żeby wprowadzić ustalone tlo */
     if(ssh_trace_level>1)
-        fprintf(stderr,"X11: Background is %d\n",(int)bacground);
+        fprintf(stderr,"X11: Background is %d\n",(int)CurrBackground);
 
     clear_screen();
 
-    _ssh_window=win;//READY TO USE!
+    _ssh_window=win; /* HANDLER READY TO USE! */
     return 1;
 }
 
+/** Wysokość ekranu/okna. */
+UNUSED_ATTR_
 ssh_natural screen_height()
 {                                                                   assert(muly>0);
-   //return ini_b+(ini_cb*font_height)/muly;/* Window size */
+   //return ini_b+(ini_cb*font_height)/muly; /* Window size - OLD STYLE */
    return height/muly;
 }
 
+/** Szerokość ekranu/okna. */
+UNUSED_ATTR_
 ssh_natural screen_width()
 {                                                                   assert(mulx>0);
-    //return ini_a+(ini_ca*font_width)/mulx;/* Window size */
+    //return ini_a+(ini_ca*font_width)/mulx;/* Window size - OLD STYLE */
     return width/mulx;
 }
 
+/** Wysokość znaku. */
+UNUSED_ATTR_
 ssh_natural char_height(char znak)
 {                                                                   assert(muly>0);
     int pom=(font_height+muly)/muly;
@@ -1201,29 +1226,33 @@ ssh_natural char_height(char znak)
     return pom;
 }
 
+/** Szerokość znaku. */
+UNUSED_ATTR_
 ssh_natural  char_width(char znak)
 {
-    int width;
+    int calculated_width;
     char pom[2];
     pom[0]=znak; pom[1]='\0';                                       assert(mulx>0);
-    width=XTextWidth(font_info,pom, 1)/mulx;
+    calculated_width= XTextWidth(font_info, pom, 1) / mulx;
 
-    if(width<1) width=1;
+    if(calculated_width < 1) calculated_width=1;
 
-    return width;
+    return calculated_width;
 }
 
 /** Aktualne rozmiary łańcucha — wysokość. */
-/** \details ...potrzebne do jego pozycjonowania */
-/** wysokość jest LICZONA BARDZO PRYMITYWNIE, jako wysokość pierwszego znaku */
+/** \details Potrzebne do pozycjonowania tekstu. */
+/**          Wysokość jest LICZONA BARDZO PRYMITYWNIE, jako wysokość pierwszego znaku. */
+UNUSED_ATTR_
 ssh_natural  string_height(const char* str)
 {
     return char_height(*str); /* Pierwszy znak! */
 }
 
 /** Aktualne rozmiary łańcucha — długość. */
-/** \details ...potrzebne do jego pozycjonowania */
-/** szerokość liczona porządnie przez XTextWidth z Xlib */
+/** \details Potrzebne do pozycjonowania tekstu. */
+/**          Szerokość liczona porządnie przez XTextWidth z Xlib */
+UNUSED_ATTR_
 ssh_natural  string_width(const char* str)
 {
     int pom=XTextWidth(font_info,str,strlen(str))/mulx;
@@ -1232,6 +1261,7 @@ ssh_natural  string_width(const char* str)
 }
 
 /** Reconciliation of memory, queue and screen contents */
+UNUSED_ATTR_
 void flush_plot()
 {
     if(ssh_trace_level>1)
@@ -1239,7 +1269,7 @@ void flush_plot()
 
     if(!opened)
     {
-        fprintf(stderr,"X11: %s","SYMSHELL graphics not initialised or pipe broken");
+        fprintf(stderr,"X11: %s","SYMSHELL graphics aren't initialized or pipe broken");
         return;
     }
 
@@ -1268,6 +1298,7 @@ void flush_plot()
 static int first_to_read=0;
 
 /** Bardzo zależna od platformy funkcja sprawdzająca, czy jest jakieś wejście "z okna grafiki". */
+UNUSED_ATTR_
 int  input_ready()
 {
     if(first_to_read)
@@ -1280,7 +1311,7 @@ int  input_ready()
         return EOF;
     }
 
-    /* TODO: Można rozróżnić zdarzenia wymagające uwagi "użytkownika" od przetworzonych przez `_read_XInput` ! */
+    /* TODO: Można by rozróżnić zdarzenia wymagające uwagi "użytkownika" od przetworzonych przez `_read_XInput` ! */
     if(XPending(display)!=0) 	/* Sprawdzenie, czy nie ma zdarzeń */
     {			                /*SĄ JAKIEŚ!*/
         buforek[0]=NODATA; 	    /*Asekuranctwo ? */
@@ -1296,7 +1327,8 @@ int  input_ready()
     return 0;
 }
 
-/** Odesłanie znaku na wejście. Zwraca 0 jeśli nie ma miejsca. */
+/** Odesłanie znaku na wejście. Zwraca 0, jeśli nie ma miejsca. */
+UNUSED_ATTR_
 ssh_stat  set_char(int c)
 {
     if(first_to_read!=0)/* Nie odebrano */
@@ -1307,15 +1339,16 @@ ssh_stat  set_char(int c)
 }
 
 /** Odczytywanie znaków sterowania. */
+UNUSED_ATTR_
 int  get_char()
 {
-    int pom;
+    int input_to_ret;
 
     if(first_to_read!=0)
     {
-        int pom=first_to_read ;
+        input_to_ret=first_to_read ;
         first_to_read=0;
-        return pom;
+        return input_to_ret;
     }
 
     DelayAction=0;
@@ -1328,13 +1361,13 @@ int  get_char()
     }
 
     _read_XInput();
-    pom=buforek[0];
+    input_to_ret=buforek[0];
     buforek[0]=NODATA;
-    return pom;
+    return input_to_ret;
 }
 
 
-/* Used for redraw & in print */
+/* Used for redraw & in print functions */
 
 static char straznik1=0x77;
 static char bufor[1024];
@@ -1342,6 +1375,7 @@ static char straznik2=0x77;
 static int ox,oy;
 
 /** Wyprowadzenie tekstu na ekran (bw). */
+UNUSED_ATTR_
 void printbw(ssh_coordinate x,ssh_coordinate y,const char* format,...)
 {
     size_t len=0;
@@ -1361,7 +1395,7 @@ void printbw(ssh_coordinate x,ssh_coordinate y,const char* format,...)
         exit(-__LINE__);
     }
 
-    /* Print string in window */
+    /* Print string in the window */
     /* Need length for both XTextWidth and XDrawString */
     len = strlen(bufor);
 
@@ -1374,7 +1408,7 @@ void printbw(ssh_coordinate x,ssh_coordinate y,const char* format,...)
     /* Output text, centered on each line */
 
     x*=mulx; /* Multiplication of coordinates */
-    y*=muly; /* if window is bigger */
+    y*=muly; /* if the window is bigger */
 
     ox=x;oy=y;
     CurrForeground=-1;
@@ -1398,6 +1432,7 @@ void printbw(ssh_coordinate x,ssh_coordinate y,const char* format,...)
 }
 
 /** Wyprowadzenie tekstu na ekran (index colors). */
+UNUSED_ATTR_
 void printc(ssh_coordinate x,ssh_coordinate y,
             ssh_color fore,ssh_color back,
             const char* format,...)
@@ -1419,7 +1454,7 @@ void printc(ssh_coordinate x,ssh_coordinate y,
         exit(-__LINE__);
     }
 
-    /* Print string in window */
+    /* Print string in the window */
     /* Need length for both XTextWidth and XDrawString */
     len = strlen(bufor);
 
@@ -1432,7 +1467,7 @@ void printc(ssh_coordinate x,ssh_coordinate y,
     /* Output text, centered on each line */
 
     x*=mulx; /* Multiplication of coordinates */
-    y*=muly; /* if window is bigger */
+    y*=muly; /* if the window is bigger */
 
     ox=x;oy=y;
     CurrForeground=-1;
@@ -1456,6 +1491,7 @@ void printc(ssh_coordinate x,ssh_coordinate y,
 }
 
 /** Wyprowadzenie tekstu na ekran (default colors). */
+UNUSED_ATTR_
 void print_d(ssh_coordinate x,ssh_coordinate y,const char* format,...)
 {
     size_t len=0;
@@ -1475,7 +1511,7 @@ void print_d(ssh_coordinate x,ssh_coordinate y,const char* format,...)
         exit(-__LINE__);
     }
 
-    /* Print string in window */
+    /* Print string in the window */
     /* Need length for both XTextWidth and XDrawString */
     len = strlen(bufor);
 
@@ -1488,7 +1524,7 @@ void print_d(ssh_coordinate x,ssh_coordinate y,const char* format,...)
     /* Output text, centered on each line */
 
     x*=mulx; /* Multiplication of coordinates */
-    y*=muly; /* if window is bigger */
+    y*=muly; /* if the window is bigger */
 
     ox=x;oy=y;
 
@@ -1504,7 +1540,7 @@ void print_d(ssh_coordinate x,ssh_coordinate y,const char* format,...)
     }
     else
     {
-        XSetForeground(display, gc, Scale[bacground] );
+        XSetForeground(display, gc, Scale[CurrBackground] );
         if(!animate)
             XDrawImageString(display, win, gc, x , y+font_height ,  bufor, len);
         if(isbuffered)
@@ -1540,6 +1576,7 @@ unsigned long buildTransparentColor(unsigned char red, unsigned char green, unsi
 }
 
 /** Drukuje z możliwością ustawienia tuszu poprzez RGB. */
+UNUSED_ATTR_
 void print_rgb(ssh_coordinate x,ssh_coordinate y,
                ssh_intensity r,ssh_intensity g,ssh_intensity b,            /*- składowe koloru tekstu */
                ssh_color back,const char* format,...)
@@ -1561,7 +1598,7 @@ void print_rgb(ssh_coordinate x,ssh_coordinate y,
         exit(-__LINE__);
     }
 
-    /* Print string in window */
+    /* Print string in the window */
     /* Need length for both XTextWidth and XDrawString */
     len = strlen(bufor);
 
@@ -1574,7 +1611,7 @@ void print_rgb(ssh_coordinate x,ssh_coordinate y,
     /* Output text, centered on each line */
 
     x*=mulx; /* Multiplication of coordinates */
-    y*=muly; /* if window is bigger */
+    y*=muly; /* if the window is bigger */
 
     ox=x;oy=y;
     CurrForeground=-1;
@@ -1598,10 +1635,11 @@ void print_rgb(ssh_coordinate x,ssh_coordinate y,
 }
 
 /** Wyświetlenie punktu na ekranie w kolorze rgb ustawionym ze składowych. */
+UNUSED_ATTR_
 void plot_rgb(ssh_coordinate x,ssh_coordinate y,ssh_intensity r,ssh_intensity g,ssh_intensity b)
 {
     x*=mulx; /* Multiplication of coordinates */
-    y*=muly; /* if window is bigger */
+    y*=muly; /* if the window is bigger */
 
     CurrForeground=-1;
     XSetForeground(display,gc,buildColor(r,g,b) );
@@ -1623,10 +1661,11 @@ void plot_rgb(ssh_coordinate x,ssh_coordinate y,ssh_intensity r,ssh_intensity g,
 }
 
 /** Wyświetlenie punktu na ekranie w kolorze domyślnym. */
+UNUSED_ATTR_
 void plot_d(ssh_coordinate x,ssh_coordinate y)
 {
     x*=mulx; /* Multiplication of coordinates */
-    y*=muly; /* if window is bigger */
+    y*=muly; /* if the window is bigger */
 
     if(PenColor!=-1)
     {
@@ -1651,10 +1690,11 @@ void plot_d(ssh_coordinate x,ssh_coordinate y)
 }
 
 /** Wyświetlenie punktu na ekranie w kolorze indeksowanym. */
+UNUSED_ATTR_
 void plot(ssh_coordinate x,ssh_coordinate y,ssh_color c)
 {
     x*=mulx; /* Multiplication of coordinates */
-    y*=muly; /* if window is bigger */
+    y*=muly; /* if the window is bigger */
 
     if(c!=CurrForeground)
     {
@@ -1682,6 +1722,7 @@ void plot(ssh_coordinate x,ssh_coordinate y,ssh_color c)
  * \details possible values: SSH_LINE_SOLID, SSH_LINE_DOTTED, SSH_LINE_DASHED
  * \warning NOT IMPLEMENTED!
  * */
+UNUSED_ATTR_
 int line_style(int Style)
 {
     if(ssh_trace_level>0)
@@ -1699,8 +1740,9 @@ int line_style(int Style)
 }
 
 /** Ustala aktualny kolor linii za pomocą typu ssh_color
- *  \warning style NOT IMPLEMENTED!
+ *  \warning style is NOT IMPLEMENTED!
  * */
+UNUSED_ATTR_
 void set_pen(ssh_color c,ssh_natural size,ssh_mode style)
 {
     if(PenColor!=Scale[c])
@@ -1711,8 +1753,9 @@ void set_pen(ssh_color c,ssh_natural size,ssh_mode style)
 }
 
 /** Ustala aktualny kolor linii za pomocą składowych RGB
- *  \warning style NOT IMPLEMENTED!
+ *  \warning style is NOT IMPLEMENTED!
  * */
+UNUSED_ATTR_
 void set_pen_rgb(ssh_intensity r,ssh_intensity g,ssh_intensity b,ssh_natural size,ssh_mode style)
 {
     PenColor=buildColor(r,g,b);
@@ -1721,20 +1764,24 @@ void set_pen_rgb(ssh_intensity r,ssh_intensity g,ssh_intensity b,ssh_natural siz
 
 
 /** Ustala aktualny kolor linii za pomocą składowych RGBA TODO TEST
- *  \warning style NOT IMPLEMENTED!
+ *  \warning style is NOT IMPLEMENTED!
  * */
+UNUSED_ATTR_
 void set_pen_rgba(ssh_intensity r,ssh_intensity g,ssh_intensity b,ssh_intensity a,ssh_natural size,ssh_mode style)
 {
     PenColor=buildTransparentColor(r,g,b,a);
     default_line_width=size;
 }
 
+/** Aktualna grubość lini. */
+UNUSED_ATTR_
 ssh_natural get_line_width()
 {
     return default_line_width;
 }
 
 /** Ustala szerokość linii. Może być kosztowne. Zwraca stan poprzedni */
+UNUSED_ATTR_
 ssh_natural line_width(ssh_natural width)
 {
     int old=default_line_width;
@@ -1752,6 +1799,7 @@ ssh_natural line_width(ssh_natural width)
 }
 
 /** Ustala aktualny kolor wypełnień za pomocą typu ssh_color */
+UNUSED_ATTR_
 void set_brush(ssh_color c)
 {
     if(BrushColor!=Scale[c])
@@ -1761,18 +1809,21 @@ void set_brush(ssh_color c)
 }
 
 /** Ustala aktualny kolor wypełnień za pomocą składowych RGB */
+UNUSED_ATTR_
 void set_brush_rgb(ssh_intensity r,ssh_intensity g,ssh_intensity b)
 {
     BrushColor=buildColor(r,g,b);
 }
 
 /** Ustala aktualny kolor wypełnień za pomocą składowych RGBA, TODO TEST */
+UNUSED_ATTR_
 void set_brush_rgba(ssh_intensity r,ssh_intensity g,ssh_intensity b,ssh_intensity a)
 {
     BrushColor=buildTransparentColor(r,g,b,a);
 }
 
-/** wyrysowanie linii w kolorze domyślnym */
+/** Wyrysowanie linii w kolorze domyślnym */
+UNUSED_ATTR_
 void line_d(int x1,int y1,int x2,int y2)
 {
     unsigned line_width=default_line_width;
@@ -1788,7 +1839,7 @@ void line_d(int x1,int y1,int x2,int y2)
     }
 
     x1*=mulx;x2*=mulx; /* Multiplication of coordinates */
-    y1*=muly;y2*=muly;  /* if window is bigger */
+    y1*=muly;y2*=muly;  /* if the window is bigger */
 
     if(PenColor!=-1)
     {
@@ -1803,7 +1854,8 @@ void line_d(int x1,int y1,int x2,int y2)
         XDrawLine(display,cont_pixmap, gc, x1, y1, x2, y2);
 }
 
-/** wyrysowanie okręgu w kolorze 'c' */
+/** Wyrysowanie okręgu w kolorze 'c' */
+UNUSED_ATTR_
 void circle_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r)
 {
     int angle2=360*64,r1,r2;
@@ -1820,7 +1872,7 @@ void circle_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r)
     }
 
     x*=mulx;y*=muly;      /* Multiplication of coordinates */
-    r1=r*mulx;r2=r*muly;  /* if window is bigger */
+    r1=r*mulx;r2=r*muly;  /* if the window is bigger */
 
     if(PenColor!=-1)
     {
@@ -1835,7 +1887,8 @@ void circle_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r)
         XDrawArc(display, cont_pixmap , gc, x-r1, y-r2, r1*2, r2*2, 0, angle2);
 }
 
-/** wyrysowanie elipsy w kolorze indeksowanym 'c' */
+/** Wyrysowanie elipsy w kolorze indeksowanym 'c' */
+UNUSED_ATTR_
 void ellipse_d(ssh_coordinate x,ssh_coordinate y,ssh_natural a,ssh_natural b)
 {
     int angle2=360*64,r1,r2;
@@ -1852,7 +1905,7 @@ void ellipse_d(ssh_coordinate x,ssh_coordinate y,ssh_natural a,ssh_natural b)
     }
 
     x*=mulx;y*=muly;      /* Multiplication of coordinates */
-    r1=a*mulx;r2=b*muly;  /* if window is bigger */
+    r1=a*mulx;r2=b*muly;  /* if the window is bigger */
 
     if(PenColor!=-1)
     {
@@ -1867,7 +1920,7 @@ void ellipse_d(ssh_coordinate x,ssh_coordinate y,ssh_natural a,ssh_natural b)
         XDrawArc(display, cont_pixmap , gc, x-r1, y-r2, r1*2, r2*2, 0, angle2);
 }
 
-/** wyrysowanie kola w kolorach domyślnych */
+/** Wyrysowanie kola w kolorach domyślnych. */
 void fill_circle_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r)
 {
     int angle2=360*64,r1,r2;
@@ -1884,7 +1937,7 @@ void fill_circle_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r)
     }
 
     x*=mulx;y*=muly;      /* Multiplication of coordinates */
-    r1=r*mulx;r2=r*muly;  /* if window is bigger */
+    r1=r*mulx;r2=r*muly;  /* if the window is bigger */
 
     if(BrushColor!=-1)
     {
@@ -1909,6 +1962,7 @@ void fill_circle_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r)
 }
 
 /** Wypełnienie elipsy w kolorach domyślnych*/
+__attribute__((unused))
 void fill_ellipse_d(ssh_coordinate x, ssh_coordinate y, ssh_natural a, ssh_natural b)
 {
     int angle2=360*64,r1,r2;
@@ -1925,7 +1979,7 @@ void fill_ellipse_d(ssh_coordinate x, ssh_coordinate y, ssh_natural a, ssh_natur
     }
 
     x*=mulx;y*=muly;      /* Multiplication of coordinates */
-    r1=a*mulx;r2=b*muly;  /* if window is bigger */
+    r1=a*mulx;r2=b*muly;  /* if the window is bigger */
 
     if(BrushColor!=-1)
     {
@@ -1954,10 +2008,10 @@ inline
 static float degrees(float radians)
 {
     return radians * deg_mult;
-    //return ( radians * 180 ) / M_PI ;
 }
 
-/** rysuje łuk kołowy o promieniu r i kolorach DOMYŚLNYCH*/
+/** Rysuje łuk kołowy o promieniu `r` i kolorach DOMYŚLNYCH */
+UNUSED_ATTR_
 void arc_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r,ssh_radian start,ssh_radian stop)
 {
     start=start;
@@ -1981,7 +2035,7 @@ void arc_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r,ssh_radian start,ssh_
     }
 
     x*=mulx;y*=muly;   /* Multiplications of coordinates */
-    r1=r*mulx;r2=r*muly;  /* if window is bigger */
+    r1=r*mulx;r2=r*muly;  /* if the the window is bigger */
 
     if(PenColor!=-1)
     {
@@ -1996,7 +2050,8 @@ void arc_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r,ssh_radian start,ssh_
         XDrawArc(display, cont_pixmap , gc, x-r1, y-r2, r1*2, r2*2,angle1, angle2);
 }
 
-/** rysuje łuk kołowy o promieniu r i kolorach indeksowanych */
+/** Rysuje łuk kołowy o promieniu r i kolorach indeksowanych */
+UNUSED_ATTR_
 void arc(ssh_coordinate x,ssh_coordinate y,ssh_natural r, ssh_radian start,ssh_radian stop,ssh_color c)
 {
     start=start;
@@ -2020,7 +2075,7 @@ void arc(ssh_coordinate x,ssh_coordinate y,ssh_natural r, ssh_radian start,ssh_r
     }
 
     x*=mulx;y*=muly;   /* Multiplications of coordinates */
-    r1=r*mulx;r2=r*muly;  /* if window is bigger */
+    r1=r*mulx;r2=r*muly;  /* if the window is bigger */
 
     if(c!=CurrForeground)
     {
@@ -2035,7 +2090,8 @@ void arc(ssh_coordinate x,ssh_coordinate y,ssh_natural r, ssh_radian start,ssh_r
         XDrawArc(display, cont_pixmap , gc, x-r1, y-r2, r1*2, r2*2,angle1, angle2);
 }
 
-/** rysuje łuk eliptyczny o półosiach a i b i domyślnym kolorze */
+/** Rysuje łuk eliptyczny o półosiach `a` i `b` i w domyślnym kolorze. */
+UNUSED_ATTR_
 void earc_d(ssh_coordinate x,ssh_coordinate y,
             ssh_natural a,ssh_natural b,
             ssh_radian start,ssh_radian stop)
@@ -2061,7 +2117,7 @@ void earc_d(ssh_coordinate x,ssh_coordinate y,
     }
 
     x*=mulx;y*=muly;   /* Multiplication of coordinates */
-    r1=a*mulx;r2=b*muly;  /* if window is bigger */
+    r1=a*mulx;r2=b*muly;  /* if the window is bigger */
 
     if(PenColor!=-1)
     {
@@ -2076,7 +2132,8 @@ void earc_d(ssh_coordinate x,ssh_coordinate y,
         XDrawArc(display, cont_pixmap , gc, x-r1, y-r2, r1*2, r2*2,angle1, angle2);
 }
 
-/** rysuje łuk eliptyczny w kolorze indeksowanym c */
+/** Rysuje łuk eliptyczny w kolorze indeksowanym `c`. */
+UNUSED_ATTR_
 void earc(ssh_coordinate x,ssh_coordinate y,
           ssh_natural a,ssh_natural b,
           ssh_radian start,ssh_radian stop,ssh_color c)
@@ -2102,7 +2159,7 @@ void earc(ssh_coordinate x,ssh_coordinate y,
     }
 
     x*=mulx;y*=muly;   /* Multiplications of coordinates */
-    r1=a*mulx;r2=b*muly;  /* if window is bigger */
+    r1=a*mulx;r2=b*muly;  /* if the window is bigger */
 
     if(c!=CurrForeground)
     {
@@ -2117,7 +2174,8 @@ void earc(ssh_coordinate x,ssh_coordinate y,
         XDrawArc(display, cont_pixmap , gc, x-r1, y-r2, r1*2, r2*2,angle1, angle2);
 }
 
-/** Wypełnia łuk kołowy w kolorze domyślnym */
+/** Wypełnia łuk kołowy w kolorze domyślnym. */
+UNUSED_ATTR_
 void fill_arc_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r, /* wypełnia łuk kołowy o promieniu r*/
                 ssh_radian start,ssh_radian stop,                /* początku i końcu */
                 ssh_bool pie)                                    /* początek i koniec łuku */
@@ -2143,7 +2201,7 @@ void fill_arc_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r, /* wypełnia ł
     }
 
     x*=mulx;y*=muly;   /* Multiplications of coordinates */
-    r1=r*mulx;r2=r*muly;  /* if window is bigger */
+    r1=r*mulx;r2=r*muly;  /* if the window is bigger */
 
     if(BrushColor!=-1)
     {
@@ -2173,7 +2231,8 @@ void fill_arc_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r, /* wypełnia ł
     }
 }
 
-/** Wypełnia łuk kołowy w kolorze indeksowanym c */
+/** Wypełnia łuk kołowy w kolorze indeksowanym `c`. */
+UNUSED_ATTR_
 void fill_arc(ssh_coordinate x,ssh_coordinate y,ssh_natural r,         /* wirtualny środek i promień łuku */
               ssh_radian start,ssh_radian stop,                        /* początku i końcu */
               ssh_bool pie,ssh_color c)                                /* w kolorze c */
@@ -2199,7 +2258,7 @@ void fill_arc(ssh_coordinate x,ssh_coordinate y,ssh_natural r,         /* wirtua
     }
 
     x*=mulx;y*=muly;   /* Multiplications of coordinates */
-    r1=r*mulx;r2=r*muly;  /* if window is bigger */
+    r1=r*mulx;r2=r*muly;  /* if the window is bigger */
 
     if(c!=CurrForeground)
     {
@@ -2229,7 +2288,8 @@ void fill_arc(ssh_coordinate x,ssh_coordinate y,ssh_natural r,         /* wirtua
     }
 }
 
-/** Wypełnia łuk eliptyczny w kolorze domyślnym */
+/** Wypełnia łuk eliptyczny w kolorze domyślnym. */
+UNUSED_ATTR_
 void fill_earc_d(ssh_coordinate x,ssh_coordinate y,                    /* wypełnia łuk eliptyczny */
                  ssh_natural a,ssh_natural b,                          /* o półosiach 'a' i 'b' */
                  ssh_radian start,ssh_radian stop,                     /* początku i końcu */
@@ -2256,7 +2316,7 @@ void fill_earc_d(ssh_coordinate x,ssh_coordinate y,                    /* wypeł
     }
 
     x*=mulx;y*=muly;      /* Multiplications of coordinates */
-    r1=a*mulx;r2=b*muly;  /* if window is bigger */
+    r1=a*mulx;r2=b*muly;  /* if the window is bigger */
 
     if(BrushColor!=-1)
     {
@@ -2286,7 +2346,8 @@ void fill_earc_d(ssh_coordinate x,ssh_coordinate y,                    /* wypeł
     }
 }
 
-/** Wypełnia łuk eliptyczny w kolorze indeksowanym */
+/** Wypełnia łuk eliptyczny w kolorze indeksowanym. */
+UNUSED_ATTR_
 void fill_earc(ssh_coordinate x,ssh_coordinate y,                      /* wirtualny środek łuku */
                ssh_natural a,ssh_natural b,                            /* o półosiach 'a' i 'b' */
                ssh_radian start,ssh_radian stop,                       /* początku i końcu */
@@ -2314,7 +2375,7 @@ void fill_earc(ssh_coordinate x,ssh_coordinate y,                      /* wirtua
     }
 
     x*=mulx;y*=muly;      /* Multiplication of coordinates */
-    r1=a*mulx;r2=b*muly;  /* if window is bigger */
+    r1=a*mulx;r2=b*muly;  /* if the window is bigger */
 
     if(c!=CurrForeground)
     {
@@ -2337,15 +2398,16 @@ void fill_earc(ssh_coordinate x,ssh_coordinate y,                      /* wirtua
             XDrawArc(display, cont_pixmap , gc, x-r1, y-r2, r1*2, r2*2,angle1,angle2);
     }
 }
-/** Wypełnienie prostokąta rozciągniętego między rogami x1y1 a x2y2, w kolorze rbg określonym składowymi koloru */
+/** Wypełnienie prostokąta rozciągniętego między rogami x1y1 a x2y2, w kolorze rbg określonym składowymi koloru. */
+UNUSED_ATTR_
 void fill_rect_rgb(ssh_coordinate x1,ssh_coordinate y1,
                    ssh_coordinate x2,ssh_coordinate y2,
                    ssh_intensity r,ssh_intensity g,ssh_intensity b)
 {
     x1*=mulx; /* Multiplication of coordinates */
-    y1*=muly; /* if window is bigger */
+    y1*=muly; /* if the window is bigger */
     x2*=mulx; /* Multiplication of 2' coordinates */
-    y2*=muly; /* if window is bigger */
+    y2*=muly; /* if the window is bigger */
 
 
     CurrForeground=-1;
@@ -2363,9 +2425,9 @@ void fill_rect_rgb(ssh_coordinate x1,ssh_coordinate y1,
 void fill_rect_d(int x1,int y1,int x2,int y2)
 {
     x1*=mulx; /* Multiplication of coordinates */
-    y1*=muly; /* if window is bigger */
+    y1*=muly; /* if the window is bigger */
     x2*=mulx; /* Multiplication of 2' coordinates */
-    y2*=muly; /* if window is bigger */
+    y2*=muly; /* if the window is bigger */
 
     if(BrushColor!=-1)
     {
@@ -2385,9 +2447,9 @@ void fill_rect(int x1,int y1,int x2,int y2,ssh_color c)
 {                                                                                                 assert( display!=NULL);
                                                                                                    assert( gc != NULL);
     x1*=mulx; /* Multiplication of coordinates */
-    y1*=muly; /* if window is bigger */
+    y1*=muly; /* if the window is bigger */
     x2*=mulx; /* Multiplication of 2' coordinates */
-    y2*=muly; /* if window is bigger */
+    y2*=muly; /* if the window is bigger */
 
     if(c!=CurrForeground)
     {
@@ -2402,7 +2464,7 @@ void fill_rect(int x1,int y1,int x2,int y2,ssh_color c)
 
 }
 
-/** Wypełnia WIELOKĄT przesunięty o vx,vy w kolorach domyślnych */
+/** Wypełnia WIELOKĄT przesunięty o vx, vy w kolorach domyślnych */
 void fill_poly_d(ssh_coordinate vx,ssh_coordinate vy,
                  const ssh_point points[],int number)
 {
@@ -2469,7 +2531,7 @@ void fill_circle(ssh_coordinate x, ssh_coordinate y, ssh_natural r, ssh_color c)
     }
 
     x*=mulx;y*=muly;   /* Multiplication of coordinates */
-    r1=r*mulx;r2=r*muly;  /* if window is bigger */
+    r1=r*mulx;r2=r*muly;  /* if the window is bigger */
 
     if(c!=CurrForeground)
     {
@@ -2501,7 +2563,7 @@ void circle(ssh_coordinate x,ssh_coordinate y,ssh_natural r,ssh_color c)
     }
 
     x*=mulx;y*=muly;   /* Multiplications of coordinates */
-    r1=r*mulx;r2=r*muly;  /* if window is bigger */
+    r1=r*mulx;r2=r*muly;  /* if the window is bigger */
 
     if(c!=CurrForeground)
        {
@@ -2516,7 +2578,7 @@ void circle(ssh_coordinate x,ssh_coordinate y,ssh_natural r,ssh_color c)
         XDrawArc(display, cont_pixmap , gc, x-r1, y-r2, r1*2, r2*2, 0, angle2);
 }
 
-/** Wypełnia wielokąt przesunięty o vx,vy w kolorze indeksowanym c */
+/** Wypełnia wielokąt przesunięty o vx, vy w kolorze indeksowanym c */
 void fill_poly(ssh_coordinate vx,ssh_coordinate vy,
                const ssh_point points[],int number,  /* - tablica wierzchołków wielokąta i jej długość */
                ssh_color c)
@@ -2562,7 +2624,7 @@ void fill_poly(ssh_coordinate vx,ssh_coordinate vy,
         XFillPolygon(display, cont_pixmap, gc,
                      LocalPoints,number,Complex,CoordModeOrigin);
 
-    if(number>10) /*Byl duzy*/
+    if(number>10) /*Był duży!*/
         free(LocalPoints);
 }
 
@@ -2574,7 +2636,7 @@ void line(ssh_coordinate x1,ssh_coordinate y1,
     unsigned line_width=default_line_width;
 
     x1*=mulx;x2*=mulx; /* Multiplications of coordinates */
-    y1*=muly;y2*=muly;  /* if window is bigger */
+    y1*=muly;y2*=muly;  /* if the window is bigger */
 
     if(c!=CurrForeground)
     {
@@ -2602,21 +2664,23 @@ void line(ssh_coordinate x1,ssh_coordinate y1,
 
 /** Informs the system that we do not care about the visibility of previous graphics operations
  * \details It allows you to inform the graphic system that
- * the entire screen / window will be blurred with new content without cleaning.
+ * the entire screen or window will be blurred with new content without cleaning.
  * \warning DO NOTHING UNDER X11
  * \todo XSync(...,discards)? https://tronche.com/gui/x/xlib/event-handling/XSync.html
  */
+UNUSED_ATTR_
 int invalidate_screen()
 {
-    //clear_screen();//Dla pewności?
+    //clear_screen();//Dla pewności? NIE! DROGIE. Nie po to unikamy w sytuacji zamazywania przez nową treść.
     return 0;
 }
 
-/** Clears the screen before changing the content to something new */
+/** Clears the screen before changing the content to something new. */
+UNUSED_ATTR_
 void clear_screen()
 {
     /* Why not https://tronche.com/gui/x/xlib/GC/convenience-functions/XSetBackground.html */
-    XSetForeground(display, gc, Scale[bacground] );
+    XSetForeground(display, gc, Scale[CurrBackground] );
     CurrForeground=-1;
     /* Clear screen and bitmap */
     if(!animate)
@@ -2665,7 +2729,7 @@ ssh_stat repaint_area(ssh_coordinate* x,ssh_coordinate* y,ssh_natural* width,ssh
         return -1;
 }
 
-/** Reads the last mouse event */
+/** Reads the last use_mouse event */
 ssh_stat get_mouse_event(int* xpos,int* ypos,int* click)
 {
     if(LastMouse.flags!=0)
@@ -2680,6 +2744,7 @@ ssh_stat get_mouse_event(int* xpos,int* ypos,int* click)
 }
 
 /** Sets the default indexed color scale. Old version. */
+UNUSED_ATTR_
 static void SetScaleOld(XColor RGBarray[])
 {
     unsigned k;
@@ -2744,7 +2809,7 @@ static void SetScale(XColor RGBarray[])
         {
             long wal=k;
             /*fprintf(stderr,"%u %ul\n",k,wal);*/
-            RGBarray[k]=RGBarray[0];//Inne pola struktury też moga byc wazne
+            RGBarray[k]=RGBarray[0]; //Inne pola struktury też mogą być ważne
             RGBarray[k].red=wal;
             RGBarray[k].green=wal;
             RGBarray[k].blue=wal;
@@ -2761,7 +2826,7 @@ static void SetScale(XColor RGBarray[])
         {
             long wal;
             double kat=(M_PI*2)*k/255.;
-            RGBarray[k]=RGBarray[0];//Inne pola struktury też moga byc wazne
+            RGBarray[k]=RGBarray[0]; //Inne pola struktury też mogą być ważne
             wal=255*sin(kat*1.25);
             if(wal>0)  RGBarray[k].red=wal;
             wal=255*(-sin(kat*0.85));
@@ -2773,7 +2838,7 @@ static void SetScale(XColor RGBarray[])
         for(k=256;k<512;k++)
         {
             long wal=k-256;
-            RGBarray[k]=RGBarray[0];//Inne pola struktury też moga byc wazne
+            RGBarray[k]=RGBarray[0];//Inne pola struktury też mogą być ważne
             /*fprintf(stderr,"%u %ul\n",k,wal);*/
             Scale[k]=buildColor(wal,wal,wal);
             RGBarray[k].red=wal;
@@ -2817,15 +2882,16 @@ void    set_rgb(ssh_color color,ssh_intensity r,ssh_intensity g,ssh_intensity b)
 * \see \n http://stackoverflow.com/questions/1157209/is-there-an-alternative-sleep-function-in-c-to-milliseconds */
 void delay_ms(ssh_natural ms)
 {
-    extern int usleep(useconds_t usec);/* takes microseconds, so you will have to multiply the input by 1000 in order to sleep in milliseconds. */
+    extern int usleep(useconds_t usec); /* takes microseconds, so you will have to multiply the input by 1000 to sleep in milliseconds. */
     usleep(ms*1000);// 1 ms = 1 000 μs
 }
 
 /** Make the program wait for a certain number of μs
 * \see \n http://stackoverflow.com/questions/1157209/is-there-an-alternative-sleep-function-in-c-to-milliseconds */
+UNUSED_ATTR_
 void delay_us(ssh_natural us)
 {
-    extern int usleep(useconds_t usec);/* takes microseconds, so you will have to multiply the input by 1000 in order to sleep in milliseconds. */
+    extern int usleep(useconds_t usec); /* takes microseconds. */
     usleep(us);
 }
 
@@ -2900,12 +2966,12 @@ ssh_stat dump_screen(const char* Filename)
 
     if (cont_pixmap)
     {
-     /* int XpmWriteFileFromPixmap (
+     /* int XpmWriteFileFromPixmap(
      //             Display *  	display,
      //             char *  	filename,
      //             Pixmap  	pixmap,
      //             Pixmap  	shapemask,   //???
-     //             XpmAttributes *  	attributes
+     //             XpmAttributes * attributes
      //         ) 	*/
         if (XpmWriteFileFromPixmap(display, NameBufor, cont_pixmap, 0, NULL) != XpmSuccess)
         {
@@ -2913,7 +2979,7 @@ ssh_stat dump_screen(const char* Filename)
         }
         else
         {
-            fprintf(stderr, "'dump_screen(%s)' finished with SUCCES! \n", NameBufor);
+            fprintf(stderr, "'dump_screen(%s)' finished with SUCCESS! \n", NameBufor);
         }
     }
     else
@@ -2924,8 +2990,7 @@ ssh_stat dump_screen(const char* Filename)
     return 0;
 }
 
-#include <X11/Xlib.h>
-
+UNUSED_ATTR_
 const char* get_xevent_name(int type) {
     switch (type) {
         case KeyPress:         return "KeyPress";
@@ -2968,9 +3033,9 @@ const char* get_xevent_name(int type) {
 
 /*#pragma exit close_plot*/
 /*v******************************************************************/
-/*              SYMSHELLLIGHT  version 2023-03...                   */
+/*              SYMSHELLLIGHT version 2026-02...                    */
 /*v******************************************************************/
-/*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
+/*           THIS CODE IS DESIGNED & COPYRIGHT BY:                  */
 /*            W O J C I E C H   B O R K O W S K I                   */
 /*    Instytut Studiów Społecznych Uniwersytetu Warszawskiego       */
 /*    WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI  */

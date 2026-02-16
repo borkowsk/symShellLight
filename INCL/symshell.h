@@ -13,7 +13,7 @@
  **
  ** \library    SYMSHELLLIGHT  version 2026a
  ** 
-/// @date 2026-01-07 (last modification)
+/// @date 2026-02-16 (last modification)
  */
 
 #ifndef _SYMSHELL_H_
@@ -27,31 +27,6 @@
 *	        Działa też implementowana w C++ wersja zapisująca do plików SVG.
 */
 ///@{
-
-#ifdef __cplusplus
-extern "C" {
-const unsigned  PALETE_LENGHT=512;                /**< \brief Długość palety predefiniowanych kolorów */
-const unsigned  SSH_SOLID_TEXT=0;
-const unsigned  SSH_TRANSPARENT_TEXT=1;
-const unsigned  SSH_SOLID_PUT=1;
-const unsigned  SSH_XOR_PUT=2;
-const unsigned  SSH_LINE_SOLID=1;
-const unsigned  SSH_LINE_DOTTED=2;
-const unsigned  SSH_LINE_DASHED=3;
-const unsigned  SSH_YES=1;
-const unsigned  SSH_NO=0;
-#else
-#define PALETE_LENGHT      (512)                /**< Długość palety predefiniowanych kolorów */
-#define SSH_SOLID_TEXT       (0)
-#define SSH_TRANSPARENT_TEXT (1)
-#define SSH_SOLID_PUT        (1)
-#define SSH_XOR_PUT          (2)
-#define SSH_LINE_SOLID       (1)
-#define SSH_LINE_DOTTED      (2)
-#define SSH_LINE_DASHED      (3)
-#define SSH_YES              (1)
-#define SSH_NO               (0)
-#endif
 
 /* TYPY */
 typedef unsigned char                           uchar8b;       /**< \brief BASIC CHAR TYPE. MUST HAVE 8 bits!? */
@@ -68,6 +43,31 @@ typedef struct ssh_rgb   {uchar8b r,g,b;}       ssh_rgb;       /**< \brief RGB t
 //typedef struct ssh_rgba  {uchar8b r,g,b,a;}     ssh_rgba;    /**< \brief RGB with alpha. Union with uint32? TODO */
 typedef unsigned int                            ssh_color;     /**< \brief Indexed color. TODO change name to ssh_color_index? */
 typedef float                                   ssh_radian;    /**< \brief katy w radianach dla łuków */
+
+#ifdef __cplusplus
+extern "C" {
+const ssh_mode  PALETE_LENGHT=512;                /**< \brief Długość palety predefiniowanych kolorów */
+const ssh_mode  SSH_SOLID_TEXT=0;
+const ssh_mode  SSH_TRANSPARENT_TEXT=1;
+const ssh_mode  SSH_SOLID_PUT=1;
+const ssh_mode  SSH_XOR_PUT=2;
+const ssh_mode  SSH_LINE_SOLID=1;
+const ssh_mode  SSH_LINE_DOTTED=2;
+const ssh_mode  SSH_LINE_DASHED=3;
+const ssh_mode  SSH_YES=1;
+const ssh_mode  SSH_NO=0;
+#else
+#define PALETE_LENGHT      (512)                /**< Długość palety predefiniowanych kolorów */
+#define SSH_SOLID_TEXT       (0)
+#define SSH_TRANSPARENT_TEXT (1)
+#define SSH_SOLID_PUT        (1)
+#define SSH_XOR_PUT          (2)
+#define SSH_LINE_SOLID       (1)
+#define SSH_LINE_DOTTED      (2)
+#define SSH_LINE_DASHED      (3)
+#define SSH_YES              (1)
+#define SSH_NO               (0)
+#endif
 
 /* ZMIENNE I STAŁE ZALEŻNE OD MODUŁU
  * ================================= */
@@ -87,8 +87,8 @@ extern int WB_error_enter_before_clean/* =0 */;
 
 /** \brief Przekazanie parametrów wywołania i nazwy okna */
 void shell_setup(const char* title,                            /**< Nazwa aplikacji używana jako tytuł okna lub jego część */
-                 const int   iargc,                            /**< liczba WSZYSTKICH parametrów wywołania */
-                 const char* iargv[]                           /**< Przekazanie parametrów wywołania */
+                 const int   iArgc,                            /**< liczba WSZYSTKICH parametrów wywołania */
+                 const char* iArgv[]                           /**< Przekazanie parametrów wywołania */
                 );
 
 /** \brief Change window title bar */
@@ -430,7 +430,7 @@ void fill_circle(ssh_coordinate x,                             /**< współrzęd
                  );
 
 /** \brief Wypełnienie elipsy o PÓŁOSIACH długości "a" i "b" kolorem domyślnym */
-void fill_ellipse_d(ssh_coordinate x,                          /**< współrzędna pozioma środka */
+__attribute__((unused)) void fill_ellipse_d(ssh_coordinate x,                          /**< współrzędna pozioma środka */
                     ssh_coordinate y,                          /**< współrzędna pionowa środka */
                     ssh_natural a,                             /**< długość PÓŁOSI 'a' (poziomej) */
                     ssh_natural b                             /**< długość PÓŁOSI 'b' (pionowej) */

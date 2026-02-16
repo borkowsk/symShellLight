@@ -10,7 +10,7 @@
 ///
 /// @file
 /// @brief Przykładowy program SYMSHELLA demonstrujący obsługę myszy.
-/// @date 2026-02-02 (last update)
+/// @date 2026-02-16 (last update)
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 #include <iostream>
@@ -64,9 +64,9 @@ void replot()
 /// Mouse handling procedure example.
 void read_mouse()
 {
-    int xpos,ypos,click; //for mouse data
+    int xpos,ypos,click; //for use_mouse data
 
-    if(get_mouse_event(&xpos,&ypos,&click)!=-1)   //Reads the last mouse event.
+    if(get_mouse_event(&xpos,&ypos,&click)!=-1)   //Reads the last use_mouse event.
     {
         if(click_index<max_points-1)
         {

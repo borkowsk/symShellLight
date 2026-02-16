@@ -10,7 +10,7 @@
 ///
 /// @file
 /// @brief Przykładowy program SYMSHELL'A z reskalowaniem
-/// @date 2026-02-02 (last update)
+/// @date 2026-02-16 (last update)
 //-/////////////////////////////////////////////////////////////////////////////////////////
 
 #include "symshell.h"
@@ -41,11 +41,11 @@ void replot()
 //   **********************
 int main(int argc,const char* argv[])
 {
-    int i=0,xpos=0,ypos=0,click=0; //Variables for reading mouse data
+    int i=0,xpos=0,ypos=0,click=0; //Variables for reading use_mouse data
     int cont=1; //continue processing flag
     int std=0;
 
-    mouse_activity(0); //We don't need the mouse now, so we deactivate it
+    mouse_activity(0); //We don't need the use_mouse now, so we deactivate it
     set_background(128);
     buffering_setup(0); //We don't need the animation, so we deactivate it
     shell_setup("SYMSHELL - RESKALOWALNA PALETA ",argc,argv);

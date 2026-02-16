@@ -12,7 +12,7 @@
 ///
 /// @file
 /// @brief Przykładowy program SYMSHELLA demonstrujący rysowanie słupków i wielokątów.
-/// @date 2026-02-02 (last update)
+/// @date 2026-02-16 (last update)
 //-/////////////////////////////////////////////////////////////////////////////////////////
 
 #include "symshell.h"
@@ -113,7 +113,7 @@ void replot()
 //   **********************
 int main(int argc,const char* argv[])
 {
-    int i=0,xpos=0,ypos=0,click=0; //for mouse data
+    int i=0,xpos=0,ypos=0,click=0; //for use_mouse data
     int cont=1;//flaga kontynuacji
     int std=0;
 

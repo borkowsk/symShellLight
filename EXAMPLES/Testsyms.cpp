@@ -9,7 +9,7 @@
 ///
 /// @file
 /// @brief Przykładowy program SYMSHELL'A z funkcją "replot"
-/// @date 2026-02-02 (last update)
+/// @date 2026-02-16 (last update)
 //-/////////////////////////////////////////////////////////////////////////////////////////
 
 #include "symshell.h"
@@ -21,7 +21,7 @@ void replot()
 {
     unsigned int i,j;
     unsigned char pom;
-    int old=mouse_activity(0); //Possible mouse deactivation during redrawing
+    int old=mouse_activity(0); //Possible use_mouse deactivation during redrawing
     clear_screen();
 
     // Redrawing the "bit-picture" content
@@ -43,14 +43,14 @@ void replot()
     printbw(screen_width()-char_width('X'),screen_height()-char_height('X'),"X");
 
     flush_plot(); //End of drawing
-    mouse_activity(old); //Possible reactivation of the mouse
+    mouse_activity(old); //Possible reactivation of the use_mouse
 }
 
 ///  GENERAL MAIN FUNCTION.
 //   **********************
 int main(int argc,const char* argv[])
 {
-    int i=0,xpos=0,ypos=0,click=0; //Variables for reading mouse data
+    int i=0,xpos=0,ypos=0,click=0; //Variables for reading use_mouse data
     int cont=1; //continue processing flag
     int std=0;
 
@@ -82,7 +82,7 @@ int main(int argc,const char* argv[])
             case '\0': /* do nothing */ break;
             case '@':					//Manual spell to fire replot()
             case '\r':replot();break;	//Systematic code to fire of replot()
-            case '\b':get_mouse_event(&xpos,&ypos,&click); //Handling a mouse event
+            case '\b':get_mouse_event(&xpos,&ypos,&click); //Handling a use_mouse event
                 if(click&0x1)
                     set_char('X');
                 break;

@@ -13,7 +13,6 @@
  * 	- https://github.com/borkowsk                                       *
  *                                                                      *
  *      File changed massively: 21.10.2020                              *
- * @date 2026-02-16 (last modifications)                                *
  * \note                                                                *
  *  WCIĄŻ Z BŁĘDEM NA EXPOSE! TODO, choć raz go już gdzieś usunąłem     *
  *                                                                      *
@@ -21,8 +20,7 @@
  *                           SYMSHELLLIGHT                              *
  ************************************************************************
  */
-/// @date 2026-02-16 (last modifications)
-
+/// @date 2026-02-17 (last modifications)
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -34,6 +32,8 @@
 #include <X11/Xutil.h>
 #include <X11/Xos.h>
 //#include <X11/Xatom.h>
+#include <X11/xpm.h>  /*  THIS SHOULD LOOK LIKE WHEN Xpm IS NORMALLY INSTALLED */
+//#include "SYMSHELL/Xpm/xpm.h"
 
 #include "symshell.h"
 #include "icon.h"
@@ -198,7 +198,7 @@ UNUSED_ATTR_
  static int             pipe_break=0;              /**< Informacja o zerwaniu połączenia z X serwerem */
 
  /** Default signal handler. */
- void SigPipe(int num)
+ static void SigPipe(int num)
  {
      pipe_break=1;
      opened=0;
@@ -209,7 +209,7 @@ UNUSED_ATTR_
 
  /** Default X IO handler.
   * \warning TODO: How to distinguish X11 network error from the window shutdown? */
- int MyXIOHandler(Display* d)
+ static int MyXIOHandler(Display* d)
  /*
     int (*XSetIOErrorHandler(handler))()
           int (*handler)(Display *);
@@ -233,7 +233,7 @@ UNUSED_ATTR_
 
  /** Default X Error handler.
   * \return 0 or never return because of exit() call. */
- int MyErrorHandler(Display *xDisplay, XErrorEvent *event)
+ static int MyErrorHandler(Display *xDisplay, XErrorEvent *event)
  {
      char buf[80];
 
@@ -264,7 +264,7 @@ UNUSED_ATTR_
      return ret;
  }
 
-/** Czy symulować niezmienność rozmiarów okna. */
+/* Czy symulować niezmienność rozmiarów okna? */
 UNUSED_ATTR_
  void fix_size(int Yes)
  {
@@ -272,8 +272,8 @@ UNUSED_ATTR_
         fprintf(stderr,"fix_size() not implemented\n");
  }
 
-/** Ustala czy mysz ma być obsługiwana.
-   \details W X11 zawsze jest, ale można ją ignorować. */
+/* Ustala czy mysz ma być obsługiwana. */
+/** \internal W X11 zawsze jest, ale można ją ignorować. */
 UNUSED_ATTR_
  int mouse_activity(int yes)
  {
@@ -282,14 +282,14 @@ UNUSED_ATTR_
      return pom;
  }
 
-/** Zwraca aktualny kolor tła — nowa wersja. */
+/* Zwraca aktualny kolor tła — nowa wersja. */
 UNUSED_ATTR_
  ssh_color background()
  {
      return CurrBackground;
  }
 
-/** Ustala index koloru do czyszczenia okna itp. */
+/* Ustala index koloru do czyszczenia okna itp. */
 UNUSED_ATTR_
  void set_background(ssh_color c)
  {
@@ -299,7 +299,7 @@ UNUSED_ATTR_
         CurrBackground=0;
  }
 
-/** Ustala czy ma być buforowanie okna. */
+/* Ustala czy ma być buforowanie okna. */
 UNUSED_ATTR_
 void buffering_setup(int _n)
 {
@@ -311,7 +311,7 @@ void buffering_setup(int _n)
          isbuffered=1;  /* żeby można było na nia pisać */
  }
 
- /** Podaje, czy jest buforowanie. */
+ /* Podaje, czy jest buforowanie... */
 UNUSED_ATTR_
  unsigned get_buffering()
  {
@@ -378,7 +378,7 @@ UNUSED_ATTR_
 /** Zabezpiecza przed ukrytą rekurencją w `close_plot`. */
 static int inside_close_plot=0;
 
-/** Closing graphics / virtual graphics / semigraphics. */
+/* Closing graphics / virtual graphics / semigraphics. */
 void close_plot()
 {
     if(inside_close_plot)
@@ -512,8 +512,9 @@ static void _tooSmall(Window win, GC gc, XFontStruct* font_info)
 }
 
 /** Kopiuje fragment mapy okna na okno. */
-inline
-static void _place_graphics(Window win,GC gc,
+inline static void _place_graphics(
+                           Window win,
+                           GC      gc,
                            int      area_x,int          area_y,
                            unsigned area_width,unsigned area_height)
 {
@@ -835,7 +836,7 @@ static void makeGC(Window win,GC* gc,XFontStruct* font_info)
 */
 }
 
-/** Zmienia napis w belce okna. */
+/* Zmienia napis w belce okna. */
 void set_title(const char* window_name)
 {
     /* Change window title bar */
@@ -843,12 +844,12 @@ void set_title(const char* window_name)
     XStoreName(display,win, window_name);
 }
 
-/** Przekazanie parametrów wywołania do konfiguracji symmshell-a. */
-void shell_setup(const char* title,int iargc,const char* iargv[])
+/* Przekazanie parametrów wywołania do konfiguracji symmshell-a. */
+void shell_setup(const char* title, int i_argc, const char* i_argv[])
 {
     int i;
-    largc=iargc;
-    largv=iargv;
+    largc=i_argc;
+    largv=i_argv;
 
     strncpy(progname,largv[0],1024); /* TODO TEST! */
     strncpy(window_name, title, 1024);
@@ -915,7 +916,7 @@ void shell_setup(const char* title,int iargc,const char* iargv[])
     }
 }
 
-/** Właściwa dla platformy inicjacja grafiki/semigrafiki/grafiki wirtualnej. */
+/* Właściwa dla platformy inicjacja grafiki/semigrafiki/grafiki wirtualnej. */
 ssh_stat init_plot(ssh_natural a,ssh_natural b,ssh_natural ca,ssh_natural cb) {
     int *disp_depht;
     int disp_depht_num = 0, i;
@@ -1185,7 +1186,7 @@ ssh_stat init_plot(ssh_natural a,ssh_natural b,ssh_natural ca,ssh_natural cb) {
     if( (ret=XSetIOErrorHandler(MyXIOHandler)) && ssh_trace_level )
         fprintf(stderr,"X11: IOErrorHandler installed. Ret=%p\n",ret);
 
-    /* Alloc pixmap for contens buffering */
+    /* Alloc pixmap for contents buffering */
     if(isbuffered)
         ResizeBuffer(width,height);
 
@@ -1201,7 +1202,7 @@ ssh_stat init_plot(ssh_natural a,ssh_natural b,ssh_natural ca,ssh_natural cb) {
     return 1;
 }
 
-/** Wysokość ekranu/okna. */
+/* Wysokość ekranu/okna. */
 UNUSED_ATTR_
 ssh_natural screen_height()
 {                                                                   assert(muly>0);
@@ -1209,7 +1210,7 @@ ssh_natural screen_height()
    return height/muly;
 }
 
-/** Szerokość ekranu/okna. */
+/* Szerokość ekranu/okna. */
 UNUSED_ATTR_
 ssh_natural screen_width()
 {                                                                   assert(mulx>0);
@@ -1217,7 +1218,7 @@ ssh_natural screen_width()
     return width/mulx;
 }
 
-/** Wysokość znaku. */
+/* Wysokość znaku. */
 UNUSED_ATTR_
 ssh_natural char_height(char znak)
 {                                                                   assert(muly>0);
@@ -1226,7 +1227,7 @@ ssh_natural char_height(char znak)
     return pom;
 }
 
-/** Szerokość znaku. */
+/* Szerokość znaku. */
 UNUSED_ATTR_
 ssh_natural  char_width(char znak)
 {
@@ -1240,27 +1241,26 @@ ssh_natural  char_width(char znak)
     return calculated_width;
 }
 
-/** Aktualne rozmiary łańcucha — wysokość. */
-/** \details Potrzebne do pozycjonowania tekstu. */
-/**          Wysokość jest LICZONA BARDZO PRYMITYWNIE, jako wysokość pierwszego znaku. */
+/* Aktualne rozmiary łańcucha znaków na ekranie — wysokość. */
 UNUSED_ATTR_
 ssh_natural  string_height(const char* str)
 {
-    return char_height(*str); /* Pierwszy znak! */
+    /** \internal Wysokość jest LICZONA BARDZO PRYMITYWNIE, jako wysokość pierwszego znaku. */
+    return char_height(*str); /* Tylko pierwszy znak! */
 }
 
-/** Aktualne rozmiary łańcucha — długość. */
-/** \details Potrzebne do pozycjonowania tekstu. */
-/**          Szerokość liczona porządnie przez XTextWidth z Xlib */
+/* Aktualne rozmiary łańcucha — długość. */
 UNUSED_ATTR_
 ssh_natural  string_width(const char* str)
 {
+    /** \internal  Szerokość liczona porządnie przez `XTextWidth` z _Xlib_ */
     int pom=XTextWidth(font_info,str,strlen(str))/mulx;
     if(pom<1)pom=1;
     return pom;
 }
 
-/** Reconciliation of memory, queue and screen contents */
+/* Uzgadnianie zawartości pamięci, kolejki i ekranu.
+ * (EN) Reconciliation of memory, queue and screen contents. */
 UNUSED_ATTR_
 void flush_plot()
 {
@@ -1292,12 +1292,13 @@ void flush_plot()
     error_count=error_limit;/* Błędy zliczamy od nowa */
 }
 
-/* GETTING INPUT */
+/* GETTING INPUT
+ * ============= */
 
 /** Za pierwszym razem zwraca '\r', żeby zasygnalizować, że trzeba wyrysować ekran. */
 static int first_to_read=0;
 
-/** Bardzo zależna od platformy funkcja sprawdzająca, czy jest jakieś wejście "z okna grafiki". */
+/* Bardzo zależna od platformy funkcja sprawdzająca, czy jest jakieś wejście dla "okna grafiki". */
 UNUSED_ATTR_
 int  input_ready()
 {
@@ -1312,33 +1313,33 @@ int  input_ready()
     }
 
     /* TODO: Można by rozróżnić zdarzenia wymagające uwagi "użytkownika" od przetworzonych przez `_read_XInput` ! */
-    if(XPending(display)!=0) 	/* Sprawdzenie, czy nie ma zdarzeń */
+    if(XPending(display)!=0)    /* Sprawdzenie, czy nie ma zdarzeń */
     {			                /*SĄ JAKIEŚ!*/
         buforek[0]=NODATA; 	    /*Asekuranctwo ? */
         /*bool ret=*/_read_XInput(); /* Przetwarzanie zdarzeń */
-        if(buforek[0]!=NODATA)	/* Czy jest cos do zwrócenia jako znak? */
+        if(buforek[0]!=NODATA)  /* Czy jest cos do zwrócenia jako znak? */
         {
             first_to_read=buforek[0]; /*Zostanie przeczytane przez get_char() */
             buforek[0]=NODATA;
-            return 1;		    /* Wiec można wywołać get_char() */
+            return 1;      /* Wiec można wywołać get_char() */
         }
     }
 
     return 0;
 }
 
-/** Odesłanie znaku na wejście. Zwraca 0, jeśli nie ma miejsca. */
+/* Odesłanie znaku na wejście. Zwraca 0, jeśli nie ma miejsca. */
 UNUSED_ATTR_
 ssh_stat  set_char(int c)
 {
     if(first_to_read!=0)/* Nie odebrano */
-            return 0;
+            return SSH_NO;
 
     first_to_read=c;
-    return 1;
+    return SSH_YES;
 }
 
-/** Odczytywanie znaków sterowania. */
+/* Odczytywanie znaków sterowania. */
 UNUSED_ATTR_
 int  get_char()
 {
@@ -1369,12 +1370,12 @@ int  get_char()
 
 /* Used for redraw & in print functions */
 
-static char straznik1=0x77;
-static char bufor[1024];
-static char straznik2=0x77;
+static char mem_guard1=0x77;
+static char bufor[2048];
+static char mem_guard2=0x77;
 static int ox,oy;
 
-/** Wyprowadzenie tekstu na ekran (bw). */
+/* Wyprowadzenie tekstu na ekran (bw). */
 UNUSED_ATTR_
 void printbw(ssh_coordinate x,ssh_coordinate y,const char* format,...)
 {
@@ -1389,9 +1390,9 @@ void printbw(ssh_coordinate x,ssh_coordinate y,const char* format,...)
 
     va_end(argptr);
 
-    if(straznik1!=0x77 || straznik2!=0x77)
+    if(mem_guard1 != 0x77 || mem_guard2 != 0x77)
     {
-        fprintf(stderr,"symshell.print(...) - line exceed 1024b!");
+        fprintf(stderr,"symshell.print(...) - text line exceed maximal length!");
         exit(-__LINE__);
     }
 
@@ -1431,7 +1432,7 @@ void printbw(ssh_coordinate x,ssh_coordinate y,const char* format,...)
     }
 }
 
-/** Wyprowadzenie tekstu na ekran (index colors). */
+/* Wyprowadzenie tekstu na ekran (index colors). */
 UNUSED_ATTR_
 void printc(ssh_coordinate x,ssh_coordinate y,
             ssh_color fore,ssh_color back,
@@ -1448,7 +1449,7 @@ void printc(ssh_coordinate x,ssh_coordinate y,
 
     va_end(argptr);
 
-    if(straznik1!=0x77 || straznik2!=0x77)
+    if(mem_guard1 != 0x77 || mem_guard2 != 0x77)
     {
         fprintf(stderr,"symshell.print(...) - line exceed 1024b!");
         exit(-__LINE__);
@@ -1490,7 +1491,7 @@ void printc(ssh_coordinate x,ssh_coordinate y,
     }
 }
 
-/** Wyprowadzenie tekstu na ekran (default colors). */
+/* Wyprowadzenie tekstu na ekran (default colors). */
 UNUSED_ATTR_
 void print_d(ssh_coordinate x,ssh_coordinate y,const char* format,...)
 {
@@ -1505,7 +1506,7 @@ void print_d(ssh_coordinate x,ssh_coordinate y,const char* format,...)
 
     va_end(argptr);
 
-    if(straznik1!=0x77 || straznik2!=0x77)
+    if(mem_guard1 != 0x77 || mem_guard2 != 0x77)
     {
         fprintf(stderr,"symshell.print(...) - line exceed 1024b!");
         exit(-__LINE__);
@@ -1548,8 +1549,10 @@ void print_d(ssh_coordinate x,ssh_coordinate y,const char* format,...)
     }
 }
 
-/** BUDOWANIE WEWNĘTRZNYCH KOLORÓW W X11 - TODO CHECK
- *  \brief Tworzenie kolory RBG w X11
+/* BUDOWANIE WEWNĘTRZNYCH KOLORÓW W X11 - TODO CHECK
+ * =================================================*/
+
+/** \brief Tworzenie kolorów RBG w X11
  *  \details Funkcja jest inline i tylko dla tego pliku źródłowego
  *  \see https://www.geeksforgeeks.org/inline-function-in-c/
  * */
@@ -1561,8 +1564,7 @@ unsigned long buildColor(unsigned char red, unsigned char green, unsigned char b
            ( (unsigned long)(blue) ) ;
 }
 
-/** BUDOWANIE WEWNĘTRZNYCH KOLORÓW W X11. TODO CHECK
- *  \brief Tworzenie kolory RBGA w X11
+/** \brief Tworzenie kolorów RBGA w X11.
  *  \details Funkcja jest inline i tylko dla tego pliku źródłówego
  *  \see https://www.geeksforgeeks.org/inline-function-in-c/
  * */
@@ -1575,7 +1577,7 @@ unsigned long buildTransparentColor(unsigned char red, unsigned char green, unsi
            ( (unsigned long)(blue) ) ;
 }
 
-/** Drukuje z możliwością ustawienia tuszu poprzez RGB. */
+/* Drukuje z możliwością ustawienia tuszu poprzez RGB. */
 UNUSED_ATTR_
 void print_rgb(ssh_coordinate x,ssh_coordinate y,
                ssh_intensity r,ssh_intensity g,ssh_intensity b,            /*- składowe koloru tekstu */
@@ -1592,9 +1594,9 @@ void print_rgb(ssh_coordinate x,ssh_coordinate y,
 
     va_end(argptr);
 
-    if(straznik1!=0x77 || straznik2!=0x77)
+    if(mem_guard1 != 0x77 || mem_guard2 != 0x77)
     {
-        fprintf(stderr,"symshell.print(...) - line exceed 1024b!");
+        fprintf(stderr,"symshell.print(...) - line exceed maximal length!");
         exit(-__LINE__);
     }
 
@@ -1634,7 +1636,7 @@ void print_rgb(ssh_coordinate x,ssh_coordinate y,
     }
 }
 
-/** Wyświetlenie punktu na ekranie w kolorze rgb ustawionym ze składowych. */
+/* Wyświetlenie punktu na ekranie w kolorze rgb ustawionym ze składowych. */
 UNUSED_ATTR_
 void plot_rgb(ssh_coordinate x,ssh_coordinate y,ssh_intensity r,ssh_intensity g,ssh_intensity b)
 {
@@ -1660,7 +1662,7 @@ void plot_rgb(ssh_coordinate x,ssh_coordinate y,ssh_intensity r,ssh_intensity g,
     }
 }
 
-/** Wyświetlenie punktu na ekranie w kolorze domyślnym. */
+/* Wyświetlenie punktu na ekranie w kolorze domyślnym. */
 UNUSED_ATTR_
 void plot_d(ssh_coordinate x,ssh_coordinate y)
 {
@@ -1689,7 +1691,7 @@ void plot_d(ssh_coordinate x,ssh_coordinate y)
     }
 }
 
-/** Wyświetlenie punktu na ekranie w kolorze indeksowanym. */
+/* Wyświetlenie punktu na ekranie w kolorze indeksowanym. */
 UNUSED_ATTR_
 void plot(ssh_coordinate x,ssh_coordinate y,ssh_color c)
 {
@@ -1718,13 +1720,12 @@ void plot(ssh_coordinate x,ssh_coordinate y,ssh_color c)
     }
 }
 
-/** Ustala styl rysowania linii.
- * \details possible values: SSH_LINE_SOLID, SSH_LINE_DOTTED, SSH_LINE_DASHED
- * \warning NOT IMPLEMENTED!
- * */
+/* Ustala styl rysowania linii. */
 UNUSED_ATTR_
 int line_style(int Style)
 {
+    /** \internal possible values: SSH_LINE_SOLID, SSH_LINE_DOTTED, SSH_LINE_DASHED
+     *  \warning NOT IMPLEMENTED! */
     if(ssh_trace_level>0)
         fprintf(stderr,"%s %s %c", __FUNCTION__ ,"not implemented ",'\t');
     if(ssh_trace_level>0)
@@ -1739,12 +1740,11 @@ int line_style(int Style)
     return SSH_LINE_SOLID; //Nie jest zaimplementowane
 }
 
-/** Ustala aktualny kolor linii za pomocą typu ssh_color
- *  \warning style is NOT IMPLEMENTED!
- * */
+/* Ustala aktualny kolor linii za pomocą typu `ssh_color` */
 UNUSED_ATTR_
 void set_pen(ssh_color c,ssh_natural size,ssh_mode style)
 {
+    /** \internal ... \warning style is NOT IMPLEMENTED! */
     if(PenColor!=Scale[c])
     {
         PenColor=Scale[c];
@@ -1752,35 +1752,33 @@ void set_pen(ssh_color c,ssh_natural size,ssh_mode style)
     }
 }
 
-/** Ustala aktualny kolor linii za pomocą składowych RGB
- *  \warning style is NOT IMPLEMENTED!
- * */
+/* Ustala aktualny kolor linii za pomocą składowych RGB */
 UNUSED_ATTR_
 void set_pen_rgb(ssh_intensity r,ssh_intensity g,ssh_intensity b,ssh_natural size,ssh_mode style)
 {
+    /** \internal ... \warning style is NOT IMPLEMENTED! */
     PenColor=buildColor(r,g,b);
     default_line_width=size;
 }
 
 
-/** Ustala aktualny kolor linii za pomocą składowych RGBA TODO TEST
- *  \warning style is NOT IMPLEMENTED!
- * */
+/* Ustala aktualny kolor linii za pomocą składowych RGBA TODO TEST */
 UNUSED_ATTR_
 void set_pen_rgba(ssh_intensity r,ssh_intensity g,ssh_intensity b,ssh_intensity a,ssh_natural size,ssh_mode style)
 {
+    /** \internal ... \warning style is NOT IMPLEMENTED! */
     PenColor=buildTransparentColor(r,g,b,a);
     default_line_width=size;
 }
 
-/** Aktualna grubość lini. */
+/* Aktualna grubość linij. */
 UNUSED_ATTR_
 ssh_natural get_line_width()
 {
     return default_line_width;
 }
 
-/** Ustala szerokość linii. Może być kosztowne. Zwraca stan poprzedni */
+/* Ustala szerokość linij. Może być kosztowne. Zwraca stan poprzedni */
 UNUSED_ATTR_
 ssh_natural line_width(ssh_natural width)
 {
@@ -1798,7 +1796,7 @@ ssh_natural line_width(ssh_natural width)
     return old;
 }
 
-/** Ustala aktualny kolor wypełnień za pomocą typu ssh_color */
+/* Ustala aktualny kolor wypełnień za pomocą typu ssh_color */
 UNUSED_ATTR_
 void set_brush(ssh_color c)
 {
@@ -1808,21 +1806,21 @@ void set_brush(ssh_color c)
     }
 }
 
-/** Ustala aktualny kolor wypełnień za pomocą składowych RGB */
+/* Ustala aktualny kolor wypełnień za pomocą składowych RGB */
 UNUSED_ATTR_
 void set_brush_rgb(ssh_intensity r,ssh_intensity g,ssh_intensity b)
 {
     BrushColor=buildColor(r,g,b);
 }
 
-/** Ustala aktualny kolor wypełnień za pomocą składowych RGBA, TODO TEST */
+/* Ustala aktualny kolor wypełnień za pomocą składowych RGBA, TODO TEST */
 UNUSED_ATTR_
 void set_brush_rgba(ssh_intensity r,ssh_intensity g,ssh_intensity b,ssh_intensity a)
 {
     BrushColor=buildTransparentColor(r,g,b,a);
 }
 
-/** Wyrysowanie linii w kolorze domyślnym */
+/* Wyrysowanie linii w kolorze domyślnym */
 UNUSED_ATTR_
 void line_d(int x1,int y1,int x2,int y2)
 {
@@ -1839,7 +1837,7 @@ void line_d(int x1,int y1,int x2,int y2)
     }
 
     x1*=mulx;x2*=mulx; /* Multiplication of coordinates */
-    y1*=muly;y2*=muly;  /* if the window is bigger */
+    y1*=muly;y2*=muly; /* if the window is bigger */
 
     if(PenColor!=-1)
     {
@@ -1854,7 +1852,7 @@ void line_d(int x1,int y1,int x2,int y2)
         XDrawLine(display,cont_pixmap, gc, x1, y1, x2, y2);
 }
 
-/** Wyrysowanie okręgu w kolorze 'c' */
+/* Wyrysowanie okręgu w kolorze 'c' */
 UNUSED_ATTR_
 void circle_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r)
 {
@@ -1887,7 +1885,7 @@ void circle_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r)
         XDrawArc(display, cont_pixmap , gc, x-r1, y-r2, r1*2, r2*2, 0, angle2);
 }
 
-/** Wyrysowanie elipsy w kolorze indeksowanym 'c' */
+/* Wyrysowanie elipsy w kolorze indeksowanym 'c' */
 UNUSED_ATTR_
 void ellipse_d(ssh_coordinate x,ssh_coordinate y,ssh_natural a,ssh_natural b)
 {
@@ -1920,7 +1918,7 @@ void ellipse_d(ssh_coordinate x,ssh_coordinate y,ssh_natural a,ssh_natural b)
         XDrawArc(display, cont_pixmap , gc, x-r1, y-r2, r1*2, r2*2, 0, angle2);
 }
 
-/** Wyrysowanie kola w kolorach domyślnych. */
+/* Wyrysowanie kola w kolorach domyślnych. */
 void fill_circle_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r)
 {
     int angle2=360*64,r1,r2;
@@ -1961,8 +1959,8 @@ void fill_circle_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r)
     }
 }
 
-/** Wypełnienie elipsy w kolorach domyślnych*/
-__attribute__((unused))
+/* Wypełnienie elipsy w kolorach domyślnych*/
+UNUSED_ATTR_
 void fill_ellipse_d(ssh_coordinate x, ssh_coordinate y, ssh_natural a, ssh_natural b)
 {
     int angle2=360*64,r1,r2;
@@ -2010,7 +2008,7 @@ static float degrees(float radians)
     return radians * deg_mult;
 }
 
-/** Rysuje łuk kołowy o promieniu `r` i kolorach DOMYŚLNYCH */
+/* Rysuje łuk kołowy o promieniu `r` i kolorach DOMYŚLNYCH */
 UNUSED_ATTR_
 void arc_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r,ssh_radian start,ssh_radian stop)
 {
@@ -2050,7 +2048,7 @@ void arc_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r,ssh_radian start,ssh_
         XDrawArc(display, cont_pixmap , gc, x-r1, y-r2, r1*2, r2*2,angle1, angle2);
 }
 
-/** Rysuje łuk kołowy o promieniu r i kolorach indeksowanych */
+/* Rysuje łuk kołowy o promieniu r i kolorach indeksowanych */
 UNUSED_ATTR_
 void arc(ssh_coordinate x,ssh_coordinate y,ssh_natural r, ssh_radian start,ssh_radian stop,ssh_color c)
 {
@@ -2090,7 +2088,7 @@ void arc(ssh_coordinate x,ssh_coordinate y,ssh_natural r, ssh_radian start,ssh_r
         XDrawArc(display, cont_pixmap , gc, x-r1, y-r2, r1*2, r2*2,angle1, angle2);
 }
 
-/** Rysuje łuk eliptyczny o półosiach `a` i `b` i w domyślnym kolorze. */
+/* Rysuje łuk eliptyczny o półosiach `a` i `b` i w domyślnym kolorze. */
 UNUSED_ATTR_
 void earc_d(ssh_coordinate x,ssh_coordinate y,
             ssh_natural a,ssh_natural b,
@@ -2132,7 +2130,7 @@ void earc_d(ssh_coordinate x,ssh_coordinate y,
         XDrawArc(display, cont_pixmap , gc, x-r1, y-r2, r1*2, r2*2,angle1, angle2);
 }
 
-/** Rysuje łuk eliptyczny w kolorze indeksowanym `c`. */
+/* Rysuje łuk eliptyczny w kolorze indeksowanym `c`. */
 UNUSED_ATTR_
 void earc(ssh_coordinate x,ssh_coordinate y,
           ssh_natural a,ssh_natural b,
@@ -2174,7 +2172,7 @@ void earc(ssh_coordinate x,ssh_coordinate y,
         XDrawArc(display, cont_pixmap , gc, x-r1, y-r2, r1*2, r2*2,angle1, angle2);
 }
 
-/** Wypełnia łuk kołowy w kolorze domyślnym. */
+/* Wypełnia łuk kołowy w kolorze domyślnym. */
 UNUSED_ATTR_
 void fill_arc_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r, /* wypełnia łuk kołowy o promieniu r*/
                 ssh_radian start,ssh_radian stop,                /* początku i końcu */
@@ -2231,7 +2229,7 @@ void fill_arc_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r, /* wypełnia ł
     }
 }
 
-/** Wypełnia łuk kołowy w kolorze indeksowanym `c`. */
+/* Wypełnia łuk kołowy w kolorze indeksowanym `c`. */
 UNUSED_ATTR_
 void fill_arc(ssh_coordinate x,ssh_coordinate y,ssh_natural r,         /* wirtualny środek i promień łuku */
               ssh_radian start,ssh_radian stop,                        /* początku i końcu */
@@ -2288,7 +2286,7 @@ void fill_arc(ssh_coordinate x,ssh_coordinate y,ssh_natural r,         /* wirtua
     }
 }
 
-/** Wypełnia łuk eliptyczny w kolorze domyślnym. */
+/* Wypełnia łuk eliptyczny w kolorze domyślnym. */
 UNUSED_ATTR_
 void fill_earc_d(ssh_coordinate x,ssh_coordinate y,                    /* wypełnia łuk eliptyczny */
                  ssh_natural a,ssh_natural b,                          /* o półosiach 'a' i 'b' */
@@ -2346,7 +2344,7 @@ void fill_earc_d(ssh_coordinate x,ssh_coordinate y,                    /* wypeł
     }
 }
 
-/** Wypełnia łuk eliptyczny w kolorze indeksowanym. */
+/* Wypełnia łuk eliptyczny w kolorze indeksowanym. */
 UNUSED_ATTR_
 void fill_earc(ssh_coordinate x,ssh_coordinate y,                      /* wirtualny środek łuku */
                ssh_natural a,ssh_natural b,                            /* o półosiach 'a' i 'b' */
@@ -2398,7 +2396,8 @@ void fill_earc(ssh_coordinate x,ssh_coordinate y,                      /* wirtua
             XDrawArc(display, cont_pixmap , gc, x-r1, y-r2, r1*2, r2*2,angle1,angle2);
     }
 }
-/** Wypełnienie prostokąta rozciągniętego między rogami x1y1 a x2y2, w kolorze rbg określonym składowymi koloru. */
+
+/* Wypełnienie prostokąta rozciągniętego między rogami x1y1 a x2y2, w kolorze rbg określonym składowymi koloru. */
 UNUSED_ATTR_
 void fill_rect_rgb(ssh_coordinate x1,ssh_coordinate y1,
                    ssh_coordinate x2,ssh_coordinate y2,
@@ -2421,7 +2420,7 @@ void fill_rect_rgb(ssh_coordinate x1,ssh_coordinate y1,
 
 }
 
-/** Wypełnienie prostokąta rozciągniętego między rogami x1y1 a x2y2, w kolorze domyślnym */
+/* Wypełnienie prostokąta rozciągniętego między rogami x1y1 a x2y2, w kolorze domyślnym */
 void fill_rect_d(int x1,int y1,int x2,int y2)
 {
     x1*=mulx; /* Multiplication of coordinates */
@@ -2442,7 +2441,7 @@ void fill_rect_d(int x1,int y1,int x2,int y2)
 
 }
 
-/** Wypełnienie prostokąta rozciągniętego między rogami x1y1 a x2y2, w kolorze indeksowanym c */
+/* Wypełnienie prostokąta rozciągniętego między rogami x1y1 a x2y2, w kolorze indeksowanym c */
 void fill_rect(int x1,int y1,int x2,int y2,ssh_color c)
 {                                                                                                 assert( display!=NULL);
                                                                                                    assert( gc != NULL);
@@ -2464,7 +2463,7 @@ void fill_rect(int x1,int y1,int x2,int y2,ssh_color c)
 
 }
 
-/** Wypełnia WIELOKĄT przesunięty o vx, vy w kolorach domyślnych */
+/* Wypełnia WIELOKĄT przesunięty o vx, vy w kolorach domyślnych */
 void fill_poly_d(ssh_coordinate vx,ssh_coordinate vy,
                  const ssh_point points[],int number)
 {
@@ -2514,7 +2513,7 @@ void fill_poly_d(ssh_coordinate vx,ssh_coordinate vy,
         free(LocalPoints);/* dealokacja */
 }
 
-/** Wypełnia kolo w kolorze c */
+/* Wypełnia kolo w kolorze c */
 void fill_circle(ssh_coordinate x, ssh_coordinate y, ssh_natural r, ssh_color c)
 {
     int angle2=360*64,r1,r2;
@@ -2546,7 +2545,7 @@ void fill_circle(ssh_coordinate x, ssh_coordinate y, ssh_natural r, ssh_color c)
         XFillArc(display, cont_pixmap , gc, x-r1, y-r2, r1*2, r2*2, 0, angle2);
 }
 
-/** Wyświetla okręg w kolorze c */
+/* Wyświetla okręg w kolorze c */
 void circle(ssh_coordinate x,ssh_coordinate y,ssh_natural r,ssh_color c)
 {
     int angle2=360*64,r1,r2;
@@ -2578,7 +2577,7 @@ void circle(ssh_coordinate x,ssh_coordinate y,ssh_natural r,ssh_color c)
         XDrawArc(display, cont_pixmap , gc, x-r1, y-r2, r1*2, r2*2, 0, angle2);
 }
 
-/** Wypełnia wielokąt przesunięty o vx, vy w kolorze indeksowanym c */
+/* Wypełnia wielokąt przesunięty o vx, vy w kolorze indeksowanym c */
 void fill_poly(ssh_coordinate vx,ssh_coordinate vy,
                const ssh_point points[],int number,  /* - tablica wierzchołków wielokąta i jej długość */
                ssh_color c)
@@ -2628,7 +2627,7 @@ void fill_poly(ssh_coordinate vx,ssh_coordinate vy,
         free(LocalPoints);
 }
 
-/** Wyświetlenie linii w kolorze c */
+/* Wyświetlenie linii w kolorze c */
 void line(ssh_coordinate x1,ssh_coordinate y1,
           ssh_coordinate x2,ssh_coordinate y2,
           ssh_color c)
@@ -2661,21 +2660,20 @@ void line(ssh_coordinate x1,ssh_coordinate y1,
         XDrawLine(display,cont_pixmap, gc, x1, y1, x2, y2);
 }
 
-
-/** Informs the system that we do not care about the visibility of previous graphics operations
- * \details It allows you to inform the graphic system that
- * the entire screen or window will be blurred with new content without cleaning.
- * \warning DO NOTHING UNDER X11
- * \todo XSync(...,discards)? https://tronche.com/gui/x/xlib/event-handling/XSync.html
- */
 UNUSED_ATTR_
 int invalidate_screen()
-{
+{/** \internal Informs the system that we do not care about the visibility of previous graphics operations
+   * It allows you to inform the graphic system that
+   * the entire screen or window will be blurred with new content without cleaning.
+   * \warning DO NOTHING UNDER X11
+   * \todo XSync(...,discards)? https://tronche.com/gui/x/xlib/event-handling/XSync.html
+   */
+
     //clear_screen();//Dla pewności? NIE! DROGIE. Nie po to unikamy w sytuacji zamazywania przez nową treść.
     return 0;
 }
 
-/** Clears the screen before changing the content to something new. */
+/* Clears the screen before changing the content to something new. */
 UNUSED_ATTR_
 void clear_screen()
 {
@@ -2698,12 +2696,12 @@ void clear_screen()
     }
 }
 
-/** Specifies the area of the screen that needs to be redrawed
- *  \details i.e: ... due to interactions between the windows.
- *  \warning UNLESS IT IS WORKING CORRECTLY!
- */
-ssh_stat repaint_area(ssh_coordinate* x,ssh_coordinate* y,ssh_natural* width,ssh_natural* height)
+/* Specifies the area of the screen that needs to be redraw
+ *  i.e: ... due to interactions between the windows. */
+ssh_stat repaint_area(ssh_coordinate* x,ssh_coordinate* y,
+                      ssh_natural* width,ssh_natural* height)
 {
+    /** \internal UNLESS IT IS WORKING CORRECTLY! */
     if(repaint_flag==1)
     {
         *x=last_repaint_data.x/mulx;
@@ -2729,7 +2727,7 @@ ssh_stat repaint_area(ssh_coordinate* x,ssh_coordinate* y,ssh_natural* width,ssh
         return -1;
 }
 
-/** Reads the last use_mouse event */
+/* Reads the last mouse event. */
 ssh_stat get_mouse_event(int* xpos,int* ypos,int* click)
 {
     if(LastMouse.flags!=0)
@@ -2792,7 +2790,7 @@ static void SetScaleOld(XColor RGBarray[])
         fprintf(stderr,"%s\n","X11: SetScaleOld() completed");
 }
 
-/** Sets the default indexed color scale */
+/** Sets the default indexed color scale. */
 static void SetScale(XColor RGBarray[])
 {
     unsigned k;
@@ -2857,7 +2855,7 @@ static void SetScale(XColor RGBarray[])
         fprintf(stderr,"%s\n","X11: SetScale() completed");
 }
 
-/** Redefines one indexed color. Indices 0..255 */
+/* Redefines one indexed color. Indices 0..255 */
 void    set_rgb(ssh_color color,ssh_intensity r,ssh_intensity g,ssh_intensity b)
 {
     XColor pom;
@@ -2878,7 +2876,7 @@ void    set_rgb(ssh_color color,ssh_intensity r,ssh_intensity g,ssh_intensity b)
 #endif
 }
 
-/** Make the program wait for a certain number of ms
+/* Make the program wait for a certain number of ms
 * \see \n http://stackoverflow.com/questions/1157209/is-there-an-alternative-sleep-function-in-c-to-milliseconds */
 void delay_ms(ssh_natural ms)
 {
@@ -2886,7 +2884,7 @@ void delay_ms(ssh_natural ms)
     usleep(ms*1000);// 1 ms = 1 000 μs
 }
 
-/** Make the program wait for a certain number of μs
+/* Make the program wait for a certain number of μs
 * \see \n http://stackoverflow.com/questions/1157209/is-there-an-alternative-sleep-function-in-c-to-milliseconds */
 UNUSED_ATTR_
 void delay_us(ssh_natural us)
@@ -2947,8 +2945,7 @@ const char* event_name(int code)
         return "Undefined";
 }
 
-#include <X11/xpm.h>  /*  THIS SHOULD LOOK LIKE WHEN Xpm IS NORMALLY INSTALLED */
-//#include "SYMSHELL/Xpm/xpm.h"
+
 
 /** Saves the screen content to a graphic file in the natural platform format: BMP, XBM, etc. */
 ssh_stat dump_screen(const char* Filename)

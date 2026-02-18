@@ -19,7 +19,7 @@
  **
  ** \library    SYMSHELLLIGHT  version 2026a
  ** 
-/// @date 2026-02-17 (last modification)
+/// @date 2026-02-18 (last modification)
  */
 #include <iostream>
 #include <fstream>
@@ -665,7 +665,7 @@ ssh_mode    line_style(ssh_mode Style)
 [[maybe_unused]]
 ssh_mode    put_style(ssh_mode Style)
 {
-    /// \internal W module SVG nie ma efektu.
+    /// \internal W module SVG nie ma efektu. TODO SVG put_style?
     if(ssh_trace_level>1) cout << "SVG: " << WB_FUNCTION_NAME_ << SEP; //put_style
     if(ssh_trace_level>1) cout << Style << SEP << "IGNORED!" << endl;
     return  SSH_SOLID_PUT;  //Zwraca poprzedni stan
@@ -867,10 +867,10 @@ ssh_mode  buffered()
 [[maybe_unused]]
 ssh_mode fixed()
 {
-    /// \internal W przypadku implementacji SVG zawsze zwraca 1
+    /// \internal W przypadku implementacji SVG zawsze zwraca SSH_YES
     if(ssh_trace_level>2) cout << "SVG: " << WB_FUNCTION_NAME_ << SEP << "return yes===1"; //fixed
     if(ssh_trace_level>2) cout << endl;
-    return 1;
+    return SSH_YES;
 }
 
 // Aktualny kolor tła.
@@ -895,10 +895,10 @@ ssh_natural get_line_width()
 [[maybe_unused]]
 ssh_color get_pen()
 {
-    /// \internal W przypadku implementacji SVG zawsze zwraca -1024 (out of table!)
+    /// \internal W przypadku implementacji SVG zawsze zwraca -1.
     if(ssh_trace_level>2) cout << "SVG: " << WB_FUNCTION_NAME_ << SEP; //get_pen
     if(ssh_trace_level>2) cout <<"IGNORED"<< endl;
-    return -1024;
+    return -1;
 }
 
 // Aktualny kolor wypełnień jako `ssh_color`.

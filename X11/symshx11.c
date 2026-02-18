@@ -1,10 +1,12 @@
 /** *********************************************************************
  * \file symshx11.c                                                     *
  * \brief X11 implementation of                                         *
- *      SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++            *
- * ******************************************************************** *
- * \details Najprostszy interface wizualizacyjny zaimplementowany       *
- *          pod X-windows za pomocą biblioteki X11                      *                    
+ *      SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++            */
+/// @date 2026-02-18 (last modifications)
+
+/* ******************************************************************** */
+/** \details Najprostszy interface wizualizacyjny zaimplementowany      *
+ *          pod X-windows za pomocą biblioteki X11                      *
  *          Na Ubuntu/Debianie potrzebne pakiety:                       *
  *                  `libx11-dev` i `libxpm-dev`                         *
  *                                                                      *
@@ -18,9 +20,7 @@
  *                                                                      *
  ************************************************************************
  *                           SYMSHELLLIGHT                              *
- ************************************************************************
- */
-/// @date 2026-02-17 (last modifications)
+ * **********************************************************************/
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -167,7 +167,9 @@ UNUSED_ATTR_
  static unsigned        NumberOfColors=512; /* ??? */
  static unsigned long   Scale[514];
  static unsigned long   PenColor=-1;
+ static unsigned int    PenIndex=255;
  static unsigned long   BrushColor=-1;
+ static unsigned int    BrushIndex=0;
  static XColor          ColorArray[512];
  static void SetScale(XColor RGBarray[512]);      /**< Ustawianie RGB kolorów indeksowanych. */
 
@@ -272,6 +274,13 @@ UNUSED_ATTR_
         fprintf(stderr,"fix_size() not implemented\n");
  }
 
+/* Sprawdza, czy okno ma zafiksowana wielkość? */
+UNUSED_ATTR_
+ssh_mode fixed()
+{
+    return SSH_YES;
+}
+
 /* Ustala czy mysz ma być obsługiwana. */
 /** \internal W X11 zawsze jest, ale można ją ignorować. */
 UNUSED_ATTR_
@@ -311,14 +320,22 @@ void buffering_setup(int _n)
          isbuffered=1;  /* żeby można było na nia pisać */
  }
 
- /* Podaje, czy jest buforowanie... */
+/* Podaje, czy jest buforowanie... */
 UNUSED_ATTR_
- unsigned get_buffering()
+ ssh_mode get_buffering()
  {
      return animate;
  }
 
- /** Zamykanie i zwalnianie zasobów. */
+/* Podaje, czy jest buforowanie... */
+UNUSED_ATTR_
+ssh_mode buffered()
+{
+    return animate;
+}
+
+
+/** Zamykanie i zwalnianie zasobów. */
  static void CloseAll()
  {
      if(display==0)
@@ -851,7 +868,8 @@ void shell_setup(const char* title, int i_argc, const char* i_argv[])
     largc=i_argc;
     largv=i_argv;
 
-    strncpy(progname,largv[0],1024); /* TODO TEST! */
+    if(largc>0)
+        strncpy(progname,largv[0],1024); /* TODO TEST! */
     strncpy(window_name, title, 1024);
     strncpy(icon_name, title,1024);
 
@@ -1740,6 +1758,18 @@ int line_style(int Style)
     return SSH_LINE_SOLID; //Nie jest zaimplementowane
 }
 
+/* Ustala stosunek nowego rysowania do starej zawartości ekranu. */
+UNUSED_ATTR_
+ssh_mode    put_style(ssh_mode Style)
+{
+    /// \internal W module X11 nie ma efektu. TODO X11 put_style?
+    if(ssh_trace_level>0)
+        fprintf(stderr,"%s %s %c", __FUNCTION__ ,"not implemented ",'\t');
+    if(ssh_trace_level>0)
+        fprintf(stderr,"%u\n", Style);
+    return  SSH_SOLID_PUT;  //Zwraca poprzedni stan
+}
+
 /* Ustala aktualny kolor linii za pomocą typu `ssh_color` */
 UNUSED_ATTR_
 void set_pen(ssh_color c,ssh_natural size,ssh_mode style)
@@ -1747,10 +1777,19 @@ void set_pen(ssh_color c,ssh_natural size,ssh_mode style)
     /** \internal ... \warning style is NOT IMPLEMENTED! */
     if(PenColor!=Scale[c])
     {
-        PenColor=Scale[c];
+        PenIndex=c;
+        PenColor=Scale[PenIndex];
         default_line_width=size;
     }
 }
+
+/* Aktualny kolor linii jako ssh_color (indeks). */
+UNUSED_ATTR_
+ssh_color get_pen()
+{
+    return PenIndex;
+}
+
 
 /* Ustala aktualny kolor linii za pomocą składowych RGB */
 UNUSED_ATTR_
@@ -1759,6 +1798,7 @@ void set_pen_rgb(ssh_intensity r,ssh_intensity g,ssh_intensity b,ssh_natural siz
     /** \internal ... \warning style is NOT IMPLEMENTED! */
     PenColor=buildColor(r,g,b);
     default_line_width=size;
+    PenIndex=-1;
 }
 
 
@@ -1769,6 +1809,7 @@ void set_pen_rgba(ssh_intensity r,ssh_intensity g,ssh_intensity b,ssh_intensity 
     /** \internal ... \warning style is NOT IMPLEMENTED! */
     PenColor=buildTransparentColor(r,g,b,a);
     default_line_width=size;
+    PenIndex=-1;
 }
 
 /* Aktualna grubość linij. */
@@ -1802,8 +1843,16 @@ void set_brush(ssh_color c)
 {
     if(BrushColor!=Scale[c])
     {
-        BrushColor=Scale[c];
+        BrushIndex=c;
+        BrushColor=Scale[BrushIndex];
     }
+}
+
+/* Aktualny kolor wypełnień jako `ssh_color` (indeks) */
+UNUSED_ATTR_
+ssh_color get_brush()
+{
+    return BrushIndex;
 }
 
 /* Ustala aktualny kolor wypełnień za pomocą składowych RGB */
@@ -1811,6 +1860,7 @@ UNUSED_ATTR_
 void set_brush_rgb(ssh_intensity r,ssh_intensity g,ssh_intensity b)
 {
     BrushColor=buildColor(r,g,b);
+    BrushIndex=0;
 }
 
 /* Ustala aktualny kolor wypełnień za pomocą składowych RGBA, TODO TEST */
@@ -1818,6 +1868,7 @@ UNUSED_ATTR_
 void set_brush_rgba(ssh_intensity r,ssh_intensity g,ssh_intensity b,ssh_intensity a)
 {
     BrushColor=buildTransparentColor(r,g,b,a);
+    BrushIndex=0;
 }
 
 /* Wyrysowanie linii w kolorze domyślnym */
@@ -2858,23 +2909,52 @@ static void SetScale(XColor RGBarray[])
 /* Redefines one indexed color. Indices 0..255 */
 void    set_rgb(ssh_color color,ssh_intensity r,ssh_intensity g,ssh_intensity b)
 {
-    XColor pom;
-    unsigned long pixels[1];
-    pom.red=r*256;
-    pom.blue=b*256;
-    pom.green=g*256;
     Scale[color]=buildColor(r,g,b);
-    pixels[0]=pom.pixel=Scale[color];
-    pom.pixel=0;
+
 #if 0   // W trybie true-color to wydaje się niepotrzebne, a co ciekawsze czasem wywraca program
-    if(XAllocColor(display,colormap,&pom)!=0)
     {
-        Scale[color]=pom.pixel;
-        /*Niepewna metoda,lub wrecz zla */
-        XFreeColors(display,colormap,pixels, 1,0);
+        XColor pom;
+        unsigned long pixels[1];
+        pom.red=r*256;
+        pom.blue=b*256;
+        pom.green=g*256;
+        pixels[0]=pom.pixel=Scale[color]; //To CHYBA NIEPOTRZEBNE też?
+        pom.pixel=0;
+
+        if(XAllocColor(display,colormap,&pom)!=0)
+        {
+            Scale[color]=pom.pixel;
+            /*Niepewna metoda, lub wręcz zła */
+            XFreeColors(display,colormap,pixels, 1,0);
+        }
     }
 #endif
 }
+
+/* Zmienia definicje pojedynczego odcienia szarości w palecie szarości. */
+void set_gray(ssh_color shade,ssh_intensity intensity)
+{
+    shade%=256;
+    Scale[256+shade]=buildColor(intensity,intensity,intensity);
+#if 0  // W trybie true-color to wydaje się niepotrzebne, a co ciekawsze czasem wywraca program
+    {
+        XColor pom;
+        unsigned long pixels[1];
+        pom.red = intensity * 256;
+        pom.blue = intensity * 256;
+        pom.green = intensity * 256;
+        pixels[0] = pom.pixel = Scale[256 + shade]; //To CHYBA NIEPOTRZEBNE też?
+        pom.pixel = 0;
+
+        if (XAllocColor(display, colormap, &pom) != 0) { //Obsługa błędu:
+            Scale[256 + shade] = pom.pixel;
+            /*Niepewna metoda, lub wręcz zla */
+            XFreeColors(display, colormap, pixels, 1, 0);
+        }
+    }
+#endif
+}
+
 
 /* Make the program wait for a certain number of ms
 * \see \n http://stackoverflow.com/questions/1157209/is-there-an-alternative-sleep-function-in-c-to-milliseconds */

@@ -1,13 +1,15 @@
 /// @file
 /// @brief Test linkowania podprogramów SYMSHELL'a.
+/// @date 2026-02-18 (last update)
+/// @author W.Borkowski: https://github.com/borkowsk
 /// @details Linking test for:
-/// SYMSHELL.H - SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++
-///*******************************************************************
-/// designed by W.Borkowski: https://github.com/borkowsk
+///     SYMSHELL.H - SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++
+///     *****************************************************************
+/// ##HISTORY
 /// - Last changed massively: 22.06.2007
 /// - Comments edition:       19.11.2021
 /// - Small changes:          06.02.2023
-/// @date 2026-02-02 (last update)
+/// - Next....
 
 #include "symshell.h"
 
@@ -102,7 +104,7 @@ void test()
     /* POBIERANIE ZNAKÓW Z KLAWIATURY i ZDARZEŃ OKIENNYCH (w tym z MENU) */
     while (true)
     {
-        if( input_ready() ) 	            /* Funkcja sprawdzająca, czy jest cos do wzięcia z wejścia */
+        if( input_ready() )                 /* Funkcja sprawdzająca, czy jest cos do wzięcia z wejścia */
         {
             int c = get_char();    	        /* Funkcja odczytywania znaków sterowania */
             if( c=='a' )

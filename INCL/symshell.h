@@ -13,7 +13,7 @@
  **
  ** \library    SYMSHELLLIGHT  version 2026a
  ** 
-/// @date 2026-02-17 (last modification)
+/// @date 2026-02-18 (last modification)
  */
 
 #ifndef _SYMSHELL_H_
@@ -218,7 +218,10 @@ void set_brush_rgba(ssh_intensity r,                            /**< Składowa r
 /** \brief Sprawdza buforowanie. \return Zwraca 1, jeśli buforowane. */
 ssh_mode  buffered();
 
-/** \brief Sprawdza, czy okno ma zafiksowana wielkość? \return Zwraca 1, jeśli TAK. */
+/** \brief Sprawdza, czy okno ma zafiksowana wielkość? \return Zwraca SSH_YES albo SSH_NO.
+ *  \details Aktualnie tylko w środowisku MS Windows dostępne są obie opcje.
+ *           W SVG rozmiar jest zawsze zafiksowany, a w X11 jest elastyczny zewnętrznie, ale multiplikowany.
+ *           Zatem grafika jest skalowana wielokrotnościami, ale napisy pozostają w tym samym rozmiarze. */
 ssh_mode  fixed();
 
 /** \brief Jakie są ustawienia RGB konkretnego kolorku w palecie. */
@@ -227,12 +230,16 @@ ssh_rgb   get_rgb_from(ssh_color c);
 /** \brief Aktualny kolor tla... */
 ssh_color background();
 
-/** \brief Aktualny kolor linii jako `ssh_color`.
-    \details W przypadku implementacji SVG zawsze zwraca -1024 (out of table!) */
+/** \brief Aktualny kolor linii jako `ssh_color` (indeks koloru w tabeli).
+    \details
+        Jeśli "pen" został ustawiony w trybie RBG(A), to zwraca wartość (unsigned)-1.
+        W przypadku implementacji SVG zawsze zwraca -1024. */
 ssh_color get_pen();
 
 /** \brief Aktualny kolor wypełnień jako `ssh_color`.
-    \details W przypadku implementacji SVG zawsze zwraca 0 (czarny) */
+    \details
+        Jeśli "brush" został ustawiony w trybie RBG(A), to zwraca wartość (unsigned)-1.
+        W przypadku implementacji SVG zawsze zwraca 0 (czarny) */
 ssh_color get_brush();
 
 /** \brief Aktualna grubość linii. */

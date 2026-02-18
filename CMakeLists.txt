@@ -6,7 +6,7 @@
 # Manually define WITHTESTS=true, if you want build test applications!
 #
 # (c)ISS UW, @author Wojciech Borkowski
-# @date 2026-02-02 (last update)
+# @date 2026-02-18 (last update)
 ##################################################################################
 
 cmake_minimum_required(VERSION 3.11)
@@ -47,7 +47,7 @@ if(true) # SVG SYMSHELL LIB
 			"UTILS/wb_rand.cpp"
 			"UTILS/wb_randg.c"
 			"UTILS/sshmenufdummy.c" #dummy functions of menus
-			 "SVG/errorent.c"
+			"UTILS/error_enter_before_clean.c"
 		)
 	#target_compile_features(wbsyshSVG PUBLIC cxx_std_11)
 endif()
@@ -80,7 +80,7 @@ if(X11) # only for X11 LIB
 			"UTILS/wb_rand.cpp"
 			"UTILS/wb_randg.c"
 			"UTILS/sshmenufdummy.c" #dummy functions of menus
-			"X11/errorent.c"
+			"UTILS/error_enter_before_clean.c"
 		)
 
 	#target_compile_features(wbsyshX11 PUBLIC cxx_std_11)
@@ -95,9 +95,9 @@ if(WINDOWS) # only for WINDOWS - NOT TESTED IN THIS VERSION (after 2016)
 			"UTILS/wb_pchar.cpp"
 			"UTILS/wb_rand.cpp"
 			"UTILS/wb_randg.c"
-			"WIN/sshmenufwin.c"
+			"WIN/sshmenufwin.c" #real functions for MS Windows menus.
 			#"UTILS/sshmenufdummy.c" #dummy functions of menus
-			"WIN/errorent.c"
+			"UTILS/error_enter_before_clean.c"
 		)
 
 	#target_compile_features(wbsyshWIN PUBLIC cxx_std_11)
@@ -119,8 +119,9 @@ if(X11 AND WITHTESTS ) #X11 tests
 				)
 	add_executable("TestsymsX11"	"EXAMPLES/Testsyms.cpp"	)
 	add_executable("TestsyshX11"	"EXAMPLES/Testsysh.cpp"	)
-	add_executable("TurmitX11"	"EXAMPLES/Turmit.cpp"		)
-	add_executable("CAGasX11"	"EXAMPLES/CAGas.cpp"		)
+	add_executable("TurmitX11"	    "EXAMPLES/Turmit.cpp"	)
+	add_executable("CAGasX11"	    "EXAMPLES/CAGas.cpp"	)
+	add_executable("LinktestX11"    "EXAMPLES/Linktest.cpp" )
 
 	target_link_libraries("TestmousX11" wbsyshLight X11 Xpm rt)
 	target_link_libraries("TestpaleX11" wbsyshLight X11 Xpm rt)
@@ -130,38 +131,23 @@ if(X11 AND WITHTESTS ) #X11 tests
 	target_link_libraries("TestsyshX11" wbsyshLight X11 Xpm rt)
 	target_link_libraries("TurmitX11"   wbsyshLight X11 Xpm rt)
 	target_link_libraries("CAGasX11"    wbsyshLight X11 Xpm pthread rt)
-
-	#add_executable("LinktestX11" "EXAMPLES/Linktest.cpp"    )
-	#target_link_libraries("LinktestX11" wbsyshX11 X11 Xpm rt)
+	target_link_libraries("LinktestX11" wbsyshLight X11 Xpm rt)
 endif()
 
-if( WINDOWS AND WITHTESTS ) #X11 tests
-	add_executable("TestmousWIN"
-				"EXAMPLES/Testmous.cpp"
-			)
-	add_executable("TestpaleWIN"
-				"EXAMPLES/Testpale.cpp"
-			)
-	add_executable("TestpolyWIN"
-				"EXAMPLES/Testpoly.cpp"
-			)
+if( WINDOWS AND WITHTESTS ) #MS Windows tests
+	add_executable("TestmousWIN" "EXAMPLES/Testmous.cpp" )
+	add_executable("TestpaleWIN" "EXAMPLES/Testpale.cpp" )
+	add_executable("TestpolyWIN" "EXAMPLES/Testpoly.cpp" )
 	add_executable("TestrandWIN"
 				"EXAMPLES/Testrand.cpp"
 				"UTILS/wb_randg.c"
 				"UTILS/wb_rand.cpp"
 			)
-	add_executable("TestsymsWIN"
-				"EXAMPLES/Testsyms.cpp"
-			)
-	add_executable("TestsyshWIN"
-				"EXAMPLES/Testsysh.cpp"
-			)
-	add_executable("TurmitWIN"
-				"EXAMPLES/Turmit.cpp"
-			)
-	add_executable("CAGasWIN"
-				"EXAMPLES/CAGas.cpp"
-			)
+	add_executable("TestsymsWIN" "EXAMPLES/Testsyms.cpp" )
+	add_executable("TestsyshWIN" "EXAMPLES/Testsysh.cpp" )
+	add_executable("TurmitWIN"   "EXAMPLES/Turmit.cpp" )
+	add_executable("CAGasWIN"    "EXAMPLES/CAGas.cpp" )
+	add_executable("LinktestWIN" "EXAMPLES/Linktest.cpp" )
 
 	target_link_libraries("TestmousWIN" wbsyshLight  )
 	target_link_libraries("TestpaleWIN" wbsyshLight  )
@@ -171,9 +157,7 @@ if( WINDOWS AND WITHTESTS ) #X11 tests
 	target_link_libraries("TestsyshWIN" wbsyshLight  )
 	target_link_libraries("TurmitWIN"   wbsyshLight  )
 	target_link_libraries("CAGasWIN"    wbsyshLight  )
-
-	add_executable("LinktestWIN" "EXAMPLES/Linktest.cpp"    )
-	target_link_libraries("LinktestWIN" wbsyshLight )
+	target_link_libraries("LinktestWIN" wbsyshLight  )
 endif()
 
 
@@ -186,10 +170,11 @@ if(WITHTESTS) #SVG tests
 					"UTILS/wb_randg.c"
 					"UTILS/wb_rand.cpp"
 				)
-	add_executable("TestsymsSVG" "EXAMPLES/Testsyms.cpp"    )
-	add_executable("TestsyshSVG" "EXAMPLES/Testsysh.cpp"    )
-	add_executable("TurmitSVG" "EXAMPLES/Turmit.cpp"    )
-	add_executable("CAGasSVG" "EXAMPLES/CAGas.cpp"    )
+	add_executable("TestsymsSVG" "EXAMPLES/Testsyms.cpp" )
+	add_executable("TestsyshSVG" "EXAMPLES/Testsysh.cpp" )
+	add_executable("TurmitSVG"   "EXAMPLES/Turmit.cpp"   )
+	add_executable("CAGasSVG"    "EXAMPLES/CAGas.cpp"    )
+	add_executable("LinktestSVG" "EXAMPLES/Linktest.cpp" )
 
 	if( WINDOWS )
 		target_link_libraries("TestmousSVG" wbsyshLightSVG  )
@@ -200,26 +185,16 @@ if(WITHTESTS) #SVG tests
 		target_link_libraries("TestsyshSVG" wbsyshLightSVG  )
 		target_link_libraries("TurmitSVG"   wbsyshLightSVG  )
 		target_link_libraries("CAGasSVG"    wbsyshLightSVG  )
-
-		add_executable("LinktestSVG"
-					"EXAMPLES/Linktest.cpp"
-				)
-
 		target_link_libraries("LinktestSVG" wbsyshLightSVG  )
 	else()
-		target_link_libraries("TestmousSVG" wbsyshLightSVG  rt)
-		target_link_libraries("TestpaleSVG" wbsyshLightSVG  rt)
-		target_link_libraries("TestpolySVG" wbsyshLightSVG  rt)
-		target_link_libraries("TestrandSVG" wbsyshLightSVG  rt)
-		target_link_libraries("TestsymsSVG" wbsyshLightSVG  rt)
-		target_link_libraries("TestsyshSVG" wbsyshLightSVG  rt)
-		target_link_libraries("TurmitSVG"   wbsyshLightSVG  rt)
+		target_link_libraries("TestmousSVG" wbsyshLightSVG rt)
+		target_link_libraries("TestpaleSVG" wbsyshLightSVG rt)
+		target_link_libraries("TestpolySVG" wbsyshLightSVG rt)
+		target_link_libraries("TestrandSVG" wbsyshLightSVG rt)
+		target_link_libraries("TestsymsSVG" wbsyshLightSVG rt)
+		target_link_libraries("TestsyshSVG" wbsyshLightSVG rt)
+		target_link_libraries("TurmitSVG"   wbsyshLightSVG rt)
 		target_link_libraries("CAGasSVG"    wbsyshLightSVG pthread rt)
-
-		add_executable("LinktestSVG"
-					"EXAMPLES/Linktest.cpp"
-				)
-
 		target_link_libraries("LinktestSVG" wbsyshLightSVG rt )
 	endif()
 

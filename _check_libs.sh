@@ -18,14 +18,14 @@ check_package() {
 # Definicja nazw pakietów dla różnych systemów
 if [ -f /etc/debian_version ]; then
     OS_TYPE="Debian-based"
-    XLIB_PKG="libx11-6"
-    XPM_PKG="libxpm4"
-    # Opcjonalnie wersje deweloperskie: libx11-dev, libxpm-dev
+    # Pakiety deweloperskie dla Debiana
+    XLIB_PKG="libx11-dev"
+    XPM_PKG="libxpm-dev"
 elif [ -f /etc/redhat-release ]; then
     OS_TYPE="RedHat-based"
-    XLIB_PKG="libX11"
-    XPM_PKG="libXpm"
-    # Opcjonalnie wersje deweloperskie: libX11-devel, libXpm-devel
+    # Pakiety deweloperskie dla RedHat/Fedora
+    XLIB_PKG="libX11-devel"
+    XPM_PKG="libXpm-devel"
 else
     echo "Nieobsługiwany system operacyjny."
     exit 1

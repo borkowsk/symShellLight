@@ -2,28 +2,28 @@
 #skrypt, który łączy wykrywanie systemu, sprawdzanie obecności bibliotek X11 oraz interaktywną ich instalację w razie potrzeby
 #Zrobione w całości przez Gemini
 
-# --- 1. Wykrywanie systemu i konfiguracja zmiennych ---
+# --- 1. Wykrywanie systemu i konfiguracja nazw deweloperskich ---
 if [ -f /etc/debian_version ]; then
     OS_TYPE="Debian-based"
     PKG_MANAGER="apt"
     CHECK_CMD="dpkg -s"
-    # Nazwy pakietów dla Debiana/Ubuntu
-    XLIB_PKG="libx11-6"
-    XPM_PKG="libxpm4"
+    # Pakiety deweloperskie dla Debiana
+    XLIB_PKG="libx11-dev"
+    XPM_PKG="libxpm-dev"
 elif [ -f /etc/redhat-release ]; then
     OS_TYPE="RedHat-based"
-    PKG_MANAGER="dnf" # dnf jest standardem w nowszych systemach, zastąpił yum
+    PKG_MANAGER="dnf"
     CHECK_CMD="rpm -q"
-    # Nazwy pakietów dla RHEL/CentOS/Fedora
-    XLIB_PKG="libX11"
-    XPM_PKG="libXpm"
+    # Pakiety deweloperskie dla RedHat/Fedora
+    XLIB_PKG="libX11-devel"
+    XPM_PKG="libXpm-devel"
 else
     echo "Błąd: Nieobsługiwany system operacyjny."
     exit 1
 fi
 
-echo "System: $OS_TYPE"
-echo "Menedżer pakietów: $PKG_MANAGER"
+echo "Wykryto system: $OS_TYPE"
+echo "Tryb: Sprawdzanie pakietów deweloperskich (-dev/-devel)"
 echo "------------------------------------------"
 
 # --- 2. Funkcja sprawdzająca i instalująca ---
@@ -35,10 +35,12 @@ manage_package() {
         echo "[ZAINSTALOWANY]"
     else
         echo "[BRAK]"
-        read -p "Czy chcesz zainstalować pakiet $pkg? [y/N]: " choice
+        read -p "Czy chcesz zainstalować pakiet deweloperski $pkg? [y/N]: " choice
         case "$choice" in
             [yY][eE][sS]|[yY])
-                echo "Próba instalacji $pkg..."
+                echo "Aktualizacja list pakietów i instalacja $pkg..."
+                # Dodano 'sudo apt update' dla Debiana, by uniknąć błędów 404
+                [[ "$PKG_MANAGER" == "apt" ]] && sudo apt update
                 sudo $PKG_MANAGER install -y "$pkg"
                 ;;
             *)
@@ -48,9 +50,9 @@ manage_package() {
     fi
 }
 
-# --- 3. Wykonanie dla konkretnych bibliotek ---
+# --- 3. Wykonanie dla bibliotek deweloperskich ---
 manage_package "$XLIB_PKG"
 manage_package "$XPM_PKG"
 
 echo "------------------------------------------"
-echo "Zakończono sprawdzanie bibliotek."
+echo "Zakończono sprawdzanie."

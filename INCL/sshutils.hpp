@@ -30,6 +30,12 @@
 #define M_PI_4      0.785398163397448309616
 #endif
 
+/// Pomocnicza funkcja kwadratowa dla skrócenia kodu tu i tam...
+template<class NUM>
+inline NUM sqr(const NUM& x)
+{ return x*x; }
+
+
 /**
  * @defgroup SymShellUtils Różne dodatkowe narzędzia do grafiki
  * \brief    Zdefiniowane kolory i dodatkowe kształty

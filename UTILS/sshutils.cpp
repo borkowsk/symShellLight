@@ -26,12 +26,6 @@
 
 using namespace std;
 
-/// Pomocnicza funkcja kwadratowa dla elegancji kodu
-inline int sqr(int x)
-{
-    return x*x;
-}
-
 /// Funkcja ta drukuje w obszarze nie większym niz 'maxwidth' z justowaniem
 /// Sekwencje określające justowanie muszą być na początku i są to:
 /// %@L - left , %@R - right oraz %@C - center.

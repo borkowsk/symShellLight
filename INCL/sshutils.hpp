@@ -16,7 +16,7 @@
 #error C++ required
 #endif
 
-#include <math.h>
+#include <cmath>
 #include "symshell.h"
 
 #ifndef M_PI
@@ -51,28 +51,28 @@ typedef ssh_color wb_color;
 
 // Zestaw identyfikatorów kolorów 'sshutils'
 
-const wb_color default_transparent=wb_color(-1);     ///< domyślny kolor do oznaczania transparentności
-const wb_color default_color=default_transparent;    ///< domyślny kolor indeksowany
-const wb_color default_black=0;                      ///< domyślny kolor indeksowany czarny
-const wb_color default_white=255;                    ///< domyślny kolor indeksowany biały
-const wb_color default_dark_gray=256+64;             ///< domyślny kolor indeksowany ciemno szary
-const wb_color default_half_gray=256+128;            ///< domyślny kolor indeksowany średnio szary
-const wb_color default_light_gray=256+128+64;        ///< domyślny kolor indeksowany jasno szary
+const wb_color default_transparent=wb_color(-1);     ///< Domyślny kolor do oznaczania transparentności
+const wb_color default_color=default_transparent;    ///< Domyślny kolor indeksowany
+const wb_color default_black=0;                      ///< Domyślny kolor indeksowany czarny
+const wb_color default_white=255;                    ///< Domyślny kolor indeksowany biały
+const wb_color default_dark_gray=256+64;             ///< Domyślny kolor indeksowany ciemnoszary
+const wb_color default_half_gray=256+128;            ///< Domyślny kolor indeksowany średnio szary
+const wb_color default_light_gray=256+128+64;        ///< Domyślny kolor indeksowany jasnoszary
 
 /// \brief Funkcja interpretująca string jako wartość RGB
 /// \param s powinno zawierać tekst z definicją koloru RBG
-/// \param endptr pozwala sprawdzić czy nie było błędu
-/// \return kolor RBG zakodowany w postaci liczby 32 bitowej. TODO - powinno zwracać ssh_rgba, ale na razie nie używamy
+/// \param endptr pozwala sprawdzić, czy nie było błędu
+/// \return kolor RBG zakodowany w postaci liczby 32-bitowej. TODO — powinno zwracać ssh_rgba, ale na razie nie używamy
 /// \details Dopuszczalne formaty to: xFFFFFF  b111111111111111111111111  rgb(255,255,255) RGB(255,255,255)
 unsigned strtorgb(const char *s, char **endptr);
 
 // Ustawienia grubości i rozmiarów elementów 'sshutils'
 
-extern int def_frame_width;/* =1;*/                  ///< domyślna grubość ramki
-extern int def_cross_width;/* =5;*/                  ///< domyślna szerokość krzyżyka
-extern int def_scale_width;/* =10;*/                 ///< domyślna szerokość skali
-extern double def_arrow_size;/* =15;*/               ///< domyślna długość grota strzałki
-extern double def_arrow_theta;/*=M_PI/6.0+M_PI;*/    ///< domyślne rozwarcie grota strzałki
+extern int def_frame_width;/* =1;*/                  ///< Domyślna grubość ramki
+extern int def_cross_width;/* =5;*/                  ///< Domyślna szerokość krzyżyka
+extern int def_scale_width;/* =10;*/                 ///< Domyślna szerokość skali
+extern double def_arrow_size;/* =15;*/               ///< Domyślna długość grota strzałki
+extern double def_arrow_theta;/*=M_PI/6.0+M_PI;*/    ///< Domyślne rozwarcie grota strzałki
 
 /// \brief Struktura konfiguracji słupków 3D.
 struct settings_bar3d
@@ -87,15 +87,15 @@ struct settings_bar3d
                ):
 		a(ia),b(ib),c(ic),wire(wcol),back(bcol)
         {}
-    int         a; ///< długość odcinka a słupka
-    int         b; ///< długość odcinka b słupka
-    int         c; ///< długość odcinka c słupka
+    int         a; ///< Długość odcinka a słupka
+    int         b; ///< Długość odcinka b słupka
+    int         c; ///< Długość odcinka c słupka
     wb_color wire; ///< Kolor ramek
     wb_color back; ///< Informacja o kolorze tla
 };
 
 /// \brief  Funkcja konfiguracji słupków 3D
-/// \return Zwraca poprzednią konfiguracje albo NULL jeśli przywraca poprzednio zapamiętaną
+/// \return Zwraca poprzednią konfigurację albo NULL, jeśli przywraca poprzednio zapamiętaną
 const settings_bar3d* bar3d_config(settings_bar3d* st);
 
 /// \brief  Rysuje słupek 3D w kolorach indeksowanych
@@ -104,7 +104,7 @@ void bar3d(int x,int y,int h,wb_color col1,wb_color col2);
 /// \brief  Rysuje słupek 3D w kolorze RBG z cieniem
 void bar3dRGB(int x,int y,int h,int R,int G,int B,int ShadowDiv);
 
-/// \brief  Rysuje kwadratowa ramkę o zadanej grubości
+/// \brief  Rysuje kwadratową ramkę o zadanej grubości
 void rect(int x1,int y1,int x2,int y2,wb_color frame_c,int width=def_frame_width);
 
 /// \brief  Rysuje pionową skalę kolorów
@@ -132,7 +132,7 @@ int print_width(int x,int y,int max_width,wb_color col,wb_color bcg,const char* 
 
 extern "C" {
 /// \brief Wyświetlanie pliku HTML poprzez shell systemowy.
-/// \details Tak naprawdę można użyć do wszystkich typów plików
+/// \details Tak naprawdę można użyć do wszystkich typów plików,
 ///          jakie może wyświetlić przeglądarka
 /// \param URL - pełny URL, ale czasem ujdzie i nazwa pliku :-D
 /// \return powinien zwrócić kod wykonania programu "dziecka"
@@ -141,7 +141,7 @@ extern "C" {
 
 ///@}
 /* ******************************************************************/
-/*              SYMSHELLLIGHT  version 2022-10-27                   */
+/*                 SYMSHELLLIGHT  version 2026                      */
 /* ******************************************************************/
 /*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
 /*            W O J C I E C H   B O R K O W S K I                   */

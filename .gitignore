@@ -39,13 +39,17 @@ TESTS/RawTests/native/native
 
 
 # IDE configs or cmake temporaries
-*.cmake
-CMakeFiles/
+.idea/*
 cmake-build-debug/
+cmake-build-release/
+cmake-build-relwithdebinfo/
+doxDocs/
+CMakeFiles/
+
+*.cmake
 CMakeLists.txt.user
 CMakeCache.txt
 Makefile
 
 *.cbp
-.idea/*
 .qtcreator.err

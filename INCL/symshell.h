@@ -13,7 +13,7 @@
  **
  ** \library    SYMSHELLLIGHT  version 2026a
  ** 
-/// @date 2026-02-18 (last modification)
+/// @date 2026-04-16 (last modification)
  */
 
 #ifndef _SYMSHELL_H_
@@ -81,6 +81,29 @@ extern unsigned long _ssh_window;
 /** Określa czy zamykać od razu, czy dać szanse na przejrzenie zawartości.
 * Do sterowania `close_plot` - czy wymaga ono potwierdzenia od użytkownika. */
 extern int WB_error_enter_before_clean/* =0 */;
+
+
+typedef struct WBProposedContextMenyOtherData {
+    unsigned long long ScrIdentifier; /**< Dane identyfikacji systemu wyświetlania. Np. Display handle w X11 */
+    unsigned long long WinIdentifier; /**< Dane identyfikacji wywołującego okna. Np. Window handle w X11 */
+    unsigned X; /**< Bezwzględne położenie `x` kursora w układzie wyświetlacza albo -1, gdy nie można obliczyć. */
+    unsigned Y; /**< Bezwzględne położenie `y` kursora w układzie wyświetlacza albo -1, gdy nie można obliczyć. */
+} WBProposedContextMenyOtherData;
+
+/** Funkcja uruchamiająca kontekstowe menu po kliknięciu prawym klawiszem myszy.
+ * @param x - współrzędna pozioma kursora myszy.
+ * @param y - współrzędna pionowa kursora myszy.
+ * @param other_data - wskaźnik do rekordu danych użytkownika zawierającego co najmniej uchwyt Display i uchwyt okna.
+ * @return 0 gdy menu nic nie zwróciło albo oczekujemy, że wynik wróci później jako message.
+ *        -1 gdy funkcja zaniechała obsługi i kliknięcie ma być przekazane normalnej obsłudze w aplikacji (przez `\b`).
+ *         Każda wartość dodatnia jest traktowana jako komunikat do zwrócenia przez funkcję `get_char()`.
+ *         Inna wartość ujemna powoduje wyświetlenie informacji o błędzie, ze sprawdzeniem wartości zmiennej `errno`.
+ * @details Funkcja może być blokująca lub nieblokująca (np. odpalać osobny wątek). Podstawową implementację dostarcza
+ *          biblioteka SYMSHELL, ale zdefiniowanie własnej przez użytkownika biblioteki blokuje linkowanie wersji domyślnej.
+ */
+extern long long WB_context_menu_expected(unsigned x,unsigned y,struct WBProposedContextMenyOtherData* other_data);
+
+
 
 /* OTWIERANIE i ZAMYKANIE TRYBU (OKNA) GRAFICZNEGO */
 /* Operacje konfiguracyjne o działaniu gwarantowanym przed inicjacją */

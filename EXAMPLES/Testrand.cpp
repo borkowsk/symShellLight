@@ -4,7 +4,7 @@
 ///-------------------------------------------------------------------------
 /// Demonstruje skalowanie okna niezależne od aplikacyjnej strony programu
 /// i robione w funkcjach symshell'a.
-/// @date 2026-02-02 (last update)
+/// @date 2026-04-16 (last update)
 //-////////////////////////////////////////////////////////////////////////////
 #include "symshell.h"
 #include <cstdio>
@@ -59,8 +59,8 @@ void replot()
     flush_plot();
 }
 
-/*  OGÓLNA FUNKCJA MAIN */
-/************************/
+/*  OGÓLNA FUNKCJA MAIN  */
+/* ********************* */
 
 int main(int argc,const char* argv[])
 {
@@ -84,15 +84,19 @@ int main(int argc,const char* argv[])
     {
         int inpt;
 
-        while(!input_ready()) // Czekaj na wejście
+        while(!input_ready()) // Czekaj na jakieś wejście
             replot(); // odrysowując
 
         inpt=get_char(); //Jest wejście. Trzeba przetworzyć.
         switch(inpt)
         {
-        default:
-        case '\r':
-        case '\0': /* do nothing */ break;
+        default: printf("Event: %d %x %c\n",inpt,inpt,inpt);
+                 fflush(stdout);
+                 break;
+        case '\0': /* A not important event */
+                   printf("noImpEvent ");
+                   break;
+        case '\r': break;
         case 's':std=!std;break;
         case 'q':
         case EOF:

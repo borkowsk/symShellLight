@@ -2,8 +2,7 @@
  * \file symshx11.c                                                     *
  * \brief X11 implementation of                                         *
  *      SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++            */
-/// @date 2026-02-18 (last modifications)
-
+/// @date 2026-04-16 (last modifications)
 /* ******************************************************************** */
 /** \details Najprostszy interface wizualizacyjny zaimplementowany      *
  *          pod X-windows za pomocą biblioteki X11                      *
@@ -16,7 +15,9 @@
  *                                                                      *
  *      File changed massively: 21.10.2020                              *
  * \note                                                                *
- *  WCIĄŻ Z BŁĘDEM NA EXPOSE! TODO, choć raz go już gdzieś usunąłem     *
+ *  get_char() aktualnie zjada wszystkie nieznakowe komunikaty, jakie   *
+ *  są w kolejce komunikatów, przez co EXPOSE działa jeszcze inaczej... *
+ *  Czy błędnie to na razie trudno powiedzieć.                          *
  *                                                                      *
  ************************************************************************
  *                           SYMSHELLLIGHT                              *
@@ -33,6 +34,7 @@
 #include <X11/Xos.h>
 //#include <X11/Xatom.h>
 #include <X11/xpm.h>  /*  THIS SHOULD LOOK LIKE WHEN Xpm IS NORMALLY INSTALLED */
+#include <errno.h>
 //#include "SYMSHELL/Xpm/xpm.h"
 
 #include "symshell.h"
@@ -62,7 +64,7 @@ UNUSED_ATTR_
 const char *_ssh_grx_module_name="SVG";
 
 /** Maska poziomów śledzenia 1-msgs 2-grafika 3-grafika detaliczna 4-alokacje/zwalnianie */
- int                    ssh_trace_level = 0;
+int                    ssh_trace_level = 0;
 
 #ifdef __cplusplus
 }
@@ -94,8 +96,9 @@ const char *_ssh_grx_module_name="SVG";
  /* These are used as arguments to nearly every Xlib routine, so it
    * saves routine arguments to declare them global; if there were
    * additional source files, they would be declared `extern` there */
- static Display         *display=0; /**< HANDLER TO Display */
- static int             screen_num; /**< SCREEN NUMBER */
+ static Display         *display=0;                /**< HANDLER TO Display */
+ static Atom            wmDeleteMessage=0;         /**< ATOM przypisywany przy rejestracji "protokołu" zamknięcia okna */
+ static int             screen_num;                /**< SCREEN NUMBER */
  static char            *display_name = NULL;      /**< Display name. To be read. */
  static unsigned int    display_width=0;           /**< Will be filled during initialization */
  static unsigned int    display_height=0;          /**< Will be filled during initialization */
@@ -195,9 +198,9 @@ UNUSED_ATTR_
  /* OBSŁUGA SYGNAŁÓW */
  const  int             error_limit=3;             /**< Limit odesłanych błędów od x-serwera */
  static int             error_count=3;             /**< Antylicznik błędów. Gdy osiąga 0 - koniec programu */
+ static int             pipe_break=0;              /**< Informacja o zerwaniu połączenia z X serwerem */
 UNUSED_ATTR_
  static int             DelayAction=0;             /**< Sterowanie zasypianiem, jeśli program czeka. NIEUŻYWANE. TODO? */
- static int             pipe_break=0;              /**< Informacja o zerwaniu połączenia z X serwerem */
 
  /** Default signal handler. */
  static void SigPipe(int num)
@@ -216,21 +219,27 @@ UNUSED_ATTR_
     int (*XSetIOErrorHandler(handler))()
           int (*handler)(Display *);
 
-    Arguments
+    Arguments:
     handler 	Specifies the program's supplied error handler.
-    Description
-    The XSetIOErrorHandler() sets the fatal I/O error handler. Xlib calls the program's supplied error handler if any sort of system call error occurs (for example, the connection to the server was lost). This is assumed to be a fatal condition, and the called routine should not return. If the I/O error handler does return, the client process exits.
+
+    Description:
+    The `XSetIOErrorHandler()` sets the fatal I/O error handler. `Xlib` calls the program's supplied error handler
+    if any sort of system call error occurs (for example, the connection to the server was lost).
+    This is assumed to be a fatal condition, and the called routine should not return.
+    If the I/O error handler does return, the client process exits.
 
     Note that the previous error handler is returned.
   */
  {
-     pipe_break=1; /* Process finished with after window close should be treated as normal situation! */
+     pipe_break=1; /* Zamknięcie okna powinno być traktowane jako normalna sytuacja. Ale jak to zrobić? */
 
-     fprintf(stderr,"\nX11-SYMSHELL GOT A IOError\n");
+     fprintf(stderr,"\nX11-SYMSHELL GOT A IOError; errno:%d\n",errno);
      XSetIOErrorHandler(NULL); /* Kasowanie dotychczasowej funkcji obsługi błędów z wywołania XSetIOErrorHandler(MyXIOHandler); */
-     exit( -1 );         /* 245 was my choice??? !!! */
 
-     return -11;
+     if(error_count--==0)
+         exit( -13 );         /* 245 was my choice??? !!! */
+
+     return 0; /* Gdy tu dochodził i tak kończyło się wyjściem poprzez bibliotekę z kodem 1. */
  }
 
  /** Default X Error handler.
@@ -542,229 +551,285 @@ inline static void _place_graphics(
 }
 
 /** Obsługa zdarzeń X11. */
-static void _read_XInput()
+static long int _read_XInput()
 {
-    static int buffer_empty=1;
-
+    static int is_gr_buffer_empty=1; /* Czy bufor graficzny jest pusty i wymaga wypełnienia? */
     XEvent report;  /* Miejsce na odczytywane zdarzenia */
 
     if(pipe_break)	/* Musi zwrócić EOF */
     {
         *buforek=EOF;
-        return ;
+        return EOF;
     }
 
-    /* Get events, use first to display text and graphics
-     *    display - specifies the connection to the X server.
-     *    event_return - returns the next event in the queue.
-     * The XNextEvent() function copies the first event from the event queue into the specified
-     * XEvent structure and then removes it from the queue. If the event queue is empty,
-     * XNextEvent() flushes the output buffer and _b_l_o_c_k_s_ until an event is received.
-     * See: https://tronche.com/gui/x/xlib/event-handling/manipulating-event-queue/XNextEvent.html */
-    int ret=0;
-    GET_AGAIN: //TODO BO TO NIE TAKIE PROSTE...
-    ret=XNextEvent(display, &report);
-    if(ret<0)
-        fprintf(stderr,"XNextEvent has retuned error code: %i\n",ret);
+    do {
+        /* Pobierz dostępne zdarzenia i, jeśli zdarzenie wymaga obsługi zewnętrznej, wyjdź.
+         * display — określa połączenie z serwerem X.
+         * event_return — zwraca następne zdarzenie w kolejce.
+         * Funkcja `XNextEvent()` kopiuje pierwsze zdarzenie z kolejki zdarzeń do określonej
+         * struktury `XEvent`, a następnie usuwa je z tej kolejki.
+         * Jeśli kolejka zdarzeń jest pusta, `XNextEvent()` opróżnia bufor wyjściowy (flush)
+         * i blokuje działanie do momentu odebrania zdarzenia.
+         * Zobacz: https://tronche.com/gui/x/xlib/event-handling/manipulating-event-queue/XNextEvent.html */
+        int ret = 0;
+        GET_AGAIN: //TODO BO TO NIE TAKIE PROSTE...
+        ret = XNextEvent(display, &report);
+        if (ret < 0)
+            fprintf(stderr, "XNextEvent has retuned error code: %i\n", ret);
 
-    switch  (report.type) {
-    case NoExpose: /* To nie wymaga żadnej obsługi. */
-            delay_ms(1);
-            //goto GET_AGAIN; /* Nic się nie zmieniło... TODO SPRYTNE ALE ROBI PROBLEM*/
-            break;
-    case Expose:
-        if(ssh_trace_level)
-            fprintf(stderr,"X11: EXPOSE: %s #%d x=%d y=%d %dx%d\n",
-                    icon_name,
-                    report.xexpose.count,
-                    report.xexpose.x,
-                    report.xexpose.y,
-                    report.xexpose.width,
-                    report.xexpose.height);
+        switch (report.type) {
+            case NoExpose: /* To nie wymaga żadnej obsługi. */
+                delay_ms(1);
+                //goto GET_AGAIN; /* Nic się nie zmieniło... TODO SPRYTNE ALE ROBI PROBLEM*/
+                break;
+            case Expose:
+                if (ssh_trace_level)
+                    fprintf(stderr, "X11: EXPOSE: %s #%d x=%d y=%d %dx%d\n",
+                            icon_name,
+                            report.xexpose.count,
+                            report.xexpose.x,
+                            report.xexpose.y,
+                            report.xexpose.width,
+                            report.xexpose.height);
 
-        /* Unless this is the last contiguous expose,
-           * don't draw the window */
-        /* if (!isbuffered && report.xexpose.count != 0)
-                         break;  */
+                /* Unless this is the last contiguous expose,
+                   * don't draw the window */
+                /* if (!isbuffered && report.xexpose.count != 0)
+                                 break;  */
 
-        /* If the main window is too small to use */
-        if(window_size == TOO_SMALL)
-            _tooSmall(win, gc, font_info);
-        else
-        {
-            XSetForeground(display, gc, Scale[CurrBackground]);
-            CurrForeground=-1;
+                /* If the main window is too small to use */
+                if (window_size == TOO_SMALL)
+                    _tooSmall(win, gc, font_info);
+                else {
+                    XSetForeground(display, gc, Scale[CurrBackground]);
+                    CurrForeground = -1;
 
-            XFillRectangle(display,win , gc,
-                           report.xexpose.x,
-                           report.xexpose.y,
-                           report.xexpose.width,
-                           report.xexpose.height);
+                    XFillRectangle(display, win, gc,
+                                   report.xexpose.x,
+                                   report.xexpose.y,
+                                   report.xexpose.width,
+                                   report.xexpose.height);
 
-            if( repaint_flag==1 || (!isbuffered) || buffer_empty )
-            {
-                /* Sumuje z marginesem, także, żeby pokrywało wszystkie zdarzenia expose. TODO. Niezbyt działa! */
-                if(last_repaint_data.x>report.xexpose.x)
-                    last_repaint_data.x=report.xexpose.x;
+                    if (repaint_flag == 1 || (!isbuffered) || is_gr_buffer_empty) {
+                        /* Sumuje z marginesem, także, żeby pokrywało wszystkie zdarzenia expose. TODO. Niezbyt działa! */
+                        if (last_repaint_data.x > report.xexpose.x)
+                            last_repaint_data.x = report.xexpose.x;
 
-                if(last_repaint_data.y>report.xexpose.y)
-                    last_repaint_data.y=report.xexpose.y;
+                        if (last_repaint_data.y > report.xexpose.y)
+                            last_repaint_data.y = report.xexpose.y;
 
-                /* Tu jest chyba źle */
-                if(last_repaint_data.width<report.xexpose.width)
-                    last_repaint_data.width+=report.xexpose.width;
+                        /* Tu jest chyba źle */
+                        if (last_repaint_data.width < report.xexpose.width)
+                            last_repaint_data.width += report.xexpose.width;
 
-                if(last_repaint_data.height<report.xexpose.height)
-                    last_repaint_data.height+=report.xexpose.height;
+                        if (last_repaint_data.height < report.xexpose.height)
+                            last_repaint_data.height += report.xexpose.height;
 
-                repaint_flag=1; /* Są już dane dla repaint */
+                        repaint_flag = 1; /* Są już dane dla repaint */
 
-                /* Set information for the main program about refresh screen */
-                if(report.xexpose.count == 0 ||  buffer_empty )
-                {
-                    if(ssh_trace_level)
-                        fprintf(stderr,"X11: EXPOSE force repaint\n");
-                    buforek[0]='\r';
-                    buffer_empty=0;
+                        /* Set information for the main program about refresh screen */
+                        if (report.xexpose.count == 0 || is_gr_buffer_empty) {
+                            if (ssh_trace_level)
+                                fprintf(stderr, "X11: EXPOSE force repaint\n");
+                            buforek[0] = '\r';
+                            is_gr_buffer_empty = 0;
+                            break;
+                        }
+                    } else {
+                        /* Refresh from pixmap buffer */
+                        if (ssh_trace_level)
+                            fprintf(stderr, "X11: EXPOSE DOING BITBLT\n");
+
+                        _place_graphics(win, gc,
+                                        report.xexpose.x, report.xexpose.y,
+                                        report.xexpose.width, report.xexpose.height
+                        );
+
+                        DelayAction = 0;/* Pojawiła się aktywność. Nie należy spać! */
+                    }
+                }
+                break;
+
+            case MappingNotify:
+                XRefreshKeyboardMapping((XMappingEvent *) &report);
+                DelayAction = 0;/* Pojawiła się aktywność. Nie należy spać! */
+                break;
+
+            case ConfigureNotify:
+                DelayAction = 0;/* Pojawiła się aktywność. Nie należy spać! */
+                if (ssh_trace_level)
+                    fprintf(stderr, "X11: CONFIGURE: %s=%dx%d scale: x=%d:1 y=%d:1 ",
+                            icon_name,
+                            width, height, mulx, muly);
+
+                /* The Window has been resized; change width
+                   * and height for next Expose */
+
+                if (width == report.xconfigure.width &&
+                    height == report.xconfigure.height) {
+                    if (ssh_trace_level)
+                        fprintf(stderr, "The same.\n");
+                    //goto GET_AGAIN; /* Nic się nie zmieniło... TODO SPRYTNE ALE ROBI PROBLEM*/
                     break;
                 }
-            }
-            else
+
+                width = report.xconfigure.width;
+                height = report.xconfigure.height;
+
+                if ((width < size_hints->min_width) ||
+                    (height < size_hints->min_height)) {
+                    window_size = TOO_SMALL;
+                    if (ssh_trace_level)
+                        fprintf(stderr, "To small!\n");
+                } else {
+                    window_size = BIG_ENOUGH;
+
+                    mulx = (width - ini_ca * font_width) / ini_a;
+                    muly = (height - ini_cb * font_height) / ini_b;
+
+                    if (mulx <= 0) mulx = 1; /* Gdy ekran przymusowo zmniejszony */
+                    if (muly <= 0) muly = 1;
+
+                    load_font(&font_info, &gc); /* New font - size changed */
+
+                    if (isbuffered) {
+                        ResizeBuffer(width, height);
+                        is_gr_buffer_empty = 1;
+                    }
+
+                    if (ssh_trace_level)
+                        fprintf(stderr, "->%dx%d scale: x=%d:1 y=%d:1 \n", width, height, mulx, muly);
+                }
+                break;
+
+            case ButtonPress:
             {
-                /* Refresh from pixmap buffer */
-                if(ssh_trace_level)
-                    fprintf(stderr,"X11: EXPOSE DOING BITBLT\n");
-                _place_graphics(win, gc ,
-                               report.xexpose.x,report.xexpose.y,
-                               report.xexpose.width,report.xexpose.height
-                               );
-                DelayAction=0;/* Pojawiła się aktywność. Nie należy spać! */
-            }
-        }
-        break;
+                DelayAction = 0; /* Pojawiła się aktywność. Nie należy spać! */
+                if(report.xbutton.button==3)
+                {
+                    WBProposedContextMenyOtherData data={(unsigned long long)display,win,-1,-1};
+                    assert(sizeof(data.ScrIdentifier)==sizeof(display));
+                    data.X=report.xbutton.x_root;
+                    data.Y=report.xbutton.y_root;
+                    long long ret=WB_context_menu_expected(report.xbutton.x,report.xbutton.y,&data);
+                    if(ret<-1)
+                    {
+                        //fprintf(stderr,);
+                        perror("`WB_context_menu_expected` failed");
+                        break;
+                    } else if(ret>0)
+                    {
+                        *buforek=ret;
+                        return ret;
+                    }
+                    else if(ret==-1)
+                    {
+                        // Sytuacja specjalna. Przekazanie tego kliku do normalnej obsługi uzytkownika.
+                    }
+                    else
+                    {
+                        // Nic do zrobienia na teraz.
+                        assert(ret==0);
+                        break;
+                    }
+                }
 
-    case MappingNotify:
-        XRefreshKeyboardMapping((XMappingEvent *)&report );
-        DelayAction=0;/* Pojawiła się aktywność. Nie należy spać! */
-        break;
+                if (use_mouse) {
+                    buforek[0] = '\b';
+                    LastMouse.flags = 1;
+                    LastMouse.x = report.xbutton.x;
+                    LastMouse.y = report.xbutton.y;
+                    LastMouse.buttons = report.xbutton.button;
 
-    case ConfigureNotify:
-        DelayAction=0;/* Pojawiła się aktywność. Nie należy spać! */
-        if(ssh_trace_level)
-            fprintf(stderr,"X11: CONFIGURE: %s=%dx%d scale: x=%d:1 y=%d:1 ",
-                    icon_name,
-                    width,height,mulx,muly);
+                    if (ssh_trace_level)
+                        fprintf(stderr, "ButtonPress:x=%d y=%d b=X0%x\n",
+                                LastMouse.x, LastMouse.y, LastMouse.buttons);
 
-        /* The Window has been resized; change width
-           * and height for next Expose */
+                    return '\b'; /* KAŻDE KLIKNIĘCIE MYSZOWE MUSI BYĆ OBSŁUŻONE PRZEZ KOD UŻYTKOWNIKA */
+                }
+            } break;
 
-        if( width== report.xconfigure.width &&
-                height== report.xconfigure.height)
-        {
-            if(ssh_trace_level)
-                fprintf(stderr,"The same.\n");
-            //goto GET_AGAIN; /* Nic się nie zmieniło... TODO SPRYTNE ALE ROBI PROBLEM*/
-            break;
-        }
-
-        width = report.xconfigure.width;
-        height = report.xconfigure.height;
-
-        if ((width < size_hints->min_width) ||
-                (height < size_hints->min_height))
-        {
-            window_size = TOO_SMALL;
-            if(ssh_trace_level)
-                fprintf(stderr,"To small!\n");
-        }
-        else
-        {
-            window_size = BIG_ENOUGH;
-
-            mulx=(width-ini_ca*font_width)/ini_a;
-            muly=(height-ini_cb*font_height)/ini_b;
-
-            if(mulx<=0) mulx=1; /* Gdy ekran przymusowo zmniejszony */
-            if(muly<=0) muly=1;
-
-            load_font(&font_info,&gc); /* New font - size changed */
-
-            if(isbuffered)
+            case KeyPress:
             {
-                ResizeBuffer(width,height);
-                buffer_empty=1;
-            }
+                char Bufor[8];
+                unsigned KeyCount = XLookupString((XKeyEvent *) &report, Bufor, sizeof(buforek), &theKeyXID, 0);
+                DelayAction = 0;/* Pojawiła się aktywność. Nie należy spać! */
 
-            if(ssh_trace_level)
-                fprintf(stderr,"->%dx%d scale: x=%d:1 y=%d:1 \n",width,height,mulx,muly);
-        }
-        break;
+                *buforek = *Bufor;/* Na zewnątrz widziane w zmiennej "buforek" */
 
-    case ButtonPress:
-        DelayAction=0; /* Pojawiła się aktywność. Nie należy spać! */
-        if(use_mouse)
-        {
-            buforek[0]='\b';
-            LastMouse.flags=1;
-            LastMouse.x=report.xbutton.x;
-            LastMouse.y=report.xbutton.y;
-            LastMouse.buttons=report.xbutton.button;
-            if(ssh_trace_level)
-                fprintf(stderr,"ButtonPress:x=%d y=%d b=X0%x\n",
-                        LastMouse.x,LastMouse.y,LastMouse.buttons  );
-        }
-        break;
+                if (KeyCount != 1)
+                    *buforek = NODATA;
 
-    case KeyPress:
-    {
-        char Bufor[8];
-        unsigned KeyCount=XLookupString((XKeyEvent *)&report, Bufor, sizeof(buforek), &theKeyXID, 0);
-        DelayAction=0;/* Pojawiła się aktywność. Nie należy spać! */
+                if (ssh_trace_level)
+                    fprintf(stderr, "KeyPress:%c %x \n ", *Bufor, (int) (*Bufor));
 
-        *buforek=*Bufor;/* Na zewnątrz widziane w zmiennej "buforek" */
+                if (*Bufor == 0x3 || *Bufor == 0x4) /* User przerwał w oknie X11 */
+                    *buforek = EOF;
 
-        if(KeyCount!=1)
-            *buforek=NODATA;
+                return *buforek; /* KAŻDE ZDARZENIE KLAWIATUROWE MUSI BYĆ OBSŁUŻONE PRZEZ KOD UŻYTKOWNIKA */
+            } break;
 
-        if(ssh_trace_level)
-            fprintf(stderr,"KeyPress:%c %x \n ",*Bufor,(int)(*Bufor));
+            case ClientMessage: /* https://tronche.com/gui/x/xlib/events/client-communication/client-message.html */
+            {
+                if (ssh_trace_level) {
+                    fprintf(stderr, " Client message arrived ");
+                    switch (report.xclient.format) {
+                        case 8:
+                            fprintf(stderr, "->%s\n", report.xclient.data.b);
+                            break;
+                        case 16:
+                            fprintf(stderr, "->0x%x\n", report.xclient.data.s[0]);
+                            break;
+                        case 32:
+                            fprintf(stderr, "->0x%lu\n", report.xclient.data.l[0]);
+                            break;
+                        default:
+                            fprintf(stderr, "->Invalid format field %d\n", report.xclient.format);
+                            break;
+                    }
+                }
 
-        if(*Bufor==0x3 || *Bufor==0x4) /* User przerwał w oknie X11 */
-            *buforek=EOF;
-    } break;
+                switch (report.xclient.format) { /* Drugie powtórzenie switch, ale za to nie będzie 3 if-ów */
+                    case 8:
+                        fprintf(stderr, " 8bit client message arrived. UNEXPECTED!\n");
+                        break;
+                    case 16:
+                        fprintf(stderr, " 16bit client message arrived.\n");
+                        if (report.xclient.data.s[0] == (short) 0xffff) {
+                            pipe_break = 1;
+                            *buforek = EOF;
+                        }
+                        break;
+                    case 32:
+                        if (report.xclient.data.l[0] == wmDeleteMessage) {
+                            fprintf(stderr, " [\xc3\x97] clicked.\n"); // [×]
+                            pipe_break = 1;
+                            *buforek = EOF;
+                        }
+                        else {
+                            fprintf(stderr, " 32bit client message arrived.\n");
+                            *buforek = report.xclient.data.l[0];
+                        }
+                        break;
+                    default:
+                        break;
+                }
 
-    case ClientMessage: /* https://tronche.com/gui/x/xlib/events/client-communication/client-message.html */
-    {
-        if(ssh_trace_level)
-        {
-            fprintf(stderr," Client message arrived ");
-            switch(report.xclient.format){
-            case 8:fprintf(stderr,"->%s\n", report.xclient.data.b);
-                break;
-            case 16:fprintf(stderr,"->0x%x\n", report.xclient.data.s[0]);
-                break;
-            case 32:fprintf(stderr,"->0x%lu\n", report.xclient.data.l[0]);
-                break;
-            default:fprintf(stderr,"->Invalid format field %d\n",report.xclient.format );
-                break;}
-        }
-        switch(report.xclient.format){
-        case 8: break;
-        case 16:if( report.xclient.data.s[0]==(short)0xffff)
-            {pipe_break=1;*buforek=EOF;}
-            break;
-        case 32:*buforek=report.xclient.data.l[0];
-            break;
-        default: break;}
-    } break;
+                return *buforek;  /* KAŻDE ZDARZENIE UŻYTKOWNIKA MUSI BYĆ OBSŁUŻONE PRZEZ KOD UŻYTKOWNIKA OCZYWIŚCIE */
+            } break;
 
-    default:
-        if(ssh_trace_level)
-            fprintf(stderr,"Message %d=\"%s\" arrived but ignored \n ",
-                    report.type, event_name(report.type) );
-        break;
-    } /* End switch */
+            default:
+            {
+                /* Nie powinno być zdarzeń, których w ogóle nie zauważamy! */
+                if (ssh_trace_level)
+                    fprintf(stderr, "Message %d=\"%s\" arrived but ignored \n ",
+                            report.type, event_name(report.type));
+            } break;
+        } /* End switch */
 
+    }while(XPending(display)!=0); /* Czy są może jeszcze jakieś zdarzenia do obsłużenia? */
+
+    return 0; /* Nie ma nic do obsługi na zewnątrz, choć były pewnie jakieś zdarzenia wewnętrzne. */
 }
 
 
@@ -951,17 +1016,17 @@ ssh_stat init_plot(ssh_natural a,ssh_natural b,ssh_natural ca,ssh_natural cb) {
     if (!(size_hints = XAllocSizeHints())) {
         fprintf(stderr, "X11: %s: failure allocating memory", progname);
         exit(-2);
-        return 0;
+        return -2;
     }
     if (!(wm_hints = XAllocWMHints())) {
         fprintf(stderr, "X11: %s: failure allocating memory", progname);
         exit(-2);
-        return 0;
+        return -2;
     }
     if (!(class_hints = XAllocClassHint())) {
         fprintf(stderr, "X11: %s: failure allocating memory", progname);
         exit(-2);
-        return 0;
+        return -2;
     }
 
     /* Connect to X server */
@@ -969,7 +1034,7 @@ ssh_stat init_plot(ssh_natural a,ssh_natural b,ssh_natural ca,ssh_natural cb) {
         fprintf(stderr, "X11: '%s': cannot connect to X server '%s'\n",
                 progname, XDisplayName(display_name));
         exit(-1);
-        return 0;
+        return -1;
     }
 
     /* Get screen size from display structure macro */
@@ -1130,7 +1195,8 @@ ssh_stat init_plot(ssh_natural a,ssh_natural b,ssh_natural ca,ssh_natural cb) {
     {
         fprintf( stderr, "X11: %s: structure allocation for "
                                "windowName failed.\n", progname);
-       exit(-1);return 0;
+       exit(-2);
+       return -2;
     }
 
     ptrName=icon_name; /** TODO CHECK - icon is empty now, but because of new windows managers probably */
@@ -1138,7 +1204,8 @@ ssh_stat init_plot(ssh_natural a,ssh_natural b,ssh_natural ca,ssh_natural cb) {
     {
         fprintf( stderr, "X11: %s: structure allocation for "
                          "iconName failed.\n", progname);
-       exit(-1);return 0;
+       exit(-1);
+       return -1;
     }
 
     /* Set size hints for window manager:
@@ -1203,6 +1270,9 @@ ssh_stat init_plot(ssh_natural a,ssh_natural b,ssh_natural ca,ssh_natural cb) {
     XIOErrorHandler ret;
     if( (ret=XSetIOErrorHandler(MyXIOHandler)) && ssh_trace_level )
         fprintf(stderr,"X11: IOErrorHandler installed. Ret=%p\n",ret);
+
+    wmDeleteMessage = XInternAtom(display, "WM_DELETE_WINDOW", False);
+    XSetWMProtocols(display, win, &wmDeleteMessage, 1);
 
     /* Alloc pixmap for contents buffering */
     if(isbuffered)
@@ -1334,7 +1404,7 @@ int  input_ready()
     if(XPending(display)!=0)    /* Sprawdzenie, czy nie ma zdarzeń */
     {			                /*SĄ JAKIEŚ!*/
         buforek[0]=NODATA; 	    /*Asekuranctwo ? */
-        /*bool ret=*/_read_XInput(); /* Przetwarzanie zdarzeń */
+        unsigned int ret=_read_XInput(); /* Przetwarzanie zdarzeń */
         if(buforek[0]!=NODATA)  /* Czy jest cos do zwrócenia jako znak? */
         {
             first_to_read=buforek[0]; /*Zostanie przeczytane przez get_char() */
@@ -1382,6 +1452,7 @@ int  get_char()
     _read_XInput();
     input_to_ret=buforek[0];
     buforek[0]=NODATA;
+
     return input_to_ret;
 }
 

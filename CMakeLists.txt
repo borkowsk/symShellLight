@@ -6,7 +6,7 @@
 # Manually define WITHTESTS=true, if you want build test applications!
 #
 # (c)ISS UW, @author Wojciech Borkowski
-# @date 2026-02-18 (last update)
+# @date 2026-04-16 (last update)
 ##################################################################################
 
 cmake_minimum_required(VERSION 3.20)
@@ -109,6 +109,20 @@ endif(WINDOWS)
 #######################
 
 if(X11 AND WITHTESTS ) #X11 tests
+	# 1. Definiujemy listę nazw programów, aby uniknąć powtórzeń
+	set(X11_EXAMPLES
+			"TestmousX11"
+			"TestpaleX11"
+			"TestpolyX11"
+			"TestrandX11"
+			"TestsymsX11"
+			"TestsyshX11"
+			"TurmitX11"
+			"CAGasX11"
+			"LinktestX11"
+	)
+
+	#2. Definicja źródeł (także dla tych z niestandardowymi plikami)
 	add_executable("TestmousX11"	"EXAMPLES/Testmous.cpp"    	)
 	add_executable("TestpaleX11"	"EXAMPLES/Testpale.cpp"    	)
 	add_executable("TestpolyX11"	"EXAMPLES/Testpoly.cpp"	)
@@ -123,18 +137,40 @@ if(X11 AND WITHTESTS ) #X11 tests
 	add_executable("CAGasX11"	    "EXAMPLES/CAGas.cpp"	)
 	add_executable("LinktestX11"    "EXAMPLES/Linktest.cpp" )
 
-	target_link_libraries("TestmousX11" wbsyshLight X11 Xpm rt)
-	target_link_libraries("TestpaleX11" wbsyshLight X11 Xpm rt)
-	target_link_libraries("TestpolyX11" wbsyshLight X11 Xpm rt)
-	target_link_libraries("TestrandX11" wbsyshLight X11 Xpm rt)
-	target_link_libraries("TestsymsX11" wbsyshLight X11 Xpm rt)
-	target_link_libraries("TestsyshX11" wbsyshLight X11 Xpm rt)
-	target_link_libraries("TurmitX11"   wbsyshLight X11 Xpm rt)
-	target_link_libraries("CAGasX11"    wbsyshLight X11 Xpm pthread rt)
-	target_link_libraries("LinktestX11" wbsyshLight X11 Xpm rt)
+	# 3. Masowe ustawienie bibliotek i katalogu wyjściowego
+	foreach(test_target ${X11_EXAMPLES})
+		# Kierujemy pliki wykonywalne do podkatalogu bin/
+		set_target_properties(${test_target} PROPERTIES
+				RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/bin"
+		)
+
+		# Wspólne biblioteki dla wszystkich
+		target_link_libraries(${test_target} wbsyshLight X11 Xpm rt)
+	endforeach()
+
+	# Specyficzny przypadek dla CAGas (dodatkowy pthread)
+	target_link_libraries("CAGasX11" pthread)
+
+	# 4. Cel zbiorczy (meta-target)
+	# Pozwala na wywołanie: make all_x11_tests
+	add_custom_target(all_x11_tests DEPENDS ${X11_EXAMPLES})
 endif()
 
 if( WINDOWS AND WITHTESTS ) #MS Windows tests
+	# 1. Definiujemy listę nazw programów, aby uniknąć powtórzeń
+	set(WIN_EXAMPLES
+			"TestmousSVG"
+			"TestpaleSVG"
+			"TestpolySVG"
+			"TestrandSVG"
+			"TestsymsSVG"
+			"TestsyshSVG"
+			"TurmitSVG"
+			"CAGasSVG"
+			"LinktestSVG"
+	)
+
+	#2. Definicja źródeł (także dla tych z niestandardowymi plikami)
 	add_executable("TestmousWIN" "EXAMPLES/Testmous.cpp" )
 	add_executable("TestpaleWIN" "EXAMPLES/Testpale.cpp" )
 	add_executable("TestpolyWIN" "EXAMPLES/Testpoly.cpp" )
@@ -149,6 +185,15 @@ if( WINDOWS AND WITHTESTS ) #MS Windows tests
 	add_executable("CAGasWIN"    "EXAMPLES/CAGas.cpp" )
 	add_executable("LinktestWIN" "EXAMPLES/Linktest.cpp" )
 
+	# 3. Masowe ustawienie katalogu wyjściowego
+	foreach(test_target ${WIN_EXAMPLES})
+		# Kierujemy pliki wykonywalne do podkatalogu bin/
+		set_target_properties(${test_target} PROPERTIES
+				RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/bin"
+		)
+	endforeach()
+
+	# 3b. Ustawienie bibliotek
 	target_link_libraries("TestmousWIN" wbsyshLight  )
 	target_link_libraries("TestpaleWIN" wbsyshLight  )
 	target_link_libraries("TestpolyWIN" wbsyshLight  )
@@ -158,10 +203,28 @@ if( WINDOWS AND WITHTESTS ) #MS Windows tests
 	target_link_libraries("TurmitWIN"   wbsyshLight  )
 	target_link_libraries("CAGasWIN"    wbsyshLight  )
 	target_link_libraries("LinktestWIN" wbsyshLight  )
+
+	# 4. Cel zbiorczy (meta-target)
+	# Pozwala na wywołanie: make all_Win_tests
+	add_custom_target(all_Win_tests DEPENDS ${WIN_EXAMPLES})
 endif()
 
 
 if(WITHTESTS) #SVG tests
+	# 1. Definiujemy listę nazw programów, aby uniknąć powtórzeń
+	set(SVG_EXAMPLES
+			"TestmousSVG"
+			"TestpaleSVG"
+			"TestpolySVG"
+			"TestrandSVG"
+			"TestsymsSVG"
+			"TestsyshSVG"
+			"TurmitSVG"
+			"CAGasSVG"
+			"LinktestSVG"
+	)
+
+	#2. Definicja źródeł (także dla tych z niestandardowymi plikami)
 	add_executable("TestmousSVG" "EXAMPLES/Testmous.cpp"    )
 	add_executable("TestpaleSVG" "EXAMPLES/Testpale.cpp"    )
 	add_executable("TestpolySVG" "EXAMPLES/Testpoly.cpp"    )
@@ -176,6 +239,15 @@ if(WITHTESTS) #SVG tests
 	add_executable("CAGasSVG"    "EXAMPLES/CAGas.cpp"    )
 	add_executable("LinktestSVG" "EXAMPLES/Linktest.cpp" )
 
+	# 3. Masowe ustawienie katalogu wyjściowego
+	foreach(test_target ${SVG_EXAMPLES})
+		# Kierujemy pliki wykonywalne do podkatalogu bin/
+		set_target_properties(${test_target} PROPERTIES
+				RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/bin"
+		)
+	endforeach()
+
+	# 3b. Ustawienie bibliotek
 	if( WINDOWS )
 		target_link_libraries("TestmousSVG" wbsyshLightSVG  )
 		target_link_libraries("TestpaleSVG" wbsyshLightSVG  )
@@ -198,6 +270,9 @@ if(WITHTESTS) #SVG tests
 		target_link_libraries("LinktestSVG" wbsyshLightSVG rt )
 	endif()
 
+	# 4. Cel zbiorczy (meta-target)
+	# Pozwala na wywołanie: make all_Win_tests
+	add_custom_target(all_SVG_tests DEPENDS ${SVG_EXAMPLES})
 endif()
 
 #KONIEC - THE END

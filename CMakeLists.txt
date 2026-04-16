@@ -48,6 +48,7 @@ if(true) # SVG SYMSHELL LIB
 			"UTILS/wb_randg.c"
 			"UTILS/sshmenufdummy.c" #dummy functions of menus
 			"UTILS/error_enter_before_clean.c"
+			"UTILS/wb_context_menu_expected.c"
 		)
 	#target_compile_features(wbsyshSVG PUBLIC cxx_std_11)
 endif()
@@ -81,7 +82,8 @@ if(X11) # only for X11 LIB
 			"UTILS/wb_randg.c"
 			"UTILS/sshmenufdummy.c" #dummy functions of menus
 			"UTILS/error_enter_before_clean.c"
-		)
+			"UTILS/wb_context_menu_expected.c"
+	)
 
 	#target_compile_features(wbsyshX11 PUBLIC cxx_std_11)
 endif(X11)
@@ -98,7 +100,8 @@ if(WINDOWS) # only for WINDOWS - NOT TESTED IN THIS VERSION (after 2016)
 			"WIN/sshmenufwin.c" #real functions for MS Windows menus.
 			#"UTILS/sshmenufdummy.c" #dummy functions of menus
 			"UTILS/error_enter_before_clean.c"
-		)
+			wb_context_menu_expected.c
+	)
 
 	#target_compile_features(wbsyshWIN PUBLIC cxx_std_11)
 endif(WINDOWS)
@@ -140,6 +143,9 @@ if(X11 AND WITHTESTS ) #X11 tests
 	# 3. Masowe ustawienie bibliotek i katalogu wyjściowego
 	foreach(test_target ${X11_EXAMPLES})
 		# Kierujemy pliki wykonywalne do podkatalogu bin/
+		# Jeśli chcesz, aby pliki trafiały do bin/ bezpośrednio w katalogu ze źródłami (niezalecane, ale czasem stosowane),
+		# zmień ${CMAKE_CURRENT_BINARY_DIR}/bin na ${CMAKE_CURRENT_SOURCE_DIR}/bin.
+		# Standardowo jednak CMake operuje wewnątrz katalogu build, dzięki czemu kompilaty "Debug" i "Release" nie mylą się.
 		set_target_properties(${test_target} PROPERTIES
 				RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/bin"
 		)

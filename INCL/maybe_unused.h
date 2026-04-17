@@ -1,0 +1,8 @@
+//
+// Created by borkowsk on 17.04.26.
+//
+
+#ifndef SYMSHELLLIGHT_MAYBE_UNUSED_H
+#define SYMSHELLLIGHT_MAYBE_UNUSED_H
+
+#endif //SYMSHELLLIGHT_MAYBE_UNUSED_H

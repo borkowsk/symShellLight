@@ -84,6 +84,7 @@ if(X11) # only for X11 LIB
 			"UTILS/sshmenufdummy.c" #dummy functions of menus
 			"UTILS/error_enter_before_clean.c"
 			"X11/wb_context_menu_expected_rofi.c"
+			"X11/wb_context_menu_default.c"
 	)
 
 	#target_compile_features(wbsyshX11 PUBLIC cxx_std_11)

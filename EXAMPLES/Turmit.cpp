@@ -115,6 +115,14 @@ void replot() //Rysuje na ekranie
     //line(xmouse-10,ymouse,xmouse+10,ymouse,255);
 }
 
+/** Własna definicja menu kontekstowego. */
+ssh_menu_item_definition  context_menu_default[]= {
+        {"TO TEXT", 'p'},
+        {"DUMP GRAPHIC", 'd'},
+        {"QUIT", 'q'}
+};
+size_t context_menu_default_size= sizeof(context_menu_default) / sizeof(context_menu_default[0]);
+
 int main(int argc,const char* argv[])//Potrzebne są parametry wywołania programu
 {
     fix_size(1);        // Czy udajemy, że ekran ma zawsze taki sam rozmiar?
@@ -145,7 +153,7 @@ int main(int argc,const char* argv[])//Potrzebne są parametry wywołania progra
             case 'D':
             case 'd': screen_to_file();break; //"Zrzut" grafiki
             case 'p': write_to_file();break; //Zapis do pliku tekstowego
-            case '\r': replot(); flush_plot();break;//Wymagane odrysowanie
+            case '\r': replot(); flush_plot();break; //Wymagane odrysowanie
             case '\b': read_mouse();break;//Jest zdarzenie myszy
             case EOF:  //Typowe zakończenie
             case  27:  //ESC

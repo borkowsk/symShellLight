@@ -16,12 +16,12 @@
  * @details Funkcja może być blokująca lub nieblokująca (np. odpalać osobny wątek). Podstawową implementację dostarcza
  *          biblioteka SYMSHELL, ale zdefiniowanie własnej przez użytkownika biblioteki blokuje linkowanie wersji domyślnej.
  */
-long long WB_context_menu_expected(unsigned x,unsigned y,struct WBProposedContextMenyOtherData* other_data)
+long long WB_context_menu_expected(unsigned x,unsigned y,struct ssh_basic_win_place_context* other_data)
 {
     fprintf(stderr,"Dummy `WB_context_menu_expected(%d,%d)` is called...\n",x,y);
     if(other_data!=NULL)
     {
-        fprintf(stderr,"Dummy `WBProposedContextMenyOtherData`:\nD:\t%lld\nW:\t%lld\nX:\t%u\nY:\t%u\n",
+        fprintf(stderr,"Dummy `ssh_basic_win_place_context`:\nD:\t%lld\nW:\t%lld\nX:\t%u\nY:\t%u\n",
                 other_data->ScrIdentifier,
                 other_data->WinIdentifier,
                 other_data->X,

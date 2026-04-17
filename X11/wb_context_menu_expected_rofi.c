@@ -1,5 +1,5 @@
 /// @file
-/// @brief SymshellLight default of `WB_context_menu_expected` using rofi (blocking).
+/// @brief SymshellLight default implementation of `WB_context_menu_expected` using rofi (blocking).
 //  Created by borkowsk on 16.04.26.
 /// @date 2026-04-17 (last modification)
 #include <stdio.h>
@@ -8,16 +8,9 @@
 #include <string.h>
 #include <assert.h>
 #include "symshell.h"
+//#include "wb_context_menu_default.h"
 
-/** Domyślna definicja menu kontekstowego. */
-struct menu_item_definition {
-    const char* item_text; long long   item_value;
-} context_menu[]= {
-        {"HELP", 'H'},
-        {"DUMP", 'D'},
-        {"QUIT", 'q'}
-};
-char menu_str[1024];  /**< Menu przetworzone na listę dla programu wyświetlającego. */
+extern int    ssh_trace_level; /**< Z symshx11.c — maska poziomów śledzenia 1-msgs 2-grafika 3-grafika detaliczna 4-alokacje/zwalnianie */
 
 /** Szablon komendy do wywołania programu rofi wyświetlające menu kontekstowe.
  *  Kolejność parametrów %s %d oraz %lld musi być zachowana. */
@@ -40,6 +33,10 @@ const char* command_tmpl=
                                 "x-offset:     %lldpx;\n"
                                 "y-offset:     %lldpx;\n"
                                 "}'\0";
+
+/* BUFORY NA STRINGI KONIECZNE DO URUCHOMIENIA rofi */
+/* ================================================ */
+char menu_str[1024]; /**< Menu przetworzone na listę dla programu rofi. */
 char command[2048]; /**< Ostateczna treść komendy dla popen. */
 char answer[1024]; /**< Bufor na odpowiedź z komendy. */
 
@@ -52,6 +49,9 @@ char answer[1024]; /**< Bufor na odpowiedź z komendy. */
 static int run_popen(const char command[],char out_str[],size_t exp_size);
 
 /* Funkcja uruchamiająca kontekstowe menu po kliknięciu prawym klawiszem myszy.
+ *
+ * DEFINCJE MENU BIERZE Z ZMIENNEJ `context_menu_default`.
+ *
  * @param x — współrzędna pozioma kursora myszy.
  * @param y — współrzędna pionowa kursora myszy.
  * @param other_data - wskaźnik do rekordu danych użytkownika zawierającego co najmniej uchwyt Display i uchwyt okna.
@@ -62,7 +62,7 @@ static int run_popen(const char command[],char out_str[],size_t exp_size);
  * @details Funkcja może być blokująca lub nieblokująca (np. odpalać osobny wątek). Podstawową implementację dostarcza
  *          biblioteka SYMSHELL, ale zdefiniowanie własnej przez użytkownika biblioteki blokuje linkowanie wersji domyślnej.
  */
-long long WB_context_menu_expected(unsigned x,unsigned y,struct WBProposedContextMenyOtherData* other_data)
+long long WB_context_menu_expected(unsigned x,unsigned y,struct ssh_basic_win_place_context* other_data)
 {
     if(other_data==NULL)
     {
@@ -72,46 +72,44 @@ long long WB_context_menu_expected(unsigned x,unsigned y,struct WBProposedContex
     }
     else
     {
-//        fprintf(stderr,"WB_context_menu_expected:`WBProposedContextMenyOtherData`:\nD:\tx%llx\nW:\tx%llx\nX:\t%u\nY:\t%u\n\n",
-//                other_data->ScrIdentifier,
-//                other_data->WinIdentifier,
-//                other_data->X,
-//                other_data->Y
-//                );
-//        fflush(stderr);
+        if(ssh_trace_level>2)
+            fprintf(stderr,"WB_context_menu_expected(%u,%u):`ssh_basic_win_place_context`:\nD:\tx%llx\nW:\tx%llx\nX:\t%u\nY:\t%u\n\n",
+                x,y,
+                other_data->ScrIdentifier,
+                other_data->WinIdentifier,
+                other_data->X,
+                other_data->Y
+                );
+        fflush(stderr);
 
-        size_t menu_size=sizeof(context_menu)/sizeof(context_menu[0]);
-        *menu_str='\0';
-        for(int i=0;i<menu_size;i++) {
-            strcat(menu_str, context_menu[i].item_text);
+        *menu_str='\0'; // Początek "stakowania" definicji menu na string-u.
+        for(int i=0; i < context_menu_default_size; i++) {
+            strcat(menu_str, context_menu_default[i].item_text);
             strcat(menu_str,"\n");
         }                                                                  assert(strlen(menu_str)<sizeof(menu_str));
 
-        //size_t command_len=sizeof(command_tmpl)+1+sizeof(context_menu)+80;
-        //char command[command_len]; // TO CHYBA ROZSZERZENIE gcc/clang
-
-        sprintf(command,command_tmpl,
-                                menu_str,
-                                menu_size,
-                                other_data->X,
+        sprintf(command, command_tmpl,
+                menu_str,
+                context_menu_default_size,
+                other_data->X,
                 other_data->Y);                                              assert(strlen(command)<sizeof(command));
 
-        //fprintf(stderr,"%s\n\n",command);
+        if(ssh_trace_level>1) fprintf(stderr,"%s\n\n",command);
         int ret=run_popen(command,answer,sizeof(answer));
-        fprintf(stderr,"%s\n\n",answer);
+        if(ssh_trace_level>0) fprintf(stderr,"%s\n\n",answer);
 
-        if(ret==EXIT_SUCCESS)
+        if(ret==EXIT_SUCCESS) // Gdy wywołanie się powiodło, to trzeba dopasować odpowiedź i wysłać odpowiednią wartość.
         {
-            for(int i=0;i<menu_size;i++) {
-                if(strcmp(answer,context_menu[i].item_text)==0)
-                    return context_menu[i].item_value;
+            for(int i=0; i < context_menu_default_size; i++) {
+                if(strcmp(answer, context_menu_default[i].item_text) == 0)
+                    return context_menu_default[i].item_value;
             }
 
             return 0; //Jak nie znalazł nic w odpowiedzi.
         }
         else return -2;
     }
-    // To poniżej juz bezużyteczne.
+    // To poniżej już bezużyteczne.
     // return -1; /* OBSŁUGA ZANIECHANA! Poślij dane domyślnej obsłudze `\b` */
 }
 
@@ -131,37 +129,39 @@ int run_popen(const char comm_str[],char result_buffer[],size_t RESULT_SIZE)
     }
 
     // 2. Odczyt danych z kontrolą rozmiaru
-    // fgets jest bezpieczny, bo nie wyjdzie poza RESULT_SIZE
-    if (fgets(result_buffer, 1024, fp) != NULL) {
+    // `fgets` jest bezpieczny, bo nie wyjdzie poza RESULT_SIZE
+    if (fgets(result_buffer, RESULT_SIZE, fp) != NULL) {
         // Opcjonalnie: usuwanie znaku nowej linii, który fgets zachowuje
         result_buffer[strcspn(result_buffer, "\n")] = '\0';
 
         //printf("Odebrano dane: [%s]\n", result_buffer);
     } else {
-        // Jeśli fgets zwrócił NULL, więc sprawdzamy, czy to błąd, czy pusty wynik
+        // Jeśli `fgets` zwrócił NULL, więc sprawdzamy, czy to błąd, czy pusty wynik
         if (ferror(fp)) {
             fprintf(stderr, "Błąd podczas odczytu ze strumienia.\n");
         } else {
-            //printf("Komenda nie zwróciła żadnych danych.\n"); //Co jest możliwe i OK.
+            if(ssh_trace_level>1)
+                fprintf(stderr,"Wykonanie popen nie zwróciło żadnych danych.\n"); //Co jest możliwe i OK.
         }
     }
 
     // 3. Zamknięcie strumienia i odczyt statusu zakończenia
-    // pclose zwraca status procesu, który warto sprawdzić
+    // `pclose` zwraca status procesu, który warto sprawdzić
     int status = pclose(fp);
     if (status == -1) {
         fprintf(stderr, "Błąd podczas zamykania strumienia: %s\n", strerror(errno));
         return EXIT_FAILURE;
     } else {
         // Sprawdzenie, czy proces zakończył się sukcesem (kod 0)
-        // Np. "rofi" zwraca 1, gdy nie udziela odpowiedzi (pusty output).
-        // Np. kliknie się poza jego okna, a ma opcje znikania. To nas nie koniecznie tutaj interesuje, ale kiedyś może.
+        // Np. "rofi" zwraca 1, gdy nie udziela odpowiedzi (pusty output),
+        // bo kliknie się poza jego okna, a ma opcje znikania.
+        // To nas nie koniecznie tutaj interesuje, ale kiedyś może.
         if (WIFEXITED(status) && WEXITSTATUS(status) != 0) {
-            //fprintf(stderr, "Komenda zakończona kodem błędu: %d\n", WEXITSTATUS(status));
+            if(ssh_trace_level>0)
+                fprintf(stderr, "Wykonanie popen zakończone kodem błędu: %d\n", WEXITSTATUS(status));
             //return EXIT_FAILURE;
         }
     }
 
     return EXIT_SUCCESS;
-    return -1;
 }

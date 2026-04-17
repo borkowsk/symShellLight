@@ -1,6 +1,7 @@
 /** \file symshell.h
  *  \brief SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++
  *         ====================================================
+ * @date 2026-04-17 (last modification)
  * \details
  *             The whole file changed massively: 15.11.2020
  *             Comments changed massively: 3-4.01.2022
@@ -12,8 +13,6 @@
  ** \author     Designed by W. Borkowski from the University of Warsaw
  **
  ** \library    SYMSHELLLIGHT  version 2026a
- ** 
-/// @date 2026-04-16 (last modification)
  */
 
 #ifndef _SYMSHELL_H_
@@ -81,29 +80,6 @@ extern unsigned long _ssh_window;
 /** Określa czy zamykać od razu, czy dać szanse na przejrzenie zawartości.
 * Do sterowania `close_plot` - czy wymaga ono potwierdzenia od użytkownika. */
 extern int WB_error_enter_before_clean/* =0 */;
-
-
-typedef struct WBProposedContextMenyOtherData {
-    unsigned long long ScrIdentifier; /**< Dane identyfikacji systemu wyświetlania. Np. Display handle w X11 */
-    unsigned long long WinIdentifier; /**< Dane identyfikacji wywołującego okna. Np. Window handle w X11 */
-    unsigned X; /**< Bezwzględne położenie `x` kursora w układzie wyświetlacza albo -1, gdy nie można obliczyć. */
-    unsigned Y; /**< Bezwzględne położenie `y` kursora w układzie wyświetlacza albo -1, gdy nie można obliczyć. */
-} WBProposedContextMenyOtherData;
-
-/** Funkcja uruchamiająca kontekstowe menu po kliknięciu prawym klawiszem myszy.
- * @param x - współrzędna pozioma kursora myszy.
- * @param y - współrzędna pionowa kursora myszy.
- * @param other_data - wskaźnik do rekordu danych użytkownika zawierającego co najmniej uchwyt Display i uchwyt okna.
- * @return 0 gdy menu nic nie zwróciło albo oczekujemy, że wynik wróci później jako message.
- *        -1 gdy funkcja zaniechała obsługi i kliknięcie ma być przekazane normalnej obsłudze w aplikacji (przez `\b`).
- *         Każda wartość dodatnia jest traktowana jako komunikat do zwrócenia przez funkcję `get_char()`.
- *         Inna wartość ujemna powoduje wyświetlenie informacji o błędzie, ze sprawdzeniem wartości zmiennej `errno`.
- * @details Funkcja może być blokująca lub nieblokująca (np. odpalać osobny wątek). Podstawową implementację dostarcza
- *          biblioteka SYMSHELL, ale zdefiniowanie własnej przez użytkownika biblioteki blokuje linkowanie wersji domyślnej.
- */
-extern long long WB_context_menu_expected(unsigned x,unsigned y,struct WBProposedContextMenyOtherData* other_data);
-
-
 
 /* OTWIERANIE i ZAMYKANIE TRYBU (OKNA) GRAFICZNEGO */
 /* Operacje konfiguracyjne o działaniu gwarantowanym przed inicjacją */
@@ -597,6 +573,44 @@ ssh_stat  repaint_area(ssh_coordinate* x,          /**< [out] Adres, na który w
                        ssh_natural* width,         /**< [out] Adres, na który wpisze szerokość obszaru. */
                        ssh_natural* height         /**< [out] Adres, na który wpisze wysokość obszaru. */
                        );
+
+/* OBSŁUGA MENU KONTEKSTOWEGO */
+/* ========================== */
+
+/** Struktura do definiowania prostego menu. */
+typedef struct ssh_menu_item_definition {
+    const char* item_text;  /**< Tekst linii menu. Może być też etykieta różniąca się tym, że wartość jest 0. */
+    long long   item_value; /**< Wartość przekazywana poprzez funkcję `get_char()`. Dla etykiet 0. */
+} ssh_menu_item_definition;
+
+/** Struktura do przekazywania absolutnego położenia kliknięcia i innych danych do uruchomienia menu kontekstowego. */
+typedef struct ssh_basic_win_place_context {
+    unsigned long long ScrIdentifier; /**< Dane identyfikacji systemu wyświetlania. Np. Display handle w X11 */
+    unsigned long long WinIdentifier; /**< Dane identyfikacji wywołującego okna. Np. Window handle w X11 */
+    unsigned X; /**< Bezwzględne położenie `x` kursora w układzie wyświetlacza albo -1, gdy nie można obliczyć. */
+    unsigned Y; /**< Bezwzględne położenie `y` kursora w układzie wyświetlacza albo -1, gdy nie można obliczyć. */
+} ssh_basic_win_place_context;
+
+/** Funkcja uruchamiająca kontekstowe menu po kliknięciu prawym klawiszem myszy.
+ * Wywoływana z biblioteki, z pętli zdarzeń. Użytkownik biblioteki może zaproponować swoją wersję, a wersja
+ * domyślna znajduje się w odpowiednim katalogu źródłowym biblioteki, np. "X11/wb_context_menu_expected_rofi.c"
+ * @param x - współrzędna pozioma kursora myszy.
+ * @param y - współrzędna pionowa kursora myszy.
+ * @param other_data - wskaźnik do rekordu danych użytkownika zawierającego co najmniej uchwyt Display i uchwyt okna.
+ * @return 0 gdy menu nic nie zwróciło albo oczekujemy, że wynik wróci później jako message.
+ *        -1 gdy funkcja zaniechała obsługi i kliknięcie ma być przekazane normalnej obsłudze w aplikacji (przez `\b`).
+ *         Każda wartość dodatnia jest traktowana jako komunikat do zwrócenia przez funkcję `get_char()`.
+ *         Inna wartość ujemna powoduje wyświetlenie informacji o błędzie, ze sprawdzeniem wartości zmiennej `errno`.
+ * @details Funkcja może być blokująca lub nieblokująca (np. odpalać osobny wątek). Podstawową implementację dostarcza
+ *          biblioteka SYMSHELL, ale zdefiniowanie własnej przez użytkownika biblioteki blokuje linkowanie wersji domyślnej.
+ */
+extern long long WB_context_menu_expected(unsigned x,unsigned y,struct ssh_basic_win_place_context* other_data);
+
+/** Domyślna definicja menu kontekstowego. W X11 dostarczana z biblioteki, ale można ją podmienić na poziomie linkowania.*/
+extern ssh_menu_item_definition  context_menu_default[];
+
+/** Liczba itemów w domyślnym menu kontekstowym. Musi towarzyszyć `context_menu_default`. */
+extern size_t context_menu_default_size;
 
 #ifdef __cplusplus
 } //extern C

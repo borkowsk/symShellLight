@@ -2,7 +2,7 @@
  * \file symshx11.c                                                     *
  * \brief X11 implementation of                                         *
  *      SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++            */
-/// @date 2026-04-16 (last modifications)
+/// @date 2026-04-17 (last modifications)
 /* ******************************************************************** */
 /** \details Najprostszy interface wizualizacyjny zaimplementowany      *
  *          pod X-windows za pomocą biblioteki X11                      *
@@ -707,7 +707,7 @@ static long int _read_XInput()
                 DelayAction = 0; /* Pojawiła się aktywność. Nie należy spać! */
                 if(report.xbutton.button==3)
                 {
-                    WBProposedContextMenyOtherData data={(unsigned long long)display,win,-1,-1};
+                    ssh_basic_win_place_context data={(unsigned long long)display, win, -1, -1};
                     assert(sizeof(data.ScrIdentifier)==sizeof(display));
                     data.X=report.xbutton.x_root;
                     data.Y=report.xbutton.y_root;
@@ -3181,7 +3181,7 @@ const char* get_xevent_name(int type) {
 
 /*#pragma exit close_plot*/
 /*v******************************************************************/
-/*              SYMSHELLLIGHT version 2026-02...                    */
+/*              SYMSHELLLIGHT version 2026-04...                    */
 /*v******************************************************************/
 /*           THIS CODE IS DESIGNED & COPYRIGHT BY:                  */
 /*            W O J C I E C H   B O R K O W S K I                   */

@@ -9,7 +9,7 @@
 ///
 /// @file
 /// @brief Przykładowy program SYMSHELL'A z funkcją "replot"
-/// @date 2026-02-16 (last update)
+/// @date 2026-04-17 (last update)
 //-/////////////////////////////////////////////////////////////////////////////////////////
 
 #include "symshell.h"
@@ -85,6 +85,9 @@ int main(int argc,const char* argv[])
             case '\b':get_mouse_event(&xpos,&ypos,&click); //Handling a use_mouse event
                 if(click&0x1)
                     set_char('X');
+                break;
+            case 'D':
+                dump_screen("symshell_dump");
                 break;
             case 's':std=!std;break;	//Echo on console on/off
             case 'q':					//Manual code at application termination

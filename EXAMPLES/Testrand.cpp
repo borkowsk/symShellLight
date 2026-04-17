@@ -4,7 +4,7 @@
 ///-------------------------------------------------------------------------
 /// Demonstruje skalowanie okna niezależne od aplikacyjnej strony programu
 /// i robione w funkcjach symshell'a.
-/// @date 2026-04-16 (last update)
+/// @date 2026-04-17 (last update)
 //-////////////////////////////////////////////////////////////////////////////
 #include "symshell.h"
 #include <cstdio>
@@ -90,13 +90,16 @@ int main(int argc,const char* argv[])
         inpt=get_char(); //Jest wejście. Trzeba przetworzyć.
         switch(inpt)
         {
-        default: printf("Event: %d %x %c\n",inpt,inpt,inpt);
+        default: printf("Event: %d x%x %c\n",inpt,inpt,inpt);
                  fflush(stdout);
                  break;
         case '\0': /* A not important event */
                    printf("noImpEvent ");
                    break;
         case '\r': break;
+        case 'D':
+            dump_screen("symshell_dump");
+            break;
         case 's':std=!std;break;
         case 'q':
         case EOF:

@@ -1,7 +1,7 @@
 /// @file
 /// @brief Simple demo of `WB_context_menu_expected` user defined function.
-// Created by borkowsk on 16.04.26.
-//
+//  Created by borkowsk on 16.04.26.
+/// @date 2026-04-17 (last modification)
 #include <stdio.h>
 #include "symshell.h"
 

@@ -1,12 +1,13 @@
 # CMAKE configuration for SYMSHELLLIGHT libraries wbsyshSVG wbsyshX11
 ##################################################################################
-# X11 auto-defined under linux/unix for compiling X11 version of the library.
-# WINDOWS auto-defined under MS Windows for compiling appr. version of the lib.
+# "X11" auto-defined under linux/unix for compiling X11 version of the library.
+# "WINDOWS" auto-defined under MS Windows for compiling appr. version of the 
+#  library.
 #
 # Manually define WITHTESTS=true, if you want build test applications!
 #
 # (c)ISS UW, @author Wojciech Borkowski
-# @date 2026-04-16 (last update)
+# @date 2026-04-17 (last update)
 ##################################################################################
 
 cmake_minimum_required(VERSION 3.20)
@@ -48,7 +49,7 @@ if(true) # SVG SYMSHELL LIB
 			"UTILS/wb_randg.c"
 			"UTILS/sshmenufdummy.c" #dummy functions of menus
 			"UTILS/error_enter_before_clean.c"
-			"UTILS/wb_context_menu_expected.c"
+			"UTILS/wb_context_menu_expected_tmpl.c"
 		)
 	#target_compile_features(wbsyshSVG PUBLIC cxx_std_11)
 endif()
@@ -82,7 +83,7 @@ if(X11) # only for X11 LIB
 			"UTILS/wb_randg.c"
 			"UTILS/sshmenufdummy.c" #dummy functions of menus
 			"UTILS/error_enter_before_clean.c"
-			"UTILS/wb_context_menu_expected.c"
+			"X11/wb_context_menu_expected_rofi.c"
 	)
 
 	#target_compile_features(wbsyshX11 PUBLIC cxx_std_11)
@@ -100,7 +101,7 @@ if(WINDOWS) # only for WINDOWS - NOT TESTED IN THIS VERSION (after 2016)
 			"WIN/sshmenufwin.c" #real functions for MS Windows menus.
 			#"UTILS/sshmenufdummy.c" #dummy functions of menus
 			"UTILS/error_enter_before_clean.c"
-			wb_context_menu_expected.c
+			"WIN/wb_context_menu_expected.c"
 	)
 
 	#target_compile_features(wbsyshWIN PUBLIC cxx_std_11)

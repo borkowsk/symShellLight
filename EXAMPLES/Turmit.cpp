@@ -7,7 +7,7 @@
 ///
 /// Turmit ma element aktywny i środowisko, tzw. "głowicę" albo "czoło" oraz pamięć
 /// , ponieważ turmit jest tak naprawdę 2 wymiarowym uogólnieniem maszyny Turinga
-/// @date 2026-02-02 (last update)
+/// @date 2026-04-17 (last update)
 //-//////////////////////////////////////////////////////////////////////////////////
 
 
@@ -109,7 +109,7 @@ void replot() //Rysuje na ekranie
             //z%=512; //Albo wersja  z szarościami
             plot(x,y,z); //Rysowanie punktu "świata"
         }
-    printc(size/2,size,128,255,"%06u  ",step_counter);//Licznik kroków
+    printc(size/3,size,128,255,"%06u  ",step_counter);//Licznik kroków
     //Ostatnie położenie kliku - biały krzyżyk
     //line(xmouse,ymouse-10,xmouse,ymouse+10,255);
     //line(xmouse-10,ymouse,xmouse+10,ymouse,255);
@@ -142,6 +142,7 @@ int main(int argc,const char* argv[])//Potrzebne są parametry wywołania progra
             switch(pom)
             {
             case '\0': /* do nothing */ break;
+            case 'D':
             case 'd': screen_to_file();break; //"Zrzut" grafiki
             case 'p': write_to_file();break; //Zapis do pliku tekstowego
             case '\r': replot(); flush_plot();break;//Wymagane odrysowanie
@@ -151,7 +152,7 @@ int main(int argc,const char* argv[])//Potrzebne są parametry wywołania progra
             case 'q':  //Zakończenie zdefiniowane przez programistę
             case 'Q': not_finished=false;break;
             default:
-                printbw(0,screen_height()-char_height('N'),"Nie wiem, co znaczy %c [%d] ",pom,pom);
+                printbw(screen_width()/2,screen_height()-char_height('C'),"Co znaczy %c [%d] ?",pom,pom);
                 printf("Nie wiem, co znaczy %c [%d] ",pom,pom);
                 flush_plot();	// Grafika gotowa
                 break;

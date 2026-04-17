@@ -10,7 +10,7 @@
 ///
 /// @file
 /// @brief Przykładowy program SYMSHELLA demonstrujący obsługę myszy.
-/// @date 2026-02-16 (last update)
+/// @date 2026-04-17 (last update)
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 #include <iostream>
@@ -108,7 +108,11 @@ int main(int argc,const char* argv[])
                 break;
             case '\r': replot();break;
             case '\b': //print(0,100,"Mouse");
-                read_mouse();break;
+                read_mouse();
+                break;
+            case 'D':
+                dump_screen("symshell_dump");
+                break;
             case EOF:
             case 'q':goto END;
             default: //Unsupported input

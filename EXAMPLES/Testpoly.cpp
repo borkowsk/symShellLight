@@ -12,7 +12,7 @@
 ///
 /// @file
 /// @brief Przykładowy program SYMSHELLA demonstrujący rysowanie słupków i wielokątów.
-/// @date 2026-02-16 (last update)
+/// @date 2026-04-17 (last update)
 //-/////////////////////////////////////////////////////////////////////////////////////////
 
 #include "symshell.h"
@@ -156,6 +156,9 @@ int main(int argc,const char* argv[])
             list[i%numi].color=i%256;
             i++;
             replot();
+            break;
+        case 'D':
+            dump_screen("symshell_dump");
             break;
         case 's':std=!std;break;
         case 'q':

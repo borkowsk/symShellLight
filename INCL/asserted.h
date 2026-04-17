@@ -1,6 +1,8 @@
-/// @file
-/// Created by borkowsk on 06.01.26.
-/// @date 2026-04-17 (last modification)
+/** @file
+ * @brief Szablon konwersji typów liczbowych zabezpieczonej asercjami.
+ * Created by borkowsk on 06.01.26.
+ * @date 2026-04-17 (last modification) */
+/* ==================================== */
 
 #ifndef SYMSHELL_ASSERTED_H
 #define SYMSHELL_ASSERTED_H

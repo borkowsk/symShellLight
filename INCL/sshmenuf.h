@@ -1,5 +1,5 @@
 /** \file   sshmenuf.h
-*  \brief   INTERFACE FOR SYMSHELL MENU AND RELATED FEATURES
+*  \brief   INTERFACE FOR SYMSHELL MENU AND RELATED FEATURES.
 *  @date 2026-04-17 (last modification)
 *  \warning MS WINDOWS ONLY. Otherwise dummy version is provided.
 *  \note  Unix version used Motif is outdated.

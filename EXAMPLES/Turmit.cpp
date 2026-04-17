@@ -1,7 +1,6 @@
-//-//////////////////////////////////////////////////////////////////////////////////
 /// @file
-///     Turmit prototypowy - "Mrówka Langtona" z możliwością wariacji na temat.
-///------------------------------------------------------------------------------
+/// @brief "Mrówka Langtona" z możliwością wariacji na temat (turmit prototypowy)
+// -------------------------------------------------------------------------------
 /// @date 2026-04-17 (last update)
 ///
 ///                   (przykładowy program SYMSHELL'a)

@@ -1,7 +1,7 @@
-/** \file random.h                                                      */
-/** \brief INTERFACE "C" DO ROZMAITYCH GENERATORÓW LICZB PSEUDOLOSOWYCH */
-/** @date 2026-04-17 (last modification)                                */
-/**---------------------------------------------------------------------*/
+/** @file
+ * @brief INTERFACE "C" DO ROZMAITYCH GENERATORÓW LICZB PSEUDOLOSOWYCH.
+ * @date 2026-04-17 (last modification)                                */
+/* -------------------------------------------------------------------- */
 #ifndef __RANDOM__H__INCLUDED__
 #define __RANDOM__H__INCLUDED__  (1)
 #include <time.h> // Potrzebne, bo wszędzie jest time()

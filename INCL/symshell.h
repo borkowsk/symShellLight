@@ -1,7 +1,8 @@
-/** \file symshell.h
- *  \brief SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++
- *         ====================================================
- * @date 2026-04-17 (last modification)
+/** @file
+ * @brief SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++ .
+ * @date 2026-04-17 (last modification)                           */
+/*  ============================================================= */
+ /**
  * \details
  *             The whole file changed massively: 15.11.2020
  *             Comments changed massively: 3-4.01.2022
@@ -14,7 +15,6 @@
  **
  ** \library    SYMSHELLLIGHT  version 2026a
  */
-
 #ifndef _SYMSHELL_H_
 #define _SYMSHELL_H_
 

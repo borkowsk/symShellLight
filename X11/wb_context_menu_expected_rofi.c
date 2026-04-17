@@ -22,7 +22,7 @@ const char* command_tmpl=
                                 "scrollbar:      false;\n"
                                 "}\n"
                         "entry {\n"
-                                "placeholder:    \"Szukaj...\";\n"
+                                "placeholder:    \"abcd...\";\n"
                                 "}\n"
                         "window {\n"
                                 "width:          300px;\n"

@@ -610,7 +610,7 @@ extern long long WB_context_menu_expected(unsigned x,unsigned y,struct ssh_basic
 extern ssh_menu_item_definition  context_menu_default[];
 
 /** Liczba itemów w domyślnym menu kontekstowym. Musi towarzyszyć `context_menu_default`. */
-extern size_t context_menu_default_size;
+extern unsigned context_menu_default_size;
 
 #ifdef __cplusplus
 } //extern C

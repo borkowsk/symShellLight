@@ -1,13 +1,16 @@
 //-//////////////////////////////////////////////////////////////////////////////////
 /// @file
 ///     Turmit prototypowy - "Mrówka Langtona" z możliwością wariacji na temat.
-///                   (przykładowy program SYMSHELL'a)
 ///------------------------------------------------------------------------------
-/// Prosta obsługa grafiki, ale z odtwarzaniem ekranu i obsługą zdarzeń.
+/// @date 2026-04-17 (last update)
+///
+///                   (przykładowy program SYMSHELL'a)
+///
+/// Prosta obsługa grafiki, ale z odtwarzaniem ekranu i obsługą zdarzeń
+/// , oraz własne menu kontekstowe, różne od domyślnego.
 ///
 /// Turmit ma element aktywny i środowisko, tzw. "głowicę" albo "czoło" oraz pamięć
 /// , ponieważ turmit jest tak naprawdę 2 wymiarowym uogólnieniem maszyny Turinga
-/// @date 2026-04-17 (last update)
 //-//////////////////////////////////////////////////////////////////////////////////
 
 
@@ -39,7 +42,7 @@ unsigned step_counter=0; ///< Licznik realnych kroków modelu
 
 void init_world() ///< Funkcja do zapoczątkowania świata.
 {
-    //World[0][0]=255;//TODO: ewentualna inicjalizacja losowa świata
+    //World[0][0]=255;//TODO: ewentualna inicjalizacja świata (losowo?)
 }
 
 /// Struktura definiująca stan turmita.
@@ -51,15 +54,15 @@ struct Turmit
     {}
 };
 
-/// Struktura anonimowa dla kierunków ruchu.
+/// Struktura anonimowa dla kierunków ruchu. Kolejność góra,prawo,dół,lewo.
 struct
 {
     int dx,dy;
-} Directions[4]={{0,-1},{1,0},{0,1},{-1,0}}; //góra,prawo,dół,lewo
+} Directions[4]={{0,-1},{1,0},{0,1},{-1,0}};
 
-Turmit LaAnt(size/2,size/2,0); //Inicjalizacja turmita na środku z kierunkiem "góra"
+Turmit LaAnt(size/2,size/2,0); ///< Nasz turmit. Inicjalizacja turmita na środku z kierunkiem "góra".
 
-void single_step() //Funkcja robiąca jeden krok symulacji
+void single_step() ///< Funkcja robiąca jeden krok symulacji
 {
     LaAnt.x=( LaAnt.x+Directions[LaAnt.stan].dx //Przesunięcie po X
             + size ) % size; //i zabezpieczenie, żeby nie wyjść za tablicę
@@ -121,7 +124,7 @@ ssh_menu_item_definition  context_menu_default[]= {
         {"DUMP GRAPHIC", 'd'},
         {"QUIT", 'q'}
 };
-size_t context_menu_default_size= sizeof(context_menu_default) / sizeof(context_menu_default[0]);
+unsigned context_menu_default_size= sizeof(context_menu_default) / sizeof(context_menu_default[0]);
 
 int main(int argc,const char* argv[])//Potrzebne są parametry wywołania programu
 {

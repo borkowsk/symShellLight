@@ -1,19 +1,61 @@
-/** \brief INTERFACE "C" DO ROZMAITYCH GENERATORÓW LICZB PSEUDOLOSOWYCH */
 /** \file random.h                                                      */
+/** \brief INTERFACE "C" DO ROZMAITYCH GENERATORÓW LICZB PSEUDOLOSOWYCH */
+/** @date 2026-04-17 (last modification)                                */
 /**---------------------------------------------------------------------*/
 #ifndef __RANDOM__H__INCLUDED__
 #define __RANDOM__H__INCLUDED__  (1)
 #include <time.h> // Potrzebne, bo wszędzie jest time()
+
+/**
+ *  @def USES_RANDG
+ *  @brief Zdefiniuj takie makro przed włączeniem pliku "random.h", żeby użyć implementacji z numerical recipie.
+ *
+ *  @def USES_BSD_RANDOM
+ *  @brief Zdefiniuj takie makro przed włączeniem pliku "random.h", żeby użyć implementacji systemu BSD.
+ *
+ *  @def USES_SVR4_DRAND
+ *  @brief Zdefiniuj takie makro przed włączeniem pliku "random.h", żeby użyć implementacji systemu SVR4.
+ *
+ *  @def USES_STDC_RAND
+ *  @brief Zdefiniuj takie makro przed włączeniem pliku "random.h", żeby użyć standardowego generatora języka C.
+ *
+ *	@def RANDOM_MAX
+ *	@brief Największa wartość, jaką można uzyskać z generatora w wersji całkowitoliczbowej.
+ *
+ *	@def RAND
+ *	@brief Losowanie liczby z zakresu 0...RANDOM_MAX.
+ *
+ *	@def RANDOM
+ *	@brief Losowanie liczby z zakresu 0...parametr makra.
+ *
+ *	@def SRAND
+ *	@brief Inicjowanie generatora jakąś liczbą całkowitą.
+ *
+ *	@def DRAND
+  *	@brief Losowanie liczby "rzeczywistej" z zakresu 0...1.
+ *
+ *	@def RANDOMIZE
+ *	@brief Inicjalizowanie generatora czasem systemowym z dokładnością do sekund (?).
+ */
 
 #if   defined( USES_RANDG )
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-float  randg(void); 		/**< Random number generator from Numerical Recipies*/
-void   srandg(short int);	/**< Seed setting for generator */
-float  randnorm(void);
-float  randexp(void);
+
+/**
+ * @name Różne funkcje związane z generowaniem liczb losowych zaimplementowane w języku C.
+ * @details Nalezy oczekiwać że zwracają liczbę typu `float` z zakresu <0...1).
+ * @{
+ */
+
+float  randg(void); 		/**< Random number generator from Numerical Recipies. */
+void   srandg(short int);	/**< Seed setting for generator. */
+float  randnorm(void);		/**< TODO... ??? */
+float  randexp(void);		/**< TODO... ??? */
+
+/** @} */
 #ifdef __cplusplus
 }
 #endif
@@ -35,7 +77,7 @@ float  randexp(void);
 #	define RAND()                           ( random() )
 #	define RANDOM(_I_)                      ( (int) (((double) (random)() * (_I_) ) / ((double)RANDOM_MAX+1) ) )
 #	define SRAND(_P_)                       { srandom(_P_);}
-#   define DRAND()                              ( (double)random()/((double)(RANDOM_MAX)+1) )
+#	define DRAND()                              ( (double)random()/((double)(RANDOM_MAX)+1) )
 #	define RANDOMIZE()                      { (srandom)( (unsigned) time(NULL) ); }
 
 #elif defined( USES_SVR4_DRAND )
@@ -45,7 +87,7 @@ float  randexp(void);
 #	define RANDOM(_I_)                      ( drand48()*(_I_))
 #	define SRAND(_P_)                       { srand48( _P_ ); }
 #	define DRAND()                          ( drand48() )
-#   define RANDOMIZE()                          { (srand48)( (long) time(NULL) ); }
+#	define RANDOMIZE()                          { (srand48)( (long) time(NULL) ); }
 
 #elif defined( USES_STDC_RAND )
 
@@ -64,7 +106,7 @@ float  randexp(void);
 #	define RAND() 	                ( SELECT_RANDOM_NOT_DEFINED_FOR_THIS_CODE  )
 #	define RANDOM(_I_)              ( SELECT_RANDOM_NOT_DEFINED_FOR_THIS_CODE  )
 #	define SRAND(_P_)               { SELECT_RANDOM_NOT_DEFINED_FOR_THIS_CODE  }
-#       define DRAND()                 ( SELECT_RANDOM_NOT_DEFINED_FOR_THIS_CODE  )
+#	define DRAND()                 ( SELECT_RANDOM_NOT_DEFINED_FOR_THIS_CODE  )
 #	define RANDOMIZE()              { SELECT_RANDOM_NOT_DEFINED_FOR_THIS_CODE  }
 
 #endif
@@ -72,26 +114,27 @@ float  randexp(void);
 #ifdef __cplusplus
 //extern "C" {
 
-/** Funkcja dająca liczbę losową z zakresu 0..1, ale o rozkładzie
- * albo gausso-podobnym (W>0) albo pareto-podobnym (W<0) lub 1 gdy W=0 */
+/** Funkcja dająca liczbę losową ze skrzywionego rozkładu.
+ * Produkowana wartość jest zakresu 0..1, ale o rozkładzie albo gausso-podobnym (W>0)
+ * albo pareto-podobnym (W<0). Może być też rozkład płaski, gdy W=0 */
 inline  double DRAND_LOOP(int W)
 {
-	double pom;
-	int i;
-	if(W>0)
-	{
-		pom=0;
-		for(i=0;i<W;i++)
-			pom+=DRAND();
-		return pom/W;
-	}
-	else
-	{
-		pom=1;
-		for(i=0;i<-W;i++)
-			pom*=DRAND();
-		return pom;
-	}
+    double pom;
+    int i;
+    if(W>0)
+    {
+        pom=0;
+        for(i=0;i<W;i++)
+            pom+=DRAND();
+        return pom/W;
+    }
+    else
+    {
+        pom=1;
+        for(i=0;i<-W;i++)
+            pom*=DRAND();
+        return pom;
+    }
 }
 
 //#ifdef __cplusplus
@@ -99,7 +142,7 @@ inline  double DRAND_LOOP(int W)
 #endif
 
 /* *******************************************************************/
-/*               SYMSHELLLIGHT  version 2022-10-27                   */
+/*               SYMSHELLLIGHT  version 2026                         */
 /* *******************************************************************/
 /*            THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
 /*             W O J C I E C H   B O R K O W S K I                   */

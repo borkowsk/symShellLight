@@ -2,11 +2,11 @@
 * \file   sshutils.hpp
 * \brief  Implementacja pomocniczych funkcji symshell-a w sposób już niezależny od platformy.
 *         ***********************************************************************************
+*  @date 2026-04-17 (last modification)
 * \details
 *          Napisane PRAWIE NIEOBIEKTOWO ale w C++
 *          Jest tu: print_width() , puste rect(), bar3D(), arrow() ...itp...
 * \author borkowsk
-* \n :atom_symbol:
 * */
 
 #ifndef __SSHUTILS_HPP__
@@ -20,14 +20,15 @@
 #include "symshell.h"
 
 #ifndef M_PI
-/** Własne definicje:
- *  \def M_PI
- *  \def M_PI_2
- *  \def M_PI_4
- *  definiowane, gdy nie sa dostarczone przez kompilator. Np. starsze MVC++ nie definiowało. */
+/** @name M_PIx
+ * @brief Własne definicje stałych związanych z liczbą Pi.
+ * @details Definiowane, gdy nie są dostarczone przez kompilator. Np. starsze MVC++ nie definiowało.
+ * @{
+ */
 #define M_PI        3.14159265358979323846
 #define M_PI_2      1.57079632679489661923
 #define M_PI_4      0.785398163397448309616
+/** @} */
 #endif
 
 /// Pomocnicza funkcja kwadratowa dla skrócenia kodu tu i tam...
@@ -38,35 +39,39 @@ inline NUM sqr(const NUM& x)
 
 /**
  * @defgroup SymShellUtils Różne dodatkowe narzędzia do grafiki
- * \brief    Zdefiniowane kolory i dodatkowe kształty
+ * \brief    Zdefiniowane kolory i dodatkowe kształty.
  */
-///@{
+/// @{
 
-/// \brief Obliczanie odległości Euklides. Często potrzebne w takich programach
+/// \brief Obliczanie odległości Euklides. Często potrzebne w takich programach. @note NIEINTUICYJNY UKŁAD PARAMETRÓW!
 double distance(double X1,double X2,double Y1,double Y2);
 
-/// \brief Alias dla typu ssh_color
-/// \note W funkcjach rysujących modułu 'sshutils' używany jest kolor indeksowany
+/// \brief Alias dla typu `ssh_color`.
+/// \note W funkcjach rysujących modułu 'sshutils' używany jest kolor indeksowany.
 typedef ssh_color wb_color;
 
-// Zestaw identyfikatorów kolorów 'sshutils'
+/**
+@name Zestaw identyfikatorów kolorów
+* @{
+ */
+const wb_color default_transparent=wb_color(-1);     ///< Domyślny kolor do oznaczania transparentności.
+const wb_color default_color=default_transparent;    ///< Domyślny kolor indeksowany.
+const wb_color default_black=0;                      ///< Domyślny kolor indeksowany czarny.
+const wb_color default_white=255;                    ///< Domyślny kolor indeksowany biały.
+const wb_color default_dark_gray=256+64;             ///< Domyślny kolor indeksowany ciemnoszary.
+const wb_color default_half_gray=256+128;            ///< Domyślny kolor indeksowany średnio szary.
+const wb_color default_light_gray=256+128+64;        ///< Domyślny kolor indeksowany jasnoszary.
+/** @} */
 
-const wb_color default_transparent=wb_color(-1);     ///< Domyślny kolor do oznaczania transparentności
-const wb_color default_color=default_transparent;    ///< Domyślny kolor indeksowany
-const wb_color default_black=0;                      ///< Domyślny kolor indeksowany czarny
-const wb_color default_white=255;                    ///< Domyślny kolor indeksowany biały
-const wb_color default_dark_gray=256+64;             ///< Domyślny kolor indeksowany ciemnoszary
-const wb_color default_half_gray=256+128;            ///< Domyślny kolor indeksowany średnio szary
-const wb_color default_light_gray=256+128+64;        ///< Domyślny kolor indeksowany jasnoszary
-
-/// \brief Funkcja interpretująca string jako wartość RGB
-/// \param s powinno zawierać tekst z definicją koloru RBG
-/// \param endptr pozwala sprawdzić, czy nie było błędu
+/// \brief Funkcja interpretująca string jako wartość RGB.
+/// \param s powinno zawierać tekst z definicją koloru RBG.
+/// \param endptr pozwala sprawdzić, czy nie było błędu.
 /// \return kolor RBG zakodowany w postaci liczby 32-bitowej. TODO — powinno zwracać ssh_rgba, ale na razie nie używamy
 /// \details Dopuszczalne formaty to: xFFFFFF  b111111111111111111111111  rgb(255,255,255) RGB(255,255,255)
 unsigned strtorgb(const char *s, char **endptr);
 
-// Ustawienia grubości i rozmiarów elementów 'sshutils'
+// Ustawienia grubości i rozmiarów elementów 'sshutils':
+// /////////////////////////////////////////////////////
 
 extern int def_frame_width;/* =1;*/                  ///< Domyślna grubość ramki
 extern int def_cross_width;/* =5;*/                  ///< Domyślna szerokość krzyżyka
@@ -77,69 +82,69 @@ extern double def_arrow_theta;/*=M_PI/6.0+M_PI;*/    ///< Domyślne rozwarcie gr
 /// \brief Struktura konfiguracji słupków 3D.
 struct settings_bar3d
 {
-    ///Konstruktor struktury konfiguracji słupków 3D
+    ///Konstruktor struktury konfiguracji słupków 3D.
     settings_bar3d(
                int ia=10,
                int ib=10,
                int ic=6,
-			   wb_color wcol=default_white,
-			   wb_color bcol=default_black
+               wb_color wcol=default_white,
+               wb_color bcol=default_black
                ):
-		a(ia),b(ib),c(ic),wire(wcol),back(bcol)
+        a(ia),b(ib),c(ic),wire(wcol),back(bcol)
         {}
-    int         a; ///< Długość odcinka a słupka
-    int         b; ///< Długość odcinka b słupka
-    int         c; ///< Długość odcinka c słupka
-    wb_color wire; ///< Kolor ramek
-    wb_color back; ///< Informacja o kolorze tla
+    int         a; ///< Długość odcinka a słupka.
+    int         b; ///< Długość odcinka b słupka.
+    int         c; ///< Długość odcinka c słupka.
+    wb_color wire; ///< Kolor ramek.
+    wb_color back; ///< Informacja o kolorze tla.
 };
 
-/// \brief  Funkcja konfiguracji słupków 3D
-/// \return Zwraca poprzednią konfigurację albo NULL, jeśli przywraca poprzednio zapamiętaną
+/// \brief  Funkcja konfiguracji słupków 3D.
+/// \return Zwraca poprzednią konfigurację albo NULL, jeśli przywraca poprzednio zapamiętaną.
 const settings_bar3d* bar3d_config(settings_bar3d* st);
 
-/// \brief  Rysuje słupek 3D w kolorach indeksowanych
+/// \brief  Rysuje słupek 3D w kolorach indeksowanych.
 void bar3d(int x,int y,int h,wb_color col1,wb_color col2);
 
-/// \brief  Rysuje słupek 3D w kolorze RBG z cieniem
+/// \brief  Rysuje słupek 3D w kolorze RBG z cieniem.
 void bar3dRGB(int x,int y,int h,int R,int G,int B,int ShadowDiv);
 
-/// \brief  Rysuje kwadratową ramkę o zadanej grubości
+/// \brief  Rysuje kwadratową ramkę o zadanej grubości.
 void rect(int x1,int y1,int x2,int y2,wb_color frame_c,int width=def_frame_width);
 
-/// \brief  Rysuje pionową skalę kolorów
+/// \brief  Rysuje pionową skalę kolorów.
 void ver_scale(int x1,int y1,int width=def_scale_width,wb_color start=0,wb_color end=255);
 
-/// \brief  Rysuje poziomą skalę kolorów
+/// \brief  Rysuje poziomą skalę kolorów.
 void hor_scale(int x1,int y1,int high=def_scale_width,wb_color start=0,wb_color end=255);
 
-/// \brief  Rysuje krzyżyk
+/// \brief  Rysuje krzyżyk.
 void cross(int x,int y,wb_color color,int line_width=def_cross_width);
 
-/// \brief  Rysuje dowolnie skierowaną strzałkę od punktu x1y1 do x2y2
+/// \brief  Rysuje dowolnie skierowaną strzałkę od punktu x1y1 do x2y2.
 void arrow(int x1,int y1,int x2,int y2,wb_color color,double size=def_arrow_size,double theta=def_arrow_theta);
 
-/// \brief  Efektywnie rysuje poziomą strzałkę
+/// \brief  Efektywnie rysuje poziomą strzałkę.
 void vert_arrow(int x1,int x2,int y,wb_color color,double size=def_arrow_size);
 
-/// \brief  Efektywnie rysuje pionową strzałkę
+/// \brief  Efektywnie rysuje pionową strzałkę.
 void hor_arrow(int x,int y1,int y2,wb_color  color,double size=def_arrow_size);
 
 /// \brief   Drukuje tekst w obszarze nie szerszym niz max_width.
-/// \return  Zwraca width albo 0
-/// \details wewnętrzny bufor ma nie więcej niż 1024 znaki
+/// \return  Zwraca width albo 0.
+/// \details wewnętrzny bufor ma nie więcej niż 1024 znaki.
 int print_width(int x,int y,int max_width,wb_color col,wb_color bcg,const char* format ...);
 
 extern "C" {
 /// \brief Wyświetlanie pliku HTML poprzez shell systemowy.
 /// \details Tak naprawdę można użyć do wszystkich typów plików,
-///          jakie może wyświetlić przeglądarka
-/// \param URL - pełny URL, ale czasem ujdzie i nazwa pliku :-D
-/// \return powinien zwrócić kod wykonania programu "dziecka"
+///          jakie może wyświetlić przeglądarka.
+/// \param URL - pełny URL, ale czasem ujdzie i nazwa pliku :-D ...
+/// \return powinien zwrócić kod wykonania programu "dziecka".
     int ViewHtml(const char* URL);
 }
 
-///@}
+/// @}
 /* ******************************************************************/
 /*                 SYMSHELLLIGHT  version 2026                      */
 /* ******************************************************************/

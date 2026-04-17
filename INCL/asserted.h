@@ -1,6 +1,6 @@
 /// @file
 /// Created by borkowsk on 06.01.26.
-/// @date 2026-01-06 (last modification)
+/// @date 2026-04-17 (last modification)
 
 #ifndef SYMSHELL_ASSERTED_H
 #define SYMSHELL_ASSERTED_H
@@ -17,4 +17,15 @@ T_VALUE asserted(const S_VALUE& value)
     return value;
 }
 
+/* *******************************************************************/
+/*               SYMSHELLLIGHT  version 2026                         */
+/* *******************************************************************/
+/*            THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
+/*             W O J C I E C H   B O R K O W S K I                   */
+/*     Instytut Studiów Społecznych Uniwersytetu Warszawskiego       */
+/*     WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI  */
+/*     GITHUB: https://github.com/borkowsk                           */
+/*                                                                   */
+/*                                (Don't change or remove this note) */
+/* *******************************************************************/
 #endif //SYMSHELL_ASSERTED_H

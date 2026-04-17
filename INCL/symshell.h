@@ -30,18 +30,18 @@
 /* TYPY */
 typedef unsigned char                           uchar8b;       /**< \brief BASIC CHAR TYPE. MUST HAVE 8 bits!? */
 
-typedef uchar8b                                 ssh_bool;      /**< \brief logic type. 0 or 1 */
-typedef int                                     ssh_msg;       /**< \brief Character from the keyboard or other special numbers, especially from the menu */
+typedef uchar8b                                 ssh_bool;      /**< \brief logic type. 0 or 1. */
+typedef int                                     ssh_msg;       /**< \brief Character from the keyboard or other special numbers, especially from the menu. */
 typedef signed   int                            ssh_mode;      /**< \brief Only symbols defined above expected! */
-typedef signed   int                            ssh_stat;      /**< \brief Values returned as status for some functions */
-typedef signed   int                            ssh_coordinate;/**< \brief Wszelkie współrzędne ekranowe */
-typedef unsigned int                            ssh_natural;   /**< \brief Liczby większe od zera, gdy zero jest sytuacją nieoczekiwaną */
-typedef unsigned int                            ssh_intensity; /**< \brief Składowe kolorów itp. wartości od 0 wzwyż */
-typedef struct ssh_point {ssh_coordinate x,y;}  ssh_point;     /**< \brief Punkt we współrzędnych ekranowych */
+typedef signed   int                            ssh_stat;      /**< \brief Values returned as status for some functions. */
+typedef signed   int                            ssh_coordinate;/**< \brief Wszelkie współrzędne ekranowe. */
+typedef unsigned int                            ssh_natural;   /**< \brief Liczby większe od zera, gdy zero jest sytuacją nieoczekiwaną. */
+typedef unsigned int                            ssh_intensity; /**< \brief Składowe kolorów itp. wartości od 0 wzwyż. */
+typedef struct ssh_point {ssh_coordinate x,y;}  ssh_point;     /**< \brief Punkt we współrzędnych ekranowych. */
 typedef struct ssh_rgb   {uchar8b r,g,b;}       ssh_rgb;       /**< \brief RGB type. What about alpha? Union with uint32? TODO */
 //typedef struct ssh_rgba  {uchar8b r,g,b,a;}     ssh_rgba;    /**< \brief RGB with alpha. Union with uint32? TODO */
 typedef unsigned int                            ssh_color;     /**< \brief Indexed color. TODO change name to ssh_color_index? */
-typedef float                                   ssh_radian;    /**< \brief katy w radianach dla łuków */
+typedef float                                   ssh_radian;    /**< \brief katy w radianach dla łuków. */
 
 #ifdef __cplusplus
 extern "C" {
@@ -74,7 +74,7 @@ const ssh_mode  SSH_NO=0;                         /**< \brief Flaga zaprzeczają
  *  Could be "X11", "WINDOWS" or "SVG". */
 extern const char*  _ssh_grx_module_name;
 
-/** \brief If not 0, the window is usable */
+/** \brief If not 0, the window is usable. */
 extern unsigned long _ssh_window;
 
 /** Określa czy zamykać od razu, czy dać szanse na przejrzenie zawartości.
@@ -84,7 +84,7 @@ extern int WB_error_enter_before_clean/* =0 */;
 /* OTWIERANIE i ZAMYKANIE TRYBU (OKNA) GRAFICZNEGO */
 /* Operacje konfiguracyjne o działaniu gwarantowanym przed inicjacją */
 
-/** \brief Przekazanie parametrów wywołania i nazwy okna */
+/** \brief Przekazanie parametrów wywołania i nazwy okna. */
 void shell_setup(const char* title,                      /**< Nazwa aplikacji używana jako tytuł okna lub jego część. */
                  const int   i_argc,                      /**< Liczba WSZYSTKICH parametrów wywołania. */
                  const char* i_argv[]                     /**< Przekazanie parametrów wywołania. */
@@ -100,17 +100,17 @@ void buffering_setup(ssh_mode Yes);
  *  W takim trybie zmiana wielkości okna powiększa piksele o całkowitą wielokrotność. */
 void fix_size(ssh_mode Yes);
 
-/** \brief Zmienia definicje koloru w palecie kolorów. Indeksy 0..255 */
-void set_rgb(ssh_color color,                                  /**< indeks koloru */
-             ssh_intensity r,                                  /**< Wartość składowej `red` */
-             ssh_intensity g,                                  /**< Wartość składowej `green` */
-             ssh_intensity b                                   /**< Wartość składowej `blue` */
+/** \brief Zmienia definicje koloru w palecie kolorów. Indeksy 0..255. */
+void set_rgb(ssh_color color,                                  /**< indeks koloru. */
+             ssh_intensity r,                                  /**< Wartość składowej `red`. */
+             ssh_intensity g,                                  /**< Wartość składowej `green`. */
+             ssh_intensity b                                   /**< Wartość składowej `blue`. */
              );
 
 /** \brief Zmiana definicje odcienia szarości w palecie szarości. Indeksy od 256 do 511. */
 void set_gray(ssh_color shade,ssh_intensity intensity);
 
-/** \brief Ustala index koloru do czyszczenia. Może nie działać po inicjacji*/
+/** \brief Ustala index koloru do czyszczenia. Może nie działać po inicjacji.*/
 void set_background(ssh_color c);
 
 /** \brief Właściwa dla platformy inicjacja grafiki (a kiedyś też semigrafiki!).
@@ -599,7 +599,7 @@ typedef struct ssh_basic_win_place_context {
  * @param other_data - wskaźnik do rekordu danych użytkownika zawierającego co najmniej uchwyt Display i uchwyt okna.
  * @return 0 gdy menu nic nie zwróciło albo oczekujemy, że wynik wróci później jako message.
  *        -1 gdy funkcja zaniechała obsługi i kliknięcie ma być przekazane normalnej obsłudze w aplikacji (przez `\b`).
- *         Każda wartość dodatnia jest traktowana jako komunikat do zwrócenia przez funkcję `get_char()`.
+ *         Każda wartość dodatnia jest traktowana jako komunikat do zwrócenia przez funkcję `get_char`.
  *         Inna wartość ujemna powoduje wyświetlenie informacji o błędzie, ze sprawdzeniem wartości zmiennej `errno`.
  * @details Funkcja może być blokująca lub nieblokująca (np. odpalać osobny wątek). Podstawową implementację dostarcza
  *          biblioteka SYMSHELL, ale zdefiniowanie własnej przez użytkownika biblioteki blokuje linkowanie wersji domyślnej.
@@ -656,7 +656,7 @@ inline ssh_stat  repaint_area(ssh_coordinate& x, ssh_coordinate& y,ssh_natural& 
 /// \warning FUNKCJE PRZESTARZAŁE TAKŻE DOSTĘPNE TYLKO DLA KOMPILATORA C++
 inline ssh_mode   get_buffering() { return 	buffered(); }        /**< Zwraca 1, jeśli buforowane. */
 inline ssh_mode   get_fixed() { return fixed(); }                /**< Czy okno ma zafiksowana wielkość. */
-inline ssh_color  get_background(void) { return background(); }  /**< Aktualny kolor tla... */
+inline ssh_color  get_background(void) { return background(); }  /**< Aktualny kolor tła... */
 #endif
 
 ///@}

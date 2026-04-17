@@ -1,4 +1,6 @@
-/** \file _sig_msg.h */
+/** \file _sig_msg.h
+ *  @date 2026-04-17 (last modification)
+ * */
 // ///////////////////
 /** IDM_SIGNAL_COMMAND - ważne dla implementacji w MS Windows
  * Musi być tak samo dla wb_posix.c jak i w symshwin.c!!!

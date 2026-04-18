@@ -61,9 +61,9 @@ Current version does not work fully under __Windows__, because some functions ar
 * cmake
 * make
 * c/c++ (gcc/g++)
-* For unix native graphixs it needs development version of __X11__ packages including XPM
+* For _unix_ native graphixs it needs development version of __X11__ packages including XPM
   ( _libxpm-dev_, so on UBUNTU use: `sudo apt install libxpm-dev` )
-* rofi for context menus
+* _rofi_ for context menus
 * Also _doxygen_ adn _doxywizard_ for creating documentation.
 
 **Licencing**
@@ -72,5 +72,7 @@ You can use this software freely for educational and research purposes, but if y
 
 **COFFEE**
 
-* https://www.paypal.com/paypalme/wborkowsk
+* [PayPal](https://www.paypal.com/paypalme/wborkowsk)
+  OR
+* [Coffee](https://buycoffee.to/adalbertus)
 

@@ -1,13 +1,14 @@
 /** \file   sshmenuf.h
-*  \brief   INTERFACE FOR SYMSHELL MENU AND RELATED FEATURES.
-*  @date 2026-04-17 (last modification)
+*   \brief INTERFACE FOR SYMSHELL MENU AND RELATED FEATURES.       */
+/*         =================================================       */
+/** @date 2026-04-18 (last modification)
 *  \warning MS WINDOWS ONLY. Otherwise dummy version is provided.
-*  \note  Unix version used Motif is outdated.
+*  \note Unix version used Motif is outdated.
 *  \note Under X11 the popup menu using rofi is available.
 *  \author  borkowsk
-* ************************************************** */
-#ifndef SYMSHELL_MENU_FUNCTIONS_H_INCLUDED
-#define SYMSHELL_MENU_FUNCTIONS_H_INCLUDED
+* **************************************************************** */
+#ifndef SYMSHELL_MENU_FUNCTIONS_H_INCLUDED_
+#define SYMSHELL_MENU_FUNCTIONS_H_INCLUDED_
 
 #ifdef __cplusplus
 #define DEF_VAL_IF_CPP( _P_ )  =(_P_)
@@ -39,15 +40,15 @@ extern "C" {
 
     /** \brief Uchwyt do PODMENU podanego menu */
     ssh_menu_handle ssh_sub_menu(
-                    ssh_menu_handle hMenu,						 /**< uchwyt do menu lub sub-menu. */
-                    unsigned    Position						 /**< pozycja składowej menu. */
+                    ssh_menu_handle hMenu,						 /**< Uchwyt do menu lub sub-menu. */
+                    unsigned    Position						 /**< Pozycja składowej menu. */
                     );
 
     /** \brief pozycja itemu o danej nazwie. */
     /** \return MAX_UINT if cant find such item. */
     unsigned ssh_get_item_position(
-                 ssh_menu_handle hMenu,							 /**< uchwyt do menu lub sub-menu. */
-                 const char* ItemName							 /**< nazwa składowej menu. */
+                 ssh_menu_handle hMenu,							 /**< Uchwyt do menu lub sub-menu. */
+                 const char* ItemName							 /**< Nazwa składowej menu. */
                  );
 
     /** \brief dodanie itemu o danej nazwie. */
@@ -63,16 +64,16 @@ extern "C" {
     /** \brief znakowanie itemu menu. */
     /** \param asPosition Need be 1 if submenu checking ??? */
     int ssh_menu_mark_item(
-                    ssh_menu_handle hMenu,						 /**< uchwyt do menu lub sub-menu. */
-                    unsigned    Check,			 			 	 /**< czy z check-markiem. */
-                    unsigned    ItemCommandOrPosition,			 /**< jakiś identyfikator itemu. */
+                    ssh_menu_handle hMenu,					 /**< Uchwyt do menu/sub-menu, na którym przeprowadzamy operację. */
+                    unsigned    Check,			 			 /**< Informuje, czy z check-markiem. */
+                    unsigned    ItemCommandOrPosition,		 /**< Jakiś identyfikator itemu. */
                     unsigned    asPosition DEF_VAL_IF_CPP(0)
                                 );
 
     /** \brief Usuwa item z menu. */
     int ssh_menu_remove_item(
-                    ssh_menu_handle hMenu,							 /**< uchwyt do menu lub sub-menu. */
-                    unsigned    ItemCommandOrPosition,				 /**< Jakiś identyfikator itemu. */
+                    ssh_menu_handle hMenu,					 /**< Uchwyt do menu/sub-menu, na którym przeprowadzamy operację. */
+                    unsigned    ItemCommandOrPosition,		 /**< Jakiś identyfikator itemu. */
                     unsigned    asPosition DEF_VAL_IF_CPP(0)
                     );
 
@@ -89,6 +90,7 @@ extern char*    ssh_menu_options;
 #ifdef __cplusplus
 };
 #endif
+
 ///@}
 
 /* *******************************************************************/
@@ -102,7 +104,7 @@ extern char*    ssh_menu_options;
 /*                                                                   */
 /*                                (Don't change or remove this note) */
 /* *******************************************************************/
-#endif //SYMSHELL_MENU_FUNCTIONS_H_INCLUDED
+#endif //SYMSHELL_MENU_FUNCTIONS_H_INCLUDED_
 
 
 

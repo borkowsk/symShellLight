@@ -1,15 +1,22 @@
 /// \file
 /// \brief Klasa wielobok i biblioteka różnych wieloboków
-///        ***********************************************
-/// \details Powstała jako przykład definiowania dosyć prostej klasy
+//        ************************************************
+/** @date 2026-04-18 (last modification */
+/// \details Powstała jako przykład definiowania dosyć prostej klasy, a potem się skomplikowała.
 /// \author  borkowsk
-// ////////////////////////////////////////////////////////////
-#ifndef __WBORK_WIELOBOKI_HPP__
-#define __WBORK_WIELOBOKI_HPP__
+// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#ifndef SYMSHELL_WIELOBOKI_HPP_INCLUDED_
+#define SYMSHELL_WIELOBOKI_HPP_INCLUDED_ (1)
 
 #include "symshell.h" //Potrzebne typy z symshell'a
 
-/// \brief Definicja klasy Wielobok - NIEMAL bez żadnej implementacji metod wewnątrz
+/**
+ * @defgroup SymShellUtils Różne dodatkowe narzędzia do grafiki
+ * \brief    Zdefiniowane kolory i dodatkowe kształty.
+ */
+/// @{
+
+/// \brief Definicja klasy Wielobok - NIEMAL bez żadnej implementacji metod wewnątrz.
 class   Wielobok
 {
 private: // Pola prywatne - nikt nie ma bezpośredniego dostępu
@@ -26,14 +33,14 @@ public:  // Interface - metody widoczne dla użytkowników klasy:
 
 unsigned IlePunktow() const {return Ilobok;}     //!< Ile ma wierzchołków. To może być metoda "inline" - szybsza.
 
-const ssh_point& DajPunkt(unsigned Ktory) const; //!< A to lepiej już nie tu, bo "zaciemni" kod
+const ssh_point& DajPunkt(unsigned Ktory) const; //!< A to lepiej już nie tu, bo "zaciemni" kod.
                                                  //!< \return Ta metoda zwraca "stałą referencję" do punktu,
-                                                 //!< co pozwala na czytanie, ale nie pozwala modyfikować tego punktu.
+                                                 //!<      pozwala na czytanie, ale nie pozwala modyfikować tego punktu.
 
-/// \brief   Określenie otoczenia figury
+/// \brief   Określenie otoczenia figury.
 /// \details Metoda przelatuje punkty i daje informacje
-///          - o otaczającym prostokącie
-///          - oraz o promieniu otaczajacego okręgu ze środkiem w punkcie 0,0
+///          - o otaczającym prostokącie,
+///          - oraz o promieniu otaczającego okręgu ze środkiem w punkcie 0,0.
 void Zakresy(  double& MinX,  //!< [out] najmniejszy X.
                double& MinY,  //!< [out] najmniejszy Y.
 			   double& MaxX,  //!< [out] największy X.
@@ -55,22 +62,20 @@ Wielobok(const Wielobok& Wzorek);                          //!< Konstruktor kopi
 Wielobok(const ssh_point Wzorek[],unsigned RozmiarWzorka); //!< Konstruktor z tablicy punktów.
 Wielobok(unsigned IleBokow,float R);                       //!< Konstruktor N-kąta o zmiennej liczbie boków i rozmiarze.
 
-/// \brief Destruktor - bo trzeba zwolnić pomocniczą tablice.
-//  Ale i tak każda klasa powinna mieć
+/// \brief Destruktor — bo trzeba zwolnić pomocniczą tablicę.
 /// \note "virtual" - bo tak jest bezpieczniej.
-//  Co to znaczy będzie innym razem :-)
 virtual ~Wielobok();
 
-// Transformacje. Modyfikują listę punktów, żeby było wygodniej
+// Transformacje. Modyfikują listę punktów, żeby było wygodniej:
 void OdbijWPionie();   ///< Zmienia w odbicie lustrzane pionowo
 void OdbijWPoziomie(); ///< Zmienia w odbicie lustrzane poziomo
 
 /// \note Metody obracania, skalowania i centrowania są "niszczące", bo punkty są pamiętane
 ///       na liczbach całkowitych i wyniki WCALE nie muszą takie być!
 ///       W miarę bezpiecznie można użyć raz lub dwa, bo potem kształt się krzywi.
-void ObracajORad(double Radiany);  //!< Obraca o ileś radianów
-void Skaluj(double x,double y);    //!< Zmienia współrzędne
-void Centruj();                    //!< Zmienia współrzędne tak, żeby były wokół środka ciężkości
+void ObracajORad(double Radiany);  //!< Obraca o ileś radianów.
+void Skaluj(double x,double y);    //!< Zmienia współrzędne.
+void Centruj();                    //!< Zmienia współrzędne tak, żeby były wokół środka ciężkości.
 
 /// @details 
 /// Biblioteka podstawowych kształtów w przestrzeni nazw klasy `Wielobok`
@@ -85,9 +90,9 @@ void Centruj();                    //!< Zmienia współrzędne tak, żeby były 
 static const char*     NazwyWielobokow(int pos);           //!< Zwraca nazwę i-tego wieloboku z biblioteki.
                                                            //!< \return Jak NULL to nie ma już więcej.
                                                            
-static const Wielobok& WielobokWgNazwy(const char* Nazwa); //!< Kształt z biblioteki \return Jak nie ma właściwego to domyślny.
-static const Wielobok* SprobujWielobok(const char* Nazwa); //!< Kształt z biblioteki \return Jak nie ma to zwraca NULL (TODO lub probuje załadować z pliku)
-static const Wielobok& Domyslny();                         //!< Produkuje kształt domyślny, zastępczy jak nie ma potrzebnego!
+static const Wielobok& WielobokWgNazwy(const char* Nazwa); //!< Kształt z biblioteki. \return Jak nie ma właściwego to domyślny.
+static const Wielobok* SprobujWielobok(const char* Nazwa); //!< Kształt z biblioteki. \return Jak nie ma to zwraca NULL (TODO lub probuje załadować z pliku).
+static const Wielobok& Domyslny();                         //!< Produkuje kształt domyślny, zastępczy jak nie ma potrzebnego.
 
 // Skróty do częściej używanych wieloboków z biblioteki:
 //*/////////////////////////////////////////////////////
@@ -98,8 +103,10 @@ static const Wielobok& Ufo();               //!< Kształt UFO. Skrótowy dostęp
 static const Wielobok& Ludzik(int typ);     //!< Kształt człowieka. Skrótowy dostęp do obiektu z biblioteki kształtów.
 };
 
+/// @}
+
 /* ****************************************************************** */
-/*              SYMSHELLLIGHT  version 2024-06-25                     */
+/*              SYMSHELLLIGHT  version 2026                           */
 /* ****************************************************************** */
 /*            THIS CODE IS DESIGNED & COPYRIGHT  BY:                  */
 /*             W O J C I E C H   B O R K O W S K I                    */
@@ -109,5 +116,5 @@ static const Wielobok& Ludzik(int typ);     //!< Kształt człowieka. Skrótowy 
 /*                                                                    */
 /*                                 (Don't change or remove this note) */
 /* ****************************************************************** */
-#endif //__WBORK_WIELOBOKI_HPP__
+#endif //SYMSHELL_WIELOBOKI_HPP_INCLUDED_
 

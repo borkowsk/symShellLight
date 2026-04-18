@@ -1,16 +1,14 @@
-/**
-* \file   sshutils.hpp
-* \brief  Implementacja pomocniczych funkcji symshell-a w sposób już niezależny od platformy.
-*         ***********************************************************************************
-*  @date 2026-04-17 (last modification)
-* \details
+/** @file   sshutils.hpp
+ *  @brief  Implementacja pomocniczych funkcji symshell-a w sposób już niezależny od platformy.  */
+/*         ===================================================================================== */
+/** @date 2026-04-18 (last modification)
+*   @details
 *          Napisane PRAWIE NIEOBIEKTOWO ale w C++
 *          Jest tu: print_width() , puste rect(), bar3D(), arrow() ...itp...
-* \author borkowsk
-* */
-
-#ifndef __SSHUTILS_HPP__
-#define __SSHUTILS_HPP__
+*   @author borkowsk                                                                             */
+/* ********************************************************************************************* */
+#ifndef SYMSHELL_UTILS_HPP_INCLUDED_
+#define SYMSHELL_UTILS_HPP_INCLUDED_
 
 #ifndef __cplusplus
 #error C++ required
@@ -31,19 +29,19 @@
 /** @} */
 #endif
 
-/// Pomocnicza funkcja kwadratowa dla skrócenia kodu tu i tam...
-template<class NUM>
-inline NUM sqr(const NUM& x)
-{ return x*x; }
-
-
 /**
  * @defgroup SymShellUtils Różne dodatkowe narzędzia do grafiki
  * \brief    Zdefiniowane kolory i dodatkowe kształty.
  */
 /// @{
 
-/// \brief Obliczanie odległości Euklides. Często potrzebne w takich programach. @note NIEINTUICYJNY UKŁAD PARAMETRÓW!
+/// Pomocnicza funkcja kwadratowa dla skrócenia kodu tu i tam...
+template<class NUM>
+inline NUM sqr(const NUM& x)
+{ return x*x; }
+
+/// \brief Obliczanie odległości Euklidesa. Często potrzebne w takich programach.
+/// @note NIEINTUICYJNY UKŁAD PARAMETRÓW!
 double distance(double X1,double X2,double Y1,double Y2);
 
 /// \brief Alias dla typu `ssh_color`.
@@ -52,6 +50,7 @@ typedef ssh_color wb_color;
 
 /**
 @name Zestaw identyfikatorów kolorów
+@details Wszystko to sa wybrane indeksy zestawu 256 kolorów i 256 odcieni szarości.
 * @{
  */
 const wb_color default_transparent=wb_color(-1);     ///< Domyślny kolor do oznaczania transparentności.
@@ -73,11 +72,11 @@ unsigned strtorgb(const char *s, char **endptr);
 // Ustawienia grubości i rozmiarów elementów 'sshutils':
 // /////////////////////////////////////////////////////
 
-extern int def_frame_width;/* =1;*/                  ///< Domyślna grubość ramki
-extern int def_cross_width;/* =5;*/                  ///< Domyślna szerokość krzyżyka
-extern int def_scale_width;/* =10;*/                 ///< Domyślna szerokość skali
-extern double def_arrow_size;/* =15;*/               ///< Domyślna długość grota strzałki
-extern double def_arrow_theta;/*=M_PI/6.0+M_PI;*/    ///< Domyślne rozwarcie grota strzałki
+extern int def_frame_width; /* =1;*/                  ///< Domyślna grubość ramki.
+extern int def_cross_width; /* =5;*/                  ///< Domyślna szerokość krzyżyka.
+extern int def_scale_width; /* =10;*/                 ///< Domyślna szerokość skali.
+extern double def_arrow_size; /* =15;*/               ///< Domyślna długość grota strzałki.
+extern double def_arrow_theta; /*=M_PI/6.0+M_PI;*/    ///< Domyślne rozwarcie grota strzałki.
 
 /// \brief Struktura konfiguracji słupków 3D.
 struct settings_bar3d
@@ -145,6 +144,7 @@ extern "C" {
 }
 
 /// @}
+
 /* ******************************************************************/
 /*                 SYMSHELLLIGHT  version 2026                      */
 /* ******************************************************************/

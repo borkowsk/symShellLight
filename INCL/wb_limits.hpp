@@ -1,8 +1,7 @@
 /// @file
 /// @brief    LIMITS FOR SCALAR TYPES (Designed before such thing appeared in C++ standard).
 //           -------------------------------------------------------------------------------
-/// @date 2026-04-17 (last modification)
-///
+/// @date 2026-04-18 (last modification)
 /// \details Szablon klas implementujących limity dla skalarów
 ///          z możliwością dodania własnych specjalizacji.
 ///          Ten jest w przestrzeni nazw 'wbrtm::'.
@@ -11,114 +10,117 @@
 ///          ADD_OWN_SPECIALISATION_TO_WB_LIMITS_H przed włączeniem
 ///          tego pliku
 /// \author borkowsk
+// ////////////////////////////////////////////////////////////////////////////////////////////
 
 /// @ingroup OBSOLETE
-#ifdef _MSC_VER //# warning still not work under Microsoft C++
+#ifdef _MSC_VER //# warning still not work under Microsoft C++ (???)
 #warning  "This code is OBSOLETE and not tested in C++11 standard"
 #endif
 
-#ifndef _WB_LIMITS_H_
-#define _WB_LIMITS_H_
+#ifndef WB_LIMITS_HPP_
+#define WB_LIMITS_HPP_ (1)
 #include <float.h>
 #include <limits.h>
 
+namespace wbrtm { // Przestrzeń nazw biblioteki WBRTM
+
 /**
  * @defgroup TypesService Informacja o typach i nazewnictwo
- * \brief Ładne i przenośne nazwy typów, limity itp.
+ * \brief Ładne i przenośne nazwy typów, limity typów itp.
  */
 /// @{
 
-namespace wbrtm { // Przestrzeń nazw biblioteki WBRTM
-
-    /// \brief Szablon udostępniający limity dla poszczególnych typów skalarnych
+    /// \brief Szablon udostępniający limity dla poszczególnych typów skalarnych.
     template<class Scalar>
     class limit {
     public:
-        static Scalar Max(); ///< musi być zdefiniowane maksimum
-        static Scalar Min(); ///< musi być zdefiniowane minimum
+        static Scalar Max(); ///< Musi być zdefiniowane maksimum.
+        static Scalar Min(); ///< Musi być zdefiniowane minimum.
     };
 
-    // SPECJALIZACJE DLA TYPÓW WBUDOWANYCH
-    //*///////////////////////////////////////////////////////
-    template<>
+    // SPECJALIZACJE DLA TYPÓW WBUDOWANYCH:
+    //*////////////////////////////////////
+    /** \brief wersja dla `double` */ template<>
     inline double limit<double>::Max() { return DBL_MAX; }
 
-    template<>
+    /** \brief wersja dla `float` */ template<>
     inline float limit<float>::Max() { return FLT_MAX; }
 
-    template<>
+    /** \brief wersja dla `long int` */ template<>
     inline long limit<long>::Max() { return LONG_MAX; }
 
-    template<>
+    /** \brief wersja dla `unsigned long` */ template<>
     inline unsigned long limit<unsigned long>::Max() { return ULONG_MAX; }
 
-    template<>
+    /** \brief wersja dla `int` */ template<>
     inline int limit<int>::Max() { return INT_MAX; }
 
-    template<>
+    /** \brief wersja dla `unsigned int` */ template<>
     inline unsigned int limit<unsigned int>::Max() { return UINT_MAX; }
 
-    template<>
+    /** \brief wersja dla `short int` */ template<>
     inline short limit<short>::Max() { return SHRT_MAX; }
 
-    template<>
+    /** \brief wersja dla `unsigned short` */ template<>
     inline unsigned short limit<unsigned short>::Max() { return USHRT_MAX; }
 
-    template<>
+    /** \brief wersja dla `signed char` */ template<>
     inline signed char limit<signed char>::Max() { return CHAR_MAX; }
 
-    template<>
+    /** \brief wersja dla `unsigned char` */ template<>
     inline unsigned char limit<unsigned char>::Max() { return UCHAR_MAX; }
 
-    template<>
+    /** \brief wersja dla `bool` */ template<>
     inline bool limit<bool>::Max() { return true; }
 
 
-    template<>
+    /** \brief wersja dla `double` */ template<>
     inline double limit<double>::Min() { return -DBL_MAX; }
 
-    template<>
+    /** \brief wersja dla `float` */ template<>
     inline float limit<float>::Min() { return -FLT_MAX; }
 
-    template<>
+    /** \brief wersja dla `long` */ template<>
     inline long limit<long>::Min() { return LONG_MIN; }
 
-    template<>
+    /** \brief wersja dla `unsigned long` */ template<>
     inline unsigned long limit<unsigned long>::Min() { return 0; }
 
-    template<>
+    /** \brief wersja dla `int` */ template<>
     inline int limit<int>::Min() { return INT_MIN; }
 
-    template<>
+    /** \brief wersja dla `unsigned int` */ template<>
     inline unsigned int limit<unsigned int>::Min() { return 0; }
 
-    template<>
+    /** \brief wersja dla `short` */ template<>
     inline short limit<short>::Min() { return SHRT_MIN; }
 
-    template<>
+    /** \brief wersja dla `unsigned short` */ template<>
     inline unsigned short limit<unsigned short>::Min() { return 0; }
 
-    template<>
+    /** \brief wersja dla `signed char` */ template<>
     inline signed char limit<signed char>::Min() { return CHAR_MIN; }
 
-    template<>
+    /** \brief wersja dla `unsigned char` */ template<>
     inline unsigned char limit<unsigned char>::Min() { return 0; }
 
-    template<>
+    /** \brief wersja dla `bool` */ template<>
     inline bool limit<bool>::Min() { return false; }
 
 #ifndef ADD_OWN_SPECIALISATION_TO_WB_LIMITS_H
 
+    /// W przypadku ogólnej implementacji `Max` liczymy na warning i inteligentną konwersję.
     template<class Scalar>
     inline Scalar limit<Scalar>::Max() { return DBL_MAX; }
 
+    /// W przypadku ogólnej implementacji `Min` liczymy na warning i inteligentną konwersję.
     template<class Scalar>
     inline Scalar limit<Scalar>::Min() { return DBL_MIN; }
 
 #endif
 
-    /// Klasa do tworzenia sensownego "missing values" oraz
-    /// sprawdzania minimum i maksimum dla wszystkich typów skalarnych
+    /// \brief Klasa do tworzenia sensownego "missing values".
+    /// \details Dla typów ze znakiem wartość "missing" to -maksimum, a dla typów bez znaku maksimum.
     template<class Scalar>
     class default_missing
     {
@@ -131,48 +133,51 @@ namespace wbrtm { // Przestrzeń nazw biblioteki WBRTM
         }
     };
 
-    template<>
-    inline default_missing<double>::default_missing() { miss = DBL_MAX; }
+    /** \brief wersja dla `double` */ template<>
+    inline default_missing<double>::default_missing() { miss = -DBL_MAX; } //TODO TU SIĘ ZMIENIŁO 2026 - PRZETESTUJ!
 
-    template<>
-    inline default_missing<float>::default_missing() { miss = FLT_MAX; }
+    /** \brief wersja dla `float` */ template<>
+    inline default_missing<float>::default_missing() { miss = -FLT_MAX; } //TODO TU SIĘ ZMIENIŁO 2026 - PRZETESTUJ!
 
-    template<>
+    /** \brief wersja dla `long` */ template<>
     inline default_missing<long>::default_missing() { miss = LONG_MIN; }
 
-    template<>
+    /** \brief wersja dla `unsigned long` */ template<>
     inline default_missing<unsigned long>::default_missing() { miss = ULONG_MAX; }
 
-    template<>
+    /** \brief wersja dla `int` */ template<>
     inline default_missing<int>::default_missing() { miss = INT_MIN; }
 
-    template<>
+    /** \brief wersja dla `unsigned int` */ template<>
     inline default_missing<unsigned int>::default_missing() { miss = UINT_MAX; }
 
-    template<>
+    /** \brief wersja dla `signed char` */ template<>
     inline default_missing<signed char>::default_missing() { miss = CHAR_MIN; }
 
-    template<>
+    /** \brief wersja dla `unsigned char` */ template<>
     inline default_missing<unsigned char>::default_missing() { miss = UCHAR_MAX; }
 
 #ifndef ADD_OWN_SPECIALISATION_TO_WB_LIMITS_H
 
+    /// W wersji ogólnej liczymy na warning i w ostateczności inteligentną konwersję.
     template<class Scalar>
     inline default_missing<Scalar>::default_missing() { miss = -DBL_MAX; }
 
 #endif
 
+/// @}
+
 } //namespaxe wbrtm
-///@}
+
+/* ***************************************************************** */
+/*               WB_RTM for SymShell  version 2026                   */
+/* ***************************************************************** */
+/*             THIS CODE IS DESIGNED & COPYRIGHT BY:                 */
+/*              W O J C I E C H   B O R K O W S K I                  */
+/*    Instytut Studiów Społecznych Uniwersytetu Warszawskiego        */
+/*    WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI   */
+/*    GITHUB: https://github.com/borkowsk                            */
+/*                                                                   */
+/*                               (Don't change or remove this note)  */
+/* ***************************************************************** */
 #endif
-/* ******************************************************************/
-/*              SYMSHELLLIGHT  version 2022                         */
-/* ******************************************************************/
-/*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
-/*            W O J C I E C H   B O R K O W S K I                   */
-/*    Instytut Studiów Społecznych Uniwersytetu Warszawskiego       */
-/*    WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI  */
-/*    GITHUB: https://github.com/borkowsk                           */
-/*                                                                  */
-/*                               (Don't change or remove this note) */
-/* ******************************************************************/

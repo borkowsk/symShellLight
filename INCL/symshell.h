@@ -1,6 +1,6 @@
 /** @file
  * @brief SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++ .
- * @date 2026-04-17 (last modification)                           */
+ * @date 2026-04-18 (last modification)                           */
 /*  ============================================================= */
  /**
  * \details
@@ -15,17 +15,17 @@
  **
  ** \library    SYMSHELLLIGHT  version 2026a
  */
-#ifndef _SYMSHELL_H_
-#define _SYMSHELL_H_
+#ifndef SYMSHELL_H_INCLUDED_
+#define SYMSHELL_H_INCLUDED_ (1)
 
 /**
 * @defgroup	GrxInterface Podstawowe funkcje interfejsu graficznego
-* @brief	przenośne między X11 i Windows funkcje rysujące i stowarzyszone
+* @brief	przenośne między X11 i Windows funkcje rysujące i stowarzyszone.
 * @details
 *	        Większość to moduły w języku C, a przynajmniej z takim interfejsem.
 *	        Działa też implementowana w C++ wersja zapisująca do plików SVG.
 */
-///@{
+/// @{
 
 /* TYPY */
 typedef unsigned char                           uchar8b;       /**< \brief BASIC CHAR TYPE. MUST HAVE 8 bits!? */
@@ -37,11 +37,14 @@ typedef signed   int                            ssh_stat;      /**< \brief Value
 typedef signed   int                            ssh_coordinate;/**< \brief Wszelkie współrzędne ekranowe. */
 typedef unsigned int                            ssh_natural;   /**< \brief Liczby większe od zera, gdy zero jest sytuacją nieoczekiwaną. */
 typedef unsigned int                            ssh_intensity; /**< \brief Składowe kolorów itp. wartości od 0 wzwyż. */
-typedef struct ssh_point {ssh_coordinate x,y;}  ssh_point;     /**< \brief Punkt we współrzędnych ekranowych. */
-typedef struct ssh_rgb   {uchar8b r,g,b;}       ssh_rgb;       /**< \brief RGB type. What about alpha? Union with uint32? TODO */
-//typedef struct ssh_rgba  {uchar8b r,g,b,a;}     ssh_rgba;    /**< \brief RGB with alpha. Union with uint32? TODO */
 typedef unsigned int                            ssh_color;     /**< \brief Indexed color. TODO change name to ssh_color_index? */
 typedef float                                   ssh_radian;    /**< \brief katy w radianach dla łuków. */
+/** \brief Punkt we współrzędnych ekranowych. */
+typedef struct ssh_point {ssh_coordinate x,y;}  ssh_point;
+/** \brief Typ dla zestawu składowych RGB. TODO What about alpha? Union with uint32?  */
+typedef struct ssh_rgb   {uchar8b r,g,b;}       ssh_rgb;
+// **< \brief TODO RGB with alpha. Union with uint32?  */
+//typedef struct ssh_rgba  {uchar8b r,g,b,a;}     ssh_rgba;
 
 #ifdef __cplusplus
 extern "C" {
@@ -77,7 +80,7 @@ extern const char*  _ssh_grx_module_name;
 /** \brief If not 0, the window is usable. */
 extern unsigned long _ssh_window;
 
-/** Określa czy zamykać od razu, czy dać szanse na przejrzenie zawartości.
+/** \brief Określa czy zamykać od razu, czy dać szanse na przejrzenie zawartości.
 * Do sterowania `close_plot` - czy wymaga ono potwierdzenia od użytkownika. */
 extern int WB_error_enter_before_clean/* =0 */;
 
@@ -577,13 +580,13 @@ ssh_stat  repaint_area(ssh_coordinate* x,          /**< [out] Adres, na który w
 /* OBSŁUGA MENU KONTEKSTOWEGO */
 /* ========================== */
 
-/** Struktura do definiowania prostego menu. */
+/** \brief Struktura do definiowania prostego menu. */
 typedef struct ssh_menu_item_definition {
     const char* item_text;  /**< Tekst linii menu. Może być też etykieta różniąca się tym, że wartość jest 0. */
     long long   item_value; /**< Wartość przekazywana poprzez funkcję `get_char()`. Dla etykiet 0. */
 } ssh_menu_item_definition;
 
-/** Struktura do przekazywania absolutnego położenia kliknięcia i innych danych do uruchomienia menu kontekstowego. */
+/** \brief Struktura do przekazywania absolutnego położenia kliknięcia i innych danych do uruchomienia menu kontekstowego. */
 typedef struct ssh_basic_win_place_context {
     unsigned long long ScrIdentifier; /**< Dane identyfikacji systemu wyświetlania. Np. Display handle w X11 */
     unsigned long long WinIdentifier; /**< Dane identyfikacji wywołującego okna. Np. Window handle w X11 */
@@ -659,7 +662,8 @@ inline ssh_mode   get_fixed() { return fixed(); }                /**< Czy okno m
 inline ssh_color  get_background(void) { return background(); }  /**< Aktualny kolor tła... */
 #endif
 
-///@}
+/// @}
+
 /* ****************************************************************** */
 /*                     SYMSHELLLIGHT 2026                             */
 /* ****************************************************************** */
@@ -671,6 +675,6 @@ inline ssh_color  get_background(void) { return background(); }  /**< Aktualny k
 /*                                                                    */
 /*                                 (Don't change or remove this note) */
 /* ****************************************************************** */
-#endif /* _SYMSHELL_H_ */
+#endif /* SYMSHELL_H_INCLUDED_ */
 
 

@@ -1,10 +1,10 @@
-//-///////////////////////////////////////////////////////////////////////////
 /// @file
+/// @brief Losowe punkty na ekranie w oknie, którego rozmiar można zmieniać.
 ///                     Przykładowy program SYMSHELL'A.
 ///-------------------------------------------------------------------------
 /// Demonstruje skalowanie okna niezależne od aplikacyjnej strony programu
 /// i robione w funkcjach symshell'a.
-/// @date 2026-04-17 (last update)
+/// @date 2026-04-18 (last update)
 //-////////////////////////////////////////////////////////////////////////////
 #include "symshell.h"
 #include <cstdio>

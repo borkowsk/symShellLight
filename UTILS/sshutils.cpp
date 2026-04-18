@@ -26,18 +26,18 @@
 
 using namespace std;
 
-/// Funkcja ta drukuje w obszarze nie większym niz 'maxwidth' z justowaniem
+/// Funkcja ta drukuje w obszarze nie większym niż 'maxwidth' z justowaniem.
 /// Sekwencje określające justowanie muszą być na początku i są to:
 /// %@L - left , %@R - right oraz %@C - center.
-/// Wewnętrzny bufor ma nie więcej niz 1024 znaki.
-/// \param x : pozioma współrzędna punktu startu
-/// \param y : pionowa współrzędna punktu startu
-/// \param maxwidth : maksymalna dostępna szerokość
-/// \param col : kolor tekstu
-/// \param bcg : kolor tła
-/// \param format : jak zwykle w print, ale może mieć na początku sekwencje określający justowanie
-/// \param ... : zmienne parametry wynikające z formatu
-/// \return Zwraca użyte 'width' albo 0
+/// Wewnętrzny bufor ma nie więcej niż 1024 znaki.
+/// \param x : pozioma współrzędna punktu startu.
+/// \param y : pionowa współrzędna punktu startu.
+/// \param maxwidth : maksymalna dostępna szerokość.
+/// \param col : kolor tekstu.
+/// \param bcg : kolor tła.
+/// \param format : jak zwykle w print, ale może mieć na początku sekwencje określający justowanie.
+/// \param ... : zmienne parametry wynikające z formatu.
+/// \return Zwraca użyte 'width' albo 0.
 int print_width(int x,int y,int maxwidth,wb_color col,wb_color bcg,const char* format ...)
 {
     const size_t BUFSIZE=1024;
@@ -90,7 +90,7 @@ if(width<=maxwidth)
 /// Domyślna grubość ramki używana do ustawiania ostatniego parametru wywołania.
 int def_frame_width=1;
 
-/// \details Rysuje kwadratowa ramkę o zadanej grubości
+/// \details Rysuje kwadratową ramkę o zadanej grubości.
 /// \param x1
 /// \param y1
 /// \param x2
@@ -116,12 +116,12 @@ void rect(int x1,int y1,int x2,int y2,wb_color frame_color,int line_weight)
     }
 }
 
-/// Stałe parametry konfiguracji słupka: s-aktualny old-poprzedni
+/// Stałe parametry konfiguracji słupka: s-aktualny old-poprzedni.
 static settings_bar3d bar3d_settings,old_bar3d_settings;
 
-/// Konfiguracja słupków 3D. Zwraca poprzednią konfiguracje.
-/// Jeśli parametr == NULL to przywraca poprzednio zapamiętaną w 'old'
-/// \param  new_settings
+/// Konfiguracja słupków 3D. Zwraca poprzednią konfigurację.
+/// Jeśli parametr == NULL to przywraca poprzednio zapamiętaną w 'old'.
+/// \param  new_settings ...
 /// \return pointer to 'old_bar3d_settings`.
 const settings_bar3d* bar3d_config(settings_bar3d* new_settings)
 {
@@ -136,12 +136,12 @@ const settings_bar3d* bar3d_config(settings_bar3d* new_settings)
     return &old_bar3d_settings;
 }
 
-/// Rysuje słupek 3D w kolorach indeksowanych
-/// \param x  : pozioma współrzędna lewego dolnego rogu frontu
-/// \param y  : pionowa współrzędna lewego dolnego rogu frontu
-/// \param h  : wysokość frontu
-/// \param col1 : indeks koloru przodu
-/// \param col2 : indeks koloru boku
+/// Rysuje słupek 3D w kolorach indeksowanych.
+/// \param x  : pozioma współrzędna lewego dolnego rogu frontu.
+/// \param y  : pionowa współrzędna lewego dolnego rogu frontu.
+/// \param h  : wysokość frontu.
+/// \param col1 : indeks koloru przodu.
+/// \param col2 : indeks koloru boku.
 void bar3d(int x,int y,int h,wb_color col1,wb_color col2)
 {
 	ssh_point romb[7];
@@ -185,14 +185,14 @@ void bar3d(int x,int y,int h,wb_color col1,wb_color col2)
 
 } /* end of bar3d */
 
-/// Rysuje słupek 3D w kolorze RBG z cieniem
-/// \param x  : pozioma współrzędna lewego dolnego rogu frontu
-/// \param y  : pionowa współrzędna lewego dolnego rogu frontu
-/// \param h  : wysokość frontu
-/// \param R  : składowa koloru 'red'
-/// \param G  : składowa koloru 'green'
-/// \param B  : składowa koloru 'blue'
-/// \param Shad : dzielnik do RGB żeby uzyskać cień na bocznej ścianie
+/// Rysuje słupek 3D w kolorze RBG z cieniem.
+/// \param x  : pozioma współrzędna lewego dolnego rogu frontu.
+/// \param y  : pionowa współrzędna lewego dolnego rogu frontu.
+/// \param h  : wysokość frontu.
+/// \param R  : składowa koloru 'red'.
+/// \param G  : składowa koloru 'green'.
+/// \param B  : składowa koloru 'blue'.
+/// \param Shad : dzielnik do RGB, żeby uzyskać cień na bocznej ścianie.
 void bar3dRGB(int x,int y,int h,int R,int G,int B,int Shad)
 {
 	ssh_point romb[7];
@@ -233,10 +233,10 @@ void bar3dRGB(int x,int y,int h,int R,int G,int B,int Shad)
 	fill_rect(x,y-h,x+1,y+1,wire_col);       //lewy pion
 }/* end of bar3dRGB */
 
-/// Domyślna szerokość krzyżyka
+/// Domyślna szerokość krzyżyka.
 int def_cross_width=5;
 
-/// Rysuje krzyżyk
+/// Rysuje krzyżyk.
 /// \param x
 /// \param y
 /// \param color
@@ -247,12 +247,12 @@ void cross(int x,int y,wb_color color,int line_width)
 	line(x, y - line_width, x, y + line_width, color);
 }
 
-/// Rysuje pionową skalę kolorów
+/// Rysuje pionową skalę kolorów.
 /// \param x1
 /// \param y1
-/// \param width : szerokość paska
-/// \param start : kolor początkowy
-/// \param end   : kolor końcowy
+/// \param width : szerokość paska.
+/// \param start : kolor początkowy.
+/// \param end   : kolor końcowy.
 void ver_scale(int x1,int y1,int width,wb_color start,wb_color end)
 {
 	for(wb_color i=start;i<=end;i++)
@@ -261,17 +261,17 @@ void ver_scale(int x1,int y1,int width,wb_color start,wb_color end)
 	}
 }
 
-/// Stałe parametry strzałek - '*size' grota i '*theta'-jego rozwarcie
+/// Stałe parametry strzałek - '*size' grota i '*theta'-jego rozwarcie.
 double def_arrow_size=15,def_arrow_theta=M_PI/6.0+M_PI;//3.6651914291881
 
-/// Rysuje dowolnie skierowaną strzałkę od punktu x1y1 do x2y2
+/// Rysuje dowolnie skierowaną strzałkę od punktu x1y1 do x2y2.
 /// \param x1
 /// \param y1
 /// \param x2
 /// \param y2
-/// \param color : indeks koloru strzałki
-/// \param size  : długość strzałki
-/// \param theta : kierunek strzałki
+/// \param color : indeks koloru strzałki.
+/// \param size  : długość strzałki.
+/// \param theta : kierunek strzałki.
 void arrow(int x1,int y1,int x2,int y2,wb_color color,double size,double theta)
 {	
 	//METODA LICZENIA Z OBRACANIA OSI STRZAŁKI
@@ -310,7 +310,7 @@ double distance(double X1,double X2,double Y1,double Y2)
 }
 
 /* ****************************************************************** */
-/*               SYMSHELLLIGHT  version 2022-03-14                    */
+/*               SYMSHELLLIGHT  version 2026                          */
 /* ****************************************************************** */
 /*            THIS CODE IS DESIGNED & COPYRIGHT  BY:                  */
 /*             W O J C I E C H   B O R K O W S K I                    */

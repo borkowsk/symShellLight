@@ -1,8 +1,10 @@
 /// @file optParam.hpp
 /// @brief KLASY potrzebne do obsługi parametrów wywołania programu.
-/// @date 2026-04-17 (last modification)
-#ifndef OPTIONAL_PARAMETERS_HPP
-#define  OPTIONAL_PARAMETERS_HPP
+//         /////////////////////////////////////////////////////////
+/// @date 2026-04-18 (last modification)
+// /////////////////////////////////////////////////////////////////
+#ifndef OPTIONAL_PARAMETERS_HPP_
+#define OPTIONAL_PARAMETERS_HPP_
 
 #include <cstdlib>
 #include <cstring>
@@ -17,7 +19,7 @@ using namespace std;
 ///\namespace wbrtm \brief WOJCIECH BORKOWSKI RUN TIME LIBRARY
 namespace wbrtm {
 /**
- * @defgroup MAINandPARS Okolice funkcji `main` i parametrów
+ * @defgroup MAINandPARS Okolice funkcji main i parametrów wywołania
  * \brief    Obsługa parametrów wywołania programu i innych podobnych aspektów.
  */
 ///@{

@@ -1,22 +1,16 @@
 /** \file wb_clone.hpp
-*	\brief  WB CLONING SUPPORT FOR ANY C++ OBJECTS
-*	        **************************************
-*	\author borkowsk
+*	\brief  WB CLONING SUPPORT FOR ANY C++ OBJECTS */
+/*	        ************************************** */
+/** @date 2026-04-18 (last modification */
+/**	\author borkowsk
 *   \details
 *       - Function for cloning strings;
 *       - Template function for cloning scalars;
 *       - Template class for forced cloning;
 *       - For class pointers to char could be handled intuitively - by contents, not by pointer value.
-*
-* \author borkowsk
-* \n :atom_symbol:
 */
-#ifndef _WB_CLONE_HPP_
-#define _WB_CLONE_HPP_
-
-#ifndef __cplusplus
-#error C++ required
-#endif
+#ifndef WB_CLONE_HPP_INCLUDED_
+#define WB_CLONE_HPP_INCLUDED_
 
 #include <string.h>
 
@@ -24,32 +18,35 @@
 namespace wbrtm {
 
 /// \brief   Kopiuje stały łańcuch znaków na stertę
-/// \return  Wynikem jest kopia albo NULL jeśli nie może stworzyć kopi
+/// \return  Wynikiem jest kopia albo NULL, jeśli nie może stworzyć kopi.
 inline char* clone_str(const char* const p)
 {
-    if (p != NULL)
-    {
-        auto  len = ::strlen(p) + 1;
-        char* out = new char[ len ];
-        if (out != NULL)
+    if (p != NULL) {
+        auto len = ::strlen(p) + 1;
+        char *out = new char[len];
+        if (out != NULL) //To sprawdzenie już zbędne W WIĘKSZOŚCI SYSTEMÓW.
 #ifdef _MSC_VER
+        {
             strcpy_s(out,len,p);
+        }
 #else
+        {
             ::strcpy(out, p);
+        }
 #endif
         return out;
     }
     else return NULL;
 }
 
-/// \brief Klonowanie łańcucha znaków zgodne z szablonem funkcyjnym clone()
+/// \brief Klonowanie łańcucha znaków zgodne z szablonem funkcyjnym clone().
 ///        Wersje dla const char *const
 inline char* clone(const char *const p)
 {
     return clone_str(p);
 }
 
-/// \brief Klonowanie łańcucha znaków zgodne z szablonem funkcyjnym clone()
+/// \brief Klonowanie łańcucha znaków zgodne z szablonem funkcyjnym clone().
 ///        Wersja dla char* nie różni się niczym. Chyba zbędna. TODO?
 inline char* clone(char* p)
 {
@@ -69,7 +66,7 @@ T* clone(const T* p)
     return (p!=NULL?new T(*p):NULL);
 }
 
-///	 \brief CLASS alternative (FIXING TYPE) of cloning template
+///	 \brief CLASS alternative (FIXING TYPE) of cloning template.
 template<class T>
 class Clone
 {
@@ -79,7 +76,7 @@ public:
     operator T* () {return ptr;}
 };
 
-///  \brief "char" specialization of CLASS alternative of cloning template
+///  \brief "char" specialization of CLASS alternative of cloning template.
 template<>
 class Clone<char>
 {
@@ -90,15 +87,15 @@ public:
 };
 
 } //namespace
-/* ******************************************************************/
-/*              SYMSHELLLIGHT  version 2022-11-17                   */
-/* ******************************************************************/
-/*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
-/*            W O J C I E C H   B O R K O W S K I                   */
-/*    Instytut Studiów Społecznych Uniwersytetu Warszawskiego       */
-/*    WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI  */
-/*    GITHUB: https://github.com/borkowsk                           */
-/*                                                                  */
-/*                               (Don't change or remove this note) */
-/* ******************************************************************/
+/* ***************************************************************** */
+/*               WB_RTM for SymShell  version 2026                   */
+/* ***************************************************************** */
+/*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                  */
+/*            W O J C I E C H   B O R K O W S K I                    */
+/*    Instytut Studiów Społecznych Uniwersytetu Warszawskiego        */
+/*    WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI   */
+/*    GITHUB: https://github.com/borkowsk                            */
+/*                                                                   */
+/*                               (Don't change or remove this note)  */
+/* ***************************************************************** */
 #endif

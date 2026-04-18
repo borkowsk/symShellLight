@@ -1,10 +1,16 @@
 /** @file
  * @brief INTERFACE "C" DO ROZMAITYCH GENERATORÓW LICZB PSEUDOLOSOWYCH.
- * @date 2026-04-17 (last modification)                                */
+ * @date 2026-04-18 (last modification)                                */
 /* -------------------------------------------------------------------- */
-#ifndef __RANDOM__H__INCLUDED__
-#define __RANDOM__H__INCLUDED__  (1)
+#ifndef WB_RTM_RANDOM_H_INCLUDED_
+#define WB_RTM_RANDOM_H_INCLUDED_  (1)
 #include <time.h> // Potrzebne, bo wszędzie jest time()
+
+/**
+* @defgroup RandomNumbers  Liczby losowe.
+* \brief Funkcjonalności związane z liczbami pseudolosowymi.
+*/
+/// @{
 
 /**
  *  @def USES_RANDG
@@ -102,12 +108,13 @@ float  randexp(void);		/**< TODO... ??? */
 
 #else /* NO USEABLE RANDOM FUNCTIONS */
 
-#	define RANDOM_MAX               ( SELECT_RANDOM_NOT_DEFINED_FOR_THIS_CODE  )
-#	define RAND() 	                ( SELECT_RANDOM_NOT_DEFINED_FOR_THIS_CODE  )
-#	define RANDOM(_I_)              ( SELECT_RANDOM_NOT_DEFINED_FOR_THIS_CODE  )
-#	define SRAND(_P_)               { SELECT_RANDOM_NOT_DEFINED_FOR_THIS_CODE  }
-#	define DRAND()                 ( SELECT_RANDOM_NOT_DEFINED_FOR_THIS_CODE  )
-#	define RANDOMIZE()              { SELECT_RANDOM_NOT_DEFINED_FOR_THIS_CODE  }
+#warning  Random functions set not selected!
+#	define RANDOM_MAX               ( RANDOM_FUNCTIONS_SET_NOT_SELECTED )
+#	define RAND() 	                ( RANDOM_FUNCTIONS_SET_NOT_SELECTED )
+#	define RANDOM(_I_)              ( RANDOM_FUNCTIONS_SET_NOT_SELECTED )
+#	define SRAND(_P_)               { RANDOM_FUNCTIONS_SET_NOT_SELECTED }
+#	define DRAND()                  ( RANDOM_FUNCTIONS_SET_NOT_SELECTED )
+#	define RANDOMIZE()              { RANDOM_FUNCTIONS_SET_NOT_SELECTED }
 
 #endif
 
@@ -140,6 +147,8 @@ inline  double DRAND_LOOP(int W)
 //#ifdef __cplusplus
 //}
 #endif
+
+/// @}
 
 /* *******************************************************************/
 /*               SYMSHELLLIGHT  version 2026                         */

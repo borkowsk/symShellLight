@@ -1,5 +1,5 @@
 #  SymShellLight - basic graphics for Unix/Window simulations
-## @date 2026-01-30 (last change)
+## @date 2026-04-18 (last change)
 
  [//]: # (date is updated automatically by git preprocessing script) 
 
@@ -63,6 +63,7 @@ Current version does not work fully under __Windows__, because some functions ar
 * c/c++ (gcc/g++)
 * For unix native graphixs it needs development version of __X11__ packages including XPM
   ( _libxpm-dev_, so on UBUNTU use: `sudo apt install libxpm-dev` )
+* rofi for context menus
 * Also _doxygen_ adn _doxywizard_ for creating documentation.
 
 **Licencing**

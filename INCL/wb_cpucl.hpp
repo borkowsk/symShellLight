@@ -1,6 +1,7 @@
 /// \file wb_cpucl.hpp
 /// \brief Klasa stopera liczącego czas CPU
-///        ********************************
+//        ==================================
+/** @date 2026-04-18 (last modification */
 /// \author borkowsk
 /// \warning OBSOLETE
 // ///////////////////////////////////////////////////////
@@ -10,32 +11,34 @@
 #include <time.h>
 #include <iostream>
 
-/// \namespace wbrtm \brief WOJCIECH BORKOWSKI RUN TIME LIBRARY
+/// \namespace wbrtm \brief WOJCIECH BORKOWSKI RUN TIME LIBRARY.
 namespace wbrtm {
 
-/// \brief   Klasa stopera liczącego czas CPU
-/// \details Liczy czas od momentu utworzenia lub wywołania reset()
-///          do chwili pobrania wartości za pomocą "operator double()"
+/// \brief   Klasa stopera liczącego czas CPU.
+/// \details Liczy czas od momentu utworzenia lub wywołania `reset`
+///          do chwili pobrania wartości za pomocą "operator `double`".
     class wb_cpu_clock
     {
-        clock_t begin_val; ///< zapamiętana wartość początkowa z clock()
+        clock_t begin_val; ///< Zapamiętana wartość początkowa z konstruktora `clock` (albo z `reset`)
 
     public:
+        /// CONSTRUCTOR. Czyta początkowy czas zegara.
         wb_cpu_clock() { begin_val = clock(); }
 
-        /// \brief restart liczenia czasu
+        /// \brief Restart liczenia czasu.
         void reset() { begin_val = clock(); }
 
+        /// \brief Konwersja aktualnego stanu na wartość `double`.
         operator double() const
         {
             return (double(clock()) - double(begin_val)) /
-                   CLOCKS_PER_SEC;
+                    CLOCKS_PER_SEC;
 #ifdef __BORLAND__ //????
-            CLK_TCK;
+                    CLK_TCK;
 #endif
         }
 
-        /// \brief Obsolete! Jawne wywołanie destruktora, trochę na wzór języka JAVA
+        /// \brief Obsolete! Jawne wywołanie destruktora, trochę na wzór języka JAVA. Chociaż całkiem nadmiarowe.
         void finalise()
         {
             this->~wb_cpu_clock();
@@ -80,13 +83,15 @@ namespace wbrtm {
     inline SMANIP(const_wb_cpu_clock_ref)      pretty(const_wb_cpu_clock_ref _c) { return SMANIP(const_wb_cpu_clock_ref)(__pretty, _c); }
     */
 
-    //Wersja mniej generalna, ale tez powinna dzialac
+    /// Wypisywanie w wersji mniej generalnek, która też powinna dzialać.
     class pretty
     {
         const wb_cpu_clock& what;
     public:
+        /// Konstruktor rejestruje referencje do "clockera".
         pretty(const wb_cpu_clock& iw):what(iw){}
     friend
+        /// Wypisanie klasy na strumień.
         ostream& operator << (ostream& o, const pretty& c)
         {
             c.what.PrettyPrint(o);
@@ -100,17 +105,17 @@ namespace wbrtm {
 
 typedef wbrtm::wb_cpu_clock cticker; ///< ready to use timer starting before main()
 
-/* ******************************************************************/
-/*              SYMSHELLLIGHT  version 2022-01-04                   */
-/* ******************************************************************/
-/*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
-/*            W O J C I E C H   B O R K O W S K I                   */
-/*    Instytut Studiów Społecznych Uniwersytetu Warszawskiego       */
-/*    WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI  */
-/*    GITHUB: https://github.com/borkowsk                           */
-/*                                                                  */
-/*                               (Don't change or remove this note) */
-/* ******************************************************************/
+/* ***************************************************************** */
+/*               WB_RTM for SymShell  version 2026                   */
+/* ***************************************************************** */
+/*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                  */
+/*            W O J C I E C H   B O R K O W S K I                    */
+/*    Instytut Studiów Społecznych Uniwersytetu Warszawskiego        */
+/*    WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI   */
+/*    GITHUB: https://github.com/borkowsk                            */
+/*                                                                   */
+/*                               (Don't change or remove this note)  */
+/* ***************************************************************** */
 #endif //__CPU_CLOCK_HPP_
 
 

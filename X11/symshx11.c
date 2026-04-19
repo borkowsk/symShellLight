@@ -2,7 +2,7 @@
  * \file symshx11.c                                                     *
  * \brief X11 implementation of                                         *
  *      SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++            */
-/// @date 2026-04-17 (last modifications)
+/// @date 2026-04-19 (last modifications)
 /* ******************************************************************** */
 /** \details Najprostszy interface wizualizacyjny zaimplementowany      *
  *          pod X-windows za pomocą biblioteki X11                      *
@@ -319,9 +319,9 @@ UNUSED_ATTR_
 
 /* Ustala czy ma być buforowanie okna. */
 UNUSED_ATTR_
-void buffering_setup(int _n)
+void buffering_setup(int yes)
 {
-    if(_n)
+    if(yes)
         animate=1;
     else
         animate=0;
@@ -711,11 +711,11 @@ static long int _read_XInput()
                     assert(sizeof(data.ScrIdentifier)==sizeof(display));
                     data.X=report.xbutton.x_root;
                     data.Y=report.xbutton.y_root;
-                    long long ret=WB_context_menu_expected(report.xbutton.x,report.xbutton.y,&data);
+                    long long ret= ssh_context_menu_expected(report.xbutton.x, report.xbutton.y, &data);
                     if(ret<-1)
                     {
                         //fprintf(stderr,);
-                        perror("`WB_context_menu_expected` failed");
+                        perror("`ssh_context_menu_expected` failed");
                         break;
                     } else if(ret>0)
                     {
@@ -1811,16 +1811,16 @@ void plot(ssh_coordinate x,ssh_coordinate y,ssh_color c)
 
 /* Ustala styl rysowania linii. */
 UNUSED_ATTR_
-int line_style(int Style)
+int line_style(int style)
 {
     /** \internal possible values: SSH_LINE_SOLID, SSH_LINE_DOTTED, SSH_LINE_DASHED
      *  \warning NOT IMPLEMENTED! */
     if(ssh_trace_level>0)
         fprintf(stderr,"%s %s %c", __FUNCTION__ ,"not implemented ",'\t');
     if(ssh_trace_level>0)
-        fprintf(stderr,"%u\n", Style);
+        fprintf(stderr, "%u\n", style);
     /*int old = GrLineStyle;
-    GrLineStyle = Style;
+    GrLineStyle = style;
     return  GrLineStyle;    //Zwraca poprzedni stan
     SEE: LineSolid in X.h - TODO IMPLEMENT IT!
         XSetLineAttributes(display, gc,default_line_width,
@@ -2586,20 +2586,20 @@ void fill_rect(int x1,int y1,int x2,int y2,ssh_color c)
 }
 
 /* Wypełnia WIELOKĄT przesunięty o vx, vy w kolorach domyślnych */
-void fill_poly_d(ssh_coordinate vx,ssh_coordinate vy,
-                 const ssh_point points[],int number)
+void fill_poly_d(ssh_coordinate vx, ssh_coordinate vy,
+                 const ssh_point points[], ssh_length length)
 {
     static XPoint   _LocalTable[10];
     XPoint*          LocalPoints=_LocalTable;
     int i;
 
-    if(number<=2)
+    if(length <= 2)
         return; /*Nie da się rysować
         wielokąta o dwu punktach lub
             mniej*/
 
-    if(number>10) /*Jest za duży. Alokacja*/
-        LocalPoints=calloc(number,sizeof(XPoint));
+    if(length > 10) /*Jest za duży. Alokacja*/
+        LocalPoints=calloc(length, sizeof(XPoint));
 
     if(LocalPoints==NULL)
     {
@@ -2617,7 +2617,7 @@ void fill_poly_d(ssh_coordinate vx,ssh_coordinate vy,
     vx*=mulx;
     vy*=muly;
 
-    for(i=0;i<number;i++)
+    for(i=0; i < length; i++)
     {
         LocalPoints[i].x=points[i].x*mulx+vx;
         LocalPoints[i].y=points[i].y*muly+vy;
@@ -2625,13 +2625,13 @@ void fill_poly_d(ssh_coordinate vx,ssh_coordinate vy,
 
     if(!animate)
         XFillPolygon(display, win, gc,
-                     LocalPoints,number,Complex,CoordModeOrigin);
+                     LocalPoints, length, Complex, CoordModeOrigin);
 
     if(isbuffered)
         XFillPolygon(display, cont_pixmap, gc,
-                     LocalPoints,number,Complex,CoordModeOrigin);
+                     LocalPoints, length, Complex, CoordModeOrigin);
 
-    if(number>10) /*Byl duży*/
+    if(length > 10) /*Byl duży*/
         free(LocalPoints);/* dealokacja */
 }
 
@@ -2700,21 +2700,21 @@ void circle(ssh_coordinate x,ssh_coordinate y,ssh_natural r,ssh_color c)
 }
 
 /* Wypełnia wielokąt przesunięty o vx, vy w kolorze indeksowanym c */
-void fill_poly(ssh_coordinate vx,ssh_coordinate vy,
-               const ssh_point points[],int number,  /* - tablica wierzchołków wielokąta i jej długość */
+void fill_poly(ssh_coordinate vx, ssh_coordinate vy,
+               const ssh_point points[], ssh_length length,  /* - tablica wierzchołków wielokąta i jej długość */
                ssh_color c)
 {
     static XPoint _LocalTable[10];
     XPoint* 	LocalPoints=_LocalTable;
     int i;
 
-    if(number<=2)
+    if(length <= 2)
         return; /*Nie da się rysować
         wielokąta o dwu punktach lub
             mniej*/
 
-    if(number>10) /*Jest za duży. Alokacja*/
-        LocalPoints=calloc(number,sizeof(XPoint));
+    if(length > 10) /*Jest za duży. Alokacja*/
+        LocalPoints=calloc(length, sizeof(XPoint));
 
     if(LocalPoints==NULL)
     {
@@ -2732,7 +2732,7 @@ void fill_poly(ssh_coordinate vx,ssh_coordinate vy,
     vx*=mulx;
     vy*=muly;
 
-    for(i=0;i<number;i++)
+    for(i=0; i < length; i++)
     {
         LocalPoints[i].x=points[i].x*mulx+vx;
         LocalPoints[i].y=points[i].y*muly+vy;
@@ -2740,12 +2740,12 @@ void fill_poly(ssh_coordinate vx,ssh_coordinate vy,
 
     if(!animate)
         XFillPolygon(display, win, gc,
-                     LocalPoints,number,Complex,CoordModeOrigin);
+                     LocalPoints, length, Complex, CoordModeOrigin);
     if(isbuffered)
         XFillPolygon(display, cont_pixmap, gc,
-                     LocalPoints,number,Complex,CoordModeOrigin);
+                     LocalPoints, length, Complex, CoordModeOrigin);
 
-    if(number>10) /*Był duży!*/
+    if(length > 10) /*Był duży!*/
         free(LocalPoints);
 }
 

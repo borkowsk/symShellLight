@@ -19,7 +19,7 @@
  **
  ** \library    SYMSHELLLIGHT  version 2026a
  ** 
-/// @date 2026-02-18 (last modification)
+/// @date 2026-04-19 (last modification)
  */
 #include <iostream>
 #include <fstream>
@@ -1635,11 +1635,11 @@ void fill_rect(ssh_coordinate x1, ssh_coordinate y1, ssh_coordinate x2, ssh_coor
 // Wypełnia wielokąt przesunięty o vx, vy w kolorach domyślnych (pen & fill).
 [[maybe_unused]]
 void fill_poly_d(ssh_coordinate vx, ssh_coordinate vy,
-                 const ssh_point points[], int number)
+                 const ssh_point points[], ssh_length n_of_points)
 {
     if(ssh_trace_level>2) cout << "SVG: " << WB_FUNCTION_NAME_ << SEP; //fill_poly_d
     if(ssh_trace_level>2) cout << vx << SEP << vy << SEP
-                               << number << endl;
+                               << n_of_points << endl;
 
     GrOperation& Op = NextGrListEntry_(); //enum GrType { Empty = 0, Point=1,LineTo=2,Line=3,Circle=4,Rect=5,Text=6,Poly=7 };
                                                                                    assert(Op.empty.type==GrType::Empty);
@@ -1656,9 +1656,9 @@ void fill_poly_d(ssh_coordinate vx, ssh_coordinate vy,
     Op.poly.bf = GrBrushColor.b;
     //if(Op.poly.points!=NULL)
     //	delete [] Op.poly.points;
-    Op.poly.points= new ssh_point[number];
-    Op.poly.si=number;
-    for (unsigned i = 0; i < number; i++)
+    Op.poly.points= new ssh_point[n_of_points];
+    Op.poly.si=n_of_points;
+    for (unsigned i = 0; i < n_of_points; i++)
     {
         Op.poly.points[i].x = points[i].x + vx;
         Op.poly.points[i].y = points[i].y + vy;
@@ -1669,12 +1669,12 @@ void fill_poly_d(ssh_coordinate vx, ssh_coordinate vy,
 // Wypełnia wielokąt przesunięty o vx, vy kolorem z palety
 [[maybe_unused]]
 void fill_poly(ssh_coordinate vx, ssh_coordinate vy,
-               const ssh_point points[], int number,
+               const ssh_point points[], ssh_length n_of_points,
                ssh_color c)
 {
     if(ssh_trace_level>2) cout << "SVG: " << WB_FUNCTION_NAME_ << SEP; //fill_poly
     if(ssh_trace_level>2) cout << vx << SEP << vy << SEP
-                               << number << SEP
+                               << n_of_points << SEP
                                << (ssh_color)c << endl;
 
     GrOperation& Op = NextGrListEntry_(); //enum GrType { Empty = 0, Point=1,LineTo=2,Line=3,Circle=4,Rect=5,Text=6,Poly=7 };
@@ -1693,9 +1693,9 @@ void fill_poly(ssh_coordinate vx, ssh_coordinate vy,
     //Op.poly.points.alloc(number);
     //if(Op.poly.points!=NULL)
     //	delete [] Op.poly.points;
-    Op.poly.points= new ssh_point[number];
-    Op.poly.si=number;
-    for (unsigned i = 0; i < number; i++)
+    Op.poly.points= new ssh_point[n_of_points];
+    Op.poly.si=n_of_points;
+    for (unsigned i = 0; i < n_of_points; i++)
     {
         Op.poly.points[i].x = points[i].x + vx;
         Op.poly.points[i].y = points[i].y + vy;
@@ -1849,10 +1849,10 @@ static void SetScale()
         //else ?ALTERNATYWNIE? TODO CHECK!
         {
             unsigned kk;
-            for(kk=256; kk < PALETE_LENGHT; kk++)
+            for(kk=256; kk < PALETTE_LENGTH; kk++)
                 set_rgb(kk, (unsigned char)kk, (unsigned char)kk, (unsigned char)kk );
             if(ssh_trace_level & 4)
-               cout << "SVG: " << WB_FUNCTION_NAME_ << SEP << "SetScale (Colors: 0-255; Gray: 256-->" << PALETE_LENGHT << ") completed" << endl;
+               cout << "SVG: " << WB_FUNCTION_NAME_ << SEP << "SetScale (Colors: 0-255; Gray: 256-->" << PALETTE_LENGTH << ") completed" << endl;
         }
     }
 

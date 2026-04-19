@@ -1,8 +1,8 @@
 /** @file
  * @brief Szablon konwersji typów liczbowych zabezpieczonej asercjami. */
-/*        ============================================================ */
-/** @date 2026-04-18 (last modification)
- * Created by borkowsk on 06.01.26. */
+/* ============================================================ */
+/** @date 2026-04-19 (ostatnia modyfikacja)
+ * Autor: borkowsk, 06.01.26. */
 
 #ifndef WB_RTM_ASSERTED_H_
 #define WB_RTM_ASSERTED_H_ (1)
@@ -12,17 +12,17 @@
 
 /**
  * @defgroup TypesService Informacja o typach i nazewnictwo
- * \brief Ładne i przenośne nazwy typów, limity typów itp.
+ * \brief Przejrzyste i przenośne nazwy typów, limity typów itp.
  */
 /// @{
 
-/// \brief It does value "cast" with lowest-highest assertion.
-/// \note Not usable for `long long` and `long double`.
-/// \tparam T_VALUE target scalar type.
-/// \tparam S_VALUE source scalar type.
-/// \param value to be cast.
-/// \return value cast from type S_VALUE into T_VALUE.
-/// Example:
+/// \brief Wykonuje rzutowanie wartości z asercją sprawdzającą zakres (minimum-maksimum).
+/// \note Nie do użytku z typami `long long` oraz `long double`.
+/// \tparam T_VALUE docelowy typ skalarny.
+/// \tparam S_VALUE źródłowy typ skalarny.
+/// \param value wartość do rzutowania.
+/// \return wartość rzutowana z typu S_VALUE na T_VALUE.
+/// Przykład:
 /// ```
 ///     double d=....
 ///     float f=asserted<float>(d);

@@ -1,7 +1,7 @@
 /** @file
- * @brief SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++ .
- * @date 2026-04-18 (last modification)                           */
-/*  ============================================================= */
+ * @brief SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++ (PL Doxygen).
+ * @date 2026-04-19 (last modification)                                      */
+/* ========================================================================= */
  /**
  * \details
  *             The whole file changed massively: 15.11.2020
@@ -13,7 +13,7 @@
  *
  ** \author     Designed by W. Borkowski from the University of Warsaw
  **
- ** \library    SYMSHELLLIGHT  version 2026a
+ ** \library    SYMSHELLLIGHT  version 2026b
  */
 #ifndef SYMSHELL_H_INCLUDED_
 #define SYMSHELL_H_INCLUDED_ (1)
@@ -22,33 +22,35 @@
 * @defgroup	GrxInterface Podstawowe funkcje interfejsu graficznego
 * @brief	przenośne między X11 i Windows funkcje rysujące i stowarzyszone.
 * @details
-*	        Większość to moduły w języku C, a przynajmniej z takim interfejsem.
-*	        Działa też implementowana w C++ wersja zapisująca do plików SVG.
+*		Większość to moduły w języku C, a przynajmniej z takim interfejsem.
+*		Działa też implementowana w C++ wersja zapisująca do plików SVG.
 */
 /// @{
 
 /* TYPY */
-typedef unsigned char                           uchar8b;       /**< \brief BASIC CHAR TYPE. MUST HAVE 8 bits!? */
+typedef unsigned char		uchar8b;		/**< \brief PODSTAWOWY TYP ZNAKÓW. MUSI MIEĆ 8 BITÓW (co najmniej). */
 
-typedef uchar8b                                 ssh_bool;      /**< \brief logic type. 0 or 1. */
-typedef int                                     ssh_msg;       /**< \brief Character from the keyboard or other special numbers, especially from the menu. */
-typedef signed   int                            ssh_mode;      /**< \brief Only symbols defined above expected! */
-typedef signed   int                            ssh_stat;      /**< \brief Values returned as status for some functions. */
-typedef signed   int                            ssh_coordinate;/**< \brief Wszelkie współrzędne ekranowe. */
-typedef unsigned int                            ssh_natural;   /**< \brief Liczby większe od zera, gdy zero jest sytuacją nieoczekiwaną. */
-typedef unsigned int                            ssh_intensity; /**< \brief Składowe kolorów itp. wartości od 0 wzwyż. */
-typedef unsigned int                            ssh_color;     /**< \brief Indexed color. TODO change name to ssh_color_index? */
-typedef float                                   ssh_radian;    /**< \brief katy w radianach dla łuków. */
+typedef	uchar8b				ssh_bool;		/**< \brief Zastępczy typ logiczny. Może być 0 albo 1. */
+typedef	signed	int			ssh_msg;		/**< \brief Znak z klawiatury lub inne specjalne liczby, szczególnie z menu. */
+typedef	signed	int			ssh_mode;		/**< \brief Zazwyczaj jest 0 lub 1, może 2, ale jak -1 to znaczy, że jakiś błąd. */
+typedef	signed	int			ssh_stat;		/**< \brief Wartości zwracane jako status niektórych funkcji.*/
+typedef	signed	int			ssh_coordinate;	/**< \brief Wszelkie współrzędne ekranowe. */
+typedef unsigned	int		ssh_length;		/**< \brief Sytuacje, gdy 0 jest dopuszczalne, ale nie coś ujemnego np. długości tablic */
+typedef	unsigned	int		ssh_natural;	/**< \brief Liczby większe od zera, gdy zero jest sytuacją nieoczekiwaną. */
+typedef	unsigned	int		ssh_intensity;	/**< \brief Składowe kolorów itp. wartości od 0 wzwyż. */
+typedef	unsigned	int		ssh_color;		/**< \brief Kolor indeksowany. TODO change name to ssh_color_index? */
+typedef	float				ssh_radian;		/**< \brief Kąty w radianach dla łuków. */
 /** \brief Punkt we współrzędnych ekranowych. */
-typedef struct ssh_point {ssh_coordinate x,y;}  ssh_point;
+typedef	struct	ssh_point	{ssh_coordinate x,y;}		ssh_point;
 /** \brief Typ dla zestawu składowych RGB. TODO What about alpha? Union with uint32?  */
-typedef struct ssh_rgb   {uchar8b r,g,b;}       ssh_rgb;
-// **< \brief TODO RGB with alpha. Union with uint32?  */
-//typedef struct ssh_rgba  {uchar8b r,g,b,a;}     ssh_rgba;
+typedef	struct	ssh_rgb		{uchar8b r,g,b;}			ssh_rgb;
+/** \brief TODO RGB with alpha. Union with uint32?  */
+typedef	struct	ssh_rgba	{uchar8b r,g,b,a;}			ssh_rgba;
 
 #ifdef __cplusplus
 extern "C" {
-const ssh_mode  PALETE_LENGHT=512;                /**< \brief Długość palety predefiniowanych kolorów. */
+const ssh_mode  PALETTE_LENGTH=512;               /**< \brief Długość palety predefiniowanych kolorów. */
+const ssh_mode  PALETE_LENGHT=512;                /**< \brief Długość palety predefiniowanych kolorów (stara nazwa). */
 const ssh_mode  SSH_SOLID_TEXT=0;                 /**< \brief Tekst na wypełnionym pasku tła. */
 const ssh_mode  SSH_TRANSPARENT_TEXT=1;           /**< \brief Tekst na przezroczystym tle. */
 const ssh_mode  SSH_SOLID_PUT=1;                  /**< \brief Zawartość nakładana na tło. */
@@ -59,7 +61,7 @@ const ssh_mode  SSH_LINE_DASHED=3;                /**< \brief Linia przerywana. 
 const ssh_mode  SSH_YES=1;                        /**< \brief Flaga potwierdzająca. */
 const ssh_mode  SSH_NO=0;                         /**< \brief Flaga zaprzeczająca. */
 #else
-#define PALETE_LENGHT      (512)                /**< Długość palety predefiniowanych kolorów. */
+#define PALETTE_LENGTH      (512)                /**< Długość palety predefiniowanych kolorów. */
 #define SSH_SOLID_TEXT       (0)                /**< \brief Tekst na wypełnionym pasku tła. */
 #define SSH_TRANSPARENT_TEXT (1)                /**< \brief Tekst na przezroczystym tle. */
 #define SSH_SOLID_PUT        (1)                /**< \brief Zawartość nakładana na tło. */
@@ -85,7 +87,10 @@ extern unsigned long _ssh_window;
 extern int WB_error_enter_before_clean/* =0 */;
 
 /* OTWIERANIE i ZAMYKANIE TRYBU (OKNA) GRAFICZNEGO */
+/* =============================================== */
+
 /* Operacje konfiguracyjne o działaniu gwarantowanym przed inicjacją */
+/* ----------------------------------------------------------------- */
 
 /** \brief Przekazanie parametrów wywołania i nazwy okna. */
 void shell_setup(const char* title,                      /**< Nazwa aplikacji używana jako tytuł okna lub jego część. */
@@ -97,11 +102,11 @@ void shell_setup(const char* title,                      /**< Nazwa aplikacji u�
 void set_title(const char* title);
 
 /** \brief Przełączanie buforowanie okna. Może nie działać po inicjacji.*/
-void buffering_setup(ssh_mode Yes);
+void buffering_setup(ssh_mode yes);
 
 /** \brief Określa, czy symulować niezmienność rozmiarów okna.
  *  W takim trybie zmiana wielkości okna powiększa piksele o całkowitą wielokrotność. */
-void fix_size(ssh_mode Yes);
+void fix_size(ssh_mode yes);
 
 /** \brief Zmienia definicje koloru w palecie kolorów. Indeksy 0..255. */
 void set_rgb(ssh_color color,                                  /**< indeks koloru. */
@@ -115,6 +120,9 @@ void set_gray(ssh_color shade,ssh_intensity intensity);
 
 /** \brief Ustala index koloru do czyszczenia. Może nie działać po inicjacji.*/
 void set_background(ssh_color c);
+
+/* Inicjalizacja okna i całkowite zamykanie okna */
+/* --------------------------------------------- */
 
 /** \brief Właściwa dla platformy inicjacja grafiki (a kiedyś też semigrafiki!).
 *   \return Zwraca 1, jeśli zadziałał poprawnie. */
@@ -154,16 +162,16 @@ ssh_stat  invalidate_screen();
 /** \brief Zapisuje zawartość ekranu do pliku graficznego w naturalnym formacie platformy: BMP, XBM, SVG itp.
  * \details Może nie działać w trybie bez buforowania okna/ekranu.
  * \return Zwraca 1, jeśli zadziałał poprawnie. */
-ssh_stat  dump_screen(const char* Filename);
+ssh_stat  dump_screen(const char* file_name);
 
 /* Operacje przestawiania własności pracy okna graficznego
  * ======================================================= */
 
 /** \brief Ustala czy mysz ma byc obsługiwana. \return poprzedni stan flagi. */
-ssh_mode    mouse_activity(ssh_mode Yes);
+ssh_mode    mouse_activity(ssh_mode yes);
 
 /** \brief Włącza drukowanie tekstu bez zamazywania tła. \return Poprzednie ustawienie. */
-ssh_mode    print_transparently(ssh_mode Yes);
+ssh_mode    print_transparently(ssh_mode yes);
 
 /** \brief Ustala szerokość linii. Grube linie są kosztowne! TODO WHAT ABOUT 0?
  * \return Poprzednie ustawienie. */
@@ -171,11 +179,11 @@ ssh_natural line_width(ssh_natural width);
 
 /** \brief Ustala styl rysowania linii: SSH_LINE_SOLID, SSH_LINE_DOTTED, SSH_LINE_DASHED.
  * \return Poprzednie ustawienie. */
-ssh_mode    line_style(ssh_mode Style);
+ssh_mode    line_style(ssh_mode style);
 
 /** \brief Ustala stosunek nowego rysowania do starej zawartości ekranu: SSH_SOLID_PUT, SSH_XOR_PUT.
  * \return Poprzednie ustawienie. */
-ssh_mode    put_style(ssh_mode Style);
+ssh_mode    put_style(ssh_mode style);
 
 /** \brief Ustala aktualny kolor linii i konturów za pomocą typu ssh_color oraz styl i grubość. */
 void set_pen(ssh_color c, ssh_natural width, ssh_mode style);
@@ -256,10 +264,10 @@ ssh_natural  screen_height();                                   /**< Całkowita 
    ==========================  */
 
 /** \brief Aktualne rozmiary znaku potrzebne do pozycjonowania tekstu. */
-ssh_natural  char_height(char znak);                            /**< Wysokość znaku. */
-ssh_natural  char_width(char znak);                             /**< Szerokość znaku. */
-ssh_natural  string_height(const char* str);                    /**< Wysokość łańcucha tekstowego na ekranie. */
-ssh_natural  string_width(const char* str);                     /**< Szerokość łańcucha tekstowego na ekranie. */
+ssh_natural  char_height(char sample);         /**< Wysokość znaku. Najlepiej dać 'X'. */
+ssh_natural  char_width(char sample);          /**< Szerokość znaku. @note W 99% sytuacji mamy font stały (monotyp). */
+ssh_natural  string_height(const char* str);   /**< Wysokość łańcucha tekstowego na ekranie. */
+ssh_natural  string_width(const char* str);    /**< Szerokość łańcucha tekstowego na ekranie. */
 
 /* DRUKOWANIE NA EKRANIE
  * ===================== */
@@ -531,14 +539,14 @@ void fill_rect_rgb(ssh_coordinate x1,                                /**< Wspó�
 void fill_poly_d(ssh_coordinate vx,                                   /**< Pozioma składowa wektora przesunięcia. */
                  ssh_coordinate vy,                                   /**< Pionowa składowa wektora przesunięcia. */
                  const ssh_point points[],                            /**< Tablica wierzchołków wielokąta. */
-                 int   length                                         /**< Długość tablicy. */
+                 ssh_length n_of_points                               /**< Długość tablicy. */
                  );
 
 /** \brief Wypełnia wielokąt przesunięty o "vx","vy" kolorem indeksowanym 'c'. */
 void fill_poly(ssh_coordinate vx,                                    /**< Pozioma składowa wektora przesunięcia. */
                ssh_coordinate vy,                                    /**< Pionowa składowa wektora przesunięcia. */
                const ssh_point points[],                             /**< Tablica wierzchołków wielokąta. */
-               int   length,                                         /**< Długość tablic. */
+               ssh_length n_of_points,                               /**< Długość tablic. */
                ssh_color c                                           /**< Indeks koloru. */
                );
 
@@ -607,7 +615,7 @@ typedef struct ssh_basic_win_place_context {
  * @details Funkcja może być blokująca lub nieblokująca (np. odpalać osobny wątek). Podstawową implementację dostarcza
  *          biblioteka SYMSHELL, ale zdefiniowanie własnej przez użytkownika biblioteki blokuje linkowanie wersji domyślnej.
  */
-extern long long WB_context_menu_expected(unsigned x,unsigned y,struct ssh_basic_win_place_context* other_data);
+extern long long ssh_context_menu_expected(unsigned x, unsigned y, struct ssh_basic_win_place_context* other_data);
 
 /** Domyślna definicja menu kontekstowego. W X11 dostarczana z biblioteki, ale można ją podmienić na poziomie linkowania.*/
 extern ssh_menu_item_definition  context_menu_default[];

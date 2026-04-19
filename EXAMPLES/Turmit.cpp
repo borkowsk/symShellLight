@@ -1,20 +1,20 @@
 /// @file
 /// @brief "Mrówka Langtona" z możliwością wariacji na temat (turmit prototypowy)
 // -------------------------------------------------------------------------------
-/// @date 2026-04-17 (last update)
+/// @date 2026-04-19 (last update)
 ///
-///                   (przykładowy program SYMSHELL'a)
+///                   (przykładowy program SYMSHELL-a)
 ///
 /// Prosta obsługa grafiki, ale z odtwarzaniem ekranu i obsługą zdarzeń
 /// , oraz własne menu kontekstowe, różne od domyślnego.
 ///
-/// Turmit ma element aktywny i środowisko, tzw. "głowicę" albo "czoło" oraz pamięć
+/// Turmit ma element aktywny i środowisko, tzw. głowicę albo "czoło" oraz pamięć
 /// , ponieważ turmit jest tak naprawdę 2 wymiarowym uogólnieniem maszyny Turinga
 //-//////////////////////////////////////////////////////////////////////////////////
 
 
-#include <stdio.h> //Wyjście na konsole a la język C - printf(....)
-#include <math.h>
+#include <stdio.h> //Wyjście na konsole à la język C - printf(....)
+//#include <math.h>
 #include <fstream>
 
 #if defined(_MSC_VER)
@@ -53,7 +53,7 @@ struct Turmit
     {}
 };
 
-/// Struktura anonimowa dla kierunków ruchu. Kolejność góra,prawo,dół,lewo.
+/// Struktura anonimowa dla kierunków ruchu. Kolejność góra, prawo, dół, lewo.
 struct
 {
     int dx,dy;
@@ -86,19 +86,19 @@ void single_step() ///< Funkcja robiąca jeden krok symulacji
 
 void stats() ///< Funkcja do obliczenia statystyk
 {
-  //TODO: Np średniej liczny odwiedzeń już odwiedzonych oraz liczby pustych
+  //TODO: Np średniej liczby odwiedzeń już odwiedzonych oraz liczby pustych.
 }
 
 //Do wizualizacji obsługi zdarzeń
 const int DELA=0; //Jak długie oczekiwanie w obrębie pętli zdarzeń
 const int VISUAL=1000; //Co ile kroków symulacji odrysowywać widok
 const char* CZEKAM="Tylko patrz! "; //Monit w pętli zdarzeń
-int xmouse=10,ymouse=10; //Pozycja ostatniego "kliku" myszy
+int x_mouse=10,y_mouse=10; //Pozycja ostatniego "kliku" myszy
 
 //Kilka deklaracji zapowiadających inne funkcje obsługujące model
 void replot(); //Funkcja odrysowująca
-void read_mouse(); // Obsługa myszy. Używać o ile potrzebne!
-void write_to_file(); // Obsługa zapisu do pliku. Używać o ile potrzebne!
+void read_mouse(); // Obsługa myszy. Używać, o ile potrzebne!
+void write_to_file(); // Obsługa zapisu do pliku. Używać, o ile potrzebne!
 void screen_to_file(); //Zapis ekranu do pliku
 
 void replot() //Rysuje na ekranie
@@ -108,13 +108,13 @@ void replot() //Rysuje na ekranie
         {
             unsigned z=World[y][x]*20; //Co tam było? Wzmocnione
             z%=256; //Żeby nie przekroczyć kolorów
-            //z%=512; //Albo wersja  z szarościami
+            // z %= 512; //Albo wersja  z szarościami
             plot(x,y,z); //Rysowanie punktu "świata"
         }
     printc(size/3,size,128,255,"%06u  ",step_counter);//Licznik kroków
-    //Ostatnie położenie kliku - biały krzyżyk
-    //line(xmouse,ymouse-10,xmouse,ymouse+10,255);
-    //line(xmouse-10,ymouse,xmouse+10,ymouse,255);
+    //Ostatnie położenie kliku — biały krzyżyk
+    //line(x_mouse, y_mouse-10, x_mouse, y_mouse+10,255);
+    //line(x_mouse-10, y_mouse, x_mouse+10, y_mouse,255);
 }
 
 /** Własna definicja menu kontekstowego. */
@@ -131,7 +131,7 @@ int main(int argc,const char* argv[])//Potrzebne są parametry wywołania progra
     mouse_activity(0);  // Czy mysz będzie obsługiwana?
     buffering_setup(1); // Czy będzie pamiętać w bitmapie zawartość ekranu? PAMIĘTANIE PRZYŚPIESZA!
     shell_setup(NAZWA_MODELU, argc, argv); // Przygotowanie okna z użyciem parametrów wywołania
-    init_plot(size,size,0,1); // Otwarcie okna SIZExSIZE pikseli + 1 wiersz znaków za pikselami
+    init_plot(size,size,0,1); // Otwarcie okna SIZE x SIZE pikseli + 1 wiersz znaków za pikselami
 
     // Teraz można rysować i pisać w oknie
     init_world();
@@ -190,10 +190,10 @@ int main(int argc,const char* argv[])//Potrzebne są parametry wywołania progra
 
 void read_mouse() ///< Procedura obsługi myszy. SZKIELETOWA!
 { 
-    int xpos,ypos,click;
-    if(get_mouse_event(&xpos,&ypos,&click)!=-1)//Operator & - pobranie adresu
+    int x_pos,y_pos,click;
+    if(get_mouse_event(&x_pos, &y_pos, &click) != -1)//Operator & - pobranie adresu
     {
-        xmouse=xpos;ymouse=ypos;
+        x_mouse=x_pos;y_mouse=y_pos;
         //TODO - zaimplementować jeśli potrzebne
         //...
     }
@@ -204,8 +204,8 @@ void write_to_file() ///< Zapis stanu modelu do pliku. SZKIELET!
     const char* NazwaPliku= NAZWA_MODELU ".out";//Używamy sztuczki ze zlepianiem stałych
     //łańcuchowych przez kompilator
     std::ofstream out(NazwaPliku); //Nazwa na razie ustalona z góry
-    //TODO - funkcja powinna zapisać wyniki modelu do pliku zamiast wyrysowaywać na ekranie
-    //Format - tabela liczb odpowieniego typu rozdzielanych tabulacjami
+    //TODO - funkcja powinna zapisać wyniki modelu do pliku zamiast wyrysowywać na ekranie
+    //Format - tabela liczb odpowiedniego typu rozdzielanych tabulacjami
     //out<<"L i c z b y:\n"<<a[]<<'\t'<<std::endl;
 
     out.close();
@@ -221,7 +221,7 @@ void screen_to_file() ///< Zapis ekranu do pliku.
 /* *******************************************************************/
 /*                SYMSHELLLIGHT  version 2026                        */
 /* *******************************************************************/
-/*            THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
+/*            THIS CODE IS DESIGNED & COPYRIGHT BY:                  */
 /*             W O J C I E C H   B O R K O W S K I                   */
 /*     Instytut Studiów Społecznych Uniwersytetu Warszawskiego       */
 /*     WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI  */

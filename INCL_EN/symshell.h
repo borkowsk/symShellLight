@@ -540,14 +540,14 @@ void fill_rect_rgb(ssh_coordinate x1,                                /**< Horizo
 void fill_poly_d(ssh_coordinate vx,                                   /**< Horizontal component of translation vector. */
                  ssh_coordinate vy,                                   /**< Vertical component of translation vector. */
                  const ssh_point points[],                            /**< Array of polygon vertices. */
-                 ssh_length length                                  /**< Array length. */
+                 ssh_length n_of_points                               /**< Array length. */
                  );
 
 /** \brief Fills a polygon shifted by "vx", "vy" in indexed color 'c'. */
 void fill_poly(ssh_coordinate vx,                                    /**< Horizontal component of translation vector. */
                ssh_coordinate vy,                                    /**< Vertical component of translation vector. */
                const ssh_point points[],                             /**< Array of polygon vertices. */
-               ssh_length length,                                    /**< Array length. */
+               ssh_length n_of_points,                               /**< Array length. */
                ssh_color c                                           /**< Color index. */
                );
 

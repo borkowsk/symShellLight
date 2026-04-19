@@ -10,7 +10,7 @@
 ///     VC++ linkuje biblioteki Windows automatycznie
 ///     Dev-Cpp potrzebne są dwie bibloteki:
 ///     ".../Dev-Cpp/lib/libgdi32.a" oraz "...Dev-Cpp/lib/libcomdlg32.a"
-/// @date 2026-02-02 (last update)
+/// @date 2026-04-19 (last update)
 //-//////////////////////////////////////////////////////////////////////////////
 //#define MULTITR (1)  //Jeśli chcemy użyć wielowątkowości, ale nie działa, bo jakieś niezdefiniowane "size"
 
@@ -64,7 +64,7 @@ int     curr_side=500; //Raczej powinno być parzyste!
 const char* CZEKAM="?>"; //Monit w pętli zdarzeń
 const int DELA=0; //Jak długie oczekiwanie w obrębie pętli zdarzeń
 unsigned VISUAL=1; //Co ile kroków symulacji odrysowywać widok
-int xmouse=10,ymouse=10; //Pozycja ostatniego "kliku" myszy
+int x_mouse=10,y_mouse=10; //Pozycja ostatniego "kliku" myszy
 
 time_t RANDOM_SEED=time(NULL);    //Zarodek generatora pseudolosowego 
 unsigned DENSITY=(curr_side*curr_side)/100; //Musi być tyle, żeby były miejsca z komórkami obok siebie
@@ -324,8 +324,8 @@ void replot() //Rysuje coś na ekranie
     printc(curr_side/5,curr_side,128,255,"%06u MstT:%g  ",
            step_counter,(double)MyCPUClock/step_counter);//Licznik kroków
     //Ostatnie położenie kliku: biały krzyżyk
-    //line(xmouse,ymouse-10,xmouse,ymouse+10,255);
-    //line(xmouse-10,ymouse,xmouse+10,ymouse,255);
+    //line(x_mouse,y_mouse-10,x_mouse,y_mouse+10,255);
+    //line(x_mouse-10,y_mouse,x_mouse+10,y_mouse,255);
 }
 
 
@@ -413,7 +413,7 @@ void read_mouse() //Procedura obsługi myszy. SZKIELETOWA!
    int xpos,ypos,click;
    if(get_mouse_event(&xpos,&ypos,&click)!=-1)//Operator & - pobranie adresu
    {
-      xmouse=xpos;ymouse=ypos;
+       x_mouse=xpos;y_mouse=ypos;
       //TODO - zaimplementować jeśli będzie potrzebne
       //...
    }

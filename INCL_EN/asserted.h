@@ -1,0 +1,8 @@
+//
+// Created by borkowsk on 19.04.26.
+//
+
+#ifndef SYMSHELLLIGHT_ASSERTED_H
+#define SYMSHELLLIGHT_ASSERTED_H
+
+#endif //SYMSHELLLIGHT_ASSERTED_H

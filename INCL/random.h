@@ -1,6 +1,6 @@
 /** @file
  * @brief INTERFACE "C" DO ROZMAITYCH GENERATORÓW LICZB PSEUDOLOSOWYCH.
- * @date 2026-04-18 (last modification)                                */
+ * @date 2026-04-20 (last modification)                                */
 /* -------------------------------------------------------------------- */
 #ifndef WB_RTM_RANDOM_H_INCLUDED_
 #define WB_RTM_RANDOM_H_INCLUDED_  (1)
@@ -56,8 +56,8 @@ extern "C" {
  * @{
  */
 
-float  randg(void); 		/**< Random number generator from Numerical Recipies. */
-void   srandg(short int);	/**< Seed setting for generator. */
+float  randg(void); 		/**< Generator z Numerical Recipies z lat 90-tych. */
+void   srandg(short int);	/**< Inicjalizacja generatora konkretna liczba całkowitą. */
 float  randnorm(void);		/**< TODO... ??? */
 float  randexp(void);		/**< TODO... ??? */
 
@@ -83,38 +83,38 @@ float  randexp(void);		/**< TODO... ??? */
 #	define RAND()                           ( random() )
 #	define RANDOM(_I_)                      ( (int) (((double) (random)() * (_I_) ) / ((double)RANDOM_MAX+1) ) )
 #	define SRAND(_P_)                       { srandom(_P_);}
-#	define DRAND()                              ( (double)random()/((double)(RANDOM_MAX)+1) )
+#	define DRAND()                          ( (double)random()/((double)(RANDOM_MAX)+1) )
 #	define RANDOMIZE()                      { (srandom)( (unsigned) time(NULL) ); }
 
 #elif defined( USES_SVR4_DRAND )
 
-#   define RANDOM_MAX                           ( MAXINT)
+#   define RANDOM_MAX                       ( MAXINT)
 #	define RAND() 	                        ( lrand48() ) /* CHECK RANGE! */
 #	define RANDOM(_I_)                      ( drand48()*(_I_))
 #	define SRAND(_P_)                       { srand48( _P_ ); }
 #	define DRAND()                          ( drand48() )
-#	define RANDOMIZE()                          { (srand48)( (long) time(NULL) ); }
+#	define RANDOMIZE()                      { (srand48)( (long) time(NULL) ); }
 
 #elif defined( USES_STDC_RAND )
 
 #include <stdlib.h>
-#	define RANDOM_MAX               ( RAND_MAX )
-#	define RAND() 	                ( rand() )
-#	define RANDOM(_I_)              (int)(((double)rand()*(_I_))/((double)RAND_MAX+1))
-#	define SRAND(_P_)               { srand( _P_ ); }
-#	define DRAND()                  ((double)rand()/(double)RAND_MAX)
+#	define RANDOM_MAX                       ( RAND_MAX )
+#	define RAND() 	                        ( rand() )
+#	define RANDOM(_I_)                      (int)(((double)rand()*(_I_))/((double)RAND_MAX+1))
+#	define SRAND(_P_)                       { srand( _P_ ); }
+#	define DRAND()                          ((double)rand()/(double)RAND_MAX)
 //( double d=(double)rand()/(double)RAND_MAX,assert(d>0),d )
-#	define RANDOMIZE()              {  srand( (unsigned)time(NULL) ); }
+#	define RANDOMIZE()                      {  srand( (unsigned)time(NULL) ); }
 
 #else /* NO USEABLE RANDOM FUNCTIONS */
 
 #warning  Random functions set not selected!
-#	define RANDOM_MAX               ( RANDOM_FUNCTIONS_SET_NOT_SELECTED )
-#	define RAND() 	                ( RANDOM_FUNCTIONS_SET_NOT_SELECTED )
-#	define RANDOM(_I_)              ( RANDOM_FUNCTIONS_SET_NOT_SELECTED )
-#	define SRAND(_P_)               { RANDOM_FUNCTIONS_SET_NOT_SELECTED }
-#	define DRAND()                  ( RANDOM_FUNCTIONS_SET_NOT_SELECTED )
-#	define RANDOMIZE()              { RANDOM_FUNCTIONS_SET_NOT_SELECTED }
+#	define RANDOM_MAX                       ( RANDOM_FUNCTIONS_SET_NOT_SELECTED )
+#	define RAND() 	                        ( RANDOM_FUNCTIONS_SET_NOT_SELECTED )
+#	define RANDOM(_I_)                      ( RANDOM_FUNCTIONS_SET_NOT_SELECTED )
+#	define SRAND(_P_)                       { RANDOM_FUNCTIONS_SET_NOT_SELECTED }
+#	define DRAND()                          ( RANDOM_FUNCTIONS_SET_NOT_SELECTED )
+#	define RANDOMIZE()                      { RANDOM_FUNCTIONS_SET_NOT_SELECTED }
 
 #endif
 
@@ -123,7 +123,7 @@ float  randexp(void);		/**< TODO... ??? */
 
 /** Funkcja dająca liczbę losową ze skrzywionego rozkładu.
  * Produkowana wartość jest zakresu 0..1, ale o rozkładzie albo gausso-podobnym (W>0)
- * albo pareto-podobnym (W<0). Może być też rozkład płaski, gdy W=0 */
+ * albo pareto-podobnym (W<0). Może być też rozkład płaski, gdy W = 0 */
 inline  double DRAND_LOOP(int W)
 {
     double pom;
@@ -151,9 +151,9 @@ inline  double DRAND_LOOP(int W)
 /// @}
 
 /* *******************************************************************/
-/*               SYMSHELLLIGHT  version 2026                         */
+/*                 SYMSHELLLIGHT  version 2026                       */
 /* *******************************************************************/
-/*            THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
+/*            THIS CODE IS DESIGNED & COPYRIGHT BY:                  */
 /*             W O J C I E C H   B O R K O W S K I                   */
 /*     Instytut Studiów Społecznych Uniwersytetu Warszawskiego       */
 /*     WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI  */

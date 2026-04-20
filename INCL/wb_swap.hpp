@@ -1,11 +1,11 @@
 /** @file
  * @brief Szablon zamiany dwóch wartości tego samego typu niezależnie od typu. */
 /*        ==================================================================== */
-/** @date 2026-04-18 (last modification)
+/** @date 2026-04-20 (last modification)
  * Created by borkowsk on 06.01.26.                                            */
 /* *************************************************************************** */
-#ifndef WB_SWAP
-#define WB_SWAP
+#ifndef WB_SWAP_HPP_INCLUDED_
+#define WB_SWAP_HPP_INCLUDED_
 
 /**
  * @defgroup TypesService Informacja o typach i nazewnictwo
@@ -81,5 +81,5 @@ void wb_strong_swap(T& a, T& b) {
 /*                                                                    */
 /*                                (Don't change or remove this note)  */
 /* ****************************************************************** */
-#endif
+#endif //WB_SWAP_HPP_INCLUDED_
 

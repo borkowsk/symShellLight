@@ -1,11 +1,11 @@
 /** \file   sshmenuf.h
-*   \brief INTERFACE FOR SYMSHELL MENU AND RELATED FEATURES.       */
-/*         =================================================       */
-/** @date 2026-04-18 (last modification)
-*  \warning MS WINDOWS ONLY. Otherwise dummy version is provided.
-*  \note Unix version used Motif is outdated.
-*  \note Under X11 the popup menu using rofi is available.
-*  \author  borkowsk
+* \brief INTERFEJS DLA MENU SYMSHELL I POWIĄZANYCH FUNKCJI.       */
+/* =================================================       */
+/** @date 2026-04-20 (ostatnia modyfikacja)
+* \warning TYLKO DLA MS WINDOWS. W innym przypadku dostarczana jest wersja pusta (zaślepka).
+* \note Wersja Unix używająca Motif jest przestarzała.
+* \note Pod X11 dostępne jest menu podręczne (popup) używające rofi.
+* \author  borkowsk
 * **************************************************************** */
 #ifndef SYMSHELL_MENU_FUNCTIONS_H_INCLUDED_
 #define SYMSHELL_MENU_FUNCTIONS_H_INCLUDED_
@@ -17,11 +17,11 @@
 #endif
 
 /**
- * @defgroup SymShellMenu Interface do dynamicznej obsługi menu Windows.
- * \brief    Podstawowe funkcje pozwalające manipulować menu w MS Windows
- * \details  Wersja dla X11 używająca Motifs kiedyś istniała, ale jest już raczej bezużyteczna.
- *           Jest moduł dummy służący za zaślepkę na tej platformie oraz w SVG.
- *           TODO wersja tekstowa lub html/JavaScript. A może jest coś przenośnego, co by można włączyć?
+ * @defgroup SymShellMenu Interfejs do dynamicznej obsługi menu Windows.
+ * \brief    Podstawowe funkcje pozwalające manipulować menu w MS Windows.
+ * \details  Wersja dla X11 używająca Motif kiedyś istniała, ale jest już raczej bezużyteczna.
+ *           Istnieje moduł "dummy" służący za zaślepkę na innych platformach oraz w SVG.
+ * TODO: wersja tekstowa lub html/JavaScript. A może istnieje coś przenośnego, co można by włączyć?
  */
 ///@{
 
@@ -40,24 +40,24 @@ extern "C" {
 
     /** \brief Uchwyt do PODMENU podanego menu */
     ssh_menu_handle ssh_sub_menu(
-                    ssh_menu_handle hMenu,						 /**< Uchwyt do menu lub sub-menu. */
-                    unsigned    Position						 /**< Pozycja składowej menu. */
+                    ssh_menu_handle hMenu,					 /**< Uchwyt do menu lub sub-menu. */
+                    unsigned    Position					 /**< Pozycja składowej menu. */
                     );
 
     /** \brief pozycja itemu o danej nazwie. */
     /** \return MAX_UINT if cant find such item. */
     unsigned ssh_get_item_position(
-                 ssh_menu_handle hMenu,							 /**< Uchwyt do menu lub sub-menu. */
-                 const char* ItemName							 /**< Nazwa składowej menu. */
+                 ssh_menu_handle hMenu,						 /**< Uchwyt do menu lub sub-menu. */
+                 const char* ItemName						 /**< Nazwa składowej menu. */
                  );
 
     /** \brief dodanie itemu o danej nazwie. */
     /** \note  by default item is ENABLE immediately. It could be changed using `Flags`. */
     int	ssh_menu_add_item(
-                    ssh_menu_handle hMenu,						 /**< uchwyt do menu lub sub-menu. */
-                    const char* ItemName,						 /**< nazwa składowej menu. */
-                    unsigned    Message,			 			 /**< ??? */
-                    unsigned    Flags			 				 /**< flagi ustawień. */
+                    ssh_menu_handle hMenu,					 /**< Uchwyt do menu lub sub-menu. */
+                    const char* ItemName,					 /**< Nazwa składowej menu. */
+                    unsigned    Message,			 		 /**< ??? */
+                    unsigned    Flags			 			 /**< Flagi ustawień. */
                                 DEF_VAL_IF_CPP(0)
                                 );
 
@@ -78,13 +78,13 @@ extern "C" {
                     );
 
     /** \brief zapewnia, że menu staje się gotowe do użycia. */
-    int ssh_realize_menu(ssh_menu_handle hMenu);					 /**< \param hMenu - uchwyt do menu lub sub-menu. */
+    int ssh_realize_menu(ssh_menu_handle hMenu);			 /**< \param hMenu - uchwyt do menu lub sub-menu. */
 
 #ifdef unix
-/** For debugging purposes - external accessible. */
-extern int 		ssh_menu_trace;
-/** MOTIF STYLE OPTIONS */
-extern char*    ssh_menu_options;
+/** Do celów debugowania — dostępne zewnętrznie. */
+extern int      ssh_menu_trace;
+/** OPCJE W STYLU MOTIF */
+extern char* ssh_menu_options;
 #endif
 
 #ifdef __cplusplus

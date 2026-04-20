@@ -1,7 +1,7 @@
 /** @file   sshutils.hpp
  *  @brief  Implementacja pomocniczych funkcji symshell-a w sposób już niezależny od platformy.  */
 /*         ===================================================================================== */
-/** @date 2026-04-18 (last modification)
+/** @date 2026-04-20 (last modification)
 *   @details
 *          Napisane PRAWIE NIEOBIEKTOWO ale w C++
 *          Jest tu: print_width() , puste rect(), bar3D(), arrow() ...itp...
@@ -16,6 +16,7 @@
 
 #include <cmath>
 #include "symshell.h"
+#include "maybe_unused.h"
 
 #ifndef M_PI
 /** @name M_PIx
@@ -35,13 +36,14 @@
  */
 /// @{
 
-/// Pomocnicza funkcja kwadratowa dla skrócenia kodu tu i tam...
+/// Pomocnicza funkcja kwadratowa dla skrócenia kodu tu i tam.
 template<class NUM>
 inline NUM sqr(const NUM& x)
 { return x*x; }
 
 /// \brief Obliczanie odległości Euklidesa. Często potrzebne w takich programach.
 /// @note NIEINTUICYJNY UKŁAD PARAMETRÓW!
+MAYBE_UNUSED
 double distance(double X1,double X2,double Y1,double Y2);
 
 /// \brief Alias dla typu `ssh_color`.
@@ -49,28 +51,36 @@ double distance(double X1,double X2,double Y1,double Y2);
 typedef ssh_color wb_color;
 
 /**
-@name Zestaw identyfikatorów kolorów
-@details Wszystko to sa wybrane indeksy zestawu 256 kolorów i 256 odcieni szarości.
-* @{
+ * @name Zestaw identyfikatorów kolorów 'sshutils'.
+ * @details Wszystko to są wybrane indeksy zestawu 256 kolorów i 256 odcieni szarości.
+ * @{
  */
 const wb_color default_transparent=wb_color(-1);     ///< Domyślny kolor do oznaczania transparentności.
-const wb_color default_color=default_transparent;    ///< Domyślny kolor indeksowany.
 const wb_color default_black=0;                      ///< Domyślny kolor indeksowany czarny.
 const wb_color default_white=255;                    ///< Domyślny kolor indeksowany biały.
+MAYBE_UNUSED
+const wb_color default_color=default_transparent;    ///< Domyślny kolor indeksowany.
+MAYBE_UNUSED
 const wb_color default_dark_gray=256+64;             ///< Domyślny kolor indeksowany ciemnoszary.
+MAYBE_UNUSED
 const wb_color default_half_gray=256+128;            ///< Domyślny kolor indeksowany średnio szary.
+MAYBE_UNUSED
 const wb_color default_light_gray=256+128+64;        ///< Domyślny kolor indeksowany jasnoszary.
 /** @} */
 
 /// \brief Funkcja interpretująca string jako wartość RGB.
 /// \param s powinno zawierać tekst z definicją koloru RBG.
-/// \param endptr pozwala sprawdzić, czy nie było błędu.
+/// \param end_ptr pozwala sprawdzić, czy nie było błędu.
 /// \return kolor RBG zakodowany w postaci liczby 32-bitowej. TODO — powinno zwracać ssh_rgba, ale na razie nie używamy
-/// \details Dopuszczalne formaty to: xFFFFFF  b111111111111111111111111  rgb(255,255,255) RGB(255,255,255)
-unsigned strtorgb(const char *s, char **endptr);
+/// \details Dopuszczalne formaty to: xffffff  b111111111111111111111111  rgb(255,255,255) RGB(255,255,255)
+MAYBE_UNUSED
+unsigned strtorgb(const char *s, char **end_ptr);
 
-// Ustawienia grubości i rozmiarów elementów 'sshutils':
-// /////////////////////////////////////////////////////
+/**
+ * @name Ustawienia grubości i rozmiarów elementów 'sshutils'.
+ * @details Wartości konfiguracyjne dla ramek, krzyżyków strzałek itp...
+ * @{
+ */
 
 extern int def_frame_width; /* =1;*/                  ///< Domyślna grubość ramki.
 extern int def_cross_width; /* =5;*/                  ///< Domyślna szerokość krzyżyka.
@@ -100,47 +110,67 @@ struct settings_bar3d
 
 /// \brief  Funkcja konfiguracji słupków 3D.
 /// \return Zwraca poprzednią konfigurację albo NULL, jeśli przywraca poprzednio zapamiętaną.
+MAYBE_UNUSED
 const settings_bar3d* bar3d_config(settings_bar3d* st);
 
+/** @} */
+
 /// \brief  Rysuje słupek 3D w kolorach indeksowanych.
+MAYBE_UNUSED
 void bar3d(int x,int y,int h,wb_color col1,wb_color col2);
 
 /// \brief  Rysuje słupek 3D w kolorze RBG z cieniem.
+MAYBE_UNUSED
 void bar3dRGB(int x,int y,int h,int R,int G,int B,int ShadowDiv);
 
 /// \brief  Rysuje kwadratową ramkę o zadanej grubości.
+MAYBE_UNUSED
 void rect(int x1,int y1,int x2,int y2,wb_color frame_c,int width=def_frame_width);
 
 /// \brief  Rysuje pionową skalę kolorów.
+MAYBE_UNUSED
 void ver_scale(int x1,int y1,int width=def_scale_width,wb_color start=0,wb_color end=255);
 
 /// \brief  Rysuje poziomą skalę kolorów.
+MAYBE_UNUSED
 void hor_scale(int x1,int y1,int high=def_scale_width,wb_color start=0,wb_color end=255);
 
 /// \brief  Rysuje krzyżyk.
+MAYBE_UNUSED
 void cross(int x,int y,wb_color color,int line_width=def_cross_width);
 
 /// \brief  Rysuje dowolnie skierowaną strzałkę od punktu x1y1 do x2y2.
+MAYBE_UNUSED
 void arrow(int x1,int y1,int x2,int y2,wb_color color,double size=def_arrow_size,double theta=def_arrow_theta);
 
 /// \brief  Efektywnie rysuje poziomą strzałkę.
+MAYBE_UNUSED
 void vert_arrow(int x1,int x2,int y,wb_color color,double size=def_arrow_size);
 
 /// \brief  Efektywnie rysuje pionową strzałkę.
+MAYBE_UNUSED
 void hor_arrow(int x,int y1,int y2,wb_color  color,double size=def_arrow_size);
 
-/// \brief   Drukuje tekst w obszarze nie szerszym niz max_width.
+/// \brief   Drukuje tekst w obszarze nie szerszym niż `max_width`.\
+/// \param x, y to współrzędne punktu startowego tekstu.
+/// \param max_width to maksymalna długość w pixelach.
+/// \param col, bcg to color tekstu i tła.
+/// \param format format tekstu jak dla `printf`.
+/// \param ... to zmienne do wypełnienia tego co definiuje format.
 /// \return  Zwraca width albo 0.
 /// \details wewnętrzny bufor ma nie więcej niż 1024 znaki.
+MAYBE_UNUSED
 int print_width(int x,int y,int max_width,wb_color col,wb_color bcg,const char* format ...);
 
 extern "C" {
-/// \brief Wyświetlanie pliku HTML poprzez shell systemowy.
-/// \details Tak naprawdę można użyć do wszystkich typów plików,
-///          jakie może wyświetlić przeglądarka.
+/// \brief Wyświetlanie pliku HTML poprzez systemowy shell.
+/// \details Tak naprawdę można użyć do wszystkich typów plików
+///          , jakie może wyświetlić przeglądarka.
 /// \param URL - pełny URL, ale czasem ujdzie i nazwa pliku :-D ...
 /// \return powinien zwrócić kod wykonania programu "dziecka".
-    int ViewHtml(const char* URL);
+MAYBE_UNUSED
+int ViewHtml(const char* url);
+// TODO `int view_html(const char* url);`
 }
 
 /// @}
@@ -148,7 +178,7 @@ extern "C" {
 /* ******************************************************************/
 /*                 SYMSHELLLIGHT  version 2026                      */
 /* ******************************************************************/
-/*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
+/*            THIS CODE IS DESIGNED & COPYRIGHT BY:                 */
 /*            W O J C I E C H   B O R K O W S K I                   */
 /*    Instytut Studiów Społecznych Uniwersytetu Warszawskiego       */
 /*    WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI  */

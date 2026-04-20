@@ -9,6 +9,7 @@
 
 #define USES_RANDG
 #include "random.h"
+
 static short int di=-1;
 
 #ifdef __cplusplus
@@ -123,5 +124,6 @@ float randexp()
 
 	return (float)( -log(dum) );
 }
+
 
 

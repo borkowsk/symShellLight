@@ -8,7 +8,7 @@ using namespace std;
 //Funkcja interpretująca string jako wartość RGB
 //Dopuszczalne formaty to: xFFFFFF  b111111111111111111111111  rgb(255,255,255) RGB(255,255,255)
 //oraz dziesiętny oczywiście
-unsigned strtorgb(const char *s, char **endptr)
+unsigned strtorgb(const char *s, char **end_ptr)
 {
 #ifdef _MSC_VER
    char* next_token = NULL;
@@ -16,16 +16,16 @@ unsigned strtorgb(const char *s, char **endptr)
    while(isspace(*s)) s++;   //isblank() Usun białe       ?
 
    if(s[0]=='0' && tolower(s[1])=='x' )
-		return  strtoul(s,endptr,16);
+		return  strtoul(s, end_ptr, 16);
    else
    if(tolower(s[0])=='x')
-		return  strtoul(s+1,endptr,16);
+		return  strtoul(s+1, end_ptr, 16);
    else
    if(tolower(s[0])=='o')
-		return  strtoul(s+1,endptr,8);
+		return  strtoul(s+1, end_ptr, 8);
    else
    if(tolower(s[0])=='b')
-		return  strtoul(s+1,endptr,2);
+		return  strtoul(s+1, end_ptr, 2);
    else
    if(tolower(s[0])=='r' &&  tolower(s[1])=='g' && tolower(s[2])=='b' && tolower(s[3])=='(')
    {
@@ -36,27 +36,27 @@ unsigned strtorgb(const char *s, char **endptr)
 #else
 		char* token=strtok(pom.get_ptr_val(),",");
 #endif
-		if(token==NULL) { *endptr=(char*)s;return 0; }
+		if(token==NULL) { *end_ptr=(char*)s;return 0; }
 		unsigned val=strtoul(token,&endptr2,10);
-		if(endptr2!=NULL && *endptr2!='\0') { *endptr=(char*)s;return 0; }
+		if(endptr2!=NULL && *endptr2!='\0') { *end_ptr=(char*)s;return 0; }
 
 #ifdef _MSC_VER
 		token = strtok_s(NULL, ",", &next_token);
 #else
 		token=strtok(NULL,",");
 #endif
-		if(token==NULL) { *endptr=(char*)s;return 0; }
+		if(token==NULL) { *end_ptr=(char*)s;return 0; }
 		val=256*val+strtoul(token,&endptr2,10);
-		if(endptr2!=NULL && *endptr2!='\0') { *endptr=(char*)s;return 0; }
+		if(endptr2!=NULL && *endptr2!='\0') { *end_ptr=(char*)s;return 0; }
 
 #ifdef _MSC_VER
 		token = strtok_s(NULL, ")", &next_token);
 #else
 		token = strtok(NULL, ")");
 #endif
-		if(token==NULL) { *endptr=(char*)s;return 0; }
+		if(token==NULL) { *end_ptr=(char*)s;return 0; }
 		val=256*val+strtoul(token,&endptr2,10);
-		if(endptr2!=NULL && *endptr2!='\0') { *endptr=(char*)s;return 0; }
+		if(endptr2!=NULL && *endptr2!='\0') { *end_ptr=(char*)s;return 0; }
 
 		return val;
    }
@@ -71,41 +71,41 @@ unsigned strtorgb(const char *s, char **endptr)
 #else
 		char* token = strtok(pom.get_ptr_val(), ",");
 #endif
-		if(token==NULL) { *endptr=(char*)s;return 0; }
+		if(token==NULL) { *end_ptr=(char*)s;return 0; }
 		unsigned val=strtoul(token,&endptr2,10);
-		if(endptr2!=NULL && *endptr2!='\0') { *endptr=(char*)s;return 0; }
+		if(endptr2!=NULL && *endptr2!='\0') { *end_ptr=(char*)s;return 0; }
 
 #ifdef _MSC_VER
 		token = strtok_s(NULL, ",", &next_token);
 #else
 		token = strtok(NULL, ",");
 #endif
-		if(token==NULL) { *endptr=(char*)s;return 0; }
+		if(token==NULL) { *end_ptr=(char*)s;return 0; }
 		val=256*val+strtoul(token,&endptr2,10);
-		if(endptr2!=NULL && *endptr2!='\0') { *endptr=(char*)s;return 0; }
+		if(endptr2!=NULL && *endptr2!='\0') { *end_ptr=(char*)s;return 0; }
 
 #ifdef _MSC_VER
 		token = strtok_s(NULL, ",", &next_token);
 #else
 		token = strtok(NULL, ",");
 #endif
-		if(token==NULL) { *endptr=(char*)s;return 0; }
+		if(token==NULL) { *end_ptr=(char*)s;return 0; }
 		val=256*val+strtoul(token,&endptr2,10);
-		if(endptr2!=NULL && *endptr2!='\0') { *endptr=(char*)s;return 0; }
+		if(endptr2!=NULL && *endptr2!='\0') { *end_ptr=(char*)s;return 0; }
 
 #ifdef _MSC_VER
 		token = strtok_s(NULL, ")", &next_token);
 #else
 		token = strtok(NULL, ")");
 #endif
-		if(token==NULL) { *endptr=(char*)s;return 0; }
+		if(token==NULL) { *end_ptr=(char*)s;return 0; }
 		val=256*val+strtoul(token,&endptr2,10);
-		if(endptr2!=NULL && *endptr2!='\0') { *endptr=(char*)s;return 0; }
+		if(endptr2!=NULL && *endptr2!='\0') { *end_ptr=(char*)s;return 0; }
 
 		return val;
    }
    else
    {
-		return strtoul(s,endptr,10);
+		return strtoul(s, end_ptr, 10);
    }
 }

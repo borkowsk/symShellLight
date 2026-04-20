@@ -1,22 +1,26 @@
 /// \file wb_cpucl.hpp
 /// \brief Klasa stopera liczącego czas CPU
 //        ==================================
-/** @date 2026-04-18 (last modification */
+/** @date 2026-04-20 (last modification */
 /// \author borkowsk
 /// \warning OBSOLETE
 // ///////////////////////////////////////////////////////
 #ifndef __CPU_CLOCK_HPP_
 #define __CPU_CLOCK_HPP_
 
+#define USES_IOSTREAM
 #include <time.h>
 #include <iostream>
+#include "asserted.h"
+#include "maybe_unused.h"
 
 /// \namespace wbrtm \brief WOJCIECH BORKOWSKI RUN TIME LIBRARY.
 namespace wbrtm {
+    using std::ostream;
+    using std::istream;
 
-/// \brief   Klasa stopera liczącego czas CPU.
-/// \details Liczy czas od momentu utworzenia lub wywołania `reset`
-///          do chwili pobrania wartości za pomocą "operator `double`".
+    /// \brief   Klasa stopera liczącego czas CPU.
+    /// \details Liczy czas od momentu utworzenia lub wywołania `reset` do chwili pobrania wartości za pomocą "operator `double`".
     class wb_cpu_clock
     {
         clock_t begin_val; ///< Zapamiętana wartość początkowa z konstruktora `clock` (albo z `reset`)
@@ -32,9 +36,10 @@ namespace wbrtm {
         operator double() const
         {
             return (double(clock()) - double(begin_val)) /
-                    CLOCKS_PER_SEC;
 #ifdef __BORLAND__ //????
                     CLK_TCK;
+#else
+                    CLOCKS_PER_SEC;
 #endif
         }
 
@@ -48,50 +53,45 @@ namespace wbrtm {
     }; //OD RAZU KONIEC KLASY
 #else //DEFINED USES_IOSTREAM
 
-    friend
-    ostream& operator << (ostream& o, const wb_cpu_clock& c)
-    { o<<double(c)<<"s ";return o; }
+        /// Klasyczne wypisywanie na strumień.
+        friend
+        ostream& operator << (ostream& o, const wb_cpu_clock& c)
+        { o<<double(c)<<"s "; return o; }
 
-    void PrettyPrint(ostream& o) const
-    {
-        double pom=double(*this);
-        double pmm=0;
-        if(pom>3600)
+        /// Wymyślne wypisywanie na strumień.
+        void PrettyPrint(ostream& o) const
         {
-            pmm=trunc(pom/3600);
-            o<<pmm<<"h ";
-            pom-=pmm*3600;
-        }
-        if(pom>60)
-        {
-            pmm=trunc(pom/60);
-            o<<pmm<<"m ";
-            pom-=pmm*60;
-        }
-        o<<pom<<"s ";
+            double pom=double(*this);
+            long pmm=0;
+            if(pom>3600)
+            {
+                pmm=asserted<long>(pom/3600);
+                o<<pmm<<"h ";
+                pom-=pmm*3600;
+            }
+            if(pom>60)
+            {
+                pmm=asserted<long>(pom/60);
+                o<<pmm<<"m ";
+                pom-=pmm*60;
+            }
+            o<<pom<<"s ";
 
-        //if(pom!=double(*this))
-        //	o<<"DEBUG["<<double(*this)<<"s]";
-    }
+            //if(pom!=double(*this))
+            //	o<<"DEBUG["<<double(*this)<<"s]";
+        }
 
     };
 
-    /* SLICZNE ALE SIE NIE KOMPILUJE - DIABLI WIEDZA DLACZEGO
-    typedef const wb_cpu_clock& const_wb_cpu_clock_ref;
-    IOMANIPdeclare(const_wb_cpu_clock_ref)
-    inline ostream& __pretty(ostream& s,const_wb_cpu_clock_ref _cl) { _cl.PrettyPrint(s); return s; }
-    inline SMANIP(const_wb_cpu_clock_ref)      pretty(const_wb_cpu_clock_ref _c) { return SMANIP(const_wb_cpu_clock_ref)(__pretty, _c); }
-    */
-
-    /// Wypisywanie w wersji mniej generalnek, która też powinna dzialać.
-    class pretty
+    /// Wymuszanie eleganckiego wypisywania na strumień w wersji dosyć generalnej.
+    class  MAYBE_UNUSED pretty
     {
         const wb_cpu_clock& what;
     public:
         /// Konstruktor rejestruje referencje do "clockera".
         pretty(const wb_cpu_clock& iw):what(iw){}
     friend
-        /// Wypisanie klasy na strumień.
+        /// Wypisanie "wartości" klasy na strumień.
         ostream& operator << (ostream& o, const pretty& c)
         {
             c.what.PrettyPrint(o);
@@ -103,13 +103,13 @@ namespace wbrtm {
 
 } //end of namespace
 
-typedef wbrtm::wb_cpu_clock cticker; ///< ready to use timer starting before main()
+typedef wbrtm::wb_cpu_clock cticker; ///< @brief Stara nazwa tej klasy, używana w niektórych bardzo starych programach.
 
 /* ***************************************************************** */
 /*               WB_RTM for SymShell  version 2026                   */
 /* ***************************************************************** */
-/*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                  */
-/*            W O J C I E C H   B O R K O W S K I                    */
+/*             THIS CODE IS DESIGNED & COPYRIGHT BY:                 */
+/*              W O J C I E C H   B O R K O W S K I                  */
 /*    Instytut Studiów Społecznych Uniwersytetu Warszawskiego        */
 /*    WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI   */
 /*    GITHUB: https://github.com/borkowsk                            */

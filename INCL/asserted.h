@@ -1,7 +1,7 @@
 /** @file
  * @brief Szablon konwersji typów liczbowych zabezpieczonej asercjami. */
 /* ============================================================ */
-/** @date 2026-04-19 (ostatnia modyfikacja)
+/** @date 2026-04-20 (ostatnia modyfikacja)
  * Autor: borkowsk, 06.01.26. */
 
 #ifndef WB_RTM_ASSERTED_H_
@@ -34,7 +34,7 @@ T_VALUE asserted(const S_VALUE& value)
     double tmp=(double)(value);
     assert( std::numeric_limits<T_VALUE>::lowest() <= tmp );
     assert( tmp <= std::numeric_limits<T_VALUE>::max() );
-    return (T_VALUE)value;
+    return (T_VALUE)(value);
 }
 
 /// @}

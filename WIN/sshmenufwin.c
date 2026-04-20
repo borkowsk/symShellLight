@@ -1,7 +1,7 @@
-/* IMPLEMENTATION FOR SYMSHELL MENU AND RELEATED FEATURES */
-/** \date  2023 - 01 - 17 (last modification)             */
-/**********************************************************/
-//#include "platform.h"
+/** @file
+ *  @brief IMPLEMENTATION FOR SYMSHELL MENU AND RELEATED FEATURES */
+/** @date 2026-04-20 (last modification)                         */
+/*  ************************************************************* */
 
 #if defined(_MSC_VER) || defined(__MSWINDOWS__) 
 #include <windows.h> //bo Menu itp
@@ -11,7 +11,7 @@
 #if defined(_MSC_VER)
 //#pragma warning(disable:4068)
 #pragma warning(disable : 4996) //deprecated functions
-//TYMCZASEM - OSTRZE¯ENIA O "conversion from 'A' to 'B', possible loss of data"
+//TYMCZASEM - OSTRZEÅ»ENIA O "conversion from 'A' to 'B', possible loss of data"
 //#pragma warning(disable : 4267)
 //#pragma warning(disable : 4244)
 #endif
@@ -22,163 +22,163 @@ extern "C"
 
 extern HWND	WB_Hwnd; //W symshwin.c
 
-/// <summary>
-/// Ustala tekst nazwy okna w jego belce
-/// \note Wygl¹da ¿e sta³o siê redundantne z nowsz¹ funkcj¹ set_title()
-/// </summary>
-/// \return TRUE -> success
+// <summary>
+// Ustala tekst nazwy okna w jego belce
+// \note WyglÄ…da Å¼e staÅ‚o siÄ™ redundantne z nowszÄ… funkcjÄ… set_title()
+// </summary>
+// \return TRUE -> success
 int ssh_set_window_name(const char* WindowName)
 {																		assert(WindowName != 0);
-	return SetWindowText(WB_Hwnd, WindowName); // SetWindowText return TRUE on success!
+    return SetWindowText(WB_Hwnd, WindowName); // SetWindowText return TRUE on success!
 }
 
-/// <summary>
-/// Daje uchwyt do g³ównego menu
-/// </summary>
+// <summary>
+// Daje uchwyt do gÅ‚Ã³wnego menu
+// </summary>
 ssh_menu_handle ssh_main_menu()
 {
-	return	GetMenu(WB_Hwnd);
+    return	GetMenu(WB_Hwnd);
 }
 
-/// <summary>
-///  Daje uchwyt do pod-menu o ustalonej pozycji
-/// </summary>
+// <summary>
+//  Daje uchwyt do pod-menu o ustalonej pozycji
+// </summary>
 ssh_menu_handle ssh_sub_menu(
-					ssh_menu_handle hMenu,				
-					unsigned    Position
-					)
+                    ssh_menu_handle hMenu,
+                    unsigned    Position
+                    )
 {																		assert(hMenu != 0);
-	return GetSubMenu((HMENU)hMenu,Position);
+    return GetSubMenu((HMENU)hMenu,Position);
 }
 
 
 unsigned ssh_get_item_position(
-					 ssh_menu_handle hMenu,
-					 const char* ItemName
-					)
+                     ssh_menu_handle hMenu,
+                     const char* ItemName
+                    )
 {
-																		assert(hMenu != 0);
-	size_t i,len=strlen(ItemName);
-	char* pom=malloc(len+1);
-	int N=GetMenuItemCount(hMenu);
-	
-	for(i=0;i<N;i++)
-	{
-		int ret=GetMenuString(hMenu,i,pom,len+1,MF_BYPOSITION);
-																        assert(ret!=0);
-		if(strcmp(ItemName,pom)==0)
-		{
-			free(pom);
-			return i;
-		}
-	}
+                                                                        assert(hMenu != 0);
+    size_t i,len=strlen(ItemName);
+    char* pom=malloc(len+1);
+    int N=GetMenuItemCount(hMenu);
 
-	free(pom);
-	return UINT_MAX;
+    for(i=0;i<N;i++)
+    {
+        int ret=GetMenuString(hMenu,i,pom,len+1,MF_BYPOSITION);
+                                                                        assert(ret!=0);
+        if(strcmp(ItemName,pom)==0)
+        {
+            free(pom);
+            return i;
+        }
+    }
+
+    free(pom);
+    return UINT_MAX;
 }
 
-/// <summary>
-/// Dodaje item do menu
-/// </summary>
+// <summary>
+// Dodaje item do menu
+// </summary>
 int	ssh_menu_add_item(
-					ssh_menu_handle hMenu,
-					const char* ItemName,
-					unsigned    Message,
-					unsigned    Flags
-					)
+                    ssh_menu_handle hMenu,
+                    const char* ItemName,
+                    unsigned    Message,
+                    unsigned    Flags
+                    )
 {																		assert(hMenu != 0);
-	/*wchar_t	UniItemName[1024];
-	//I tak nie dziala - zostaja krzaczki
-	int ret=MultiByteToWideChar(
-		1252,//CP_ACP,		       // UINT CodePage,         // code page
-		MB_PRECOMPOSED	,	       // DWORD dwFlags,         // character-type options
-		ItemName,		       // LPCSTR lpMultiByteStr, // address of string to map
-	  strlen(ItemName)+1,		       // number of bytes in string
-		UniItemName,			// LPWSTR lpWideCharStr,  // address of wide-character buffer
-		1024				// int cchWideChar        // size of buffer
-	);
-	 */
-	if(Flags==0) // Ma byc domyslnie
-		Flags=MF_ENABLED;
-	
-	return AppendMenu(hMenu,Flags,Message,ItemName); //return AppendMenuW(hMenu,Flags,Message,UniItemName);
+    /*wchar_t	UniItemName[1024];
+    //I tak nie dziala - zostaja krzaczki
+    int ret=MultiByteToWideChar(
+        1252,//CP_ACP,		       // UINT CodePage,         // code page
+        MB_PRECOMPOSED	,	       // DWORD dwFlags,         // character-type options
+        ItemName,		       // LPCSTR lpMultiByteStr, // address of string to map
+      strlen(ItemName)+1,		       // number of bytes in string
+        UniItemName,			// LPWSTR lpWideCharStr,  // address of wide-character buffer
+        1024				// int cchWideChar        // size of buffer
+    );
+     */
+    if(Flags==0) // Ma byc domyslnie
+        Flags=MF_ENABLED;
+
+    return AppendMenu(hMenu,Flags,Message,ItemName); //return AppendMenuW(hMenu,Flags,Message,UniItemName);
 }
 
-/// <summary>
-/// Usuwa item z menu. Item mo¿e byæ identyfikowany wg. pozycji, albo wg. komendy któr¹ generuje (liczby z zakresu 0-FFFF)
-/// </summary>
+// <summary>
+// Usuwa item z menu. Item moÅ¼e byÄ‡ identyfikowany wg. pozycji, albo wg. komendy ktÃ³rÄ… generuje (liczby z zakresu 0-FFFF)
+// </summary>
 int ssh_menu_remove_item(
-					ssh_menu_handle hMenu,
-					unsigned ItemCommandOrPosition,
-					unsigned asPosition
-					)
+                    ssh_menu_handle hMenu,
+                    unsigned ItemCommandOrPosition,
+                    unsigned asPosition
+                    )
 {																		assert(hMenu != 0);
-	UINT Flags = 0;
-	if (asPosition)
-		Flags |= MF_BYPOSITION;
-	else
-		Flags |= MF_BYCOMMAND;
-	return RemoveMenu(hMenu, ItemCommandOrPosition, Flags) != 0xffffffff;
+    UINT Flags = 0;
+    if (asPosition)
+        Flags |= MF_BYPOSITION;
+    else
+        Flags |= MF_BYCOMMAND;
+    return RemoveMenu(hMenu, ItemCommandOrPosition, Flags) != 0xffffffff;
 }
 
-/// <summary>
-/// Ustawia lub usuwa marker przy itemie
-/// </summary>
+// <summary>
+// Ustawia lub usuwa marker przy itemie
+// </summary>
 int ssh_menu_mark_item(
-				ssh_menu_handle hMenu,
-				unsigned    Check,
-				unsigned    ItemCommandOrPosition,										
-				unsigned    asPosition
-				)
+                ssh_menu_handle hMenu,
+                unsigned    Check,
+                unsigned    ItemCommandOrPosition,
+                unsigned    asPosition
+                )
 {																		assert(hMenu != 0);
-	UINT Flags=0;
-	if(Check) Flags|=MF_CHECKED;
-		else  Flags|=MF_UNCHECKED;
-	if(asPosition) Flags|=MF_BYPOSITION;
-		else	   Flags|=MF_BYCOMMAND;
-	return  CheckMenuItem(hMenu,ItemCommandOrPosition,Flags)!=0xffffffff;
+    UINT Flags=0;
+    if(Check) Flags|=MF_CHECKED;
+        else  Flags|=MF_UNCHECKED;
+    if(asPosition) Flags|=MF_BYPOSITION;
+        else	   Flags|=MF_BYCOMMAND;
+    return  CheckMenuItem(hMenu,ItemCommandOrPosition,Flags)!=0xffffffff;
 }
 
-/// <summary>
-/// Ustawia lub usuwa marker przy itemie, wersja 2.
-/// </summary>
+// <summary>
+// Ustawia lub usuwa marker przy itemie, wersja 2.
+// </summary>
 int ssh_menu_mark_item2(	
-	            ssh_menu_handle hMenu,
-				unsigned Check,
-				unsigned ItemCommandOrPosition,
-				unsigned asPosition
-			)
+                ssh_menu_handle hMenu,
+                unsigned Check,
+                unsigned ItemCommandOrPosition,
+                unsigned asPosition
+            )
 {																		assert(hMenu != 0);
-	UINT Flags = 0;
-	if (Check)
-		Flags |= MF_CHECKED;
-	else
-		Flags |= MF_UNCHECKED;
-	if (asPosition)
-		Flags |= MF_BYPOSITION;
-	else
-		Flags |= MF_BYCOMMAND;
-	return CheckMenuItem(hMenu, ItemCommandOrPosition, Flags) != 0xffffffff;
+    UINT Flags = 0;
+    if (Check)
+        Flags |= MF_CHECKED;
+    else
+        Flags |= MF_UNCHECKED;
+    if (asPosition)
+        Flags |= MF_BYPOSITION;
+    else
+        Flags |= MF_BYCOMMAND;
+    return CheckMenuItem(hMenu, ItemCommandOrPosition, Flags) != 0xffffffff;
 }
 
-/// <summary>
-/// Wymusza pojawienie siê uprzednio zdefiniowanego lub zmodyfikowanego menu.
-/// </summary>
+// <summary>
+// Wymusza pojawienie siÄ™ uprzednio zdefiniowanego lub zmodyfikowanego menu.
+// </summary>
 int ssh_realize_menu(ssh_menu_handle hMenu)
 {																		assert(hMenu != 0);
-	return DrawMenuBar(WB_Hwnd ); 
+    return DrawMenuBar(WB_Hwnd );
 }
 
 #else
 #error "THIS SYMSHELL MENU IMPLEMENTATION IS NOT FOR THIS PLATFORM"
 #endif
 
-/********************************************************************/
-/*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
-/*            W O J C I E C H   B O R K O W S K I                   */
-/*    Instytut Studiow Spolecznych Uniwersytetu Warszawskiego       */
-/*        MAIL: wborkowski@uw.edu.pl                                */
-/*                               (Don't change or remove this note) */
-/********************************************************************/
+/* ***************************************************************** */
+/*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                  */
+/*            W O J C I E C H   B O R K O W S K I                    */
+/*    Instytut StudiÃ³w SpoÅ‚ecznych Uniwersytetu Warszawskiego        */
+/*        MAIL: wborkowski@uw.edu.pl                                 */
+/*                               (Don't change or remove this note)  */
+/* ***************************************************************** */
 
 

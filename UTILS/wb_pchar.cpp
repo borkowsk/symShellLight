@@ -138,7 +138,6 @@ bool replace(wb_pchar& bufor,const char* forrep,const char* whatins,bool fullwor
 	return true;
 }
 
-
 } //namespace wbrtm
 /********************************************************************/
 /*              SYMSHELLLIGHT  version 2021-11-24                   */

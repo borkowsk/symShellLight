@@ -1,11 +1,11 @@
 /// @file
-/// @brief    LIMITS FOR SCALAR TYPES (Designed before such thing appeared in C++ standard).
-//           -------------------------------------------------------------------------------
-/// @date 2026-04-18 (last modification)
+/// @brief   LIMITY DLA TYPÓW SKALARNYCH (Zaprojektowane, zanim podobne rozwiązanie pojawiło się w standardzie C++).
+//           -------------------------------------------------------------------------------------------------------
+/// @date 2026-04-20 (last modification)
 /// \details Szablon klas implementujących limity dla skalarów
 ///          z możliwością dodania własnych specjalizacji.
 ///          Ten jest w przestrzeni nazw 'wbrtm::'.
-///          Pomysł z czasów gdy nie było tego jeszcze w standardzie C++
+///          Pomysł z czasów, gdy nie było tego jeszcze w standardzie C++
 ///          W przypadku konfliktu specjalizacji  zdefiniuj
 ///          ADD_OWN_SPECIALISATION_TO_WB_LIMITS_H przed włączeniem
 ///          tego pliku
@@ -13,7 +13,7 @@
 // ////////////////////////////////////////////////////////////////////////////////////////////
 
 /// @ingroup OBSOLETE
-#ifdef _MSC_VER //# warning still not work under Microsoft C++ (???)
+#ifdef _MSC_VER
 #warning  "This code is OBSOLETE and not tested in C++11 standard"
 #endif
 

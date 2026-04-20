@@ -1,20 +1,20 @@
 /** \file wb_rand.hpp
- *  \brief BASIC CLASSES OF PSEUDORANDOM NUMBER GENERATORS  */
-/*        ================================================= */
-/** @date 2026-04-18 (last modification) */
+ * \brief PODSTAWOWE KLASY GENERATORÓW LICZB PSEUDOLOSOWYCH  */
+/* ================================================= */
+/** @date 2026-04-20 (ostatnia modyfikacja) */
 /**
- *  \details
- *       - RandomGenerator - interface to random generators
- *       - RandSTDC	- Random generator build in standard C
- *       - RandG	- Random generator wrote in C based on "Numerical Recipes"
- *   \author Wojciech Borkowski @ Instytut Studiów Społecznych UW
- *//*
-* \warning OBSOLETE
-* * RandBSD	- Random generator from BSD UNIX.
-* * RandSVR4 - Random generator from System V UNIX.
+ * \details
+ * - RandomGenerator - interfejs do generatorów losowych.
+ * - RandSTDC - generator losowy zbudowany w oparciu o standard C.
+ * - RandG - generator losowy napisany w C na podstawie "Numerical Recipes".
+ * \author Wojciech Borkowski @ Instytut Studiów Społecznych UW.
+ *//*\
+* \warning PRZESTARZAŁE (OBSOLETE)
+* * RandBSD - generator losowy z BSD UNIX.
+* * RandSVR4 - generator losowy z System V UNIX.
 */
 #ifndef __cplusplus
-#error Only C++ supported!!!
+#error Obsługiwany jest tylko język C++!!!
 #endif
 
 #ifndef _WB_RAND_HPP_INCLUDED_
@@ -37,112 +37,117 @@
 
 extern "C"
 {
-    long    my_rand();          /**< \brief (MUTEX PROTECTED?) `::rand()` for multithreaded programs. */
-    float	randg();            /**< \brief Numerical Recipes random number generator. (TODO MUTEX-OWE ZABEZPIECZENIE). */
-	void	srandg(short int);  /**< \brief Seed setting for generator. */
-	float	randnorm();			/**< \brief Normalised output of `randg`. */
-	float	randexp();			/**< \brief Exponential output of `randg`. */
+long    my_rand();          /**< \brief (CHRONIONY PRZEZ MUTEX?) `::rand()` dla programów wielowątkowych. */
+void    my_srand(unsigned); /**< \brief Inicjalizacja dla `my_rand()`. */
+
+float   randg();            /**< \brief Generator losowy z "Numerical Recipes". (TODO: DODAĆ MUTEX WEWNĄTRZ!). */
+void    srandg(short int);  /**< \brief Ustawianie ziarna (seed) dla generatora. */
+float   randnorm();         /**< \brief Znormalizowany wynik `randg`. */
+float   randexp();          /**< \brief Wykładniczy wynik `randg`. */
 }
 
-/// \namespace wbrtm \brief WOJCIECH BORKOWSKI RUN TIME LIBRARY
+/// \namespace wbrtm \brief BIBLIOTEKA RUN-TIME WOJCIECHA BORKOWSKIEGO.
 namespace wbrtm {
 
-/// \brief Random number generator class interface.
-class RandomGenerator {
+    /// \brief Wirtualna klasa bazowa dla generatorów.
+    /// \details Przydatna, gdy chcemy łatwo wymieniać generatory w obiekcie.
+    class RandomGenerator
+    {
     public:
-        /// \brief Max Value that can be returned from `Rand ()`.
+        /// \brief Wartość maksymalna, jaką może wypluć `Rand`.
         virtual unsigned long RandomMax() = 0;
 
-        /// \brief Returned `unsigned long` from `0` to `RandomMax`.
-        virtual unsigned long Rand() = 0;
+        /// \brief Funkcja dająca liczbę losową całkowitą z zakresu 0..RAND_MAX.
+        virtual long   Rand() = 0;
 
-        /// \brief Returned `unsigned long` from `0` to `i`.
-        virtual unsigned long Random(unsigned long i) = 0;
-
-        /// \brief Returned `double` from <0 to 1).
+        /// \brief Funkcja dająca liczbę losową rzeczywistą z zakresu 0..1 (rzadko dokładnie 1).
         virtual double DRand() = 0;
 
-        /// \brief Initialisation for a well-defined repeatable sequence.
-        virtual void Seed(unsigned long i) = 0;
+        /// \brief Zwraca `unsigned long` from `0` to `i`.
+        virtual unsigned long Random(unsigned long i) = 0;
 
-        /// \brief Initialisation for a random draw sequence.
-        virtual void Reset() = 0;
+        /// \brief Inicjalizacja dla dobrze zdefiniowanej, powtarzalnej sekwencji.
+        virtual void   Seed(unsigned long i) = 0;
 
-        /// \brief Required virtual destructor.
-        virtual ~RandomGenerator(){};
+        /// \brief Inicjalizacja dla losowo wybranej sekwencji.
+        virtual void   Reset() = 0;
+
+        /// Wirtualny destruktor dla bezpiecznego usuwania przez wskaźnik bazowy.
+        virtual ~RandomGenerator() {};
     };
 
-/// \brief Random generator specialization using the `randg ()` function.
-/// \note `randg` is (still not!) secured with a mutex.
-class RandG : public RandomGenerator {
+    /// \brief Klasa generatora G (Numerical Recipes).
+    class RandG : public RandomGenerator
+    {
     public:
-        /// \brief Max Value that can be returned from `Rand ()`.
-        unsigned long RandomMax() { return (INT_MAX); }
+        /// \brief Wartość maksymalna, jaką może wypluć `Rand`.
+        unsigned long RandomMax() override { return (INT_MAX); }
 
-        /// \brief Returned `ulong` from `0` to `RandomMax`.
-        unsigned long Rand() { return ((int) ((::randg)() * INT_MAX)); }
+        /// \brief Daje liczbę losową całkowitą z zakresu 0..RAND_MAX.
+        long   Rand() override { return ((int) ((::randg)() * INT_MAX)); }
 
-        /// \brief Returned `ulong` from `0` to `i`.
-        unsigned long Random(unsigned long i) {
+        /// \brief Zwraca `ulong` od `0` do `i`.
+        unsigned long Random(unsigned long i) override {
             unsigned long ret = (unsigned long) (((double) (::randg)() * (i)));
             if (ret >= i) ret = i - 1;
             return ret;
         }
 
-        /// \brief Returned `double` from <0 to 1).
-        double DRand() { return ((::randg)()); }
+        /// \brief Daje liczbę losową rzeczywistą z zakresu 0..1 (rzadko dokładnie 1).
+        double DRand() override  { return ((::randg)()); }
 
-        /// \brief Generation of normal distribution. Defined only for this class.
+        /// \brief Znormalizowany wynik `randg`.
         double NormRand() { return ::randnorm(); }
 
-        /// \brief Generation of exponential distribution. Defined only for this class.
+        /// \brief Wykładniczy wynik `randg`.
         double ExpRand() { return ::randexp(); }
 
-        /// \brief Initialisation for a well-defined repeatable sequence.
-        void Seed(unsigned long i) { ::srandg((short int) i); }
+        /// \brief Inicjalizacja dla dobrze zdefiniowanej, powtarzalnej sekwencji.
+        void Seed(unsigned long i) override  { ::srandg((short int) i); }
 
-        /// \brief Initialisation for a random draw sequence.
-        void Reset() { ::srandg((unsigned) time(NULL)); }
+        /// \brief Inicjalizacja dla losowo wybranej sekwencji.
+        void Reset() override { ::srandg((unsigned) time(NULL)); }
 
-        /// \brief CONSTRUCTOR.
-        RandG() {
-            RandG::Reset();
-        }
+        /// \brief KONSTRUKTOR.
+        RandG() { RandG::Reset(); }
 
+        /// \brief DESTRUKTOR.
+        ~RandG() override;
     };
 
-///  \brief A random generator specialization that uses the standard C language generator.
-class RandSTDC : public RandomGenerator {
+    /// \brief Klasa generatora standardowego C.
+    class RandSTDC : public RandomGenerator
+    {
     public:
-        /// \brief Max value that can be returned from `Rand()`.
-        unsigned long RandomMax() { return (RAND_MAX); }
+        /// \brief Wartość maksymalna, jaką może wypluć `Rand`.
+        unsigned long RandomMax() override { return (RAND_MAX); }
 
-        /// \brief Returned `ulong` from `0` to `RandomMax`.
-        unsigned long Rand() { return my_rand(); }
+        /// \brief Daje liczbę losową całkowitą z zakresu 0..RAND_MAX.
+        long   Rand() override { return (my_rand)(); }
 
-        /// \brief Returned `ulong` from `0` to `i`.
-        unsigned long Random(unsigned long i) { return (int) (((double) (my_rand)() * (i)) / ((double) RAND_MAX + 1)); }
+        /// \brief Zwraca `ulong` from `0` to `i`.
+        unsigned long Random(unsigned long i) override { return (int) (((double) (my_rand)() * (i)) / ((double) RAND_MAX + 1)); }
 
-        /// \brief Returned `double` from <0 to 1).
-        double DRand() { return ((double) (my_rand)()) / (double) RAND_MAX; }
+        /// \brief Daje liczbę losową rzeczywistą z zakresu 0..1 (rzadko dokładnie 1).
+        double DRand() override { return ((double)(my_rand)()) / (double)RAND_MAX; }
 
-        /// \brief Initialisation for a well-defined repeatable sequence.
-        void Seed(unsigned long i) { (::srand)(i); }
+        /// \brief Inicjalizacja dla dobrze zdefiniowanej, powtarzalnej sekwencji.
+        void Seed(unsigned long i) override { (::srand)(i); }
 
-        /// \brief Initialisation for a random selected sequence.
-        void Reset() { (::srand)((unsigned) time(NULL)); }
+        /// \brief Inicjalizacja dla losowo wybranej sekwencji.
+        void Reset() override { (::srand)((unsigned)time(NULL)); }
 
-        /// \brief CONSTRUCTOR.
-        RandSTDC() {
-            RandSTDC::Reset();
-        }
+        /// \brief KONSTRUKTOR.
+        RandSTDC() { RandSTDC::Reset(); }
 
+        /// \brief DESTRUKTOR.
+        ~RandSTDC() override;
     };
 
 } //namespace
 
-extern wbrtm::RandG    TheRandG;             ///< Ready to use generator using `randg()`.
-extern wbrtm::RandSTDC TheRandSTDC;          ///< Ready to use generator using standard `rand()`.
+extern wbrtm::RandG    TheRandG;             ///< Gotowy do użycia generator używający `randg()`.
+extern wbrtm::RandSTDC TheRandSTDC;          ///< Gotowy do użycia generator używający standardowego `rand()`.
 
 /// @}
 

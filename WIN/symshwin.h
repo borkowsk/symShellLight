@@ -1,23 +1,9 @@
-//SYMSHELL FOR MS WINDOWS - PROGRAMMED BY W.Borkowski BASED OD Microsoft EXAMPLES
-//-------------------------------------------------------------------------------
-#ifdef __cplusplus
-extern "C" {
-#endif
-// Product identifier string defines
-#define APPNAME       SymShell
-
-// CONST RESOURCE DEFINITION FOR ALL SYMSHELL APPLICATION
-#define IDS_APPNAME                     1
-#define IDS_DESCRIPTION                 2
-#define IDI_APPICON                     101
-
-#define IDM_SIGNAL_COMMAND				40004
-#define IDM_EXIT						40005
-
-/* Aktualne rozmiary znaku wg. skali okna Windows*/
-int  raw_char_height(void);
-int  raw_char_width(void);
-
+/// @file
+/// @brief SYMSHELL FOR MS WINDOWS - PROGRAMMED BY W.Borkowski BASED OD Microsoft EXAMPLES
+//         -------------------------------------------------------------------------------
+/// @date 2026-04-21 (modified)
+#ifndef SYMSHELL_WIN_H_INCLUDED_
+#define SYMSHELL_WIN_H_INCLUDED_
 // THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF
 // ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO
 // THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
@@ -29,17 +15,39 @@ int  raw_char_width(void);
 //    Contains declarations for all globally scoped names in the program.
 //
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-//-------------------------------------------------------------------------
-// Functions for handling main window messages.  The message-dispatching
-// mechanism expects all message-handling functions to have the following
-// prototype:
-//
+/// MS Windows specific product identifier string defines.
+#define APPNAME       SymShell
+
+/// @name CONST RESOURCE DEFINITION FOR ALL SYMSHELL APPLICATION UNDER MS Windows.
+/// @{
+#define IDS_APPNAME                     1
+#define IDS_DESCRIPTION                 2
+#define IDI_APPICON                     101
+
+#define IDM_SIGNAL_COMMAND				40004
+#define IDM_EXIT						40005
+/// @}
+
+/** @name Aktualne rozmiary znaku wg. skali okna Windows. */
+/// @{
+int		raw_char_height(void);
+int		raw_char_width(void);
+/// @}
+
+//------------------------------------------------------------------------------------------------------------------
+/// @name Functions for handling main window messages.
+/// @details The message-dispatching mechanism expects all message-handling functions to have the following prototype:
+/// ```
 //     LRESULT FunctionName(HWND, UINT, WPARAM, LPARAM);
+/// ```
+/// @{
 
 // **TODO**  Add message-handling function prototypes here.  Be sure to
-//           add the function names to the main window message table in
-//           input.c.
+//           add the function names to the main window message table.
 
 LRESULT MsgCommand(HWND, UINT, WPARAM, LPARAM);
 LRESULT MsgSysCommand(HWND, UINT, WPARAM, LPARAM);
@@ -63,48 +71,43 @@ LRESULT MsgScroll(HWND, UINT, WPARAM, LPARAM);
 LRESULT MsgScroll(HWND, UINT, WPARAM, LPARAM);
 LRESULT MsgPaint(HWND, UINT, WPARAM, LPARAM);
 
+/// @}
 
-//-------------------------------------------------------------------------
-// Global function prototypes.
+//------------------------------------------------------------------------------------------------------------------
+
+/// @name Global function prototypes.
+/// @{
 
 // **TODO**  Add global function prototypes here.
-
 BOOL InitApplication(HINSTANCE);
 BOOL InitInstance(HINSTANCE);
 BOOL InitInput(HWND);
 
-    // Callback functions.  These are called by Windows.
-
+/// Callback function called by Windows.
 // **TODO**  Add new callback function prototypes here.  Win16 compiles
 //           require the __export keyword to generate proper prolog
 //           and epilog code for exported functions.
-
 #ifdef WIN16
-
 LRESULT CALLBACK __export WndProc(HWND, UINT, WPARAM, LPARAM);
-
 #else
-
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
-
 #endif
-
+/// @}
 
 //-------------------------------------------------------------------------
 // Global variable declarations.
 
-extern HINSTANCE hInst;          // The current instance handle
-extern HWND MyHwnd;				 // Okno aplikacji
-extern char      szAppName[];    // The name of this application
-extern char      szClassName[];  // The name of window class
-extern char      szTitle[];      // The title bar text
+extern HINSTANCE hInst;				///< The current instance handle
+extern HWND      MyHwnd;			///< Okno aplikacji/Main app. window handle.
+extern char      szAppName[];		///< The name of this application
+extern char      szClassName[];		///< The name of window class
+extern char      szTitle[];			///< The title bar text
 
 // **TODO**  For NON-MDI applications, uncomment line 1 below and comment
 //           line 2.  For MDI applications, uncomment line 2 below, comment
 //           line 1, and then define hwndMDIClient as a global variable in
 //           INIT.C
-#define hwndMDIClient NULL        /* (1) Stub for NON-MDI applications. */
-// extern HWND hwndMDIClient;     /* (2) For MDI applications.          */
+#define hwndMDIClient NULL        /**< For NON-MDI applications. */
 
 
 //-------------------------------------------------------------------------
@@ -112,41 +115,39 @@ extern char      szTitle[];      // The title bar text
 // definitions and functions are used by the message dispatching
 // mechanism and do not need to be changed.
 
-    // Function pointer prototype for message handling functions.
+/// Function pointer prototype for message handling functions.
 typedef LRESULT (*PFNMSG)(HWND,UINT,WPARAM,LPARAM);
 
-    // Enumerated type used to determine which default window procedure
-    // should be called by the message- and command-dispatching mechanism
-    // if a message or command is not handled explicitly.
+/// Enumerated type used to determine which default window procedure.
+/// It should be called by the message- and command-dispatching mechanism
+/// if a message or command is not handled explicitly.
 typedef enum
 {
-   edwpNone,            // Do not call any default procedure.
-   edwpWindow,          // Call DefWindowProc.
-   edwpDialog,          // Call DefDlgProc (This should be used only for
-                        // custom dialogs - standard dialog use edwpNone).
-   edwpMDIChild,        // Call DefMDIChildProc.
-   edwpMDIFrame         // Call DefFrameProc.
-} EDWP;                // Enumeration for Default Window Procedures
+   edwpNone,            ///< Do not call any default procedure.
+   edwpWindow,          ///< Call DefWindowProc.
+   edwpDialog,          ///< Call DefDlgProc (This should be used only for custom dialogs - standard dialog use edwpNone).
+   edwpMDIChild,        ///< Call DefMDIChildProc.
+   edwpMDIFrame         ///< Call DefFrameProc.
+} EDWP;                 ///< Enumeration for Default Window Procedures
 
-    // This structure maps messages to message handling functions.
+/// Structure maps messages to message handling functions.
 typedef struct _MSD
 {
     UINT   uMessage;
     PFNMSG pfnmsg;
-} MSD;                 // MeSsage Dispatch structure
+} MSD;                 ///< MeSsage Dispatch structure
 
-    // This structure contains all of the information that a window
-    // procedure passes to DispMessage in order to define the message
-    // dispatching behavior for the window.
+/// This structure contains all the information that a window procedure passes to DispMessage.
+/// ... in order to define the message dispatching behavior for the window.
 typedef struct _MSDI
 {
-    int  cmsd;          // Number of message dispatch structs in rgmsd
-    MSD *rgmsd;         // Table of message dispatch structures
-    EDWP edwp;          // Type of default window handler needed.
-} MSDI, FAR *LPMSDI;   // MeSsage Dipatch Information
+    int  cmsd;          ///< Number of message dispatch structs in rgmsd.
+    MSD *rgmsd;         ///< Table of message dispatch structures.
+    EDWP edwp;          ///< Type of default window handler needed.
+} MSDI, FAR *LPMSDI;    ///< MeSsage Dispatch Information.
 
-    // Message dispatching function.  This looks up messages in the
-    // dispatch table and call the appropriate handler function.
+/// Message dispatching function.
+/// This looks up messages in the dispatch table and call the appropriate handler function.
 LRESULT DispMessage(LPMSDI, HWND, UINT, WPARAM, LPARAM);
 
 // Message dispatch information for the main window
@@ -164,3 +165,15 @@ extern MSDI msdiMain;
 #include <ver.h>
 #endif
 */
+/* ******************************************************************/
+/*                 SYMSHELLLIGHT  version 2026                      */
+/* ******************************************************************/
+/*            THIS CODE IS DESIGNED & COPYRIGHT BY:                 */
+/*            W O J C I E C H   B O R K O W S K I                   */
+/*    Instytut Studiów Społecznych Uniwersytetu Warszawskiego       */
+/*    WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI  */
+/*    GITHUB: https://github.com/borkowsk                           */
+/*                                                                  */
+/*                               (Don't change or remove this note) */
+/* ******************************************************************/
+#endif

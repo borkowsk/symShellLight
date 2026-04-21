@@ -1,7 +1,8 @@
 /** @file
  *  @brief IMPLEMENTATION FOR SYMSHELL MENU AND RELEATED FEATURES */
-/** @date 2026-04-20 (last modification)                         */
 /*  ************************************************************* */
+/** @date 2026-04-21 (last modification)                          */
+
 
 #if defined(_MSC_VER) || defined(__MSWINDOWS__) 
 #include <windows.h> //bo Menu itp
@@ -173,12 +174,17 @@ int ssh_realize_menu(ssh_menu_handle hMenu)
 #error "THIS SYMSHELL MENU IMPLEMENTATION IS NOT FOR THIS PLATFORM"
 #endif
 
-/* ***************************************************************** */
-/*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                  */
-/*            W O J C I E C H   B O R K O W S K I                    */
-/*    Instytut Studiów Społecznych Uniwersytetu Warszawskiego        */
-/*        MAIL: wborkowski@uw.edu.pl                                 */
-/*                               (Don't change or remove this note)  */
-/* ***************************************************************** */
+/* ******************************************************************/
+/*                 SYMSHELLLIGHT  version 2026                      */
+/* ******************************************************************/
+/*            THIS CODE IS DESIGNED & COPYRIGHT BY:                 */
+/*            W O J C I E C H   B O R K O W S K I                   */
+/*    Instytut Studiów Społecznych Uniwersytetu Warszawskiego       */
+/*    WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI  */
+/*    GITHUB: https://github.com/borkowsk                           */
+/*                                                                  */
+/*                               (Don't change or remove this note) */
+/* ******************************************************************/
+
 
 

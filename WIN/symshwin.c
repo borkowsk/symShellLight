@@ -1,13 +1,13 @@
 /*****************************************************************************************
 * @file
-* @brief Implementacja najprostrzego interface'u wizualizacyjnego dla MS Windows 32.
+* @brief Implementacja najprostrzego interface-u wizualizacyjnego dla MS Windows 32.
 * ====================================================================================== */
-/// @date 2026-02-18 (last modification)
+/// @date 2026-04-21 (last modification)
 /**
 * @details
 *   U¿ywano w of 1997 roku w ró¿nych kompilatorach C++ Borland i Microsoftu oraz w GCC na Windows
 *   Ostatnia modyfikacja/Last modification: 28.10.2014
-*   UWAGA: `ProcessMsg` u¿ywa teraz, zamiast NULL, uchwytu okna pobieraj¹c komunikat — to powinno
+*   UWAGA: `ProcessMsg` u¿ywa aktualnie, zamiast NULL, uchwytu okna pobieraj¹c komunikat — to powinno
 *   dzia³aæ lepiej, ale pewnoœci nie ma.
 * */
 
@@ -47,18 +47,18 @@ extern int WB_error_enter_before_clean; /* For controlling a closing graphics wi
 //#pragma warning(disable : 4244)
 #endif
 
-#define MY_WIN_STYLE		      (WS_OVERLAPPEDWINDOW/* | WS_HSCROLL | WS_VSCROLL*/)
-#define MAXWRITE		0xfff0	  ///< Bezpieczny rozmiar bufora
-#define MINUSERCOMMAND  IDM_EXIT  ///< Komenda u¿ytkownika o najni¿szym mo¿liwym numerze
+#define MY_WIN_STYLE	(WS_OVERLAPPEDWINDOW/* | WS_HSCROLL | WS_VSCROLL*/)	///< Domyœlny styl okna Windows.
+#define MAXWRITE		0xfff0			///< Bezpieczny rozmiar bufora.
+#define MINUSERCOMMAND	IDM_EXIT		///< Komenda u¿ytkownika o najni¿szym mo¿liwym numerze (komunikatu).
 
 /* FOR OTHER MODULES */
 const char *_ssh_grx_module_name="WINDOWS";
-HINSTANCE	WB_Instance=0;
-HINSTANCE	WB_PrevInstance=0;
-HWND		WB_Hwnd=0;					  ///< ???
-HWND		MyHwnd=0;					  ///< Main window handle.
-char szAppName[128] = "SYMSHELL";         ///< The name of this application, if not in resources
-char szClassName[128] = "CLASS_SYMSHELL"; ///< The name of window class
+HINSTANCE		WB_Instance=0;
+HINSTANCE		WB_PrevInstance=0;
+HWND			WB_Hwnd=0;
+HWND			MyHwnd=0;							//< Main window handle.
+char		szAppName[128] = "SYMSHELL";			//< The name of this application, if not in resources
+char		szClassName[128] = "CLASS_SYMSHELL";	//< The name of window class
 
 /* LOCAL VARIABLES */
 static const char* progname="WB SYMSHELL APPLICATION "__DATE__;
@@ -331,7 +331,7 @@ static HFONT MyCreateFont( const char* fontstr )
     return (hfont);
 }
 
-/** DC caching */
+/** DC caching. */
 static HDC GetMyHdc(void)
 {
     if(!UserFont && UserFontStr) //If NULL but need not be, then create
@@ -560,7 +560,7 @@ void set_pen_rgba(ssh_intensity r, ssh_intensity g, ssh_intensity b,
         free_style_pen = curent_pen = CreatePen(win_style,pom, MyColor);
     }
 
-    //Od razu uzycie piora
+    //Od razu u¿ycie pióra.
     SelectObject(GetMyHdc(), free_style_pen);
 
     curr_color = -1;
@@ -886,7 +886,7 @@ if(UseGrayScale) //U¿ywa skali szaroœci tam, gdzie normalnie s¹ kolory
       for(k=256;k<PALETE_LENGHT; k++)
             set_rgb(k,(unsigned char)k,(unsigned char)k,(unsigned char)k );
 
-     _TRACE( 4)
+      _TRACE( 4)
         fprintf(stderr,"SetScale (Colors: 0-255; Gray: 256--> %d) completed",PALETE_LENGHT);
       _TREND
       }
@@ -929,13 +929,15 @@ static int InitMainWindow(void)
         {
             return FALSE;
         }
-    if(!NoResources)//Jesli sa zasoby to staramy sie zaladowac akcelerator
+
+    if(!NoResources) //Jeœli s¹ zasoby to staramy siê za³adowaæ akcelerator
         hAccelTable = LoadAccelerators(WB_Instance, szAppName);
+
     return TRUE;
 }
 
 
-/* CONFIGURATION AND MENAGE SHELL - USE IN THIS ORDER!   */
+/* CONFIGURATION AND MANAGE SHELL - USE IN THIS ORDER!   */
 /* ***************************************************** */
 
 /* Ustala czy rozmiar okna mo¿e byæ p³ynnie zmieniany */
@@ -950,12 +952,12 @@ int fixed()
     return !Flexible;
 }
 
-/* Ustala szerokoœæ linij - rysowanie grubych mo¿e byc kosztowne. Zwraca stan poprzedni WHAT ABOUT 0?*/
+/* Ustala szerokoœæ linij — rysowanie grubych mo¿e byc kosztowne. Zwraca stan poprzedni WHAT ABOUT 0?*/
 ssh_natural line_width(ssh_natural width)
 {
     unsigned pom=LineWidth;
     LineWidth=width;
-    curr_color=-1; //Wymusza realokacj¹ jeœli zostanie u¿yty aktualny kolor
+    curr_color=-1; //Wymusza realokacj¹, jeœli zostanie u¿yty aktualny kolor.
     if(MyHdc)
         SelectObject(MyHdc,GetStockObject(NULL_PEN)); /*Wymiata pen z kontekstu */
     return pom;
@@ -970,7 +972,7 @@ int line_style(int S)
 {
     int pom=LineStyle;
     LineStyle=S;
-    curr_color=-1; //Wymusza realokacjê, jeœli zostanie u¿yty aktualny kolor
+    curr_color=-1; //Wymusza realokacjê, jeœli zostanie u¿yty aktualny kolor.
     if(MyHdc)
         SelectObject(MyHdc,GetStockObject(NULL_PEN));/*Wymiata z kontekstu */
     return pom;
@@ -1144,11 +1146,11 @@ int  init_plot(ssh_natural  a,ssh_natural   b,                 /* ile pikseli ma
     //ShowWindow(MyHwnd, SW_SHOW); // DEBUG
 
     // Resize
-    GetRealScreen(); //Zeby zaladowac niezbedna informacje o czcionce
+    GetRealScreen(); //¯eby za³adowaæ niezbêdn¹ informacjê o czcionce.
     ScreenRealW=GetDeviceCaps(MyHdc,HORZRES);
     ScreenRealH=GetDeviceCaps(MyHdc,VERTRES);
 
-    W_width=a+ca*(char_width)('X');    //by³o  _char_width - mo¿e z powodu makra które by³o kiedyœ?
+    W_width=a+ca*(char_width)('X');    //by³o  _char_width - mo¿e z powodu makra, które by³o kiedyœ?
     W_height=b+cb*(char_height)('Y');  // i analogicznie
 
     if(ForceHeight!=0)                 //Test na rozmiary okna wymuszone parametrami wywo³ania
@@ -1237,7 +1239,7 @@ void flush_plot()
         fprintf(stderr," FLUSH PLOT ");
     _TREND
 
-    if(MyHdc!=0) //Byl u¿ywany. Zwalnia tylko RelaseResources
+    if(MyHdc!=0) //Byl u¿ywany. Zwalnia tylko `RelaseResources`.
     {
         if(animate && VirtualScreen && MyHdc==MbHdc )//Animujemy i jest juz bitmapa
         {
@@ -1267,21 +1269,21 @@ void flush_plot()
 /* Wymuszenie oczekiwania przez pewn¹ liczbê ms */
 void	delay_ms(unsigned ms)
 {
-    Sleep(ms); //Uœpiene programu na pewien czas
+    Sleep(ms); //Uœpienie programu na pewien czas.
 }
 
 /* GETTING INPUT */
 
-//zmienne do komunikacji ProcesMsg z procedurami obs³ugi komunikatów
-//------------------------------------------------------------------
+// zmienne do komunikacji `ProcesMsg` z procedurami obs³ugi komunikatów
+//---------------------------------------------------------------------
 static int InputChar=0;
 static int InputXpos;
 static int InputYpos;
 static int InputClick;
-static int MouseInput=0; //Flaga sygnalizuj¹ca, ¿e s¹ nieodczytane dane myszowe
+static int MouseInput=0; ///< Flaga sygnalizuj¹ca, ¿e s¹ nieodczytane dane myszowe.
 
 /// Przerabia wejœcie i zwraca znak.
-/// EOF to jest koniec, 0 jeœli nic nie by³o do wziêcia lub jakiœ inny.
+/// EOF to jest koniec, a 0, jeœli nic nie by³o do wziêcia lub jakiœ inny komunikat.
 static int ProcessMsg(int peek)
 {
     BOOL msg_avail=0;
@@ -1375,7 +1377,7 @@ int  input_ready()
         fprintf(stderr,"* input_ready() ");
     _TREND
 
-    if(CharToGet!=0||first_to_read!=0) //Nieodebrano
+    if(CharToGet!=0||first_to_read!=0) //Nie odebrano danych.
         return TRUE;
 
     input=ProcessMsg(1); //PEEK! Trzeba sprawdziæ nowe komunikaty
@@ -1452,13 +1454,13 @@ int  get_mouse_event(int* xpos,int* ypos,int* click)
     return 0;
 }
 
-//Finishing graphics
-//******************
+// Finishing graphics:
+// *******************
 
 /* zamkniecie grafiki/semigrafiki */
 void close_plot(void)
 {
-    int ret=0; //Dla GetMessage
+    int ret=0; //Dla `GetMessage`.
 
     _TRACE( 2)
         fprintf(stderr," CLOSE PLOT ");
@@ -1496,8 +1498,8 @@ void close_plot(void)
         if(IsWindow(MyHwnd)!=0) //Jeœli IsWindow to trzeba je zamkn¹æ
             {
             DestroyWindow(MyHwnd);
-            // Message loop for ending meesages - should be?(WB)
-            while((ret=GetMessage(&msg,MyHwnd, 0, 0))!=0)     //Zamiast MyHwnd by³o NULL...
+            // Message loop for ending messages - should be?(WB)
+            while((ret=GetMessage(&msg,MyHwnd, 0, 0))!=0)     //Zamiast `MyHwnd` by³o kiedyœ NULL...
                 {
                     if (ret == -1)
                         {
@@ -1601,7 +1603,7 @@ void print_rgb( int x,int y,
 
    if(straznik1!=0x77 || straznik2!=0x77)
         {
-        fprintf(stderr,"FATAL: symshell.print(...) - bufor exced 1024b!");
+        fprintf(stderr,"FATAL: `symshell.print(...)` - output exceed 1024b!");
         abort();
         }
 
@@ -1613,7 +1615,7 @@ void print_rgb( int x,int y,
     LocalMyHdc=GetMyHdc();
     //font_height = font_info.tmHeight;
     //font_width = font_info.tmAveCharWidth;
-    x*=mulx; /* Multiplicaton of coordinates */
+    x*=mulx; /* Multiplication of coordinates */
     y*=muly; /* if window is bigger */
 
     /* Output text, centered on each line */
@@ -1652,7 +1654,7 @@ void printc(    int x,int y,
 
    if(straznik1!=0x77 || straznik2!=0x77)
         {
-        fprintf(stderr,"FATAL: symshell.print(...) - bufor exced 1024b!");
+        fprintf(stderr,"FATAL: symshell.print(...) - data exceed 1024b!");
         abort();
         }
 
@@ -1853,8 +1855,8 @@ void line_d(int x1,int y1,int x2,int y2)
     Polyline(GetMyHdc(),points,2);
 
     // Chyba niepotrzebne:
-    // plot_rgb(x2,y2,GetRValue(curent_pen_rgb),GetGValue(curent_pen_rgb),GetBValue(curent_pen_rgb));
-    // plot_rgb(x1,y1,GetRValue(curent_pen_rgb),GetGValue(curent_pen_rgb),GetBValue(curent_pen_rgb));
+    // plot_rgb(x2,y2,GetRValue(current_pen_rgb),GetGValue(current_pen_rgb),GetBValue(current_pen_rgb));
+    // plot_rgb(x1,y1,GetRValue(current_pen_rgb),GetGValue(current_pen_rgb),GetBValue(current_pen_rgb));
 }
 
 /* Wyœwietlenie okrêgu w kolorze domyœlnym */
@@ -1868,7 +1870,7 @@ void circle_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r)
     Arc(GetMyHdc(),x-r1,y-r2,x+r1,y+r2,x,y+r1,x,y+r1);
 }
 
-/* Wyœwietlenie okrêgu w kolorze c --> color_index */
+/* Wyœwietlenie okrêgu w kolorze c => color_index */
 void circle(ssh_coordinate x,ssh_coordinate y,ssh_natural r,ssh_color color_index)
 {
     int r1,r2;      assert(color_index<PALETE_LENGHT);
@@ -1927,7 +1929,7 @@ void fill_poly(int vx,int vy,
     int i;
 
     if(number<=2)
-            return; //Nie da sie rysowaæ wielok¹ta o dwu punktach lub mniej
+            return; //Nie da siê rysowaæ wielok¹ta o dwu punktach lub mniej.
 
     if(number>10) //Jest za du¿y. Alokacja
         LocalPoints=(POINT*)calloc(number,sizeof(POINT));
@@ -2255,11 +2257,11 @@ BOOL InitInstance(HINSTANCE hInstance)
 //      Display right mouse button double click message and its parameters.
 //    MsgKeyDown - Display key down message and its parameters.
 //    MsgKeyUp - Display key up message and its parameters.
-//    MsgChar - Display character recieved message and its parameters.
+//    MsgChar - Display character received message and its parameters.
 //    MsgTimer - Display timer message and a current time.
 //    MsgScroll - Display scrollbar events and position.
 //    MsgPaint - Draw the strings for current messages.
-//    InitInput - Set up the rectangles for dispay of each type of message.
+//    InitInput - Set up the rectangles for display of each type of message.
 //
 //   COMMENTS:
 //    Message dispatch table -
@@ -3090,13 +3092,13 @@ MSDI msdiMain =
 //
 //  FUNCTION: InitInput(HWND)
 //
-//  PURPOSE: Set up the rectangles for dispay of each type of message
+//  PURPOSE: Set up the rectangles for display of each type of message
 //
 //  PARAMETERS:
 //    hwnd   - Window handle
 //
 //  RETURN VALUE:
-//    Always returns TRUE - Sucess
+//    Always returns TRUE - Success
 //
 //  COMMENTS:
 //
@@ -3444,7 +3446,7 @@ void shell_setup(const char* title,int iargc,const char* iargv[])
         if(strncmp(largv[i],"-help",5)==0)
             {
             printf("SYMSHELL for MS Windows. %s\n",Copyright);
-            printf("Supported swithes:\n"
+            printf("Supported switches:\n"
                    "\t -mapped[+/-] \n"
                    "\t -buffered[+/-]\n"
                    "\t -traceenv[1|2|4]\n"
@@ -3508,8 +3510,8 @@ void shell_setup(const char* title,int iargc,const char* iargv[])
             {
             is_buffered=(largv[i][7]=='+')?1:0;
                 printf("Double mapping is %s\n",(is_buffered?"ON":"OFF"));
-            if(!is_buffered)	/* Jak nie ma bitmapy to nie mozna */
-                animate=0; /* animowac */
+            if(!is_buffered)	/* Jak nie ma bitmapy to nie mo¿na */
+                animate=0; /* animowaæ */
             }
         else
         if(strncmp(largv[i],"-mouse",6)==0)
@@ -3524,7 +3526,7 @@ void shell_setup(const char* title,int iargc,const char* iargv[])
                 printf("Buffered is %s\n",(animate?"ON":"OFF"));
             //if(animate)	/* Musi byc w³¹czona bitmapa buforuj¹ca */
             //	is_buffered=1;/* ¿eby mo¿na by³o na nia pisaæ */
-                is_buffered=animate; /*Albo,albo.NIe jak w Xwindow */
+                is_buffered=animate; /*Albo, albo. Nie jak w Xwindow */
             }
        /*
         else
@@ -3568,15 +3570,15 @@ void shell_setup(const char* title,int iargc,const char* iargv[])
 }
 
 /* ******************************************************************/
-/*                                                   2026           */
-/*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
+/*                 SYMSHELLLIGHT  version 2026                      */
+/* ******************************************************************/
+/*            THIS CODE IS DESIGNED & COPYRIGHT BY:                 */
 /*            W O J C I E C H   B O R K O W S K I                   */
-/*                                                                  */
-/*      Instytut Studiów Spo³ecznych Uniwersytetu Warszawskiego     */
-/*                                                                  */
-/*        WWW:  http://borkowsk.iss.uw.edu.pl                       */
-/*        MAIL: wborkowski@uw.edu.pl                                */
+/*    Instytut Studiów Spo³ecznych Uniwersytetu Warszawskiego       */
+/*    WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI  */
+/*    GITHUB: https://github.com/borkowsk                           */
 /*                                                                  */
 /*                               (Don't change or remove this note) */
 /* ******************************************************************/
+
 

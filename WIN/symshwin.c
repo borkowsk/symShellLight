@@ -38,7 +38,10 @@ extern int WB_error_enter_before_clean; /* For controlling a closing graphics wi
 #include "symshwin.h"       // prototypes specific to this application
 
 #define OLD_COLOUR_SCALE (0)   //Skala kolorów jak na mapie fizycznej
-
+/// @file
+/// @brief SYMSHELL FOR MS WINDOWS - PROGRAMMED BY W.Borkowski BASED OD Microsoft EXAMPLES
+//         -------------------------------------------------------------------------------
+/// @date 2026-04-21 (modified)
 #if defined(_MSC_VER)
 //#pragma warning(disable:4068)
 #pragma warning(disable : 4996) //deprecated functions

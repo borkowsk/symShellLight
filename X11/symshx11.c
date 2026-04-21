@@ -1,6 +1,6 @@
 /** ********************************************************************
- * \file symshx11.c                                                    *
- * \brief X11 implementation of SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++. */
+ * @file symshx11.c                                                    *
+ * @brief X11 implementation of SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++. */
 /*        =========================================================================== */
 /** @date 2026-04-21 (last modifications)                              */
 /* ******************************************************************* */

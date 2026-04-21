@@ -1,6 +1,6 @@
 /// @file
-/// @brief SYMSHELL FOR MS WINDOWS - PROGRAMMED BY W.Borkowski BASED OD Microsoft EXAMPLES
-//         -------------------------------------------------------------------------------
+/// @brief SYMSHELL FOR MS WINDOWS - IMPLEMENTATION HEADER.
+//         ------------------------------------------------
 /// @date 2026-04-21 (modified)
 #ifndef SYMSHELL_WIN_H_INCLUDED_
 #define SYMSHELL_WIN_H_INCLUDED_

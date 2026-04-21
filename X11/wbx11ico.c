@@ -1,6 +1,8 @@
-/** @file icon.h
- *  @brief DEFINITION of old style declaration of main icon.
- *   VISIBLE BY symshx11.c IN VERY OLD X11 Window Managers ONLY!   */
+/** @file
+ *  @brief DEFINITION of old style declaration of main icon.       */
+/*         =================================================       */
+/** @date 2026-04-21 (last modifications)                          */
+/*   VISIBLE BY symshx11.c IN VERY OLD X11 Window Managers ONLY!   */
 /* *************************************************************** */
 #include "icon.h"
 

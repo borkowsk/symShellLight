@@ -1,7 +1,9 @@
 /// @file
 /// @brief Default context menu declarations.
+//         ==================================
+/// @date 2026-04-21 (last modification)
 // Created by borkowsk on 17.04.26.
-/// @date 2026-04-19 (last modification)
+
 
 #ifndef SYMSHELLLIGHT_WB_CONTEXT_MENU_DEFAULT_H
 #define SYMSHELLLIGHT_WB_CONTEXT_MENU_DEFAULT_H
@@ -14,6 +16,7 @@ extern "C" {
 
 /** Domyślna definicja menu kontekstowego. W X11 dostarczana z biblioteki, ale można ją podmienić na poziomie linkowania.*/
 extern ssh_menu_item_definition  context_menu_default[];
+
 /** Liczba itemów w domyślnym menu kontekstowym. Musi towarzyszyć `context_menu_default`. */
 extern unsigned context_menu_default_size;
 

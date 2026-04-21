@@ -1,7 +1,12 @@
 /// @file
 /// @brief SymshellLight default implementation of `ssh_context_menu_expected` using rofi (blocking).
 //  Created by borkowsk on 16.04.26.
-/// @date 2026-04-19 (last modification)
+/// @date 2026-04-21 (last modification)
+
+#ifdef __cplusplus
+#error This file is only for pure "C" compilation.
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -10,7 +15,8 @@
 #include "symshell.h"
 //#include "wb_context_menu_default.h"
 
-extern int    ssh_trace_level; /**< Z symshx11.c — maska poziomów śledzenia 1-msgs 2-grafika 3-grafika detaliczna 4-alokacje/zwalnianie */
+/**< Z symshx11.c — maska poziomów śledzenia 1-msgs 2-grafika 3-grafika detaliczna 4-alokacje/zwalnianie */
+extern int    ssh_trace_level;
 
 /** Szablon komendy do wywołania programu rofi wyświetlające menu kontekstowe.
  *  Kolejność parametrów %s %d oraz %lld musi być zachowana. */

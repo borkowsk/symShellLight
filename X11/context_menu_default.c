@@ -1,12 +1,18 @@
 /// @file
 /// @brief Default context menu definition.
+//         ================================
+/// @date 2026-04-21 (last modification)
 // Created by borkowsk on 17.04.26.
-/// @date 2026-04-19 (last modification)
+
+#ifdef __cplusplus
+#error This file is only for pure "C" compilation.
+#endif
 
 #include "symshell.h"
 //#include "wb_context_menu_default.h"
 
-/** Domyślna definicja menu kontekstowego. */
+/* Domyślna definicja menu kontekstowego/Default context menu definition.
+ * (file: "context_menu_default.c") */
 ssh_menu_item_definition  context_menu_default[]= {
         {"HELP", 'H'}, //To nigdzie nie jest zaimplementowane.
         {"DUMP", 'D'},

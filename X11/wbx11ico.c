@@ -1,8 +1,9 @@
-/** icon.c - main icon declaration
-*   ONLY FOR symshx11.c and related
-*   Does not work properly under UBUNTU!!!
-******************************************************************* */
+/** @file icon.h
+ *  @brief DEFINITION of old style declaration of main icon.
+ *   VISIBLE BY symshx11.c IN VERY OLD X11 Window Managers ONLY!   */
+/* *************************************************************** */
 #include "icon.h"
+
 int basic_line_with=1;int WB_icon_bitmap_width=100;
 int WB_icon_bitmap_height=120;
 
@@ -113,16 +114,16 @@ char WB_icon_bitmap_bits[] = {
  0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff
  };
 
-/********************************************************************/
-/*              SYMSHELLLIGHT  version 2021-11-24                   */
-/********************************************************************/
-/*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
-/*            W O J C I E C H   B O R K O W S K I                   */
-/*    Instytut Studiów Społecznych Uniwersytetu Warszawskiego       */
-/*    WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI  */
-/*    GITHUB: https://github.com/borkowsk                           */
-/*                                                                  */
-/*                               (Don't change or remove this note) */
-/********************************************************************/
+/* ***************************************************************** */
+/*                 SYMSHELLLIGHT  version 2026                       */
+/* ***************************************************************** */
+/*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                  */
+/*            W O J C I E C H   B O R K O W S K I                    */
+/*    Instytut Studiów Społecznych Uniwersytetu Warszawskiego        */
+/*    WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI   */
+/*    GITHUB: https://github.com/borkowsk                            */
+/*                                                                   */
+/*                               (Don't change or remove this note)  */
+/* ***************************************************************** */
 
 

@@ -1,15 +1,18 @@
+/** \file
+ *  \brief STATICS FOR PSEUDORANDOM NUMBER GENERATOR CLASSES. */
+/*        =================================================== */
+/** @date 2026-04-21 (last modification) */
+
 #include "wb_rand.hpp"
 
 wbrtm::RandG		TheRandG;
-wbrtm::RandSTDC	    TheRandSTDC;
+wbrtm::RandSTDC		TheRandSTDC;
 
 //wbrtm::RandomGenerator::~RandomGenerator() = default;
 
-wbrtm::RandSTDC::~RandSTDC() {
-}
+wbrtm::RandSTDC::~RandSTDC() {}
 
-wbrtm::RandG::~RandG() {
-}
+wbrtm::RandG::~RandG() {}
 
 
 /* ***************************************************************** */

@@ -1,7 +1,7 @@
 /** @file   sshutils.hpp
  *  @brief  Implementacja pomocniczych funkcji symshell-a w sposób już niezależny od platformy.  */
 /*         ===================================================================================== */
-/** @date 2026-04-20 (last modification)
+/** @date 2026-04-21 (last modification)
 *   @details
 *          Napisane PRAWIE NIEOBIEKTOWO ale w C++
 *          Jest tu: print_width() , puste rect(), bar3D(), arrow() ...itp...
@@ -116,10 +116,22 @@ const settings_bar3d* bar3d_config(settings_bar3d* st);
 /** @} */
 
 /// \brief  Rysuje słupek 3D w kolorach indeksowanych.
+/// \param x to pozioma współrzędna lewego dolnego rogu frontu.
+/// \param y to pionowa współrzędna lewego dolnego rogu frontu.
+/// \param h to wysokość frontu.
+/// \param col1 to indeks koloru przodu.
+/// \param col2 to indeks koloru boku.
 MAYBE_UNUSED
 void bar3d(int x,int y,int h,wb_color col1,wb_color col2);
 
 /// \brief  Rysuje słupek 3D w kolorze RBG z cieniem.
+/// \param x to pozioma współrzędna lewego dolnego rogu frontu.
+/// \param y to pionowa współrzędna lewego dolnego rogu frontu.
+/// \param h to wysokość frontu.
+/// \param R to składowa koloru 'red'.
+/// \param G to składowa koloru 'green'.
+/// \param B to składowa koloru 'blue'.
+/// \param ShadowDiv to dzielnik do RGB, żeby uzyskać cień na bocznej ścianie.
 MAYBE_UNUSED
 void bar3dRGB(int x,int y,int h,int R,int G,int B,int ShadowDiv);
 
@@ -128,6 +140,10 @@ MAYBE_UNUSED
 void rect(int x1,int y1,int x2,int y2,wb_color frame_c,int width=def_frame_width);
 
 /// \brief  Rysuje pionową skalę kolorów.
+/// \param x1,y1 to współrzędne startowe (lewy górny róg).
+/// \param width to szerokość paska.
+/// \param start to kolor początkowy.
+/// \param end   to kolor końcowy.
 MAYBE_UNUSED
 void ver_scale(int x1,int y1,int width=def_scale_width,wb_color start=0,wb_color end=255);
 
@@ -140,6 +156,11 @@ MAYBE_UNUSED
 void cross(int x,int y,wb_color color,int line_width=def_cross_width);
 
 /// \brief  Rysuje dowolnie skierowaną strzałkę od punktu x1y1 do x2y2.
+/// \param x1,y1 to współrzędne początku strzałki.
+/// \param x2,y2 to współrzędne końca strzałki.
+/// \param color to indeks koloru strzałki.
+/// \param size  to długość grotu.
+/// \param theta to kierunek strzałki (kat w radianach).
 MAYBE_UNUSED
 void arrow(int x1,int y1,int x2,int y2,wb_color color,double size=def_arrow_size,double theta=def_arrow_theta);
 
@@ -153,10 +174,10 @@ void hor_arrow(int x,int y1,int y2,wb_color  color,double size=def_arrow_size);
 
 /// \brief   Drukuje tekst w obszarze nie szerszym niż `max_width`.\
 /// \param x, y to współrzędne punktu startowego tekstu.
-/// \param max_width to maksymalna długość w pixelach.
+/// \param max_width to maksymalna długość w pikselach.
 /// \param col, bcg to color tekstu i tła.
 /// \param format format tekstu jak dla `printf`.
-/// \param ... to zmienne do wypełnienia tego co definiuje format.
+/// \param ... to zmienne parametry wynikające z formatu.
 /// \return  Zwraca width albo 0.
 /// \details wewnętrzny bufor ma nie więcej niż 1024 znaki.
 MAYBE_UNUSED

@@ -1,5 +1,7 @@
-///	Implementation of more "sophisticated" methods for \class wb_pchar
-///////////////////////////////////////////////////////////////////////
+/** @file
+ * @brief Implementation of more "sophisticated" methods for class "wb_pchar".                       */
+/*        ****************************************************************************************** */
+/// @date 2026-04-21 (last modification)
 
 #include <stdio.h>
 #include <ctype.h>
@@ -10,20 +12,21 @@
 #pragma warning(disable : 4996) //deprecated functions
 #pragma warning(disable : 4521) //multiple copy constructor
 #pragma warning(disable : 4522) //multiple assigment operator
-//TYMCZASEM - OSTRZE�ENIA O "conversion from 'A' to 'B', possible loss of data"
+//TYMCZASEM - OSTRZEŻENIA O "conversion from 'A' to 'B', possible loss of data"
 //#pragma warning(disable : 4267)
 //#pragma warning(disable : 4244)
 #endif
 
 #include "wb_ptr.hpp"
+#include "maybe_unused.h"
 
 namespace wbrtm { //WOJCIECH BORKOWSKI RUN TIME LIBRARY
 
-/// Wyprowadza formatowane dane na zawartość obiektu wb_pchar.
-/// \note Nie sprawdza rozmiaru!!! Trzeba wcześniej zaalokować bezpiecznie.
-/// \param format : jak dla vsprintf
-/// \param ...
-/// \return
+// Wyprowadza formatowane dane na zawartość obiektu wb_pchar.
+// \note Nie sprawdza rozmiaru!
+//       Trzeba wcześniej zaalokować bezpiecznie.
+// \param format jak dla `vsprintf`
+MAYBE_UNUSED
 wb_pchar& wb_pchar::prn(const char* format,...)
 {
    va_list marker;
@@ -33,11 +36,11 @@ wb_pchar& wb_pchar::prn(const char* format,...)
    return *this;
 }
 
-/// Dopisuje do starej zawartości obiektu wb_pchar.
-/// \note Nie sprawdza rozmiaru!!! Trzeba wcześniej zaalokować bezpiecznie.
-/// \param format  : jak dla vsprintf
-/// \param ...
-/// \return
+// Dopisuje do starej zawartości obiektu wb_pchar.
+// \note Nie sprawdza rozmiaru!!!
+//       Trzeba wcześniej zaalokować bezpiecznie.
+// \param format jak dla vsprintf
+MAYBE_UNUSED
 wb_pchar& wb_pchar::add(const char* format,...)
 {
    va_list marker;
@@ -50,103 +53,99 @@ wb_pchar& wb_pchar::add(const char* format,...)
    return *this;
 }
 
-/// \NOTE Used only internally
-static char* _find(char* where,const char* forfind,bool fullwords)
+// \NOTE Used only internally
+MAYBE_UNUSED
+static char* _find(char* where, const char* for_find, bool full_words)
 {
-	do{
-		char* poz=::strstr(where,forfind);//Szuka
+    do{
+        char* poz=::strstr(where, for_find);//Szuka
 
-		if(poz==NULL) 
-			return NULL;//W ogóle nie znalazł
+        if(poz==NULL) 
+            return NULL; //W ogóle nie znalazł
 
-		if(!fullwords)
-		{
-			return poz;	//Znalazł połozony dowolnie
-		}
-		else			//Sprawdza, czy całe słowo
-		{
-			size_t findlen=::strlen(forfind);		                        assert(findlen>0);
-			char* pozza=poz+findlen;			//Pozycja za znaleziona fragmentem
-			if(*pozza=='\0' || isspace(*pozza) || ::strchr(".,;:?!@#$%^&*()-+={}[]|\\'<>/",*pozza)!=NULL  )//Cza za jest "odstep"
-				if(poz==where || isspace(*(poz-1)) || ::strchr(".,;:?!@#$%^&*()-+={}[]|\\'<>/",*(poz-1))!=NULL )//Czy przed jest "odstep".
-				{
-					return poz;
-				}
+        if(!full_words)
+        {
+            return poz;	//Znalazł położony dowolnie
+        }
+        else			//Sprawdza, czy całe słowo
+        {
+            size_t find_len=::strlen(for_find);													assert(find_len > 0);
+            char* loc_beh= poz + find_len;			//Pozycja za znaleziona fragmentem
+            if(*loc_beh == '\0' || isspace(*loc_beh) || ::strchr(".,;:?!@#$%^&*()-+={}[]|\\'<>/", *loc_beh) != NULL ) //Czy za jest "odstęp"?
+                if(poz==where || isspace(*(poz-1)) || ::strchr(".,;:?!@#$%^&*()-+={}[]|\\'<>/",*(poz-1))!=NULL ) //Czy przed jest "odstęp"?
+                {
+                    return poz;
+                }
 
-			where=poz+1; // Jeśli doszło tu to szukamy dalej
-		}
-	
-	}while(1);
+            where=poz+1; // Jeśli doszło tu to szukamy dalej
+        }
+    
+    }while(1);
 }
 
-/// Wstawia łańcuch tekstowy do bufora na określonej pozycji
-/// \note bufor jest sztafetowany! TODO CHECK?
-///
-/// \param bufor
-/// \param pos
-/// \param whatins
-/// \return 'true' jeśli wykonał akcję, a 'false' jeśli nie znalazł
-bool insert(wb_pchar& bufor,unsigned pos,const char* whatins)
+// Wstawia łańcuch tekstowy do bufora na określonej pozycji
+// \note bufor jest sztafetowany!
+// \return 'true' jeśli wykonał akcję, a 'false' jeśli nie znalazł
+MAYBE_UNUSED //TODO CHECK?
+bool insert(wb_pchar& bufor, unsigned where, const char* what_ins)
 {
-    if(pos>::strlen(bufor.get()))
+    if(where > ::strlen(bufor.get()))
         return false;
 
     wb_pchar pom=bufor;//sztafeta!!?
-    bufor.alloc(::strlen(pom.get())+::strlen(whatins)+1);
-    char* posptr=pom.get_ptr_val()+pos;
-    char  point=*posptr;
-    *posptr='\0';//ciach
-    posptr++;
-    bufor.prn("%s%s%c%s",pom.get(),whatins,point,posptr);
+    bufor.alloc(::strlen(pom.get()) + ::strlen(what_ins) + 1);
+    char* location= pom.get_ptr_val() + where;
+    char  point=*location;
+    *location='\0';//ciach
+    location++;
+    bufor.prn("%s%s%c%s", pom.get(), what_ins, point, location);
 
     return true;
 }
 
-/// Zamienia wszystkie łańcuchy 'forrep' zawarte w obiekcie wb_pchar
-/// na łańcuchy 'whatins'. \note Bufor jest sztafetowany!!!
-/// \param bufor
-/// \param forrep
-/// \param whatins
-/// \param fullwords
-/// \param startpos
-/// \return 'true' jeśli wykonał akcję, a 'false' jeśli nie znalazł
-bool replace(wb_pchar& bufor,const char* forrep,const char* whatins,bool fullwords,unsigned startpos)//,bool case_sens=1 ??? Brak funkcji w rodzaju stristr
+// Zamienia wszystkie łańcuchy 'for_rep' zawarte w obiekcie `wb_pchar` na łańcuchy 'what_ins'.
+// \note Bufor jest sztafetowany!!!
+// \return 'true' jeśli wykonał akcję, a 'false' jeśli nie znalazł
+MAYBE_UNUSED
+bool replace(wb_pchar& bufor, const char* for_rep, const char* what_ins, bool full_words, unsigned where_start)
 {
-	wb_pchar pom=bufor;//sztafeta!!!
+    wb_pchar pom=bufor;//sztafeta!!!
 
-	char* poz=NULL;
-	poz=_find(pom.get_ptr_val()+startpos,forrep,fullwords);
+    char* poz=NULL;
+    poz=_find(pom.get_ptr_val() + where_start, for_rep, full_words);
 
-	//cerr<<"REPLACE("<<pom<<" , "<<forrep<<" , "<<whatins<<")"<<(poz?"OK":"NO")<<endl;
-	
-	if(poz==NULL) 
-		return false;//nie ma tego do zamiany
+    //cerr<<"REPLACE("<<pom<<" , "<<for_rep<<" , "<<what_ins<<")"<<(poz?"OK":"NO")<<endl;
+    
+    if(poz==NULL) 
+        return false;//nie ma tego do zamiany
 
-	while(poz!=NULL)
-	{
-		bufor.alloc(::strlen(pom.get())+::strlen(whatins)-::strlen(forrep)+1);
-		*poz='\0';
-		poz+=::strlen(forrep);
-		bufor.prn("%s%s%s",pom.get(),whatins,poz);
+    while(poz!=NULL)
+    {
+        bufor.alloc(::strlen(pom.get()) + ::strlen(what_ins) - ::strlen(for_rep) + 1);
+        *poz='\0';
+        poz+=::strlen(for_rep);
+        bufor.prn("%s%s%s", pom.get(), what_ins, poz);
 
-		poz=bufor.get_ptr_val()+::strlen(pom.get())+::strlen(whatins);
-		poz=_find(poz,forrep,fullwords);
-		if(poz)
-			pom=bufor;
-	}
-	
-	return true;
+        poz=bufor.get_ptr_val()+::strlen(pom.get())+::strlen(what_ins);
+        poz=_find(poz, for_rep, full_words);
+        if(poz)
+            pom=bufor;
+    }
+    
+    return true;
 }
 
 } //namespace wbrtm
-/********************************************************************/
-/*              SYMSHELLLIGHT  version 2021-11-24                   */
-/********************************************************************/
-/*           THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
-/*            W O J C I E C H   B O R K O W S K I                   */
-/*    Instytut Studiów Społecznych Uniwersytetu Warszawskiego       */
-/*    WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI  */
-/*    GITHUB: https://github.com/borkowsk                           */
-/*                                                                  */
-/*                               (Don't change or remove this note) */
-/********************************************************************/
+
+/* *******************************************************************/
+/*                   SYMSHELLLIGHT  version 2026                     */
+/* *******************************************************************/
+/*             THIS CODE IS DESIGNED & COPYRIGHT BY:                 */
+/*             W O J C I E C H   B O R K O W S K I                   */
+/*     Instytut Studiów Społecznych Uniwersytetu Warszawskiego       */
+/*     WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI  */
+/*     GITHUB: https://github.com/borkowsk                           */
+/*                                                                   */
+/*                                (Don't change or remove this note) */
+/* *******************************************************************/
+

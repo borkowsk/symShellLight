@@ -1,7 +1,7 @@
 /** @file
  *  @brief Atrapowa implementacja menu SYMSHELL i powiązanych funkcji. */
 /*         =========================================================== */
-/** @date 2026-04-20 (ostatnia modyfikacja)
+/** @date 2026-04-21 (ostatnia modyfikacja)
  *  @details Rodzaj "zaślepki", która pozwala na likowanie i w bezpieczny
  *           sposób nic nie robi. Wymagane dla prawidłowego linkowania
  *           pod X11 i SVG, gdzie teraz nie ma implementacji menu.
@@ -84,6 +84,9 @@ int ssh_realize_menu(ssh_menu_handle hMenu)
     return 1;
 }
 
+char*			ssh_menu_options=""; //"-fg black -bg gray";?
+
+#pragma clang diagnostic pop
 /* *******************************************************************/
 /*                 SYMSHELLLIGHT  version 2026                       */
 /* *******************************************************************/
@@ -96,4 +99,3 @@ int ssh_realize_menu(ssh_menu_handle hMenu)
 /*                               (Don't change or remove this note)  */
 /* *******************************************************************/
 
-#pragma clang diagnostic pop

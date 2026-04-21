@@ -1,16 +1,27 @@
 /// @file
-/// Definicja flagi kończenia z zapytaniem.
-//****************************************
+/// @brief Definicja flagi kończenia z zapytaniem.
+//        ****************************************
+/// @date 2026-04-21 (last modification)
+
+#include "symshell.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-    /// \brief flaga kończenia z zapytaniem.
-    /// \details
-    /// Sterowanie reakcją na kończące błędy/wyjątki.
-    /// Jest używana w bibliotece SymShell i wb_rtm, w tym w wb_ptr.
-    /// Powinna być definiowana w programie głównym, ale w razie
-    /// zapomnienia może być pobrana z biblioteki.
+    // \brief flaga kończenia z zapytaniem.
+    // \details
+    // Sterowanie reakcją na kończące błędy/wyjątki.
+    // Jest używana w bibliotece SymShell i wb_rtm, w tym w wb_ptr.
+    // Powinna być definiowana w programie głównym, ale w razie
+    // zapomnienia może być pobrana z biblioteki.
+
+    // \brief query termination flag.
+    // \details
+    // Control response to terminating errors/exceptions.
+    // It is used in the SymShell and wb_rtm libraries, including wb_ptr.
+    // It Should be defined in the main program, but in case
+    // oblivion can be downloaded from the library.
     int WB_error_enter_before_clean=0;
 
 #ifdef  __cplusplus

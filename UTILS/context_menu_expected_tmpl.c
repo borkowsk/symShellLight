@@ -1,23 +1,22 @@
 /// @file
 /// @brief Simple demo of `ssh_context_menu_expected` user defined function.
+//         =================================================================
+/// @date 2026-04-21 (last modification)
 //  Created by borkowsk on 16.04.26.
-/// @date 2026-04-19 (last modification)
+
 #include <stdio.h>
 #include "symshell.h"
 
-/* Funkcja uruchamiająca kontekstowe menu po kliknięciu prawym klawiszem myszy.
- * @param x — współrzędna pozioma kursora myszy.
- * @param y — współrzędna pionowa kursora myszy.
- * @param other_data - wskaźnik do rekordu danych użytkownika zawierającego co najmniej uchwyt Display i uchwyt okna.
- * @return 0, gdy menu nic nie zwróciło albo oczekujemy, że wynik wróci później jako message.
- *        -1, gdy funkcja zaniechała obsługi i kliknięcie ma być przekazane normalnej obsłudze w aplikacji (przez `\b`).
- *         Każda wartość dodatnia jest traktowana jako komunikat do zwrócenia przez funkcję `get_char()`.
- *         Wartość ujemna powoduje wyświetlenie informacji o błędzie, ze sprawdzeniem wartości zmiennej `errno`.
- * @details Funkcja może być blokująca lub nieblokująca (np. odpalać osobny wątek). Podstawową implementację dostarcza
- *          biblioteka SYMSHELL, ale zdefiniowanie własnej przez użytkownika biblioteki blokuje linkowanie wersji domyślnej.
- */
+
 long long ssh_context_menu_expected(unsigned x, unsigned y, struct ssh_basic_win_place_context* other_data)
 {
+/**
+ * @internal
+ *    PL: Funkcja może być blokująca lub nieblokująca (np. odpalać osobny wątek). Podstawową implementację dostarcza
+ *        biblioteka SYMSHELL, ale zdefiniowanie własnej przez użytkownika biblioteki blokuje linkowanie wersji domyślnej.
+ *    EN: A function can be blocking or non-blocking (e.g., launching a separate thread). The basic implementation
+ *        is provided by the SYMSHELL library, but defining your own one blocks linking of the default version.
+ */
     fprintf(stderr,"Dummy `ssh_context_menu_expected(%d,%d)` is called...\n",x,y);
     if(other_data!=NULL)
     {
@@ -30,5 +29,18 @@ long long ssh_context_menu_expected(unsigned x, unsigned y, struct ssh_basic_win
         fflush(stderr);
     }
 
-    return -1; /* OBSŁUGA ZANIECHANA! Poślij dane domyślnej obsłudze `\b` */
+    return -1; /* -1 to OBSŁUGA ZANIECHANA! Poślij dane domyślnej obsłudze `\b`/
+        * -1 means RESIGNATION FROM SERVICE! Send data to the default handler `\b` */
 }
+
+/* *******************************************************************/
+/*                   SYMSHELLLIGHT  version 2026                     */
+/* *******************************************************************/
+/*            THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
+/*             W O J C I E C H   B O R K O W S K I                   */
+/*     Instytut Studiów Społecznych Uniwersytetu Warszawskiego       */
+/*     WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI  */
+/*     GITHUB: https://github.com/borkowsk                           */
+/*                                                                   */
+/*                                (Don't change or remove this note) */
+/* *******************************************************************/

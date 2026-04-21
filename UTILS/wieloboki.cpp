@@ -1,7 +1,7 @@
 /// @file
-/// @brief  Implementacja klasa wielobok i biblioteki różnych wieloboków
-//         **************************************************************
-///** @date 2026-04-20 (last modification */
+/// @brief  Implementacja klasa "wielobok" i biblioteki różnych wieloboków
+//         ****************************************************************
+///** @date 2026-04-21 (last modification) */
 
 #include <cassert>
 #include <cstring> //Bo musimy/chcemy używać funkcji "memcpy" - kopiowania pamięci oraz strcmp
@@ -439,5 +439,16 @@ const ssh_point&  Wielobok::DajPunkt(unsigned pozycja) const
     return Punkty[pozycja];
 }
 
-         
+/* *******************************************************************/
+/*                   SYMSHELLLIGHT  version 2026                     */
+/* *******************************************************************/
+/*            THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
+/*             W O J C I E C H   B O R K O W S K I                   */
+/*     Instytut Studiów Społecznych Uniwersytetu Warszawskiego       */
+/*     WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI  */
+/*     GITHUB: https://github.com/borkowsk                           */
+/*                                                                   */
+/*                                (Don't change or remove this note) */
+/* *******************************************************************/
+
 

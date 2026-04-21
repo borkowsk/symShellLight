@@ -624,6 +624,9 @@ extern ssh_menu_item_definition  context_menu_default[];
 /** Number of items in the default context menu. Must accompany `context_menu_default`. */
 extern unsigned context_menu_default_size;
 
+/** Menu debugging level. */
+extern int 			ssh_menu_trace/*=0*/;
+
 #ifdef __cplusplus
 } //extern C
 #endif

@@ -2,7 +2,7 @@
 /** \file   sshmenuf.h
 * \brief INTERFACE FOR SYMSHELL MENU AND RELATED FEATURES.       */
 /*       =================================================       */
-/** @date 2026-04-20 (last modification)
+/** @date 2026-04-21 (last modification)
 * \warning MS WINDOWS ONLY. Otherwise, a dummy version is provided.
 * \note Unix version using Motif is outdated.
 * \note Under X11, a popup menu using rofi is available.
@@ -115,7 +115,7 @@ int ssh_realize_menu(ssh_menu_handle hMenu);                /**< \param hMenu - 
 /** For debugging purposes - externally accessible. */
 extern int      ssh_menu_trace;
 /** MOTIF STYLE OPTIONS */
-extern char* ssh_menu_options;
+extern char*  ssh_menu_options;
 #endif
 
 #ifdef __cplusplus

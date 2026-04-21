@@ -623,6 +623,9 @@ extern ssh_menu_item_definition  context_menu_default[];
 /** Liczba itemów w domyślnym menu kontekstowym. Musi towarzyszyć `context_menu_default`. */
 extern unsigned context_menu_default_size;
 
+/** Zmienna określająca poziom debugging-u funkcji menu. */
+extern int 			ssh_menu_trace/*=0*/;
+
 #ifdef __cplusplus
 } //extern C
 #endif

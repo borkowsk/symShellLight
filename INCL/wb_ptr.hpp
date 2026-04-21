@@ -1,7 +1,7 @@
 /// \file wb_ptr.hpp
 /// \brief Proste szablony inteligentnych wskaźników oraz tablic dynamicznych.
 //         ===================================================================
-/// @date 2026-04-20 (modified)
+/// @date 2026-04-21 (modified)
 /// \details
 /// ZAWARTOŚĆ:
 ///	    - wb_sptr		: inteligentny wskaźnik na scalary.
@@ -365,7 +365,9 @@ public:
         return get_ptr_val();
     }
 
-    /// \brief Metoda wyprowadza formatowane dane na zawartość obiektu `wb_pchar`. \note  Nie sprawdza rozmiaru!!!
+    /// \brief Metoda wyprowadza formatowane dane na zawartość obiektu `wb_pchar`.
+    /// \param format : jak dla `vsprintf`.
+    /// \note  Nie sprawdza rozmiaru! Trzeba zaalokować odpowiednio duży łańcuch `this`.
     wb_pchar& prn(const char* format,...);
 
     /// \brief Metoda dopisuje do zawartości. \note Nie sprawdza rozmiaru!!!

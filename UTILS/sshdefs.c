@@ -1,9 +1,9 @@
-/** Domyślne parametry wymagane dla prawidłowego linkowania pod x11, gdzie teraz nie ma menu
- ********************************************************************************************* */
+/** @file
+ * @brief Zmienna wymagana dla prawidłowego linkowania, jeśli twórca aplikacji nie dostarczy swojej. */
+/*        ****************************************************************************************** */
+/// @date 2026-04-21 (last modification)
 
-char*        	ssh_menu_options=""; //"-fg black -bg gray";?
-
-/// For debugging purposes - externally accessible
+// For debugging purposes - externally accessible
 int 			ssh_menu_trace=0;
 
 /* *******************************************************************/

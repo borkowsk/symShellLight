@@ -1,7 +1,8 @@
-/********************************************************************
-**  randg generuje liczby losowe o rozkladzie prostym              **
-**  z przedzialu (0,1)                                             **
-********************************************************************/
+/** \file
+ *  \brief IMPLEMENTATION FOR PSEUDORANDOM NUMBER GENERATOR "randg". */
+/*        ========================================================== */
+/** @date 2026-04-21 (last modification) */
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
@@ -26,19 +27,19 @@ float randexp();
 #endif
 
 long my_rand()
-{  //TODO - MUTEXOWE ZABEZPIECZENIE ::rand() na wielowątkowość ALE JAK TO ZROBIC W STD C ???
+{  //TODO - MUTEXOWE ZABEZPIECZENIE ::rand() na wielowątkowość ALE JAK TO ZROBIĆ W STD C ???
     return rand();
 }
 
-/*INT_MAX musi byc 0x7fffffff*/
+/*INT_MAX musi być 0x7fffffff*/
 typedef long int32; /*Wg ANSI C long ma zawsze 32bity */
 
 void srandg(short int srandg_init_val)
-{
-        assert(srandg_init_val!=0);
-	di=-abs(srandg_init_val);
+{                                                                 assert(srandg_init_val!=0);
+    di=-abs(srandg_init_val);
 }
 
+/* randg generuje liczby losowe o rozkładzie prostym w przedziale (0,1) */
 float randg()
 {
   //TODO - MUTEXOWE ZABEZPIECZENIE ::rand() na wielowątkowość!!!
@@ -59,15 +60,15 @@ float randg()
       ma[k - 1] = mk;
       mk = mj - mk;
       if (mk < 0)
-	mk += mbig;
+    mk += mbig;
       mj = ma[k - 1];
     };
     for (k = 1; k <= 4; k++)
       for (i = 1; i <= 55; i++)
       {
-	ma[i - 1] -= ma[(i + 30) % 55];
-	if (ma[i - 1] < 0)
-	  ma[i - 1] += mbig;
+    ma[i - 1] -= ma[(i + 30) % 55];
+    if (ma[i - 1] < 0)
+      ma[i - 1] += mbig;
       };
     inext = 0;
     inextp = 31;
@@ -83,17 +84,17 @@ float randg()
   if (mj < 0)
     mj += mbig;
   ma[inext - 1] = mj;
-  return (mj * 1.e-9f);/* CZY MOZE BYC 1.e-9f czy winno BYC DOUBLE */
+  return (mj * 1.e-9f);/* CZY MOŻE BYĆ 1.e-9f czy powinno BYĆ MAX. DLA DOUBLE? */
 }
 
 float randnorm()
 {
-	//float ran1(long *idum);
-	static int iset=0;
-	static float gset;
-	float fac,rsq,v1,v2;
+    //float ran1(long *idum);
+    static int iset=0;
+    static float gset;
+    float fac,rsq,v1,v2;
    
-	//if (*idum < 0) iset=0;
+    //if (*idum < 0) iset=0;
     if  (iset == 0) 
     {
         do {
@@ -116,14 +117,15 @@ float randnorm()
 
 float randexp()
 {
-	float dum;
+    float dum;
    
-	do
-	 dum=randg();
-	while (dum == 0.0);
+    do
+     dum=randg();
+    while (dum == 0.0);
 
-	return (float)( -log(dum) );
+    return (float)( -log(dum) );
 }
 
-
-
+/* *************************** */
+/* FROM OLD Numerical Recipies */
+/* *************************** */

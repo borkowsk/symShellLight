@@ -1,7 +1,7 @@
 /// \file wb_ptr.hpp
 /// \brief Simple templates for smart pointers and dynamic arrays.
 //         ===================================================================
-/// @date 2026-04-20 (modified)
+/// @date 2026-04-21 (modified)
 /// \details
 /// CONTENTS:
 ///	    - wb_sptr		: smart pointer for scalars.
@@ -372,7 +372,10 @@ namespace wbrtm {
             return get_ptr_val();
         }
 
-        /// \brief Method outputs formatted data to the content of the `wb_pchar` object. \note It does not check the size!!!
+        /// \brief Method outputs formatted data to the content of the `wb_pchar` object.
+        /// \param format : as for `vsprintf`
+        /// \note It does not check the size!!!
+        MAYBE_UNUSED
         wb_pchar& prn(const char* format,...);
 
         /// \brief Method appends to the content. \note It does not check the size!!!
@@ -383,14 +386,14 @@ namespace wbrtm {
         MAYBE_UNUSED
         static void write(ostream& s,const char* p,char enclos='\"');
 
-        /// \brief Replaces all `forrep` strings contained in the `wb_pchar` object with `whatins` strings.
+        /// \brief Replaces all `for_rep` strings contained in the `wb_pchar` object with `what_ins` strings.
         /// It is case sensitive. \note The buffer is baton-passed (transferred)!!!
         friend MAYBE_UNUSED
-        bool replace(wb_pchar& bufor,const char* forrep,const char* whatins,bool fullwords,unsigned startpos/*=0*/);
+        bool replace(wb_pchar& bufor, const char* for_rep, const char* what_ins, bool full_words, unsigned where_start/*=0*/);
 
         /// \brief Inserts a text string into the buffer at a specified position. \note The buffer is baton-passed (transferred)!!!
         friend MAYBE_UNUSED
-        bool insert(wb_pchar& bufor,unsigned pos,const char* whatins);
+        bool insert(wb_pchar& bufor, unsigned where, const char* what_ins);
 
         /// \brief Equivalent to standard 'strlen'.
         friend MAYBE_UNUSED

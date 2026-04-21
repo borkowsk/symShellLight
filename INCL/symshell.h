@@ -1,6 +1,6 @@
 /** @file
  * @brief SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++ (PL Doxygen).
- * @date 2026-04-19 (last modification)                                      */
+ * @date 2026-04-21 (last modification)                                      */
 /* ========================================================================= */
  /**
  * \details
@@ -98,8 +98,8 @@ void shell_setup(const char* title,                      /**< Nazwa aplikacji u�
                  const char* i_argv[]                     /**< Przekazanie parametrów wywołania. */
                 );
 
-/** \brief Zmiana tytułu okna. (EN) Changes window title bar. */
-void set_title(const char* title);
+/** \brief Zmiana tytułu okna. (EN) Changes window new_window_name bar. */
+void set_title(const char* new_window_name);
 
 /** \brief Przełączanie buforowanie okna. Może nie działać po inicjacji.*/
 void buffering_setup(ssh_mode yes);
@@ -175,7 +175,7 @@ ssh_mode    print_transparently(ssh_mode yes);
 
 /** \brief Ustala szerokość linii. Grube linie są kosztowne! TODO WHAT ABOUT 0?
  * \return Poprzednie ustawienie. */
-ssh_natural line_width(ssh_natural width);
+ssh_natural line_width(ssh_natural new_width);
 
 /** \brief Ustala styl rysowania linii: SSH_LINE_SOLID, SSH_LINE_DOTTED, SSH_LINE_DASHED.
  * \return Poprzednie ustawienie. */

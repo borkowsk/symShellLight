@@ -1,6 +1,6 @@
 /** @file
  * @brief SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++ (EN Doxygen).
- * @date 2026-04-19 (translated)                                             */
+ * @date 2026-04-21 (translated)                                             */
 /* ========================================================================= */
  /**
  * \details
@@ -99,8 +99,8 @@ void shell_setup(const char* title,                      /**< Application name u
                  const char* i_argv[]                    /**< Passing execution parameters. */
                 );
 
-/** \brief Changes window title bar. */
-void set_title(const char* title);
+/** \brief Changes window new_window_name bar. */
+void set_title(const char* new_window_name);
 
 /** \brief Toggling window buffering. Might not work after initialization. */
 void buffering_setup(ssh_mode yes);
@@ -174,9 +174,9 @@ ssh_mode    mouse_activity(ssh_mode yes);
 /** \brief Enables text printing without overwriting the background. \return Previous setting. */
 ssh_mode    print_transparently(ssh_mode yes);
 
-/** \brief Sets line width. Thick lines are expensive! TODO WHAT ABOUT 0?
+/** \brief Sets line new_width. Thick lines are expensive! TODO WHAT ABOUT 0?
  * \return Previous setting. */
-ssh_natural line_width(ssh_natural width);
+ssh_natural line_width(ssh_natural new_width);
 
 /** \brief Sets line drawing style: SSH_LINE_SOLID, SSH_LINE_DOTTED, SSH_LINE_DASHED.
  * \return Previous setting. */

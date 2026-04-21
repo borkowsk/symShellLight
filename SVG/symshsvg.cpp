@@ -1,6 +1,7 @@
 /** @file
  *  \brief                      SYMSHELL SVG IMPLEMENTATION
  *//* ******************************************************************************** */
+/// @date 2026-04-21 (last modification)
 /** \details    SYMSHELL IS A SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++
  **             ==================================================================
  **
@@ -18,8 +19,7 @@
  ** \n          https://github.com/borkowsk
  **
  ** \library    SYMSHELLLIGHT  version 2026a
- ** 
-/// @date 2026-04-19 (last modification)
+ **
  */
 #include <iostream>
 #include <fstream>
@@ -79,22 +79,24 @@ using namespace wbrtm;
 #define WB_FUNCTION_NAME_  __func__ //C11
 #endif
 
-/* Zmienne eksportowane na zewnątrz
- * ********************************** */
+/** @name Zmienne eksportowane na zewnątrz */
+/*  ************************************** */
+/** @} */
 extern "C" {
+    /** Identyfikator zalinkowanego modułu */
     [[maybe_unused]] const char *_ssh_grx_module_name="SVG";
+
+    /** Maska poziomów śledzenia 1-msgs 2-grafika 3-grafika detaliczna 4-alokacje/zwalnianie */
+    int                    ssh_trace_level = 0;
 }
 
 /// Pid procesu. Przydaje się
 unsigned long     PID=_getpid();
 
-/// Maska poziomów śledzenia 1-msgs 2-grafika 3-grafika detaliczna 4-alokacje/zwalnianie.
-int         ssh_trace_level = 0;
-
 /// Jakiej długości inicjujemy tablice operacji graficznych (mnożone przez liczbę pikseli ekranu).
 double      INITIAL_LENGTH_RATIO = 0.005;
 
-/// Ile maksymalnie rekordów jest dopuszczalnych?//(mnożone przez liczbę pikseli ekranu).
+/// Ile maksymalnie rekordów jest dopuszczalnych? (mnożone przez liczbę pikseli ekranu).
 double      MAXIMAL_LENGTH_RATIO = 0.999;
 
 /// Rozszerzenie nazwy pliku wyjściowego. Jednocześnie określa format pliku wyjściowego.
@@ -123,46 +125,48 @@ int         GrCharMessage = -2;
 /// Separator wydruków.
 const char* SEP = "\t";
 
-/* Zmienne 'static' czyli bez dostępu z zewnątrz modułu
- * **************************************************** */
-
-/// Nazwa "okna" czyli domyślnego pliku generowanego przez flush_plot().
-static const char*  ScreenTitle = "SSH_SVG";
-
-/// Domyślny nagłówek pliku.
-static char ScreenHeader[1024]="SSH SVG WINDOW";
-
-// Ustawienia grafiki
-//*******************
-
-static int          GrPrintTransparently = 0;
-
-static ssh_natural  GrLineWidth = 1;
-static ssh_mode     GrLineStyle = SSH_LINE_SOLID;
-
-static ssh_rgb      GrPenColor = { 255,255,255}; //,255 };
-static ssh_rgb      GrBrushColor = { 205,205,205}; //,255 };
-
-static ssh_color    curr_background = 0;
-static unsigned     GrScreenHi = 0;
-static unsigned     GrScreenWi = 0;
-static unsigned     GrFontHi = 14;
-static unsigned     GrFontWi = 6;
-
-static ssh_rgb      palette[512];
-
-/// Flaga użycia skali szarości, np. do wydruków.
-static int          UseGrayScale = 0;  ///< Ustawiana jako parametr wywołania programu
-                                       ///< podobnie jak opcje śledzenia i buforowania
-                                       ///< , ale dla skali kolorów to jedyny sposób na
-                                       ///< włączenie
-
-/// Czy grafika już/jeszcze ZAMKNIĘTA?
-static bool         GrClosed = true;
+/** @} */
 
 /* IMPLEMENTACJA
  * ************** */
 namespace {
+    /* Zmienne 'static' czyli bez dostępu z zewnątrz modułu
+    * **************************************************** */
+
+    /// Nazwa "okna" czyli domyślnego pliku generowanego przez flush_plot().
+    static const char*  ScreenTitle = "SSH_SVG";
+
+    /// Domyślny nagłówek pliku.
+    static char ScreenHeader[1024]="SSH SVG WINDOW";
+
+    // Ustawienia grafiki:
+    // *******************
+
+    static int          GrPrintTransparently = 0;
+
+    static ssh_natural  GrLineWidth = 1;
+    static ssh_mode     GrLineStyle = SSH_LINE_SOLID;
+
+    static ssh_rgb      GrPenColor = { 255,255,255}; //,255 };
+    static ssh_rgb      GrBrushColor = { 205,205,205}; //,255 };
+
+    static ssh_color    curr_background = 0;
+    static unsigned     GrScreenHi = 0;
+    static unsigned     GrScreenWi = 0;
+    static unsigned     GrFontHi = 14;
+    static unsigned     GrFontWi = 6;
+
+    static ssh_rgb      palette[512];
+
+    /// Flaga użycia skali szarości, np. do wydruków.
+    static int          UseGrayScale = 0;  ///< Ustawiana jako parametr wywołania programu
+    ///< podobnie jak opcje śledzenia i buforowania
+    ///< , ale dla skali kolorów to jedyny sposób na
+    ///< włączenie
+
+    /// Czy grafika już/jeszcze ZAMKNIĘTA?
+    static bool         GrClosed = true;
+
     /// Liczbowe kody wewnętrznych typów obiektów graficznych.
     enum GrType {
         Empty = 0, Point = 1, LineTo = 2, Line = 3, Circle = 4, Rect = 5, Text = 6, Poly = 7, Arc = 8
@@ -187,6 +191,7 @@ namespace {
         unsigned rb: 8;
         unsigned gb: 8;
         unsigned bb: 8; /* background color */ };
+
     /// Wewnętrzna struktura dla linii docelowej.
     struct LineTo {
         unsigned type: 4;
@@ -197,6 +202,7 @@ namespace {
         unsigned r: 8;
         unsigned g: 8;
         unsigned b: 8; /* main color */ };
+
     /// Wewnętrzna struktura dla linii od do.
     struct Line {
         unsigned type: 4;
@@ -209,6 +215,7 @@ namespace {
         unsigned b: 8; // main color
         unsigned x2: 16;
         unsigned y2: 16; /* end point */ };
+
     /// Wewnętrzna struktura dla elips i kół.
     struct Ellipse {
         unsigned type: 4;
@@ -224,6 +231,7 @@ namespace {
         unsigned rf: 8;
         unsigned gf: 8;
         unsigned bf: 8; /* secondary color */ };
+
     /// Wewnętrzna struktura dla łuków kołowych i eliptycznych.
     struct Arc {
         unsigned type: 4;
@@ -241,6 +249,7 @@ namespace {
         unsigned rf: 8;
         unsigned gf: 8;
         unsigned bf: 8; /* secondary color */ };
+
     /// Wewnętrzna struktura dla prostokątów.
     struct Rect {
         unsigned type: 4;
@@ -256,6 +265,7 @@ namespace {
         unsigned rf: 8;
         unsigned gf: 8;
         unsigned bf: 8; /* secondary color */ };
+
     /// Wewnętrzna struktura dla wielokątów.
     struct Poly {
         unsigned type: 4;
@@ -269,6 +279,7 @@ namespace {
         unsigned bf: 8; /* secondary color */
         ssh_point *points;
     };
+
     /// Wewnętrzna struktura dla tekstów
     struct Text {
         unsigned type: 4;
@@ -285,9 +296,9 @@ namespace {
         char *txt;
     };
 
-/// Unia do przechowywania operacji rysowania.
-/// Jest unią wielu struktur "wewnętrznych".
-///\see \n "https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths"
+    /// Unia do przechowywania operacji rysowania.
+    /// Jest unią wielu struktur "wewnętrznych".
+    ///\see \n "https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths"
     union GrOperation {
         struct Empty empty;
         struct Point point;
@@ -315,7 +326,7 @@ namespace {
             }
         }
 
-        /// Czyści stare operacje, np. gdy uznano, że efekt i tak jest zasłonięty, albo clear_screen(), albo end.
+        /// Czyści stare operacje, np. gdy uznano, że efekt i tak jest zasłonięty, albo `clear_screen()`, albo end.
         void clean() {
             if (empty.type == GrType::Text && text.txt != nullptr)
                 delete text.txt;
@@ -324,58 +335,58 @@ namespace {
             empty.type = GrType::Empty;
         }
 
-        /// Destruktor. Jeżeli jest zapisany obiekt z danymi dynamicznymi to trzeba zwolnić
+        /// Destruktor. Jeżeli jest zapisany obiekt z danymi dynamicznymi to trzeba zwolnić.
         ~GrOperation() {
             clean();
         }
     };
 
-} //namespace
+    static wb_dynarray<GrOperation> GrList; ///< Lista operacji rysowania.
+    static int GrListPosition = -1;         ///< Aktualna pozycja na liście.
+    static int maxN=-1;                     ///< Przeliczane z MAXIMAL_LENGTH_RATIO.
 
-static wb_dynarray<GrOperation> GrList; ///< Lista operacji rysowania.
-static int GrListPosition = -1;         ///< Aktualna pozycja na liście.
-static int maxN=-1;                     ///< Przeliczane z MAXIMAL_LENGTH_RATIO.
-
-/// Funkcja implementacyjna zwracająca dostęp do kolejnego "entry" tablicy operacji graficznych.
-/// W razie potrzeby alokuje więcej? TODO TEST!
-static GrOperation&  NextGrListEntry_()
-{
-    if (++GrListPosition < GrList.get_size())
+    /// Funkcja implementacyjna zwracająca dostęp do kolejnego "entry" tablicy operacji graficznych.
+    /// W razie potrzeby alokuje więcej? TODO TEST!
+    static GrOperation&  NextGrListEntry_()
     {
-        return GrList[GrListPosition]; //Zwraca dostęp do kolejnej operacji. Potem można wpisywać informacje
-    }
-    else //NIE MA MIEJSCA!!!
-    {
-        size_t N = GrList.get_size() * 2;
-        if(N>maxN) N=maxN; //Nie więcej niż `maxN`
-
-        if(N<maxN) //Jeszcze można powiększyć
+        if (++GrListPosition < GrList.get_size())
         {
-            //Przy powiększaniu nie chcemy użyć "expand", bo to by wywoływało destruktory i kopiowanie!
-            size_t oldSize;
-            GrOperation* RawPtr = GrList.give_dynamic_ptr_val(oldSize);               assert(GrList.get_size() == 0);
-
-            GrList.alloc(N); //Nowy bufor w powiększonym rozmiarze
-            memcpy((void*) GrList.get_ptr_val(), (void*) RawPtr, oldSize * sizeof(GrOperation)); //Przekopiowanie realnej zawartości
-            for (size_t i = 0; i < oldSize; i++)
-                RawPtr[i].empty.type = GrType::Empty; //Wirtualne wyczyszczenie starego
-            delete [] RawPtr; //Zwalnianie bez wywoływania możliwych istotnych destruktorów dla Text i Poly
+            return GrList[GrListPosition]; //Zwraca dostęp do kolejnej operacji. Potem można wpisywać informacje
         }
-        else //Już nie można bardziej powiększyć bufora! Kasujemy pół najstarszej zawartości i przesuwamy
+        else //NIE MA MIEJSCA!!!
         {
-            GrOperation* RawPtr = GrList.get_ptr_val();
-            GrListPosition/=2;
-            for(size_t i=0; i < GrListPosition;i++)
-                RawPtr[i].clean(); //Zwalniamy ewentualne składniki dynamiczne
-            memmove((void*) RawPtr,(void*) (RawPtr+GrListPosition),GrListPosition*sizeof(GrOperation));
-            size_t size=GrList.get_size();
-            for(size_t i=GrListPosition;i<size;i++)
-                RawPtr[i].empty.type = GrType::Empty; //Wirtualne wyczyszczenie zduplikowanej zawartości
-        }
+            size_t N = GrList.get_size() * 2;
+            if(N>maxN) N=maxN; //Nie więcej niż `maxN`
 
-        return GrList[GrListPosition]; //Zwraca dostęp do kolejnej operacji, czyli pierwszej za starej listy
+            if(N<maxN) //Jeszcze można powiększyć
+            {
+                //Przy powiększaniu nie chcemy użyć "expand", bo to by wywoływało destruktory i kopiowanie!
+                size_t oldSize;
+                GrOperation* RawPtr = GrList.give_dynamic_ptr_val(oldSize);               assert(GrList.get_size() == 0);
+
+                GrList.alloc(N); //Nowy bufor w powiększonym rozmiarze
+                memcpy((void*) GrList.get_ptr_val(), (void*) RawPtr, oldSize * sizeof(GrOperation)); //Przekopiowanie realnej zawartości
+                for (size_t i = 0; i < oldSize; i++)
+                    RawPtr[i].empty.type = GrType::Empty; //Wirtualne wyczyszczenie starego
+                delete [] RawPtr; //Zwalnianie bez wywoływania możliwych istotnych destruktorów dla Text i Poly
+            }
+            else //Już nie można bardziej powiększyć bufora! Kasujemy pół najstarszej zawartości i przesuwamy
+            {
+                GrOperation* RawPtr = GrList.get_ptr_val();
+                GrListPosition/=2;
+                for(size_t i=0; i < GrListPosition;i++)
+                    RawPtr[i].clean(); //Zwalniamy ewentualne składniki dynamiczne
+                memmove((void*) RawPtr,(void*) (RawPtr+GrListPosition),GrListPosition*sizeof(GrOperation));
+                size_t size=GrList.get_size();
+                for(size_t i=GrListPosition;i<size;i++)
+                    RawPtr[i].empty.type = GrType::Empty; //Wirtualne wyczyszczenie zduplikowanej zawartości
+            }
+
+            return GrList[GrListPosition]; //Zwraca dostęp do kolejnej operacji, czyli pierwszej za starej listy
+        }
     }
-}
+
+} //local namespace
 
 /* OTWIERANIE i ZAMYKANIE TRYBU (OKNA) GRAFICZNEGO */
 /* Operacje konfiguracyjne o działaniu gwarantowanym przed inicjacją */
@@ -448,7 +459,9 @@ void shell_setup(const char* title, int iArgc, const char* iArgv[])
         }
 }
 
-static void SetScale();  //Gdzieś tam jest funkcja ustalająca domyślną paletę kolorów indeksowanych
+namespace {
+    static void SetScale();  //Gdzieś tam jest funkcja ustalająca domyślną paletę kolorów indeksowanych
+}
 
 // Inicjacja grafiki/semigrafiki — początek pracy okna/ekranu graficznego (lub wirtualnego).
 ssh_stat init_plot(ssh_natural  a, ssh_natural   b,                 /* ile pikseli mam mieć okno */
@@ -707,7 +720,7 @@ void set_gray(ssh_color shade,ssh_intensity intensity)
     palette[256+shade] = RGB(intensity,intensity,intensity);
 }
 
-//Ustala aktualny kolor linii za pomocą indeksu do palety.
+// Ustala aktualny kolor linii za pomocą indeksu do palety.
 [[maybe_unused]]
 void set_pen(ssh_color c,ssh_natural line_width, ssh_mode Style)
 {
@@ -821,7 +834,6 @@ void set_brush(ssh_color c)
 }
 
 // Ustala aktualny kolor wypełnień za pomocą składowych RGB.
-
 [[maybe_unused]]
 void set_brush_rgb(ssh_intensity r,ssh_intensity g,ssh_intensity b)
 {
@@ -914,7 +926,7 @@ ssh_color get_brush()
 }
 
 // Aktualne rozmiary pionowe okna z init_plot po przeliczeniach...
-// Oraz ewentualnych zmianach uczynionych "ręcznie" przez operatora
+// Oraz ewentualnych zmianach uczynionych "ręcznie" przez operatora.
 [[maybe_unused]]
 ssh_natural screen_height()
 {
@@ -1036,11 +1048,11 @@ void printbw(int x,int y,const char* format,...)
     Op.text.bf = 0;
     Op.text.x = x;
     Op.text.y = y;
-    Op.text.mode = GrPrintTransparently;                                                                  assert(format != nullptr);
+    Op.text.mode = GrPrintTransparently;												assert(format != nullptr);
     char target[2048];
     va_list marker;
     va_start(marker, format);     /* Initialize variable arguments. */
-    vsprintf(target, format, marker);						assert(strlen(target) < 2046);
+    vsprintf(target, format, marker);											assert(strlen(target) < 2046);
     va_end(marker);              /* Reset variable arguments.      */
     //Op.text.txt.take(clone_str(target));
     //if(Op.text.txt != NULL)
@@ -1072,11 +1084,11 @@ void print_d(ssh_coordinate x,ssh_coordinate y,const char* format,...)
     Op.text.b = GrBrushColor.b;
     Op.text.x = x;
     Op.text.y = y;
-    Op.text.mode = GrPrintTransparently;                                                                  assert(format != nullptr);
+    Op.text.mode = GrPrintTransparently;												assert(format != nullptr);
     char target[2048];
     va_list marker;
     va_start(marker, format);     /* Initialize variable arguments. */
-    vsprintf(target, format, marker);			                                                  assert(strlen(target) < 2046);
+    vsprintf(target, format, marker);											assert(strlen(target) < 2046);
     va_end(marker);              /* Reset variable arguments.      */
     //Op.text.txt.take(clone_str(target));
     //if(Op.text.txt != NULL)
@@ -1110,11 +1122,11 @@ void print_rgb(int x, int y,unsigned r, unsigned g, unsigned b,ssh_color back,co
     Op.text.b = palette[back].b;
     Op.text.x = x;
     Op.text.y = y;
-    Op.text.mode = GrPrintTransparently;                                                assert(format != nullptr);
+    Op.text.mode = GrPrintTransparently;												assert(format != nullptr);
     char target[2048];
     va_list marker;
     va_start(marker, format);     /* Initialize variable arguments. */
-    vsprintf(target, format, marker);                                           assert(strlen(target) < 2046);
+    vsprintf(target, format, marker);											assert(strlen(target) < 2046);
     va_end(marker);              /* Reset variable arguments.      */
     //Op.text.txt.take(clone_str(target));
     //if(Op.text.txt != NULL)
@@ -1204,7 +1216,7 @@ void fill_flood(ssh_coordinate x, ssh_coordinate y, ssh_color fill, ssh_color bo
     Op.point.bb = palette[border].b;
 }
 
-/// Wypełnia powodziowo lub algorytmem siania w kolorze RGB.
+// Wypełnia powodziowo lub algorytmem siania w kolorze RGB.
 [[maybe_unused]]
 void fill_flood_rgb(int x,int y,int rf,int gf,int bf,int rb,int gb,int bb)
 {
@@ -1702,13 +1714,466 @@ void fill_poly(ssh_coordinate vx, ssh_coordinate vy,
     }
 }
 
-/** POBIERANIE ZNAKÓW Z KLAWIATURY i ZDARZEŃ OKIENNYCH (w tym z MENU)\n
+namespace {
+
+/// Wewnętrzna implementacja termicznej skali kolorów.
+///  Czyli wypełnienie palety RGB dla kolorów indeksowanych.
+    [[maybe_unused]]
+    static void SetScale() {
+#ifndef M_PI
+        const double M_PI=3.141595;
+#endif
+
+        if (ssh_trace_level > 1) cout << "SVG: " << WB_FUNCTION_NAME_ << endl;
+
+        if (UseGrayScale)//Używa skali szarości tam, gdzie normalnie są kolory
+        {
+            int k;
+            for (k = 0; k < 255; k++) {
+                long wal = k;
+                //`fprintf(stderr,"%u %ul\n",k,wal);`
+                set_rgb(k, wal, wal, wal); //Color part
+                set_rgb(256 + k, wal, wal, wal); //Gray scale part
+            }
+
+            if (ssh_trace_level & 4)
+                cout << "SVG: " << WB_FUNCTION_NAME_ << SEP << "SetScale (0-255 Gray) completed" << endl;
+        } else {
+            int k;
+            for (k = 0; k < 255; k++) {
+                long wal1, wal2, wal3;
+                double kat = (M_PI * 2) * k / 255.;
+
+                wal1 = (long) (255 * sin(kat * 1.22));
+                if (wal1 < 0) wal1 = 0;
+
+                wal2 = (long) (255 * (-cos(kat * 0.46)));
+                if (wal2 < 0) wal2 = 0;
+
+                wal3 = (long) (255 * (-cos(kat * 0.9)));
+                if (wal3 < 0) wal3 = 0;
+
+                set_rgb(k, wal1, wal2, wal3);
+
+                /*
+                 wal1=(long)(255*sin(kat*1.25));
+
+                 if(wal1<0) wal1=0;
+                    wal2=(long)(255*(-sin(kat*0.85)));
+                 if(wal2<0) wal2=0;
+                    wal3=(long)(255*(-cos(kat*1.1)));
+                 if(wal3<0) wal3=0;
+                */
+            }
+            //else ?ALTERNATYWNIE? TODO CHECK!
+            {
+                unsigned kk;
+                for (kk = 256; kk < PALETTE_LENGTH; kk++)
+                    set_rgb(kk, (unsigned char) kk, (unsigned char) kk, (unsigned char) kk);
+                if (ssh_trace_level & 4)
+                    cout << "SVG: " << WB_FUNCTION_NAME_ << SEP << "SetScale (Colors: 0-255; Gray: 256-->"
+                         << PALETTE_LENGTH << ") completed" << endl;
+            }
+        }
+
+        set_rgb(255, 255, 255, 255); //Zazwyczaj oczekuje, że kolor 255 to biały albo chociaż jasny
+    }
+
+/* NAJWAŻNIEJSZE FUNKCJE WEWNĘTRZNE - ZAPIS INFORMACJI DO PLIKU W FORMACIE WEKTOROWYM
+ * ********************************************************************************** */
+
+/// Zapisuje w formacie "C++stream".
+/// \param o jakiś wyjściowy strumień C++
+/// \return 0, chyba że coś padło
+    static int writeSTR_(ostream &o) {
+        // extern const char* GrFileOutputByExtension; // = "str"; //Tym można sterować format pliku wyjściowego.
+        o << "#otx file - objects as text" << endl;
+        o << "#enum GrType { Empty = 0, Point=1,LineTo=2,Line=3,Circle=4,Rect=5,Text=6,Poly=7 };" << endl;
+        ssh_rgb bac = get_rgb_from(get_background());
+        o << "BACKGROUND=( " << unsigned(bac.r) << ',' << unsigned(bac.g) << ',' << unsigned(bac.b) << " )" << endl;
+        o << "GrOpt*[" << GrListPosition + 1 << "] {" << endl;
+        if (GrListPosition != -1)
+            for (unsigned i = 0; i <= GrListPosition; i++)
+                switch (GrList[i].empty.type) {
+                    case GrType::Empty:
+                        break; //NIE ROBI NIC!
+                    case GrType::Point: {
+                        o << "Point" << "\t{\t";
+                        struct Point &pr = (GrList[i].point);
+                        o << pr.x << "; " << pr.y << "; 0x" << hex << pr.mode << dec << "; ";
+                        if (pr.mode != 0) //MODE == 0 MEANS MoveTo
+                            o << "(" << pr.r << ',' << pr.g << ',' << pr.b << "); "; //COLOR
+                        if (pr.mode == 1) //FLOOD FILL TO the BORDER
+                            o << "(" << pr.rb << ',' << pr.gb << ',' << pr.bb << "); ";
+                        o << " }" << endl;
+                    }
+                        break;
+                    case GrType::LineTo: {
+                        o << "#LineTo" << "\t{\t";
+                        struct LineTo &pr = (GrList[i].lineTo);
+                        o << "NOT IMPLEMENTED!";
+                        o << " }" << endl;
+                    }
+                        break;
+                    case GrType::Line: {
+                        o << "Line" << "\t{\t";
+                        struct Line &pr = (GrList[i].line);
+                        o << pr.x1 << "; " << pr.y1 << "; " << pr.x2 << "; " << pr.y2 << "; " << pr.wi << "; 0x" << hex
+                          << pr.mode << dec << "; ";
+                        o << "(" << pr.r << ',' << pr.g << ',' << pr.b << "); ";
+                        o << " }" << endl;
+                    }
+                        break;
+                    case GrType::Circle: {
+                        o << "Circle" << "\t{\t";
+                        struct Ellipse &pr = (GrList[i].circle);
+                        o << pr.x << "; " << pr.y << "; " << pr.rx << "; " << pr.ry << "; " << pr.wi << "; 0x" << hex
+                          << pr.mode << dec << "; ";
+                        o << "(" << pr.r << ',' << pr.g << ',' << pr.b << "); ";
+                        if (pr.mode == 1)//FILL
+                            o << "(" << pr.rf << ',' << pr.gf << ',' << pr.bf << "); ";
+                        o << " }" << endl;
+                    }
+                        break;
+                    case GrType::Rect: {
+                        o << "Rect" << "\t{\t";
+                        struct Rect &pr = (GrList[i].rect);
+                        o << pr.x1 << "; " << pr.y1 << "; " << pr.x2 << "; " << pr.y2 << "; " << pr.wi << "; 0x" << hex
+                          << pr.mode << dec << "; ";
+                        o << "(" << pr.r << ',' << pr.g << ',' << pr.b << "); ";
+                        if (pr.mode == 0x1)//FILL
+                            o << "(" << pr.rf << ',' << pr.gf << ',' << pr.bf << "); ";
+                        o << " }" << endl;
+                    }
+                        break;
+                    case GrType::Text: {
+                        o << "Text" << "\t{\t";
+                        struct Text &pr = (GrList[i].text);
+                        o << pr.x << "; " << pr.y << "; 0x" << hex << pr.mode << dec << "; " << endl;
+                        o << "\t\t\"" << pr.txt << endl;
+                        o << "\t\t(" << pr.rf << ',' << pr.gf << ',' << pr.bf << "); "; //FOREGROUND
+                        if (pr.mode != 0x1)//WITH FILLED BACKGROUND
+                            o << "(" << pr.r << ',' << pr.g << ',' << pr.b << "); "; //T�O
+                        o << " }" << endl;
+                    }
+                        break;
+                    case GrType::Poly: {
+                        o << "Poly" << "\t{\t";
+                        struct Poly &pr = (GrList[i].poly);
+                        o << pr.wi << "; 0x" << hex << pr.mode << dec << "; " << endl;
+                        o << "\t\tint2d[" << pr.si << "] {";
+                        for (unsigned j = 0; j < pr.si; j++)
+                            o << " (" << pr.points[j].x << ',' << pr.points[j].y << ")";
+                        o << " }" << endl;
+                        o << "\t\t(" << pr.r << ',' << pr.g << ',' << pr.b << "); ";
+                        if (pr.mode == 0x1)//FILL
+                            o << "(" << pr.rf << ',' << pr.gf << ',' << pr.bf << "); ";
+                        o << " }" << endl;
+                    }
+                        break;
+                    default:
+                        o << "#unknown type!!! " << GrList[i].empty.type << endl;
+                        break;
+                }
+        o << "};\t#End of GrOpt list" << endl;
+        return 0;
+    }
+
+/// Zapisuje w formacie SVG
+/// \param o jakiś wyjściowy strumień C++
+/// \return 0, chyba że coś padło
+    static int writeSVG_(ostream &o) {
+        // `extern` const char* GrFileOutputByExtension; // = "str"; //Tym można sterować format pliku wyjściowego.
+        // `extern` unsigned GrReloadInterval; // = 1000; //Co ile czasu skrypt w pliku SVG wymusza przeładowanie.
+        //                                              Jak 0 to w ogóle nie ma skryptu przeładowania!!!
+        int curX = 0, curY = 0; //Do MoveTo i LineTo
+        o << "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"no\"?>\n"
+             "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">\n";
+
+        o << "<svg "
+             "xmlns:dc=\"http://purl.org/dc/elements/1.1/\" "
+             "xmlns:cc=\"http://creativecommons.org/ns#\" "
+             "xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" "
+             "xmlns:svg=\"http://www.w3.org/2000/svg\" "
+             "xmlns=\"http://www.w3.org/2000/svg\" "
+             "version=\"1.1\" ";
+
+        if (GrReloadInterval > 0)
+            o << "onload=\"init(evt)\" "; //Sam skrypt może dopiero na końcu? TODO?
+
+        o << " x=\"0px\" ";
+        o << "y=\"0px\" ";
+        o << " width=\"" << GrScreenWi << "px\" ";
+        o << " height=\"" << GrScreenHi + 22 << "px\" >"
+          << endl; //Trochę dodatkowego miejsca na wirtualnym ekranie na copyright
+
+        //if(GrReloadInterval>0)
+        //{
+        //o<<"<META HTTP-EQUIV=\"Refresh\" CONTENT=\""<<int(GrReloadInterval/1000)<<"\">\n" //??? Tak to działa w HTMLu, ale w SVG nie bardzo
+        //}
+        if (GrReloadInterval > 0) {
+            o <<
+              "<script type=\"text/ecmascript\"><![CDATA[ "
+              "function init(evt){ "
+              "setTimeout(function(){ "
+              //location.href='http://XXX.XXX.pl'; //gdyby miał ładować coć innego
+              "location.reload(1); "
+              " }, " << GrReloadInterval << " ); "
+                                            "}  ]]></script> " << endl;
+        }
+
+        ssh_rgb bac = get_rgb_from(get_background());
+        o << "<rect x=\"0px\" y=\"0px\" width=\"" << GrScreenWi << "px\" height=\"" << GrScreenHi
+          << "px\" rx=\"0\" style=\"fill:"
+          //<<"rgb(128,0,128)"<<" "
+          << "rgb(" << unsigned(bac.r) << ',' << unsigned(bac.g) << ',' << unsigned(bac.b) << "); "
+          << "stroke:#000000; stroke-width:0px;\" />" << endl;
+
+        o << "<text style=\"fill:red;\" x=\"" << 0 << "\" y=\"" << GrScreenHi + 12 << "\">This is SVG from "
+          << ScreenHeader << " " << ScreenTitle << " </text>" << endl;
+        if (GrListPosition != -1)
+            for (unsigned i = 0; i <= GrListPosition; i++)
+                switch (GrList[i].empty.type) {
+                    case GrType::Empty:
+                        break; //NIE ROBI NIC!
+                    case GrType::LineTo: {
+                        o << "#LineTo" << "\t{\t";
+                        struct LineTo &pr = (GrList[i].lineTo);
+                        o << "NOT IMPLEMENTED!";
+                        o << " }" << endl;
+                    }
+                        break;
+                    case GrType::Arc: {
+                        o << "#Arc" << "\t{\t";
+                        struct Arc &pr = (GrList[i].arc);
+                        o << "NOT IMPLEMENTED!";
+                        o << " }" << endl;
+                    }
+                        break;
+                    case GrType::Point: {
+                        struct Point &pr = (GrList[i].point);
+                        if (pr.mode == 0) //MoveTo
+                        {
+                            curX = pr.x;
+                            curY = pr.y;
+                        } else if (pr.mode == 1) //FLOOD FILL TO the BORDER
+                        {
+                            // TODO https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/flood-color
+                            // o << " rgb(" << pr.r << ',' << pr.g << ',' << pr.b << "); "; //COLOR
+                            // o << " rgb(" << pr.rb << ',' << pr.gb << ',' << pr.bb << "); "; //BORDER
+                        } else {
+                            o << "<rect ";
+                            o << "x=\"" << pr.x << "px\" y=\"" << pr.y
+                              << "\" width=\"1px\" height=\"1px\" stroke=\"0px\" "; // << hex << pr.mode << dec << "; ";
+                            if (pr.mode != 0) //MODE == 0 MEANS MoveTo
+                                o << "fill=\"rgb(" << pr.r << ',' << pr.g << ',' << pr.b << ")\" "; //COLOR
+                            o << "/>" << endl;
+                        }
+                    }
+                        break;
+                    case GrType::Line: {
+                        struct Line &pr = (GrList[i].line);
+                        //o << "<line x1 =\"0\" y1=\"0\" x2=\"100\" y2=\"50\" stroke=\"blue\" stroke-width=\"6\" />" << endl;
+                        o << "<line x1=\"" << pr.x1 << "px\" y1=\"" << pr.y1 << "px\" x2=\"" << pr.x2 << "px\" y2=\""
+                          << pr.y2 << "px\" ";
+                        if (pr.wi > 0) o << "stroke-width=\"" << pr.wi << "px\" ";
+                        o << "stroke=\"rgb(" << pr.r << ',' << pr.g << ',' << pr.b << ")\" "; //COLOR
+                        //<< "; 0x" << hex << pr.mode << dec << "; ";
+                        o << "/>" << endl;
+                    }
+                        break;
+                    case GrType::Circle: {
+                        struct Ellipse &pr = (GrList[i].circle);
+                        //o << "<circle cx=\"120\" cy=\"120\" r=\"80\" fill=\"red\" stroke=\"black\" stroke-width=\"5\" />" << endl;
+                        //o << "<ellipse cx=\"200\" cy=\"200\" rx=\"20\" ry=\"7\" fill=\"none\" stroke=\"black\" stroke-width=\"6\" />" << endl;
+                        if (pr.rx == pr.ry) //Koło — circle
+                            o << "<circle r=\"" << pr.ry << "px\" ";
+                        else {
+                            o << "<ellipse rx=" << pr.rx << "px\" ry=\"" << pr.ry << "px\" ";
+                        }
+
+                        o << "cx=\"" << pr.x << "px\" cy=\"" << pr.y << "px\" ";
+
+                        if (pr.wi > 0)
+                            o << "stroke-width=\"" << pr.wi << "px\" " << "stroke=\"rgb(" << pr.r << ',' << pr.g << ','
+                              << pr.b
+                              << ")\" "; //COLOR
+                        else {
+                            o << "stroke=\"none\" ";
+                        }
+
+                        if (pr.mode == 0x1)//FILL
+                            o << "fill=\"rgb(" << pr.rf << ',' << pr.gf << ',' << pr.bf << ")\" "; //FILL
+                        else {
+                            o << "fill=\"none\" ";
+                        }
+                        //<< "; 0x" << hex << pr.mode << dec << "; ";
+                        o << "/>" << endl;
+                    }
+                        break;
+                    case GrType::Rect: {
+                        struct Rect &pr = (GrList[i].rect);
+                        o << "<rect "; // x = \"140\" y=\"120\" width=\"250\" height=\"250\" rx=\"40\"
+                        o << "x=\"" << pr.x1 << "px\" y=\"" << pr.y1 << "px\" width=\"" << pr.x2 - pr.x1
+                          << "px\" height=\"" << pr.y2 - pr.y1 << "px\" ";
+
+                        if (pr.wi > 0)
+                            o << "stroke-width=\"" << pr.wi << "px\" " << "stroke=\"rgb(" << pr.r << ',' << pr.g << ','
+                              << pr.b
+                              << ")\" "; //COLOR
+                        else {
+                            o << "stroke=\"none\" ";
+                        }
+
+                        if (pr.mode == 0x1)//FILL
+                            o << "fill=\"rgb(" << pr.rf << ',' << pr.gf << ',' << pr.bf << ")\" "; //FILL
+                        else
+                            o << "fill=\"none\" ";
+
+                        //<< "; 0x" << hex << pr.mode << dec << "; ";
+                        o << "/>" << endl;
+                    }
+                        break;
+                    case GrType::Text: {
+                        struct Text &pr = (GrList[i].text);                                                     //assert(pr.txt != NULL);
+                        //cerr << '\t' << i << '\t' << pr.type << ' ' << pr.x << ' ' << pr.y;
+                        //cerr << ' ' << (pr.txt?pr.txt:"NULL") << endl;
+                        if (pr.txt == nullptr) // TO SIĘ NIE POWINNO ZDARZAĆ, ALE JEDNAK SIĘ ZDARZAŁO!!!
+                        {
+                            cerr << '\t' << i << '\t' << pr.type << ' ' << pr.x << ' ' << pr.y << " NULL" << endl;
+                            pr.txt = clone_str("@?@-NULL-@?@");
+                            assert(pr.txt != nullptr);
+                            //exit(-1);
+                        }
+
+                        auto length = strlen(pr.txt);
+                        if (!pr.mode)//NOT TRANSPARENTLY
+                        {
+                            o << "<rect ";
+                            o << "x=\"" << pr.x << "px\" y=\"" << pr.y << "px\" width=\"" << length * GrFontWi
+                              << "px\" height=\"" << GrFontHi << "px\" "
+                              << "stroke-width=\"" << 0 << "px\" ";
+                            o << "fill=\"rgb(" << pr.r << ',' << pr.g << ',' << pr.b << ")\" />"; //FILL
+                        }
+                        auto realFont = (GrFontHi * 4) / 5;
+                        o << "<text style=\"font-size:" << realFont << "px; fill: rgb(" << pr.rf << ',' << pr.gf << ','
+                          << pr.bf << ");\" ";
+                        //o << "textLength=\""<< length*GrFontWi <<"px\" ";
+                        o << "lengthAdjust=\"spacingAndGlyphs\" ";
+                        o << "x = \"" << pr.x << "\" y=\"" << pr.y + realFont << "\">" << pr.txt << "</text>" << endl;
+                    }
+                        break;
+                    case GrType::Poly: {
+                        struct Poly &pr = (GrList[i].poly);
+                        //	o << "<polygon class =\"MyStar\" fill=\"#3CB54A\"
+                        //points=\"134.973,14.204 143.295,31.066 161.903,33.77 148.438,46.896 151.617,65.43 134.973, 56.679, 118.329, 65.43 121.507, 46.896 108.042, 33.77 126.65, 31.066\" />" << endl;
+                        o << "<polygon ";
+                        if (pr.mode == 0x1)//FILL
+                            o << "fill=\"rgb(" << pr.rf << ',' << pr.gf << ',' << pr.bf << ")\" "; //FILL
+                        else
+                            o << "fill=\"none\" ";
+                        if (pr.wi > 0) {
+                            o << "stroke-width=\"" << pr.wi << "px\" ";
+                            o << "stroke=\"rgb(" << pr.r << ',' << pr.g << ',' << pr.b << ")\" "; //COLOR IF EXIST
+                        } else
+                            o << "stroke=\"none\" ";
+
+                        o << "points=\"";
+                        for (unsigned j = 0; j < pr.si; j++)
+                            o << " " << pr.points[j].x << ',' << pr.points[j].y << " ";
+                        o << "\" />" << endl;
+                    }
+                        break;
+                    default:
+                        o << "#unknown type!!! " << GrList[i].empty.type << endl;
+                        break;
+                }
+
+
+        o << "</svg>" << endl;
+
+        return 0;
+    }
+} //local namespace
+
+// Ostateczne uzgodnienie zawartości ekranu realnego z zawartością ekranu wirtualnego/tymczasowego w pamięci.
+void flush_plot()
+{
+    /// \internal
+    ///     W module SVG zapisuje listę operacji graficznych do pliku o ustalonym formacie
+    ///     (najczęściej SVG).
+    if(GrClosed)
+    {
+        cerr<<"SYMSHELL graphic is not initialized"<<endl;
+        return;
+    }
+
+    //GrTmpOutputDirectory ?
+    static unsigned flush_counter = 0; //Zliczamy
+    flush_counter++; //Jednak nie używamy w nazwie pliku...
+    if(ssh_trace_level>0) cout << "SVG: " << WB_FUNCTION_NAME_ << SEP; //flush_plot
+    if(ssh_trace_level>0) cout <<'#'<< flush_counter <<SEP<< GrList.get_size() <<SEP<< GrListPosition << endl;
+    wb_pchar name(MAX_PATH);
+    name.prn("%s%s_%0u", GrTmpOutputDirectory,  ScreenTitle, PID );
+    dump_screen(name.get()); //Zapisuje listę operacji graficznych do pliku w ustalonym formacie
+}
+
+// Zapisuje zawartość ekranu do pliku graficznego w naturalnym formacie platformy.
+ssh_stat	dump_screen(const char* Filename)
+{
+    /// \internal
+    /// W module SVG dostępne są tekstowe formaty wektorowe, SVG (może kiedyś też EXM?) TODO?
+    if(ssh_trace_level>0) cout << "SVG: " << WB_FUNCTION_NAME_ << SEP;
+    if(ssh_trace_level>0) cout << Filename <<'.'<< GrFileOutputByExtension << endl;
+
+    wb_pchar name(MAX_PATH);
+
+    //Sposób zapisu zależy od rozszerzenia nazwy pliku, ale na razie tworzymy plik tymczasowy
+    name.prn("%s.%s", Filename, "tmp" );
+    ofstream Out( name.get() );
+
+    if(!Out)
+    {
+        perror(Filename);
+        return -1;
+    }
+
+    int ret = 0;
+
+    if (strcmp(GrFileOutputByExtension, "svg") == 0
+    || strcmp(GrFileOutputByExtension, "SVG") == 0)
+    {
+        ret = writeSVG_(Out); // local, internal
+    }
+    else
+    {
+        ret = writeSTR_(Out); // local, internal
+    }
+
+    if (ret)
+        return ret; //Gdy błąd?
+    else {
+        Out.close();
+    }
+
+
+    wb_pchar name2(MAX_PATH);
+    //Sposób zapisu zależy od rozszerzenia nazwy pliku
+    name2.prn("%s.%s", Filename, GrFileOutputByExtension);
+
+    remove(name2.get()); //Na wypadek, gdyby był już plik o tej nazwie
+    ret=rename(name.get(),name2.get());
+
+    return ret;
+}
+
+/* TODO POBIERANIE ZNAKÓW Z KLAWIATURY i ZDARZEŃ OKIENNYCH (w tym z MENU)\n
 
 Normalnie są to znaki skierowane do okna graficznego i niezwiązane ze
 strumieniem wejściowym. W przypadku implementacji na pliku graficznym
 można by tu zrobić nieblokujące standardowe wejście, ale chyba bardziej
 elastyczny byłby "named pipe" o nazwie zależnej od PID
-i nazwy pliku wykonywalnego
+i nazwy pliku wykonywalnego.
  **/
 
 // Funkcja sprawdza, czy jest do odczytania jakieś zdarzenie wejściowe
@@ -1786,448 +2251,14 @@ ssh_stat repaint_area(int* x,int* y,unsigned* width,unsigned* height)
 [[maybe_unused]]
 ssh_rgb get_rgb_from(ssh_color c)
 {
-	ssh_rgb pom;
+    ssh_rgb pom;
     if(ssh_trace_level>2) cout << "SVG: " << WB_FUNCTION_NAME_ << SEP << (ssh_color)c << endl; //get_rgb_from
-	pom = palette[c];
-	return pom;
-}
-
-/// Wewnętrzna implementacja termicznej skali kolorów.
-///  Czyli wypełnienie palety RGB dla kolorów indeksowanych.
-[[maybe_unused]]
-static void SetScale()
-{
-#ifndef M_PI
-    const double M_PI=3.141595;
-#endif
-
-    if(ssh_trace_level>1) cout << "SVG: " << WB_FUNCTION_NAME_ << endl;
-
-    if(UseGrayScale)//Używa skali szarości tam, gdzie normalnie są kolory
-    {
-        int k;
-        for(k=0;k<255;k++)
-        {
-            long wal=k;
-            //`fprintf(stderr,"%u %ul\n",k,wal);`
-            set_rgb(k,wal,wal,wal); //Color part
-            set_rgb(256+k,wal,wal,wal); //Gray scale part
-        }
-
-        if(ssh_trace_level & 4)
-           cout << "SVG: " << WB_FUNCTION_NAME_ << SEP << "SetScale (0-255 Gray) completed" << endl;
-    }
-    else
-    {
-        int k;
-        for(k=0;k<255;k++)
-        {
-            long wal1,wal2,wal3;
-            double kat=(M_PI*2)*k/255.;
-
-            wal1=(long)(255*sin(kat*1.22));
-            if(wal1<0) wal1=0;
-
-            wal2=(long)(255*(-cos(kat*0.46)));
-            if(wal2<0) wal2=0;
-
-            wal3=(long)(255*(-cos(kat*0.9)));
-            if(wal3<0) wal3=0;
-
-            set_rgb(k,wal1,wal2,wal3);
-
-           /*
-            wal1=(long)(255*sin(kat*1.25));
-
-            if(wal1<0) wal1=0;
-               wal2=(long)(255*(-sin(kat*0.85)));
-            if(wal2<0) wal2=0;
-               wal3=(long)(255*(-cos(kat*1.1)));
-            if(wal3<0) wal3=0;
-           */
-        }
-        //else ?ALTERNATYWNIE? TODO CHECK!
-        {
-            unsigned kk;
-            for(kk=256; kk < PALETTE_LENGTH; kk++)
-                set_rgb(kk, (unsigned char)kk, (unsigned char)kk, (unsigned char)kk );
-            if(ssh_trace_level & 4)
-               cout << "SVG: " << WB_FUNCTION_NAME_ << SEP << "SetScale (Colors: 0-255; Gray: 256-->" << PALETTE_LENGTH << ") completed" << endl;
-        }
-    }
-
-    set_rgb(255,255,255,255); //Zazwyczaj oczekuje, że kolor 255 to biały albo chociaż jasny
-}
-
-/* NAJWAŻNIEJSZE FUNKCJE WEWNĘTRZNE - ZAPIS INFORMACJI DO PLIKU W FORMACIE WEKTOROWYM
- * ********************************************************************************** */
-
-/// Zapisuje w formacie "C++stream"
-/// \param o jakiś wyjściowy strumień C++
-/// \return 0, chyba że coś padło
-static int writeSTR_(ostream& o)
-{
-    // extern const char* GrFileOutputByExtension; // = "str"; //Tym można sterować format pliku wyjściowego.
-	o << "#otx file - objects as text" << endl;
-	o << "#enum GrType { Empty = 0, Point=1,LineTo=2,Line=3,Circle=4,Rect=5,Text=6,Poly=7 };" << endl;
-	ssh_rgb bac = get_rgb_from( get_background() );
-	o << "BACKGROUND=( " << unsigned(bac.r) << ',' << unsigned(bac.g) << ',' << unsigned(bac.b) << " )" << endl;
-	o << "GrOpt*[" << GrListPosition + 1 << "] {" << endl;
-    if(GrListPosition!=-1)
-      for (unsigned i = 0; i <= GrListPosition;i++)
-        switch (GrList[i].empty.type)
-		{
-		case GrType::Empty:	break; //NIE ROBI NIC!
-		case GrType::Point: {
-			o << "Point" << "\t{\t";
-			struct Point &pr = (GrList[i].point);
-			o << pr.x << "; " << pr.y << "; 0x"<<hex<<pr.mode <<dec<< "; ";
-			if (pr.mode != 0) //MODE == 0 MEANS MoveTo
-				o << "(" << pr.r << ',' << pr.g << ',' << pr.b << "); "; //COLOR
-			if (pr.mode == 1) //FLOOD FILL TO the BORDER
-				o << "(" << pr.rb<< ',' << pr.gb<< ',' << pr.bb<< "); ";
-			o << " }" << endl;
-		} break;
-		case GrType::LineTo: {
-			o << "#LineTo" << "\t{\t";
-			struct LineTo &pr = (GrList[i].lineTo);
-			o << "NOT IMPLEMENTED!";
-			o << " }" << endl;
-		} break;
-		case GrType::Line: {
-			o << "Line" << "\t{\t";
-			struct Line &pr = (GrList[i].line);
-			o << pr.x1 << "; " << pr.y1 << "; " << pr.x2 << "; " << pr.y2 << "; "<< pr.wi << "; 0x"  <<hex<< pr.mode<<dec<< "; ";
-			o << "(" << pr.r << ',' << pr.g << ',' << pr.b << "); ";
-			o << " }" << endl;
-		} break;
-		case GrType::Circle: {
-			o << "Circle" << "\t{\t";
-			struct Ellipse &pr = (GrList[i].circle);
-			o << pr.x << "; " << pr.y << "; " << pr.rx << "; " << pr.ry << "; " << pr.wi << "; 0x" << hex << pr.mode << dec << "; ";
-			o << "(" << pr.r << ',' << pr.g << ',' << pr.b << "); ";
-			if (pr.mode == 1)//FILL
-				o << "(" << pr.rf << ',' << pr.gf << ',' << pr.bf << "); ";
-			o << " }" << endl;
-		} break;
-		case GrType::Rect: {
-			o << "Rect" << "\t{\t";
-			struct Rect &pr = (GrList[i].rect);
-			o << pr.x1 << "; " << pr.y1 << "; " << pr.x2 << "; " << pr.y2 << "; " << pr.wi << "; 0x" << hex << pr.mode << dec << "; ";
-			o << "(" << pr.r << ',' << pr.g << ',' << pr.b << "); ";
-			if (pr.mode == 0x1)//FILL
-				o << "(" << pr.rf << ',' << pr.gf << ',' << pr.bf << "); ";
-			o << " }" << endl;
-		} break;
-		case GrType::Text: {
-			o << "Text" << "\t{\t";
-			struct Text &pr = (GrList[i].text);
-			o << pr.x << "; " << pr.y << "; 0x" << hex << pr.mode << dec << "; "<<endl;
-			o << "\t\t\"" << pr.txt << endl;
-			o << "\t\t(" << pr.rf << ',' << pr.gf << ',' << pr.bf << "); "; //FOREGROUND
-			if(pr.mode!= 0x1 )//WITH FILLED BACKGROUND
-				o << "(" << pr.r << ',' << pr.g << ',' << pr.b << "); "; //T�O
-			o << " }" << endl;
-		} break;
-		case GrType::Poly: {
-			o << "Poly" << "\t{\t";
-			struct Poly &pr = (GrList[i].poly);
-			o << pr.wi << "; 0x" << hex << pr.mode << dec << "; " << endl;
-			o << "\t\tint2d[" << pr.si << "] {";
-			for (unsigned j = 0; j < pr.si; j++)
-				o << " (" << pr.points[j].x << ',' << pr.points[j].y << ")";
-			o << " }"<<endl;
-			o << "\t\t(" << pr.r << ',' << pr.g << ',' << pr.b << "); ";
-			if (pr.mode == 0x1)//FILL
-				o << "(" << pr.rf << ',' << pr.gf << ',' << pr.bf << "); ";
-			o << " }" << endl;
-		} break;
-		default:
-			o << "#unknown type!!! " << GrList[i].empty.type << endl;
-			break;
-		}
-	o << "};\t#End of GrOpt list" << endl;
-	return 0;
-}
-
-/// Zapisuje w formacie SVG
-/// \param o jakiś wyjściowy strumień C++
-/// \return 0, chyba że coś padło
-static int writeSVG_(ostream& o)
-{
-    // `extern` const char* GrFileOutputByExtension; // = "str"; //Tym można sterować format pliku wyjściowego.
-    // `extern` unsigned GrReloadInterval; // = 1000; //Co ile czasu skrypt w pliku SVG wymusza przeładowanie.
-    //                                              Jak 0 to w ogóle nie ma skryptu przeładowania!!!
-	int curX = 0, curY = 0; //Do MoveTo i LineTo
-	o << "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"no\"?>\n"
-		 "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">\n";
-
-	o << "<svg "
-			"xmlns:dc=\"http://purl.org/dc/elements/1.1/\" "
-			"xmlns:cc=\"http://creativecommons.org/ns#\" "
-			"xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" "
-			"xmlns:svg=\"http://www.w3.org/2000/svg\" "
-			"xmlns=\"http://www.w3.org/2000/svg\" "
-			"version=\"1.1\" ";
-
-	if(GrReloadInterval>0)
-		o << "onload=\"init(evt)\" "; //Sam skrypt może dopiero na końcu? TODO?
-
-	o <<" x=\"0px\" ";
-	o <<"y=\"0px\" ";
-	o <<" width=\"" << GrScreenWi     << "px\" ";
-	o <<" height=\"" << GrScreenHi + 22 <<"px\" >"<<endl; //Trochę dodatkowego miejsca na wirtualnym ekranie na copyright
-
-	//if(GrReloadInterval>0)
-	//{
-	//o<<"<META HTTP-EQUIV=\"Refresh\" CONTENT=\""<<int(GrReloadInterval/1000)<<"\">\n" //??? Tak to działa w HTMLu, ale w SVG nie bardzo
-	//}
-	if(GrReloadInterval>0)
-	{
-		o <<
-		"<script type=\"text/ecmascript\"><![CDATA[ "
-		"function init(evt){ "
-		"setTimeout(function(){ "
-       //location.href='http://XXX.XXX.pl'; //gdyby miał ładować coć innego
-        "location.reload(1); "
-		" }, "<< GrReloadInterval <<" ); "
-		"}  ]]></script> "<<endl;
-	}
-
-	ssh_rgb bac = get_rgb_from(get_background());
-	o << "<rect x=\"0px\" y=\"0px\" width=\"" << GrScreenWi << "px\" height=\"" << GrScreenHi << "px\" rx=\"0\" style=\"fill:"
-		//<<"rgb(128,0,128)"<<" "
-	  <<"rgb(" << unsigned(bac.r) << ',' << unsigned(bac.g) << ',' << unsigned(bac.b) << "); "
-      <<"stroke:#000000; stroke-width:0px;\" />" << endl;
-
-    o << "<text style=\"fill:red;\" x=\""<< 0 <<"\" y=\""<< GrScreenHi + 12 <<"\">This is SVG from "<<ScreenHeader<<" "<<ScreenTitle<<" </text>"<<endl;
-    if(GrListPosition!=-1)
-      for (unsigned i = 0; i <= GrListPosition; i++)
-        switch (GrList[i].empty.type)
-		{
-		case GrType::Empty:	break; //NIE ROBI NIC!
-        case GrType::LineTo: {
-                o << "#LineTo" << "\t{\t";
-                struct LineTo &pr = (GrList[i].lineTo);
-                o << "NOT IMPLEMENTED!";
-                o << " }" << endl;
-            } break;
-        case GrType::Arc: {
-                o << "#Arc" << "\t{\t";
-                struct Arc &pr = (GrList[i].arc);
-                o << "NOT IMPLEMENTED!";
-                o << " }" << endl;
-            } break;
-		case GrType::Point: {
-			struct Point &pr = (GrList[i].point);
-			if (pr.mode == 0) //MoveTo
-			{
-				curX = pr.x;
-				curY = pr.y;
-			}
-			else
-				if (pr.mode == 1) //FLOOD FILL TO the BORDER
-				{
-					// TODO https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/flood-color
-					// o << " rgb(" << pr.r << ',' << pr.g << ',' << pr.b << "); "; //COLOR
-					// o << " rgb(" << pr.rb << ',' << pr.gb << ',' << pr.bb << "); "; //BORDER
-				}
-				else
-				{
-					o << "<rect ";
-					o << "x=\"" << pr.x << "px\" y=\"" << pr.y << "\" width=\"1px\" height=\"1px\" stroke=\"0px\" "; // << hex << pr.mode << dec << "; ";
-					if (pr.mode != 0) //MODE == 0 MEANS MoveTo
-						o << "fill=\"rgb(" << pr.r << ',' << pr.g << ',' << pr.b << ")\" "; //COLOR
-					o << "/>" << endl;
-				}
-		} break;
-		case GrType::Line: {
-			struct Line &pr = (GrList[i].line);
-			//o << "<line x1 =\"0\" y1=\"0\" x2=\"100\" y2=\"50\" stroke=\"blue\" stroke-width=\"6\" />" << endl;
-			o << "<line x1=\"" << pr.x1 << "px\" y1=\"" << pr.y1 << "px\" x2=\"" << pr.x2 << "px\" y2=\"" << pr.y2 << "px\" ";
-			if(pr.wi>0) o << "stroke-width=\"" << pr.wi << "px\" ";
-			o << "stroke=\"rgb(" << pr.r << ',' << pr.g << ',' << pr.b << ")\" "; //COLOR
-			//<< "; 0x" << hex << pr.mode << dec << "; ";
-			o << "/>" << endl;
-		} break;
-		case GrType::Circle: {
-			struct Ellipse &pr = (GrList[i].circle);
-			//o << "<circle cx=\"120\" cy=\"120\" r=\"80\" fill=\"red\" stroke=\"black\" stroke-width=\"5\" />" << endl;
-			//o << "<ellipse cx=\"200\" cy=\"200\" rx=\"20\" ry=\"7\" fill=\"none\" stroke=\"black\" stroke-width=\"6\" />" << endl;
-            if (pr.rx == pr.ry) //Koło — circle
-                o << "<circle r=\"" << pr.ry << "px\" ";
-            else {
-                o << "<ellipse rx=" << pr.rx << "px\" ry=\"" << pr.ry << "px\" ";
-            }
-
-			o << "cx=\"" << pr.x << "px\" cy=\"" << pr.y << "px\" ";
-
-            if (pr.wi > 0)
-                o << "stroke-width=\"" << pr.wi << "px\" " << "stroke=\"rgb(" << pr.r << ',' << pr.g << ',' << pr.b
-                  << ")\" "; //COLOR
-            else {
-                o << "stroke=\"none\" ";
-            }
-
-            if (pr.mode == 0x1)//FILL
-                o << "fill=\"rgb(" << pr.rf << ',' << pr.gf << ',' << pr.bf << ")\" "; //FILL
-            else {
-                o << "fill=\"none\" ";
-            }
-			//<< "; 0x" << hex << pr.mode << dec << "; ";
-			o << "/>" << endl;
-		} break;
-		case GrType::Rect: {
-			struct Rect &pr = (GrList[i].rect);
-			o << "<rect "; // x = \"140\" y=\"120\" width=\"250\" height=\"250\" rx=\"40\"
-			o << "x=\"" << pr.x1 << "px\" y=\"" << pr.y1 << "px\" width=\"" << pr.x2-pr.x1 << "px\" height=\"" << pr.y2-pr.y1 << "px\" ";
-
-            if (pr.wi > 0)
-                o << "stroke-width=\"" << pr.wi << "px\" " << "stroke=\"rgb(" << pr.r << ',' << pr.g << ',' << pr.b
-                  << ")\" "; //COLOR
-            else {
-                o << "stroke=\"none\" ";
-            }
-
-			if (pr.mode == 0x1)//FILL
-				o << "fill=\"rgb(" << pr.rf << ',' << pr.gf << ',' << pr.bf << ")\" "; //FILL
-			else
-				o << "fill=\"none\" ";
-
-			//<< "; 0x" << hex << pr.mode << dec << "; ";
-			o << "/>" << endl;
-		} break;
-		case GrType::Text: {
-            struct Text& pr = (GrList[i].text);                                                     //assert(pr.txt != NULL);
-            //cerr << '\t' << i << '\t' << pr.type << ' ' << pr.x << ' ' << pr.y;
-            //cerr << ' ' << (pr.txt?pr.txt:"NULL") << endl;
-            if (pr.txt == nullptr) // TO SIĘ NIE POWINNO ZDARZAĆ, ALE JEDNAK SIĘ ZDARZAŁO!!!
-            {
-                cerr << '\t' << i << '\t' << pr.type << ' ' << pr.x << ' ' << pr.y << " NULL" << endl;
-                pr.txt = clone_str("@?@-NULL-@?@");                                         assert(pr.txt != nullptr);
-                //exit(-1);
-            }
-
-			auto length = strlen(pr.txt);
-			if (!pr.mode)//NOT TRANSPARENTLY
-			{
-				o << "<rect ";
-				o << "x=\"" << pr.x << "px\" y=\"" << pr.y << "px\" width=\"" << length * GrFontWi << "px\" height=\"" << GrFontHi << "px\" "
-					<< "stroke-width=\"" << 0 << "px\" ";
-				o << "fill=\"rgb(" << pr.r << ',' << pr.g << ',' << pr.b << ")\" />"; //FILL
-			}
-			auto realFont = (GrFontHi * 4) / 5;
-			o << "<text style=\"font-size:" << realFont << "px; fill: rgb(" << pr.rf << ',' << pr.gf << ',' << pr.bf << ");\" ";
-			//o << "textLength=\""<< length*GrFontWi <<"px\" ";
-			o << "lengthAdjust=\"spacingAndGlyphs\" ";
-			o << "x = \"" << pr.x << "\" y=\"" << pr.y + realFont << "\">" << pr.txt << "</text>" << endl;
-		} break;
-		case GrType::Poly: {
-            struct Poly &pr = (GrList[i].poly);
-            //	o << "<polygon class =\"MyStar\" fill=\"#3CB54A\"
-            //points=\"134.973,14.204 143.295,31.066 161.903,33.77 148.438,46.896 151.617,65.43 134.973, 56.679, 118.329, 65.43 121.507, 46.896 108.042, 33.77 126.65, 31.066\" />" << endl;
-            o << "<polygon ";
-            if (pr.mode == 0x1)//FILL
-                o << "fill=\"rgb(" << pr.rf << ',' << pr.gf << ',' << pr.bf << ")\" "; //FILL
-            else
-                o << "fill=\"none\" ";
-            if (pr.wi > 0)
-            {
-                o << "stroke-width=\"" << pr.wi << "px\" ";
-                o << "stroke=\"rgb(" << pr.r << ',' << pr.g << ',' << pr.b << ")\" "; //COLOR IF EXIST
-            }
-            else
-                o << "stroke=\"none\" ";
-
-			o << "points=\"";
-			for (unsigned j = 0; j < pr.si; j++)
-					o <<" "<< pr.points[j].x << ',' << pr.points[j].y <<" ";
-			o << "\" />" << endl;
-		} break;
-		default:
-			o << "#unknown type!!! " << GrList[i].empty.type << endl;
-			break;
-		}
-
-
-	o << "</svg>" << endl;
-
-	return 0;
-}
-
-// Ostateczne uzgodnienie zawartości ekranu realnego z zawartością ekranu wirtualnego/tymczasowego w pamięci.
-void flush_plot()
-{
-    /// \internal
-    ///     W module SVG zapisuje listę operacji graficznych do pliku o ustalonym formacie
-    ///     (najczęściej SVG).
-    if(GrClosed)
-    {
-        cerr<<"SYMSHELL graphic is not initialized"<<endl;
-        return;
-    }
-
-    //GrTmpOutputDirectory ?
-    static unsigned flush_counter = 0; //Zliczamy
-    flush_counter++; //Jednak nie używamy w nazwie pliku...
-    if(ssh_trace_level>0) cout << "SVG: " << WB_FUNCTION_NAME_ << SEP; //flush_plot
-    if(ssh_trace_level>0) cout <<'#'<< flush_counter <<SEP<< GrList.get_size() <<SEP<< GrListPosition << endl;
-    wb_pchar name(MAX_PATH);
-    name.prn("%s%s_%0u", GrTmpOutputDirectory,  ScreenTitle, PID );
-    dump_screen(name.get()); //Zapisuje listę operacji graficznych do pliku w ustalonym formacie
-}
-
-// Zapisuje zawartość ekranu do pliku graficznego w naturalnym formacie platformy.
-ssh_stat	dump_screen(const char* Filename)
-{
-    /// \internal
-    /// W module SVG dostępne są tekstowe formaty wektorowe, SVG (może kiedyś też EXM?) TODO?
-    if(ssh_trace_level>0) cout << "SVG: " << WB_FUNCTION_NAME_ << SEP;
-    if(ssh_trace_level>0) cout << Filename <<'.'<< GrFileOutputByExtension << endl;
-
-    wb_pchar name(MAX_PATH);
-
-    //Sposób zapisu zależy od rozszerzenia nazwy pliku, ale na razie tworzymy plik tymczasowy
-    name.prn("%s.%s", Filename, "tmp" );
-    ofstream Out( name.get() );
-
-    if(!Out)
-    {
-        perror(Filename);
-        return -1;
-    }
-
-    int ret = 0;
-
-    if (strcmp(GrFileOutputByExtension, "svg") == 0
-    || strcmp(GrFileOutputByExtension, "SVG") == 0)
-    {
-        ret = writeSVG_(Out); // local, internal
-    }
-    else
-    {
-        ret = writeSTR_(Out); // local, internal
-    }
-
-    if (ret)
-        return ret; //Gdy błąd?
-    else {
-        Out.close();
-    }
-
-
-    wb_pchar name2(MAX_PATH);
-    //Sposób zapisu zależy od rozszerzenia nazwy pliku
-    name2.prn("%s.%s", Filename, GrFileOutputByExtension);
-
-    remove(name2.get()); //Na wypadek, gdyby był już plik o tej nazwie
-    ret=rename(name.get(),name2.get());
-
-    return ret;
+    pom = palette[c];
+    return pom;
 }
 
 /* *******************************************************************/
-/*               SYMSHELLLIGHT version 2026                         */
+/*               SYMSHELLLIGHT version 2026                          */
 /* *******************************************************************/
 /*            THIS CODE IS DESIGNED & COPYRIGHT BY:                  */
 /*             W O J C I E C H   B O R K O W S K I                   */

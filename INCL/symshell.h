@@ -75,11 +75,11 @@ const ssh_mode  SSH_NO=0;                         /**< \brief Flaga zaprzeczają
 
 /* ZMIENNE I STAŁE ZALEŻNE OD MODUŁU
  * ================================= */
-/** \brief Name of the currently used implementation for graphic.
- *  Could be "X11", "WINDOWS" or "SVG". */
+/** \brief Nazwa aktualnie używanej implementacji funkcji graficznych.
+ *  Aktualnie może być "X11", "WINDOWS" or "SVG". */
 extern const char*  _ssh_grx_module_name;
 
-/** \brief If not 0, the window is usable. */
+/** \brief Jeśli nie jest to 0, to okno można używać. */
 extern unsigned long _ssh_window;
 
 /** \brief Określa czy zamykać od razu, czy dać szanse na przejrzenie zawartości.

@@ -5,10 +5,10 @@
 /// @date 2026-04-21 (last modification)
 /**
 * @details
-*   Uøywano w of 1997 roku w rÛønych kompilatorach C++ Borland i Microsoftu oraz w GCC na Windows
+*   U≈ºywano w of 1997 roku w r√≥≈ºnych kompilatorach C++ Borland i Microsoftu oraz w GCC na Windows
 *   Ostatnia modyfikacja/Last modification: 28.10.2014
-*   UWAGA: `ProcessMsg` uøywa aktualnie, zamiast NULL, uchwytu okna pobierajπc komunikat ó to powinno
-*   dzia≥aÊ lepiej, ale pewnoúci nie ma.
+*   UWAGA: `ProcessMsg` u≈ºywa aktualnie, zamiast NULL, uchwytu okna pobierajƒÖc komunikat ‚Äî to powinno
+*   dzia≈Çaƒá lepiej, ale pewno≈õci nie ma.
 * */
 
 //Partially based on Borland and Microsoft examples
@@ -37,7 +37,7 @@ extern int WB_error_enter_before_clean; /* For controlling a closing graphics wi
 #include "_sig_msg.h"       // for compatibility with wb_posix.
 #include "symshwin.h"       // prototypes specific to this application
 
-#define OLD_COLOUR_SCALE (0)   //Skala kolorÛw jak na mapie fizycznej
+#define OLD_COLOUR_SCALE (0)   //Skala kolor√≥w jak na mapie fizycznej
 /// @file
 /// @brief SYMSHELL FOR MS WINDOWS - PROGRAMMED BY W.Borkowski BASED OD Microsoft EXAMPLES
 //         -------------------------------------------------------------------------------
@@ -45,14 +45,14 @@ extern int WB_error_enter_before_clean; /* For controlling a closing graphics wi
 #if defined(_MSC_VER)
 //#pragma warning(disable:4068)
 #pragma warning(disable : 4996) //deprecated functions
-//TYMCZASEM - OSTRZEØENIA O "conversion from 'A' to 'B', possible loss of data"
+//TYMCZASEM - OSTRZE≈ªENIA O "conversion from 'A' to 'B', possible loss of data"
 //#pragma warning(disable : 4267)
 //#pragma warning(disable : 4244)
 #endif
 
-#define MY_WIN_STYLE	(WS_OVERLAPPEDWINDOW/* | WS_HSCROLL | WS_VSCROLL*/)	///< Domyúlny styl okna Windows.
+#define MY_WIN_STYLE	(WS_OVERLAPPEDWINDOW/* | WS_HSCROLL | WS_VSCROLL*/)	///< Domy≈õlny styl okna Windows.
 #define MAXWRITE		0xfff0			///< Bezpieczny rozmiar bufora.
-#define MINUSERCOMMAND	IDM_EXIT		///< Komenda uøytkownika o najniøszym moøliwym numerze (komunikatu).
+#define MINUSERCOMMAND	IDM_EXIT		///< Komenda u≈ºytkownika o najni≈ºszym mo≈ºliwym numerze (komunikatu).
 
 /* FOR OTHER MODULES */
 const char *_ssh_grx_module_name="WINDOWS";
@@ -65,7 +65,7 @@ char		szClassName[128] = "CLASS_SYMSHELL";	//< The name of window class
 
 /* LOCAL VARIABLES */
 static const char* progname="WB SYMSHELL APPLICATION "__DATE__;
-static char window_name[1024]="Windows WB SYMSHELL interface "__DATE__; //TODO - z jakiegoú powodu MessageBox traktuje to niepoprawnie?
+static char window_name[1024]="Windows WB SYMSHELL interface "__DATE__; //TODO - z jakiego≈õ powodu MessageBox traktuje to niepoprawnie?
 static char icon_name[1024]="Windows SYMSHELL "__DATE__;
 
 static	HACCEL	    hAccelTable; ///< For read from resources.
@@ -80,36 +80,36 @@ static	MSG	                msg; ///< Struktura na aktualny komunikat.
 
 static COLORREF curent_pen_rgb=RGB(0,0,0);
 //static COLORREF curent_brush_rgb=RGB(0,0,0);
-static COLORREF colors[PALETE_LENGHT];	    ///< Tablice uchwytÛw do kolorÛw.
+static COLORREF colors[PALETE_LENGHT];	    ///< Tablice uchwyt√≥w do kolor√≥w.
 
-static HBRUSH curent_brush=NULL;			///< Aktualny uchwyt do pÍdzla.
-static HBRUSH free_style_brush=NULL;		///< Alokowany pÍdzel dowolny.
-static HBRUSH brushes[PALETE_LENGHT];		///< Tablice uchwytÛw do pÍdzli.
+static HBRUSH curent_brush=NULL;			///< Aktualny uchwyt do pƒôdzla.
+static HBRUSH free_style_brush=NULL;		///< Alokowany pƒôdzel dowolny.
+static HBRUSH brushes[PALETE_LENGHT];		///< Tablice uchwyt√≥w do pƒôdzli.
 
-static HPEN curent_pen=NULL;				///< Aktualny uchwyt do piÛra.
-static HPEN free_style_pen=NULL;			///< Alokowane dowolne piÛro.
+static HPEN curent_pen=NULL;				///< Aktualny uchwyt do pi√≥ra.
+static HPEN free_style_pen=NULL;			///< Alokowane dowolne pi√≥ro.
 
 typedef struct
 {
     HPEN handle;
-    int  size;	///< Gruboúci zaalokowanych piÛr.
-    int  style;	///< Style dla zaalokowanych piÛr.
+    int  size;	///< Grubo≈õci zaalokowanych pi√≥r.
+    int  style;	///< Style dla zaalokowanych pi√≥r.
 }	piora;
 
-static piora	pens[PALETE_LENGHT];		///< Tablice uchwytÛw do piÛr.
+static piora	pens[PALETE_LENGHT];		///< Tablice uchwyt√≥w do pi√≥r.
 
 static int NoResources=1;			///<  No resources attached to exe file.
 
 static int WindowClosed=1;			///<  Window destroyed/notopen flag for close_plot.
 static int curr_color=-1;			///<  Indeks koloru w aktualnym pisaku.
-static int curr_fill=-1;			///<  Indeks koloru w aktualnym pÍdzlu.
-static int Background=0;			///<  Indeks koloru t≥a.
+static int curr_fill=-1;			///<  Indeks koloru w aktualnym pƒôdzlu.
+static int Background=0;			///<  Indeks koloru t≈Ça.
 
 static int is_mouse=0;
 static int animate=0;
 static int is_buffered=0;
 static int transparently=0;
-static int Flexible=0;			    ///<  Czy dopuúciÊ elastyczny "resizing" okna.
+static int Flexible=0;			    ///<  Czy dopu≈õciƒá elastyczny "resizing" okna.
 
 static int DelayTime=0;			    ///<  Delay time after gr. sync.
 static int LineWidth=1;
@@ -119,15 +119,15 @@ static int muly=1;
 static int W_width,W_height;
 static int ini_width;		       ///<  MAXX+1 obszaru bitowego.
 static int ini_height;		       ///<  MAXY+1 obszaru bitowego.
-static int ForceHeight=0;	       ///<  Na rozmiary okna wymuszone parametrami wywo≥ania ("-height=").
-static int ForceWidth=0;	       ///<  Na rozmiary okna wymuszone parametrami wywo≥ania ("-width=").
+static int ForceHeight=0;	       ///<  Na rozmiary okna wymuszone parametrami wywo≈Çania ("-height=").
+static int ForceWidth=0;	       ///<  Na rozmiary okna wymuszone parametrami wywo≈Çania ("-width=").
 static int ini_col;			       ///<  Ile kolumn tekstu dodatkowo.
 static int ini_row;			       ///<  Ile wierszy tekstu dodatkowo.
 static int Is_finfo=0;
 static const char* UserFontStr=NULL;
 
 static int CharToGet=0;			   ///<  ???
-static int UseGrayScale=0;	       ///<  Flaga uøycia skali szaroúci.
+static int UseGrayScale=0;	       ///<  Flaga u≈ºycia skali szaro≈õci.
 
 // PREDECLARATIONS OF LOCAL FUNCTIONS:
 // ===================================
@@ -138,9 +138,9 @@ static HFONT MyCreateFont( const char* fontstr );
 static HDC GetVirtualScreen(void);
 static HDC GetRealScreen(void);
 
-// WewnÍtrzne úledzenie wywo≥aÒ.
+// Wewnƒôtrzne ≈õledzenie wywo≈Ça≈Ñ.
 // /////////////////////////////
-static  int trace_level=0;			//Maska poziomÛw úledzenia 1-msgs 2-grafika 4-alokacje/zwalnianie
+static  int trace_level=0;			//Maska poziom√≥w ≈õledzenia 1-msgs 2-grafika 4-alokacje/zwalnianie
 //  np:
 //  if(trace_level & 4)
 //      fprintf(stderr," FREE RESOURCES.\n");
@@ -161,13 +161,13 @@ extern int wb_about(const char* window_name); //Z biblioteki albo dostarczona z 
 #else
 static int wb_about(const char* window_name)
 {
-    char dummy[256]; //TrochÍ pustych bajtÛw dla zmy≥y (???)
+    char dummy[256]; //Trochƒô pustych bajt√≥w dla zmy≈Çy (???)
     extern HINSTANCE WB_Instance;
     extern HWND		 WB_Hwnd;
     HICON hIcon=0;
 
     hIcon=LoadIcon(WB_Instance, MAKEINTRESOURCE(IDI_APPICON));
-    ShellAbout(WB_Hwnd,window_name,Copyright ,hIcon); // Powinno byÊ LPCWSTR?
+    ShellAbout(WB_Hwnd,window_name,Copyright ,hIcon); // Powinno byƒá LPCWSTR?
 
     DeleteObject(hIcon);
     return 0;
@@ -193,7 +193,7 @@ static HDC GetRealScreen(void)
     if(MyHdc==0)
         {
         MyHdc=GetDC(MyHwnd);
-        //Gdyby mia≥y byÊ inne fonty niø domyúlny
+        //Gdyby mia≈Çy byƒá inne fonty ni≈º domy≈õlny
         if(UserFont) //Not NULL
         {
             SelectObject(MyHdc,UserFont);
@@ -218,7 +218,7 @@ static HDC GetVirtualScreen(void)
         GetClientRect(MyHwnd, &rc);
         FillRect(MbHdc, &rc, GetMyBrush(Background));
         ReleaseDC(MyHwnd,WindowDC);
-        //Gdyby mia≥y byÊ inne fonty niø domyúlny
+        //Gdyby mia≈Çy byƒá inne fonty ni≈º domy≈õlny
         if(UserFont) //Not NULL!
         {
             SelectObject(MbHdc,UserFont);
@@ -231,8 +231,8 @@ static HDC GetVirtualScreen(void)
 
 static int ReadFontSettings(const char* fontsettingsfile,LOGFONT* LogFont)
 {
-    if(LogFont==NULL) goto CATCHERROR; //B≥πd!
-    if(fontsettingsfile==NULL)  goto CATCHERROR; //B≥πd!
+    if(LogFont==NULL) goto CATCHERROR; //B≈ÇƒÖd!
+    if(fontsettingsfile==NULL)  goto CATCHERROR; //B≈ÇƒÖd!
 
     LogFont->lfHeight=GetPrivateProfileInt("FONT","lfHeight",0,fontsettingsfile);
     LogFont->lfWidth=GetPrivateProfileInt("FONT","lfWidth",0,fontsettingsfile);
@@ -285,7 +285,7 @@ static HFONT MyCreateFont( const char* fontstr )
     CHOOSEFONT cf;
     LOGFONT lf;
     HFONT hfont;      // Initialize members of the CHOOSEFONT structure.
-    int req_font_size=atoi(fontstr); //Jeúli nie liczba to wychodzi i tak 0
+    int req_font_size=atoi(fontstr); //Je≈õli nie liczba to wychodzi i tak 0
 
     _TRACE(4) //if(trace_level & 4)
         fprintf(stderr,"Create my font %s.\n",fontstr);
@@ -313,8 +313,8 @@ static HFONT MyCreateFont( const char* fontstr )
     // Display the CHOOSEFONT common-dialog box.
     if(fontstr!=NULL && *fontstr=='!')
     {
-        if( ReadFontSettings("./SYMSHELL.INI",cf.lpLogFont)==0) //Czytanie z domyúlnego pliku
-            ChooseFont(&cf); //Awaryjnie, jeúli nie uda siÍ wczytaÊ
+        if( ReadFontSettings("./SYMSHELL.INI",cf.lpLogFont)==0) //Czytanie z domy≈õlnego pliku
+            ChooseFont(&cf); //Awaryjnie, je≈õli nie uda siƒô wczytaƒá
     }
     else
     if(fontstr==NULL || *fontstr=='?' ||  strlen(fontstr)<3)
@@ -325,7 +325,7 @@ static HFONT MyCreateFont( const char* fontstr )
     else
     {
         if( ReadFontSettings(fontstr,cf.lpLogFont)==0)  //Czytanie z ustalonego pliku
-            ChooseFont(&cf); //Awaryjnie, jeúli nie uda siÍ wczytaÊ
+            ChooseFont(&cf); //Awaryjnie, je≈õli nie uda siƒô wczytaƒá
     }
 
     // Create a logical font based on the user's
@@ -367,7 +367,7 @@ static HBRUSH GetMyBrush(ssh_color color)
 {
     assert(color<PALETE_LENGHT);
 
-    if(brushes[color]==0) //Trzeba alokowaÊ pÍdzel
+    if(brushes[color]==0) //Trzeba alokowaƒá pƒôdzel
     {
         DeleteObject(brushes[color]); //???
         brushes[color]=CreateSolidBrush(colors[color]);
@@ -386,22 +386,22 @@ void set_title(const char* WindowName)
     }
 }
 
-/* Ustala aktualny kolor wype≥nieÒ za pomocπ typu ssh_color */
+/* Ustala aktualny kolor wype≈Çnie≈Ñ za pomocƒÖ typu ssh_color */
 void	set_brush(ssh_color c)
 {
     HDC hdc=GetMyHdc();
     HBRUSH MyBrush=GetMyBrush(c);
     SelectObject(hdc,MyBrush);
-    curr_fill=-1; //Funkcje same ustawiajπce brush muszπ to zrobiÊ po uøyciu set_brush
+    curr_fill=-1; //Funkcje same ustawiajƒÖce brush muszƒÖ to zrobiƒá po u≈ºyciu set_brush
 }
 
-/* Aktualny kolor wype≥nieÒ jako `ssh_color`. */
+/* Aktualny kolor wype≈Çnie≈Ñ jako `ssh_color`. */
 ssh_color get_brush()
 {
     return curr_fill;
 }
 
-/* Ustala aktualny kolor wype≥nieÒ za pomocπ sk≥adowych RGB */
+/* Ustala aktualny kolor wype≈Çnie≈Ñ za pomocƒÖ sk≈Çadowych RGB */
 void set_brush_rgb(ssh_intensity r,ssh_intensity g,ssh_intensity b)
 {
     COLORREF MyColor = RGB(r,g,b);
@@ -411,20 +411,20 @@ void set_brush_rgb(ssh_intensity r,ssh_intensity g,ssh_intensity b)
     free_style_brush=curent_brush=CreateSolidBrush(MyColor);
 
     SelectObject(GetMyHdc(),free_style_brush);
-    curr_fill=-1; //Funkcje same ustawiajπce brush muszπ to zrobiÊ po uøyciu set_brush
+    curr_fill=-1; //Funkcje same ustawiajƒÖce brush muszƒÖ to zrobiƒá po u≈ºyciu set_brush
 }
 
-/* Ustala aktualny kolor wype≥nieÒ za pomocπ sk≥adowych RGB */
+/* Ustala aktualny kolor wype≈Çnie≈Ñ za pomocƒÖ sk≈Çadowych RGB */
 void set_brush_rgba(ssh_intensity r, ssh_intensity g, ssh_intensity b, ssh_intensity a )
 {
     COLORREF MyColor = RGB(r, g, b);
-    //MyColor |= a << 24; //Teoretycznie, ale w Windows tak nie dzia≥a
+    //MyColor |= a << 24; //Teoretycznie, ale w Windows tak nie dzia≈Ça
     if (free_style_brush != NULL)
         DeleteObject(free_style_brush);
     free_style_brush = curent_brush = CreateSolidBrush(MyColor);
 
     SelectObject(GetMyHdc(), free_style_brush);
-    curr_fill = -1; //Funkcje same ustawiajπce brush muszπ to zrobiÊ po uøyciu set_brush
+    curr_fill = -1; //Funkcje same ustawiajƒÖce brush muszƒÖ to zrobiƒá po u≈ºyciu set_brush
 }
 
 static HPEN GetMyPen(ssh_color color,int size,int style)
@@ -432,11 +432,11 @@ static HPEN GetMyPen(ssh_color color,int size,int style)
     assert(color<PALETE_LENGHT);
 
     if(size<=0)
-        size=1; // co najmniej gruboúci 1
+        size=1; // co najmniej grubo≈õci 1
 
     if( pens[color].handle==0 ||
         pens[color].size!=size ||
-        pens[color].style!=style) //Trzeba alokowaÊ pÍdzel, gdy zmienia siÍ rozmiar lub styl
+        pens[color].style!=style) //Trzeba alokowaƒá pƒôdzel, gdy zmienia siƒô rozmiar lub styl
     {
         if(pens[color].handle!=0)
         {
@@ -448,7 +448,7 @@ static HPEN GetMyPen(ssh_color color,int size,int style)
             fprintf(stderr,"Pen allocation c:%x s:%d style:%d.\n",color,size,style);
         _TREND
 
-        {	//W£AåCIWA ALOKACJA
+        {	//W≈ÅA≈öCIWA ALOKACJA
             int sX=mulx*size;
             int sY=muly*size;
             int pom=sX<sY?sX:sY;
@@ -477,7 +477,7 @@ static HPEN GetMyPen(ssh_color color,int size,int style)
     return curent_pen=pens[color].handle;
 }
 
-/* Ustala aktualny kolor linii za pomocπ typu ssh_color */
+/* Ustala aktualny kolor linii za pomocƒÖ typu ssh_color */
 void set_pen(ssh_color c, ssh_natural width, ssh_mode style)
 {
     HDC hdc=GetMyHdc();
@@ -485,7 +485,7 @@ void set_pen(ssh_color c, ssh_natural width, ssh_mode style)
     curent_pen=GetMyPen(c,width,style);
     SelectObject(hdc,curent_pen);
 
-    curr_color=-1; /* Funkcje same ustawiajπce pen sπ zmuszone to zrobiÊ po uøyciu set_pen */
+    curr_color=-1; /* Funkcje same ustawiajƒÖce pen sƒÖ zmuszone to zrobiƒá po u≈ºyciu set_pen */
     LineStyle=style;//???
     LineWidth=width;
 }
@@ -496,7 +496,7 @@ ssh_color get_pen()
     return curr_color;
 }
 
-/* Ustala aktualny kolor linii za pomocπ sk≥adowych RGB */
+/* Ustala aktualny kolor linii za pomocƒÖ sk≈Çadowych RGB */
 void set_pen_rgb(ssh_intensity r, ssh_intensity g, ssh_intensity b,
                     ssh_natural size, ssh_mode style)
 {
@@ -507,7 +507,7 @@ void set_pen_rgb(ssh_intensity r, ssh_intensity g, ssh_intensity b,
             fprintf(stderr,"Free style pen allocation rgb:%x%x%x s:%d style:%d.\n",r,g,b,size,style);
     _TREND
 
-    //Tworzenie nowego piÛra
+    //Tworzenie nowego pi√≥ra
     {
         int sX=mulx*size;
         int sY=muly*size;
@@ -524,17 +524,17 @@ void set_pen_rgb(ssh_intensity r, ssh_intensity g, ssh_intensity b,
         free_style_pen=curent_pen=CreatePen(win_style,pom,RGB(r,g,b));
     }
 
-    //Od razu uøycie piÛra
+    //Od razu u≈ºycie pi√≥ra
     SelectObject(GetMyHdc(),free_style_pen);
 
-    curr_color=-1; /* Funkcje same ustawiajπce pen sa zmuszone to zrobiÊ po uøyciu set_pen */
+    curr_color=-1; /* Funkcje same ustawiajƒÖce pen sa zmuszone to zrobiƒá po u≈ºyciu set_pen */
     LineStyle=style; //???
     LineWidth=size;
 }
 
-/* Ustala aktualny domyúlny kolor linii za pomocπ sk≥adowych RGBA */
+/* Ustala aktualny domy≈õlny kolor linii za pomocƒÖ sk≈Çadowych RGBA */
 void set_pen_rgba(ssh_intensity r, ssh_intensity g, ssh_intensity b,
-                  ssh_intensity a,                             /**< kana≥ alfa */
+                  ssh_intensity a,                             /**< kana≈Ç alfa */
                   ssh_natural size, ssh_mode style)
 {
     if (free_style_pen)
@@ -544,7 +544,7 @@ void set_pen_rgba(ssh_intensity r, ssh_intensity g, ssh_intensity b,
         fprintf(stderr, "Free style pen allocation rgba:%x%x%x%x s:%d style:%d.\n", r, g, b,a, size, style);
     _TREND
 
-    //Tworzenie nowego piÛra
+    //Tworzenie nowego pi√≥ra
     {
         int sX = mulx * size;
         int sY = muly * size;
@@ -559,11 +559,11 @@ void set_pen_rgba(ssh_intensity r, ssh_intensity g, ssh_intensity b,
         }
 
         COLORREF MyColor = RGB(r, g, b);
-        //MyColor |= a << 24; TO TAK NIE DZIA£A W WINDOWS
+        //MyColor |= a << 24; TO TAK NIE DZIA≈ÅA W WINDOWS
         free_style_pen = curent_pen = CreatePen(win_style,pom, MyColor);
     }
 
-    //Od razu uøycie piÛra.
+    //Od razu u≈ºycie pi√≥ra.
     SelectObject(GetMyHdc(), free_style_pen);
 
     curr_color = -1;
@@ -571,9 +571,9 @@ void set_pen_rgba(ssh_intensity r, ssh_intensity g, ssh_intensity b,
     LineWidth = size;
 }
 
-/* Zmienia definicje koloru w palecie kolorÛw. Indeksy 0..PALETE_LENGHT */
+/* Zmienia definicje koloru w palecie kolor√≥w. Indeksy 0..PALETE_LENGHT */
 void set_rgb(ssh_color color,                                  /* - indeks koloru */
-             ssh_intensity r,ssh_intensity g,ssh_intensity b)  /* - wartoúci sk≥adowych */
+             ssh_intensity r,ssh_intensity g,ssh_intensity b)  /* - warto≈õci sk≈Çadowych */
 {
     if (color >= PALETE_LENGHT)
     {
@@ -587,11 +587,11 @@ void set_rgb(ssh_color color,                                  /* - indeks kolor
     {
         if(curr_fill==color)
         {
-            curr_fill=-1; /* Wymusza wymianÍ pÍdzla przy nastÍpnym rysowaniu */
+            curr_fill=-1; /* Wymusza wymianƒô pƒôdzla przy nastƒôpnym rysowaniu */
             if(MyHdc!=0)
                 SelectObject(MyHdc,GetStockObject(NULL_BRUSH)); /*Wymiata z kontekstu */
         }
-        DeleteObject(brushes[color]); /* Teraz moøna juø zwolnic */
+        DeleteObject(brushes[color]); /* Teraz mo≈ºna ju≈º zwolnic */
         brushes[color]=0;
     }
 
@@ -599,19 +599,19 @@ void set_rgb(ssh_color color,                                  /* - indeks kolor
     {
         if(curr_color==color)
         {
-            curr_color=-1; /* Wymusza wymianÍ piÛra przy nastÍpnym rysowaniu */
+            curr_color=-1; /* Wymusza wymianƒô pi√≥ra przy nastƒôpnym rysowaniu */
             if(MyHdc!=0)
-                SelectObject(MyHdc,GetStockObject(NULL_PEN)); /*Wymiata piÛro z kontekstu */
+                SelectObject(MyHdc,GetStockObject(NULL_PEN)); /*Wymiata pi√≥ro z kontekstu */
         }
 
-        DeleteObject(pens[color].handle); /* Teraz moøna juø zwolnic */
+        DeleteObject(pens[color].handle); /* Teraz mo≈ºna ju≈º zwolnic */
         pens[color].handle=0;
         pens[color].size=0;
         pens[color].style=0;
     }
 }
 
-/* Jakie sπ ustawienia RGB konkretnego kolorku w palecie */
+/* Jakie sƒÖ ustawienia RGB konkretnego kolorku w palecie */
 ssh_rgb   get_rgb_from(ssh_color c)
 {
     ssh_rgb pom;
@@ -621,7 +621,7 @@ ssh_rgb   get_rgb_from(ssh_color c)
     return pom;
 }
 
-/* Zmiana definicje odcienia szaroúci w palecie szaroúci. Indeksy 256..511 */
+/* Zmiana definicje odcienia szaro≈õci w palecie szaro≈õci. Indeksy 256..511 */
 void set_gray(ssh_color shade,ssh_intensity intensity)
 {
     if( ! (255<shade && shade<PALETE_LENGHT) )
@@ -632,7 +632,7 @@ void set_gray(ssh_color shade,ssh_intensity intensity)
 /*
 static HPEN Get1Pen(int color)
 {
-    if(pens[color]==0) //Trzeba alokowaÊ pÍdzel
+    if(pens[color]==0) //Trzeba alokowaƒá pƒôdzel
         {
         pens[color]=CreatePen(PS_SOLID,1,colors[color]);
         }
@@ -650,7 +650,7 @@ static void FreeResources(void)
         fprintf(stderr," FREE RESOURCES.\n");
     _TREND
 
-    if(MbHdc)		  //Zwalnia wirtualny kontekst, jeúli jest jakiú
+    if(MbHdc)		  //Zwalnia wirtualny kontekst, je≈õli jest jaki≈õ
     {
         if(MbHdc==MyHdc)
             MyHdc=0;
@@ -658,20 +658,20 @@ static void FreeResources(void)
         MbHdc=0;
     }
 
-    if(VirtualScreen!=0) //Zwalnia ekran wirtualny, jeúli jest
+    if(VirtualScreen!=0) //Zwalnia ekran wirtualny, je≈õli jest
     {
         DeleteObject(VirtualScreen);
         VirtualScreen=0;
     }
 
-    if(MyHdc!=0)		//Zwalnia kontekst okna, jeúli jest
+    if(MyHdc!=0)		//Zwalnia kontekst okna, je≈õli jest
     {
-        int ret=ReleaseDC(MyHwnd,MyHdc);            //Czy to aby dzia≥a?
+        int ret=ReleaseDC(MyHwnd,MyHdc);            //Czy to aby dzia≈Ça?
                                                     assert(ret==1);
         MyHdc=0;
     }
 
-    for(k=0;k<PALETE_LENGHT;k++) //Zwalnia wszystkie cache'owane pÍdzle
+    for(k=0;k<PALETE_LENGHT;k++) //Zwalnia wszystkie cache'owane pƒôdzle
     {
         if(pens[k].handle!=0)
         {
@@ -739,7 +739,7 @@ D_COLOUR GetColour(double v,double vmin,double vmax)
      * min and max: variation of the RGB channels (Move3D 0 -> 1)
      http://stackoverflow.com/questions/7139825/colormap-library-for-c-which-converts-a-given-value-into-red-green-and-blue-v
      */
- /* To siÍ bezpoúrednio nie nadaje bo ma 360 wartoúci!
+ /* To siƒô bezpo≈õrednio nie nadaje bo ma 360 warto≈õci!
 void GroundColorMix(double* color, double x, double min, double max)
 {
    // Red = 0 Green = 1 Blue = 2
@@ -796,11 +796,11 @@ void GroundColorMix(double* color, double x, double min, double max)
           set_rgb(k,rgb[0]*255,rgb[1]*255,rgb[2]*255);
 */
 
-/* DO UWZGL DNIENIA TEØ
+/* DO UWZGLƒòDNIENIA TE≈ª
 http://www.cs.uml.edu/~haim/ColorCenter/ColorCenterColormaps.htm
 */
 
-/* WewnÍtrzna implementacja termicznej skali kolorÛw */
+/* Wewnƒôtrzna implementacja termicznej skali kolor√≥w */
 static void SetScale(void)
 {
 #ifndef M_PI
@@ -808,7 +808,7 @@ const double M_PI=3.141595;
 #endif
 //extern void set_rgb(ssh_color color,int r,int g,int b);
 
-if(UseGrayScale) //Uøywa skali szaroúci tam, gdzie normalnie sπ kolory
+if(UseGrayScale) //U≈ºywa skali szaro≈õci tam, gdzie normalnie sƒÖ kolory
   {
     int k;
     for(k=0;k<255;k++)
@@ -883,7 +883,7 @@ if(UseGrayScale) //Uøywa skali szaroúci tam, gdzie normalnie sπ kolory
 #endif
 
       }
-      //POWYØEJ 255 - I TAK SKALA SZAROåCI:
+      //POWY≈ªEJ 255 - I TAK SKALA SZARO≈öCI:
       {
       unsigned k;
       for(k=256;k<PALETE_LENGHT; k++)
@@ -933,7 +933,7 @@ static int InitMainWindow(void)
             return FALSE;
         }
 
-    if(!NoResources) //Jeúli sπ zasoby to staramy siÍ za≥adowaÊ akcelerator
+    if(!NoResources) //Je≈õli sƒÖ zasoby to staramy siƒô za≈Çadowaƒá akcelerator
         hAccelTable = LoadAccelerators(WB_Instance, szAppName);
 
     return TRUE;
@@ -943,24 +943,24 @@ static int InitMainWindow(void)
 /* CONFIGURATION AND MANAGE SHELL - USE IN THIS ORDER!   */
 /* ***************************************************** */
 
-/* Ustala czy rozmiar okna moøe byÊ p≥ynnie zmieniany */
+/* Ustala czy rozmiar okna mo≈ºe byƒá p≈Çynnie zmieniany */
 void fix_size(int yes)
 {
     Flexible=!yes;
 }
 
-/* Czy okno jest zafiksowanej wielkoúci */
+/* Czy okno jest zafiksowanej wielko≈õci */
 int fixed()
 {
     return !Flexible;
 }
 
-/* Ustala szerokoúÊ linij ó rysowanie grubych moøe byc kosztowne. Zwraca stan poprzedni WHAT ABOUT 0?*/
+/* Ustala szeroko≈õƒá linij ‚Äî rysowanie grubych mo≈ºe byc kosztowne. Zwraca stan poprzedni WHAT ABOUT 0?*/
 ssh_natural line_width(ssh_natural width)
 {
     unsigned pom=LineWidth;
     LineWidth=width;
-    curr_color=-1; //Wymusza realokacjπ, jeúli zostanie uøyty aktualny kolor.
+    curr_color=-1; //Wymusza realokacjƒÖ, je≈õli zostanie u≈ºyty aktualny kolor.
     if(MyHdc)
         SelectObject(MyHdc,GetStockObject(NULL_PEN)); /*Wymiata pen z kontekstu */
     return pom;
@@ -975,13 +975,13 @@ int line_style(int S)
 {
     int pom=LineStyle;
     LineStyle=S;
-    curr_color=-1; //Wymusza realokacjÍ, jeúli zostanie uøyty aktualny kolor.
+    curr_color=-1; //Wymusza realokacjƒô, je≈õli zostanie u≈ºyty aktualny kolor.
     if(MyHdc)
         SelectObject(MyHdc,GetStockObject(NULL_PEN));/*Wymiata z kontekstu */
     return pom;
 }
 
-// Zmiana stylu nak≥adania grafiki: SSH_SOLID_PUT albo SSH_XOR_PUT
+// Zmiana stylu nak≈Çadania grafiki: SSH_SOLID_PUT albo SSH_XOR_PUT
 int		put_style(int S)
 {
     HDC hdc=GetMyHdc();
@@ -1001,7 +1001,7 @@ int		put_style(int S)
     return old;
 }
 
-/* Ustala czy mysz ma byÊ obs≥ugiwana. Zwraca poprzedni stan flagi. */
+/* Ustala czy mysz ma byƒá obs≈Çugiwana. Zwraca poprzedni stan flagi. */
 int  mouse_activity(int yes)
 {
     int pom=is_mouse;
@@ -1028,15 +1028,15 @@ ssh_color background()
     return Background;
 }
 
-/* Prze≥πczanie buforowanie okna */
+/* Prze≈ÇƒÖczanie buforowanie okna */
 void buffering_setup(int _n)
 {
     if(_n)
         animate=1;
     else
         animate=0;
-    if(animate)	/* Musi byc w≥πczona bitmapa buforujπca */
-        is_buffered=1; /* Øeby moøna by≥o na niej pisaÊ */
+    if(animate)	/* Musi byc w≈ÇƒÖczona bitmapa buforujƒÖca */
+        is_buffered=1; /* ≈ªeby mo≈ºna by≈Ço na niej pisaƒá */
 }
 
 int buffered()
@@ -1094,7 +1094,7 @@ ssh_natural  char_width(char znak)
     return pom;
 }
 
-/* Aktualne rozmiary ≥aÒcucha znakÛw */
+/* Aktualne rozmiary ≈Ça≈Ñcucha znak√≥w */
 ssh_natural  string_height(const char* str)
 {
     SIZE sizes;
@@ -1114,15 +1114,15 @@ ssh_natural  string_width(const char* str)
             return -1;
 }
 
-/** Øeby moøna by≥o swobodnie manipulowaÊ sposobem wywo≥ania innych funkcji */
+/** ≈ªeby mo≈ºna by≈Ço swobodnie manipulowaƒá sposobem wywo≈Çania innych funkcji */
 static void __cdecl special_close_plot(void)
 {
     close_plot();
 }
 
 /* inicjacja grafiki/semigrafiki */
-int  init_plot(ssh_natural  a,ssh_natural   b,                 /* ile pikseli mam mieÊ okno */
-               ssh_natural ca, ssh_natural cb)                 /* ile dodatkowo linij i kolumn tekstu na dole i po bokach przy domyúlnej czcionce */
+int  init_plot(ssh_natural  a,ssh_natural   b,                 /* ile pikseli mam mieƒá okno */
+               ssh_natural ca, ssh_natural cb)                 /* ile dodatkowo linij i kolumn tekstu na dole i po bokach przy domy≈õlnej czcionce */
 {
     int ScreenRealH=0,ScreenRealW=0;
     RECT rect;
@@ -1134,9 +1134,9 @@ int  init_plot(ssh_natural  a,ssh_natural   b,                 /* ile pikseli ma
     ini_col=ca;   // Ile kolumn tekstu dodatkowo
     ini_row=cb;   // Ile wierszy tekstu dodatkowo
 
-    SetScale(); //SKALA KOLOR”W.
+    SetScale(); //SKALA KOLOR√ìW.
 
-    W_width=a;W_height=b; // Øeby cos by≥o na poczπtek
+    W_width=a;W_height=b; // ≈ªeby cos by≈Ço na poczƒÖtek
 
     if(!InitWindowClass()||
         !InitMainWindow())
@@ -1149,14 +1149,14 @@ int  init_plot(ssh_natural  a,ssh_natural   b,                 /* ile pikseli ma
     //ShowWindow(MyHwnd, SW_SHOW); // DEBUG
 
     // Resize
-    GetRealScreen(); //Øeby za≥adowaÊ niezbÍdnπ informacjÍ o czcionce.
+    GetRealScreen(); //≈ªeby za≈Çadowaƒá niezbƒôdnƒÖ informacjƒô o czcionce.
     ScreenRealW=GetDeviceCaps(MyHdc,HORZRES);
     ScreenRealH=GetDeviceCaps(MyHdc,VERTRES);
 
-    W_width=a+ca*(char_width)('X');    //by≥o  _char_width - moøe z powodu makra, ktÛre by≥o kiedyú?
+    W_width=a+ca*(char_width)('X');    //by≈Ço  _char_width - mo≈ºe z powodu makra, kt√≥re by≈Ço kiedy≈õ?
     W_height=b+cb*(char_height)('Y');  // i analogicznie
 
-    if(ForceHeight!=0)                 //Test na rozmiary okna wymuszone parametrami wywo≥ania
+    if(ForceHeight!=0)                 //Test na rozmiary okna wymuszone parametrami wywo≈Çania
         W_height=ForceHeight;
     if(ForceWidth!=0)
         W_width=ForceWidth;
@@ -1165,27 +1165,27 @@ int  init_plot(ssh_natural  a,ssh_natural   b,                 /* ile pikseli ma
     rect.right=W_width;
     rect.bottom=W_height;
 
-    //Trzeba policzyÊ obszar na menu jeúli jest takowe
+    //Trzeba policzyƒá obszar na menu je≈õli jest takowe
     {
         HMENU MyMenu=GetMenu(MyHwnd);
         AdjustWindowRect(&rect,MY_WIN_STYLE,MyMenu!=NULL);
     }
 
-    //Teraz trzeba uaktualniÊ rozmiary okna
+    //Teraz trzeba uaktualniƒá rozmiary okna
     {
     char buf[128];
-    //Liczymy rozmiary ze wzglÍdu na zadany obszar roboczy oraz ewentualne menu
+    //Liczymy rozmiary ze wzglƒôdu na zadany obszar roboczy oraz ewentualne menu
     int real_W_height=abs(rect.top-rect.bottom);
     int real_W_width=abs(rect.left-rect.right);
-    //Jednak nie moøe byÊ wiÍksze niø rozmiar ekranu!
-    //if(ForceHeight==0) //I tak nie moøna powiÍkszyÊ poza ekran ó takie okno nie powstaje...
+    //Jednak nie mo≈ºe byƒá wiƒôksze ni≈º rozmiar ekranu!
+    //if(ForceHeight==0) //I tak nie mo≈ºna powiƒôkszyƒá poza ekran ‚Äî takie okno nie powstaje...
     if(real_W_height>ScreenRealH)
             real_W_height=ScreenRealH;
     //if(ForceWidth==0)
     if(real_W_width>ScreenRealW)
             real_W_width=ScreenRealW;
 
-    //Ustawiamy wg tego, co obliczy≥o AdjustWindowRect()
+    //Ustawiamy wg tego, co obliczy≈Ço AdjustWindowRect()
     SetWindowPos(  MyHwnd,
                         HWND_TOP,0,0,
                         real_W_width,real_W_height,
@@ -1196,7 +1196,7 @@ int  init_plot(ssh_natural  a,ssh_natural   b,                 /* ile pikseli ma
     if(real_W_height<=ScreenRealH && real_W_width<=ScreenRealW)
     {
         int cur_Cl_height,cur_Cl_width;
-        //Sprawdzenie, czy siÍ uda≥o, bo poprzednia funkcja nie uwzglÍdnia zawijania menu
+        //Sprawdzenie, czy siƒô uda≈Ço, bo poprzednia funkcja nie uwzglƒôdnia zawijania menu
         GetClientRect(MyHwnd,&rect);
         cur_Cl_height=abs(rect.top-rect.bottom);
         cur_Cl_width=abs(rect.left-rect.right);
@@ -1213,7 +1213,7 @@ int  init_plot(ssh_natural  a,ssh_natural   b,                 /* ile pikseli ma
         }
     }
 
-    //Zapisujemy to, co wysz≥o!
+    //Zapisujemy to, co wysz≈Ço!
     WritePrivateProfileString("WINDOW","Height",_ltoa(real_W_height,buf,10),"./SYMSHELL.INI");
     WritePrivateProfileString("WINDOW","Width",_ltoa(real_W_width,buf,10),"./SYMSHELL.INI");
     }
@@ -1224,7 +1224,7 @@ int  init_plot(ssh_natural  a,ssh_natural   b,                 /* ile pikseli ma
     WindowClosed=0;// Window open flag for close_plot
     //if(!is_mouse)
     //      SetCursor(LoadCursor(NULL, IDC_NO));
-    FreeResources(); //Bo mogπ siÍ za≥adowaÊ konteksty dla z≥ego ekranu (pod WINDOWS?)
+    FreeResources(); //Bo mogƒÖ siƒô za≈Çadowaƒá konteksty dla z≈Çego ekranu (pod WINDOWS?)
 
     PostMessage(MyHwnd,WM_PAINT,0,0); // Sends WM_PAINT message
     if(is_mouse)
@@ -1235,14 +1235,14 @@ int  init_plot(ssh_natural  a,ssh_natural   b,                 /* ile pikseli ma
     return /*TRUE*/1;
 }
 
-/* uzgodnienie zawartoúci ekranu  */
+/* uzgodnienie zawarto≈õci ekranu  */
 void flush_plot()
 {
     _TRACE( 2 )
         fprintf(stderr," FLUSH PLOT ");
     _TREND
 
-    if(MyHdc!=0) //Byl uøywany. Zwalnia tylko `RelaseResources`.
+    if(MyHdc!=0) //Byl u≈ºywany. Zwalnia tylko `RelaseResources`.
     {
         if(animate && VirtualScreen && MyHdc==MbHdc )//Animujemy i jest juz bitmapa
         {
@@ -1262,31 +1262,31 @@ void flush_plot()
     }
 
     if(DelayTime>0)
-        Sleep(DelayTime); //Uúpienie programu na pewien czas
+        Sleep(DelayTime); //U≈õpienie programu na pewien czas
 
     _TRACE(2)
         fprintf(stderr," * \n");
     _TREND
 }
 
-/* Wymuszenie oczekiwania przez pewnπ liczbÍ ms */
+/* Wymuszenie oczekiwania przez pewnƒÖ liczbƒô ms */
 void	delay_ms(unsigned ms)
 {
-    Sleep(ms); //Uúpienie programu na pewien czas.
+    Sleep(ms); //U≈õpienie programu na pewien czas.
 }
 
 /* GETTING INPUT */
 
-// zmienne do komunikacji `ProcesMsg` z procedurami obs≥ugi komunikatÛw
+// zmienne do komunikacji `ProcesMsg` z procedurami obs≈Çugi komunikat√≥w
 //---------------------------------------------------------------------
 static int InputChar=0;
 static int InputXpos;
 static int InputYpos;
 static int InputClick;
-static int MouseInput=0; ///< Flaga sygnalizujπca, øe sπ nieodczytane dane myszowe.
+static int MouseInput=0; ///< Flaga sygnalizujƒÖca, ≈ºe sƒÖ nieodczytane dane myszowe.
 
-/// Przerabia wejúcie i zwraca znak.
-/// EOF to jest koniec, a 0, jeúli nic nie by≥o do wziÍcia lub jakiú inny komunikat.
+/// Przerabia wej≈õcie i zwraca znak.
+/// EOF to jest koniec, a 0, je≈õli nic nie by≈Ço do wziƒôcia lub jaki≈õ inny komunikat.
 static int ProcessMsg(int peek)
 {
     BOOL msg_avail=0;
@@ -1372,7 +1372,7 @@ JESZCZE_RAZ:
 LOCAL 
 int first_to_read=0;
 
-/* (nie)zaleøna od platformy funkcja sprawdzajπca, czy jest wejúcie */
+/* (nie)zale≈ºna od platformy funkcja sprawdzajƒÖca, czy jest wej≈õcie */
 int  input_ready()
 {
     int input;
@@ -1383,7 +1383,7 @@ int  input_ready()
     if(CharToGet!=0||first_to_read!=0) //Nie odebrano danych.
         return TRUE;
 
-    input=ProcessMsg(1); //PEEK! Trzeba sprawdziÊ nowe komunikaty
+    input=ProcessMsg(1); //PEEK! Trzeba sprawdziƒá nowe komunikaty
 
     if(input!='\0')
     {CharToGet=input;return TRUE;}
@@ -1391,7 +1391,7 @@ int  input_ready()
     {CharToGet='\0';return FALSE;}
 }
 
-/* Odes≥anie znaku na wejúcie ó zwraca 0, jeúli nie ma miejsca */
+/* Odes≈Çanie znaku na wej≈õcie ‚Äî zwraca 0, je≈õli nie ma miejsca */
 int  set_char(int c)
 {
     _TRACE( 1)
@@ -1405,7 +1405,7 @@ int  set_char(int c)
     return 1;
 }
 
-/* odczytywanie znakÛw sterowania, z oczekiwaniem, jeúli brak */
+/* odczytywanie znak√≥w sterowania, z oczekiwaniem, je≈õli brak */
 int  get_char()
 {
     int input;
@@ -1414,7 +1414,7 @@ int  get_char()
         fprintf(stderr,"* get_char() ");
     _TREND
     
-    if(first_to_read!=0) //Sprawdza, czy nie ma zwrotÛw
+    if(first_to_read!=0) //Sprawdza, czy nie ma zwrot√≥w
     {
         input=first_to_read;
         first_to_read=0;
@@ -1428,8 +1428,8 @@ int  get_char()
         goto READY_TO_USE;//return input;
     }
 
-    // TODO - WSTAWI∆ Delay ? w aktywnπ petle?
-    while((input=ProcessMsg(0))=='\0'); //sam musi poczekaÊ na znak
+    // TODO - WSTAWIƒÜ Delay ? w aktywnƒÖ petle?
+    while((input=ProcessMsg(0))=='\0'); //sam musi poczekaƒá na znak
 
 READY_TO_USE:
     _TRACE(1)
@@ -1469,9 +1469,9 @@ void close_plot(void)
         fprintf(stderr," CLOSE PLOT ");
     _TREND
 
-    if(!WindowClosed) // Jeszcze nie, zamkniÍte wczeúniej & Valid HANDLE?
+    if(!WindowClosed) // Jeszcze nie, zamkniƒôte wcze≈õniej & Valid HANDLE?
         {
-        WindowClosed=1; //Zabezpieczenie przed powtÛrnym wywo≥aniem tej funkcji
+        WindowClosed=1; //Zabezpieczenie przed powt√≥rnym wywo≈Çaniem tej funkcji
 
         if(WB_error_enter_before_clean)
             {
@@ -1498,11 +1498,11 @@ void close_plot(void)
                 UserFont=0;
             }
 
-        if(IsWindow(MyHwnd)!=0) //Jeúli IsWindow to trzeba je zamknπÊ
+        if(IsWindow(MyHwnd)!=0) //Je≈õli IsWindow to trzeba je zamknƒÖƒá
             {
             DestroyWindow(MyHwnd);
             // Message loop for ending messages - should be?(WB)
-            while((ret=GetMessage(&msg,MyHwnd, 0, 0))!=0)     //Zamiast `MyHwnd` by≥o kiedyú NULL...
+            while((ret=GetMessage(&msg,MyHwnd, 0, 0))!=0)     //Zamiast `MyHwnd` by≈Ço kiedy≈õ NULL...
                 {
                     if (ret == -1)
                         {
@@ -1536,7 +1536,7 @@ void printbw(int x,int y,const char* format,...)       // int x,int y,const char
     static double MyHdc;
     HDC LocalMyHdc;
     RECT rc;
-    size_t len; //BÍdzie przypisane d≥ugoúciπ bufora
+    size_t len; //Bƒôdzie przypisane d≈Çugo≈õciƒÖ bufora
 
     unsigned font_height=0;
     unsigned font_width=0;
@@ -1592,7 +1592,7 @@ void print_rgb( int x,int y,
     static double MyHdc;
     HDC LocalMyHdc;
     //RECT rc;
-    size_t len; //BÍdzie przypisane d≥ugoúci bufora
+    size_t len; //Bƒôdzie przypisane d≈Çugo≈õci bufora
     //unsigned font_height=0;
     //unsigned font_width=0;
 
@@ -1643,7 +1643,7 @@ void printc(    int x,int y,
     static double MyHdc;
     HDC LocalMyHdc;
     //RECT rc;
-    size_t len; //BÍdzie przypisane d≥ugoúci bufora
+    size_t len; //Bƒôdzie przypisane d≈Çugo≈õci bufora
     //unsigned font_height=0;
     //unsigned font_width=0;
 
@@ -1688,7 +1688,7 @@ void printc(    int x,int y,
 //    TextOut(MyBtmHdc,x,y,bufor,len);
 }
 
-/* W≥πcza moøliwoúÊ drukowania tekstu bez zamazywania t≥a. Zwraca stan poprzedni */
+/* W≈ÇƒÖcza mo≈ºliwo≈õƒá drukowania tekstu bez zamazywania t≈Ça. Zwraca stan poprzedni */
 int  print_transparently(int yes)
 {
     int old=transparently;
@@ -1704,7 +1704,7 @@ int  print_transparently(int yes)
 /* DRAWING  */
 /* *******  */
 
-/* wyúwietlenie punktu na ekranie */
+/* wy≈õwietlenie punktu na ekranie */
 void plot(int x,int y,ssh_color color)
 {
     //	if(color>=PALETE_LENGHT) //DEBUG
@@ -1725,9 +1725,9 @@ void plot(int x,int y,ssh_color color)
        }
 }
 
-/* wyúwietlenie punktu na ekranie */
-void plot_rgb(ssh_coordinate x,ssh_coordinate y,                       /* WspÛ≥rzÍdne */
-              ssh_intensity r,ssh_intensity g,ssh_intensity b)         /*- sk≥adowe koloru */
+/* wy≈õwietlenie punktu na ekranie */
+void plot_rgb(ssh_coordinate x,ssh_coordinate y,                       /* Wsp√≥≈Çrzƒôdne */
+              ssh_intensity r,ssh_intensity g,ssh_intensity b)         /*- sk≈Çadowe koloru */
 {
     COLORREF color;
     color=RGB(r,g,b);
@@ -1766,7 +1766,7 @@ void _fill_seed(HDC hdc,int x,int y,COLORREF R_fill,COLORREF R_border)
     _fill_seed(hdc,x,y-1,R_fill,R_border);
 }
 
-//Wype≥nia powodziowo lub algorytmem siania
+//Wype≈Çnia powodziowo lub algorytmem siania
 void fill_flood(int x,int y,ssh_color fill,ssh_color border)
 {
     COLORREF R_fill,R_border;
@@ -1781,10 +1781,10 @@ void fill_flood(int x,int y,ssh_color fill,ssh_color border)
     _fill_seed(GetMyHdc(),x,y,R_fill,R_border);
 }
 
-//Wype≥nia powodziowo lub algorytmem siania
+//Wype≈Çnia powodziowo lub algorytmem siania
 void fill_flood_rgb(ssh_coordinate x,ssh_coordinate y,
-                ssh_intensity rf,ssh_intensity gf,ssh_intensity bf,    /*- kolor wype≥nienia podany sk≥adowymi */
-                ssh_intensity rb,ssh_intensity gb,ssh_intensity bb)    /*- kolor brzegu podany sk≥adowymi */
+                ssh_intensity rf,ssh_intensity gf,ssh_intensity bf,    /*- kolor wype≈Çnienia podany sk≈Çadowymi */
+                ssh_intensity rb,ssh_intensity gb,ssh_intensity bb)    /*- kolor brzegu podany sk≈Çadowymi */
 {
     COLORREF R_fill,R_border;
 
@@ -1798,7 +1798,7 @@ void fill_flood_rgb(ssh_coordinate x,ssh_coordinate y,
 void fill_rect(int x1,int y1,int x2,int y2,ssh_color color)
 {
     RECT rc;                                                    //assert(color<PALETE_LENGHT);
-    if(color>=PALETE_LENGHT) //PostÍpowanie awaryjne
+    if(color>=PALETE_LENGHT) //Postƒôpowanie awaryjne
     {
         color=PALETE_LENGHT-1;
     }
@@ -1811,7 +1811,7 @@ void fill_rect(int x1,int y1,int x2,int y2,ssh_color color)
     FillRect (GetMyHdc(), &rc, GetMyBrush(color)); /* Bez dolnego wiersza i prawej kolumny!!! */
 }
 
-/* Wyúwietla prostokπt w kolorach domyúlnych*/
+/* Wy≈õwietla prostokƒÖt w kolorach domy≈õlnych*/
 void fill_rect_d(int x1,int y1,int x2,int y2)
 {
     RECT rc;
@@ -1823,7 +1823,7 @@ void fill_rect_d(int x1,int y1,int x2,int y2)
     FillRect (GetMyHdc(), &rc,curent_brush); /* Bez dolnego wiersza i prawej kolumny!!! */
 }
 
-/* wyúwietlenie jednej linii */
+/* wy≈õwietlenie jednej linii */
 void line(int x1,int y1,int x2,int y2,ssh_color color)
 {
     POINT points[2];                                           assert(color<PALETE_LENGHT);
@@ -1845,7 +1845,7 @@ void line(int x1,int y1,int x2,int y2,ssh_color color)
     Polyline(GetMyHdc(),points,2);
 }
 
-/* Wyúwietlenie linii w kolorze domyúlnym */
+/* Wy≈õwietlenie linii w kolorze domy≈õlnym */
 void line_d(int x1,int y1,int x2,int y2)
 {
     POINT points[2];
@@ -1862,7 +1862,7 @@ void line_d(int x1,int y1,int x2,int y2)
     // plot_rgb(x1,y1,GetRValue(current_pen_rgb),GetGValue(current_pen_rgb),GetBValue(current_pen_rgb));
 }
 
-/* Wyúwietlenie okrÍgu w kolorze domyúlnym */
+/* Wy≈õwietlenie okrƒôgu w kolorze domy≈õlnym */
 void circle_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r)
 {
     int r1,r2;
@@ -1873,7 +1873,7 @@ void circle_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r)
     Arc(GetMyHdc(),x-r1,y-r2,x+r1,y+r2,x,y+r1,x,y+r1);
 }
 
-/* Wyúwietlenie okrÍgu w kolorze c => color_index */
+/* Wy≈õwietlenie okrƒôgu w kolorze c => color_index */
 void circle(ssh_coordinate x,ssh_coordinate y,ssh_natural r,ssh_color color_index)
 {
     int r1,r2;      assert(color_index<PALETE_LENGHT);
@@ -1888,7 +1888,7 @@ void circle(ssh_coordinate x,ssh_coordinate y,ssh_natural r,ssh_color color_inde
     Arc(GetMyHdc(),x-r1,y-r2,x+r1,y+r2,x,y+r1,x,y+r1);
 }
 
-/* Wype≥nienie kola w kolorze c */
+/* Wype≈Çnienie kola w kolorze c */
 void fill_circle(ssh_coordinate x,ssh_coordinate y,
                  ssh_natural r,
                  ssh_color color_index)
@@ -1911,7 +1911,7 @@ void fill_circle(ssh_coordinate x,ssh_coordinate y,
     Ellipse(GetMyHdc(),x-r1,y-r2,x+r1,y+r2);
 }
 
-/* Wype≥nienie kola o promieniu r w kolorach domyúlnych*/
+/* Wype≈Çnienie kola o promieniu r w kolorach domy≈õlnych*/
 void fill_circle_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r)
 {
     int r1,r2;
@@ -1922,7 +1922,7 @@ void fill_circle_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r)
     Ellipse(GetMyHdc(),x-r1,y-r2,x+r1,y+r2);
 }
 
-/* Wype≥nia wielokπt przesuniÍty o vx, vy w kolorze c */
+/* Wype≈Çnia wielokƒÖt przesuniƒôty o vx, vy w kolorze c */
 void fill_poly(int vx,int vy,
                     const ssh_point points[],int number,
                     ssh_color color)
@@ -1932,9 +1932,9 @@ void fill_poly(int vx,int vy,
     int i;
 
     if(number<=2)
-            return; //Nie da siÍ rysowaÊ wielokπta o dwu punktach lub mniej.
+            return; //Nie da siƒô rysowaƒá wielokƒÖta o dwu punktach lub mniej.
 
-    if(number>10) //Jest za duøy. Alokacja
+    if(number>10) //Jest za du≈ºy. Alokacja
         LocalPoints=(POINT*)calloc(number,sizeof(POINT));
 
     if(LocalPoints==NULL)
@@ -1962,12 +1962,12 @@ void fill_poly(int vx,int vy,
 
     Polygon(GetMyHdc(),LocalPoints,number);
 
-    if(number>10) //Gdy by≥ duøy, to mamy pamiÍÊ do zwolnienia.
+    if(number>10) //Gdy by≈Ç du≈ºy, to mamy pamiƒôƒá do zwolnienia.
         free(LocalPoints);
 }
 
 
-/* Wype≥nia wielokπt przesuniÍty o vx, vy w kolorach domyúlnych */
+/* Wype≈Çnia wielokƒÖt przesuniƒôty o vx, vy w kolorach domy≈õlnych */
 void fill_poly_d(int vx,int vy, const ssh_point points[],int number)
 {
     static POINT _LocalTable[10];
@@ -1975,9 +1975,9 @@ void fill_poly_d(int vx,int vy, const ssh_point points[],int number)
     int i;
 
     if(number<=2)
-            return; //Nie da siÍ rysowaÊ wielokπta o dwu punktach lub mniej
+            return; //Nie da siƒô rysowaƒá wielokƒÖta o dwu punktach lub mniej
 
-    if(number>10) //Jest za duøy. Alokacja pamiÍci na punkty.
+    if(number>10) //Jest za du≈ºy. Alokacja pamiƒôci na punkty.
         LocalPoints=calloc(number,sizeof(POINT));
 
     if(LocalPoints==NULL)
@@ -1993,11 +1993,11 @@ void fill_poly_d(int vx,int vy, const ssh_point points[],int number)
 
     Polygon(GetMyHdc(),LocalPoints,number);
 
-    if(number>10) //Byl duøy
+    if(number>10) //Byl du≈ºy
         free(LocalPoints);
 }
 
-/* Czyúci ekran przed zmianπ zawartoúci. Kosztowne... */
+/* Czy≈õci ekran przed zmianƒÖ zawarto≈õci. Kosztowne... */
 void clear_screen()
 {
     RECT rc;
@@ -2005,8 +2005,8 @@ void clear_screen()
         fprintf(stderr,"CLEAR SCREEN\n");
     _TREND
     GetClientRect(MyHwnd, &rc);
-    rc.right++;  //Niweluje dziwny sposÛb wype≥niania FillRect
-    rc.bottom++; //pomijajπcy dolny wiersz i skrajnie prawπ kolumnÍ
+    rc.right++;  //Niweluje dziwny spos√≥b wype≈Çniania FillRect
+    rc.bottom++; //pomijajƒÖcy dolny wiersz i skrajnie prawƒÖ kolumnƒô
     FillRect (GetMyHdc(), &rc, GetMyBrush(Background));
 }
 
@@ -2114,14 +2114,14 @@ BOOL InitApplication(HINSTANCE hInstance)
 
     static int AppInitialised=0;
     if(AppInitialised==1)
-        return TRUE; //Juø zosta≥a zainicjalizowana
+        return TRUE; //Ju≈º zosta≈Ça zainicjalizowana
 
     // Load the application name  strings.
     if(LoadString(hInstance, IDS_APPNAME, szAppName, sizeof(szAppName))==0)
-        NoResources=1; //Nie pod≥πczono zasobÛw
+        NoResources=1; //Nie pod≈ÇƒÖczono zasob√≥w
         else
         {
-            NoResources=0; //Sπ zasoby
+            NoResources=0; //SƒÖ zasoby
             MainMenu=LoadMenu(hInstance,szAppName);
         }
 
@@ -2923,7 +2923,7 @@ LRESULT MsgPaint(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
             fprintf(stderr,"-> BITBLT ");
         _TREND
         }
-        else   //Nie ma tej treúci na bitmapie
+        else   //Nie ma tej tre≈õci na bitmapie
         {
             _TRACE(1)
                 fprintf(stderr,"-> FORCE REPAINT ");
@@ -2965,9 +2965,9 @@ LRESULT MsgPaint(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
 }
 
 int  repaint_area(ssh_coordinate* x, ssh_coordinate* y,
-                  ssh_natural* width, ssh_natural* height)/* Podaje obszar, ktÛry ma byÊ odnowiony i zwraca 0 */
-                                                        /* Jeúli zwraca -1 to brak danych lub brak implementacji! OdrysowaÊ ca≥oúÊ. */
-                                                        /* Jeúli zwraca -2 to znaczy, øe dane juø zosta≥y odczytane. Naleøy zignorowaÊ. */
+                  ssh_natural* width, ssh_natural* height)/* Podaje obszar, kt√≥ry ma byƒá odnowiony i zwraca 0 */
+                                                        /* Je≈õli zwraca -1 to brak danych lub brak implementacji! Odrysowaƒá ca≈Ço≈õƒá. */
+                                                        /* Je≈õli zwraca -2 to znaczy, ≈ºe dane ju≈º zosta≈Çy odczytane. Nale≈ºy zignorowaƒá. */
 {
     if(repaint_flag==1)
         {
@@ -2990,7 +2990,7 @@ int  repaint_area(ssh_coordinate* x, ssh_coordinate* y,
         return 0;
         }
         else
-        return -1; //Nie by≥o nic odczytania (?)
+        return -1; //Nie by≈Ço nic odczytania (?)
 }
 
 LOCAL
@@ -3123,19 +3123,19 @@ BOOL InitInput(HWND hwnd)
 
 //
 //	Blok tworzenia zrzutu ekranu
-//  z przyk≥adÛw Microsoftu
+//  z przyk≈Çad√≥w Microsoftu
 //
-static jmp_buf dump_jumper; /* JUMP bufor na wypadek b≥Ídu */
+static jmp_buf dump_jumper; /* JUMP bufor na wypadek b≈Çƒôdu */
 
 void errhandler(const char* text,HWND hwnd,int Errnum)
 {
     MessageBoxA(hwnd,text,"Window capture error",MB_ICONERROR);
-    if(errno==0 && Errnum>0) //Ma ustawiÊ Errno
+    if(errno==0 && Errnum>0) //Ma ustawiƒá Errno
         errno=Errnum;
 
     longjmp(dump_jumper,Errnum);
 
-    //Tu nigdy nie powinien wejúÊ!
+    //Tu nigdy nie powinien wej≈õƒá!
     exit(Errnum);//Debug
 }
 
@@ -3336,7 +3336,7 @@ void CreateBMPFile(HWND hwnd, LPTSTR pszFile, PBITMAPINFO pbi,
 }
 
 
-/* Zrzuca ekran na plik o ekstensji zaleønej od platformy. -1 jeúli sie nie uda. */
+/* Zrzuca ekran na plik o ekstensji zale≈ºnej od platformy. -1 je≈õli sie nie uda. */
 int  dump_screen(const char* Filename)
 {
     HDC hdcScreen = GetMyHdc();
@@ -3344,7 +3344,7 @@ int  dump_screen(const char* Filename)
     HDC hdcCompatible=0;
     PBITMAPINFO info;
     char bufor[2048];
-    //TODO - problemy z za ma≥ym rozmiarem obrazka!
+    //TODO - problemy z za ma≈Çym rozmiarem obrazka!
     if(strlen(Filename)+6 > 2048)
     {
         fprintf(stderr,"Filename \"%s\" is too long!!!",Filename);
@@ -3357,7 +3357,7 @@ int  dump_screen(const char* Filename)
         fprintf(stderr,"DUMP SCREEN TO FILE %s ", bufor);
     _TREND
 
-    errno=0; /* Kasowanie úmieci w kodach b≥ÍdÛw */
+    errno=0; /* Kasowanie ≈õmieci w kodach b≈Çƒôd√≥w */
     if(setjmp(dump_jumper)!=0) //Tu wskakuje gdy awaria
     {
         if(hbmScreen)
@@ -3375,7 +3375,7 @@ int  dump_screen(const char* Filename)
         _TRACE(2)
             fprintf(stderr,"WRITE FAILED \n");
         _TREND
-        return -1; //B£•D!
+        return -1; //B≈ÅƒÑD!
     }
 
     /* GRABBING WINDOW */
@@ -3423,12 +3423,12 @@ int  dump_screen(const char* Filename)
         fprintf(stderr,"Write OK \n");
     _TREND
 
-    return 0; //Czy b≥πd?
+    return 0; //Czy b≈ÇƒÖd?
 }
 
 int title_with_pid=1;
 
-/* Przekazanie parametrÛw wywo≥ania */
+/* Przekazanie parametr√≥w wywo≈Çania */
 void shell_setup(const char* title,int iargc,const char* iargv[])
 {
     int i;
@@ -3513,8 +3513,8 @@ void shell_setup(const char* title,int iargc,const char* iargv[])
             {
             is_buffered=(largv[i][7]=='+')?1:0;
                 printf("Double mapping is %s\n",(is_buffered?"ON":"OFF"));
-            if(!is_buffered)	/* Jak nie ma bitmapy to nie moøna */
-                animate=0; /* animowaÊ */
+            if(!is_buffered)	/* Jak nie ma bitmapy to nie mo≈ºna */
+                animate=0; /* animowaƒá */
             }
         else
         if(strncmp(largv[i],"-mouse",6)==0)
@@ -3527,8 +3527,8 @@ void shell_setup(const char* title,int iargc,const char* iargv[])
             {
             animate=(largv[i][9]=='+')?1:0;
                 printf("Buffered is %s\n",(animate?"ON":"OFF"));
-            //if(animate)	/* Musi byc w≥πczona bitmapa buforujπca */
-            //	is_buffered=1;/* øeby moøna by≥o na nia pisaÊ */
+            //if(animate)	/* Musi byc w≈ÇƒÖczona bitmapa buforujƒÖca */
+            //	is_buffered=1;/* ≈ºeby mo≈ºna by≈Ço na nia pisaƒá */
                 is_buffered=animate; /*Albo, albo. Nie jak w Xwindow */
             }
        /*
@@ -3553,8 +3553,8 @@ void shell_setup(const char* title,int iargc,const char* iargv[])
         }
     }
 
-    if(animate)	/* Musi byc w≥πczona bitmapa buforujπca */
-        is_buffered=1;/* øeby moøna by≥o na niπ pisaÊ */
+    if(animate)	/* Musi byc w≈ÇƒÖczona bitmapa buforujƒÖca */
+        is_buffered=1;/* ≈ºeby mo≈ºna by≈Ço na niƒÖ pisaƒá */
 
     #if defined(_MSC_VER)
     #define snprintf _snprintf
@@ -3577,7 +3577,7 @@ void shell_setup(const char* title,int iargc,const char* iargv[])
 /* ******************************************************************/
 /*            THIS CODE IS DESIGNED & COPYRIGHT BY:                 */
 /*            W O J C I E C H   B O R K O W S K I                   */
-/*    Instytut StudiÛw Spo≥ecznych Uniwersytetu Warszawskiego       */
+/*    Instytut Studi√≥w Spo≈Çecznych Uniwersytetu Warszawskiego       */
 /*    WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI  */
 /*    GITHUB: https://github.com/borkowsk                           */
 /*                                                                  */

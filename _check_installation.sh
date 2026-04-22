@@ -4,7 +4,7 @@ EDIT=nano
 echo -e $COLOR1"Running" `realpath $0` $NORMCO
 source "./screen.ini" > /dev/null
 
-if [ -f "error.txt" ];
+if [ -s "error.txt" ]; #exist and has any information inside!
 then
      echo -e $COLERR"Error during previous run:\n"
      cat error.txt
@@ -63,7 +63,7 @@ echo -e $COLOR2"\nNow you can try to make whole library...\n"$COLOR1
 echo    "	cmake ."
 echo -e "	nano CMakeLists.txt" $COLOR3  "#if something was wrong." $COLOR1
 echo    "	make"
-echo    "       ./_makeDocs.sh"
+echo -e "       ./_makeDocs.sh" $COLOR3  "#if you want doxygen documentation." $COLOR1
 
 echo -e $COLOR2 "\nEND" $NORMCO
 

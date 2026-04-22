@@ -31,10 +31,10 @@ template<class T_VALUE,class S_VALUE>
 inline
 T_VALUE asserted(const S_VALUE& value)
 {
-    double tmp=(double)(value);
+    double tmp=static_cast<double>(value);  // NOLINT(*-narrowing-conversions)
     assert( std::numeric_limits<T_VALUE>::lowest() <= tmp );
     assert( tmp <= std::numeric_limits<T_VALUE>::max() );
-    return (T_VALUE)(value);
+    return static_cast<T_VALUE>(value);
 }
 
 /// @}

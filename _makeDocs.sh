@@ -1,17 +1,23 @@
 #!/bin/sh
-#(whereis rofi | grep "/rofi") && "OK, doxywizard available"
-#(whereis doxygen | grep "/doxygen") && echo "OK, doxygen installed"
-#(whereis doxywizard | grep "/doxywizard") && echo "OK, doxywizard installed"
+# How to install and check required componets:
+# ============================================
+# sudo apt install rofi
+# (whereis rofi | grep "/rofi") && "OK, doxywizard available"
+# sudo apt install doxygen
+# (whereis doxygen | grep "/doxygen") && echo "OK, doxygen installed"
+# sudo apt install doxygen-gui
+# (whereis doxywizard | grep "/doxywizard") && echo "OK, doxywizard installed"
 
-#!/bin/sh
+# REALNY KOD PONIŻEJ:
+# ===================
 
 # Funkcja sprawdzająca dostępność komponentu
 check_dependency() {
     if ! whereis "$1" | grep -q "/$1"; then
-        echo "BŁĄD: Komponent '$1' nie jest zainstalowany. Przerywam."
+        echo "ERROR: '$1' is NOT installed! Sorry."
         exit 1
     fi
-    echo "OK, $1 zainstalowany"
+    #echo "OK, $1 is instaled."
 }
 
 # 1. Sprawdzenie zależności
@@ -58,7 +64,7 @@ case $choice in
         ;;
 esac
 
-# 3. Uruchomienie Doxygen
+# 3. Uruchomienie Doxygen-a
 if [ -f "$FILE" ]; then
     echo "\nRUNNING Doxygen ($FILE):\n"
     doxywizard "$FILE"

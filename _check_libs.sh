@@ -31,19 +31,22 @@ else
     exit 1
 fi
 
-echo "Wykryto system: $OS_TYPE"
-echo "--------------------------"
+echo -e $COLOR2"Detected system kind: $OS_TYPE"$COLOR1
+echo "------------------------------------"
 
 # Sprawdzanie Xlib
 if check_package "$XLIB_PKG"; then
-    echo "[OK] Xlib ($XLIB_PKG) jest zainstalowana."
+    echo -e $COLOR2"[OK] Xlib ($XLIB_PKG) is instaled."$NORMCO
 else
-    echo "[FAIL] Xlib ($XLIB_PKG) NIE jest zainstalowana."
+    echo -e $COLERR"[FAIL] Xlib ($XLIB_PKG) is NOT instaled!"$NORMCO
+    exit 2
 fi
 
 # Sprawdzanie Xpm
 if check_package "$XPM_PKG"; then
-    echo "[OK] Xpm ($XPM_PKG) jest zainstalowana."
+    echo  -e $COLOR2"[OK] Xpm ($XPM_PKG) is instaled."$NORMCO
 else
-    echo "[FAIL] Xpm ($XPM_PKG) NIE jest zainstalowana."
+    echo -e $COLERR"[FAIL] Xpm ($XPM_PKG) is NOT instaled!."$NORMCO
+    exit 3
 fi
+

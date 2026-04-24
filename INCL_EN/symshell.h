@@ -576,7 +576,7 @@ ssh_mode  input_ready();
   * * '\b': A mouse event is pending. You must use `get_mouse_event` and react accordingly.
   * * EOF: The graphics window has been closed. The program must terminate.
   * * NNN: A large number representing a menu command (typically above 1024).
-  * * '/0': A neutral character. Usually indicates an event processed internally by the library. Should be ignored. */
+  * * '\0': A neutral input. Usually indicates an event processed internally by the library. Should be ignored. */
 ssh_msg   get_char();
 
 ssh_stat  set_char(ssh_msg ch); /**< \brief Sending a character back to input. \return Returns 0 if no space.

@@ -577,7 +577,7 @@ ssh_mode  input_ready();
   *     * '\b': Jest zdarzenie myszy do przetworzenia. Trzeba użyć `get_mouse_event` i odpowiednio zareagować.
   *     * EOF: Zamknięto okno graficzne. Trzeba zakończyć program.
   *     * NNN: Duża liczba reprezentującą komendę z menu (zazwyczaj powyżej 1024).
-  *     * '/0': znak neutralny. Zazwyczaj oznacza zdarzenie, które biblioteka sama przetworzyła. Należy zignorować.   */
+  *     * '\0': neutralny komunikat. Zazwyczaj oznacza zdarzenie, które biblioteka sama przetworzyła. Należy zignorować. */
 ssh_msg   get_char();
 
 ssh_stat  set_char(ssh_msg ch); /**< \brief Odesłanie znaku na wejście. \return Zwraca 0, jeśli nie ma miejsca.

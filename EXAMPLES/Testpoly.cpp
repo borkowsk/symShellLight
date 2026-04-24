@@ -1,21 +1,29 @@
-//-/////////////////////////////////////////////////////////////////////////////////////////
+/// @file
+/// @brief A sample SYMSHELL program demonstrating drawing bars and polygons/
+///        Przykładowy program SYMSHELL-a demonstrujący rysowanie słupków i wielokątów.
+/// @date 2026-04-24 (last update)
+//-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// @page page_e3_bars_and_polygons SYMSHELL TEST FOR 3D bars and polygons
-/// @brief Program SYMSHELL'A rysujący słupki 3D i poligony na klikanie myszką
+/// @brief SYMSHELL's program that draws 3D bars and polygons by clicking the mouse/Program SYMSHELL'A rysujący słupki 3D i poligony na klikanie myszką
 ///
-/// @section intro_sec_e3 Opis przykładu "3D BARS & POLYGONS"
-/// Demonstracja użycia poligonów i pseudo 3D słupków. Klikanie myszą powoduje
-/// cykliczne dodawanie wieloboków do listy. Funkcja replot() odrysowuje słupki
+/// @section intro_sec_e3 Description of the "3D BARS & POLYGONS" example/Opis przykładu "3D BARS & POLYGONS"
+///
+/// EN: Demonstration of the use of polygons and pseudo-3D bars. Clicking the mouse causes
+/// polygons to be added to the list periodically. The `replot` function draws the bars
+/// and polygons.
+/// A handler loop similar to the one in 'testsyms.cpp', but it waits for events
+/// and does not allow background execution (it does not use `input_ready`)
+///
+/// PL: Demonstracja użycia poligonów i pseudo 3D słupków. Klikanie myszą powoduje
+/// cykliczne dodawanie wieloboków do listy. Funkcja `replot` odrysowuje słupki
 /// i poligony.
 /// Pętla obsługi podobna do tej w 'testsyms.cpp', ale oczekuje na zdarzenia
-/// i nie umożliwia pracy w tle (nie używa input_ready() )
+/// i nie umożliwia pracy w tle (nie używa `input_ready`)
 /// @include Testpoly.cpp
-///
-/// @file
-/// @brief Przykładowy program SYMSHELLA demonstrujący rysowanie słupków i wielokątów.
-/// @date 2026-04-17 (last update)
-//-/////////////////////////////////////////////////////////////////////////////////////////
+//-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "symshell.h"
+
 #include <cstdio>
 #include <cstdlib>
 
@@ -27,6 +35,7 @@ const int c=6;
 const int WHITE=255;
 const int YELLO=254;
 
+/// Bar3D draw function. Similar to code available in "sshutils".
 void column(int x, int y, int h, unsigned char col1, unsigned char col2)
 {
     ssh_point romb[7];
@@ -180,8 +189,8 @@ int main(int argc,const char* argv[])
                screen_height()-char_height('X'),
                34,255,"%c",znak);
 
-        flush_plot(); /// When there is an animation, flush plot costs CPU time,
-                      /// even if there were no changes!
+        flush_plot(); // When there is an animation, flush plot costs CPU time,
+                      // even if there were no changes!
     }
 
     //Terminating this application

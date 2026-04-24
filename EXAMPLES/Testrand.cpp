@@ -1,17 +1,24 @@
 /// @file
-/// @brief Losowe punkty na ekranie w oknie, którego rozmiar można zmieniać.
-///                     Przykładowy program SYMSHELL'A.
-///-------------------------------------------------------------------------
-/// Demonstruje skalowanie okna niezależne od aplikacyjnej strony programu
-/// i robione w funkcjach symshell'a.
-/// @date 2026-04-18 (last update)
+/// @brief Random points in a resizable window/
+///        Losowe punkty w oknie, którego rozmiar można zmieniać.
+//-------------------------------------------------------------------------
+/// @date 2026-04-24 (last update)
+/// @page page_e8_randpoints RANDOM POINTS/LOSOWE PUNKTY
+/// @brief Random points in a resizable window/Losowe punkty w oknie, którego rozmiar można zmieniać
+/// @section intro_sec_e8 Random points in a resizable window/Losowe punkty w oknie o zmiennym rozmiarze
+/// EN: Demonstrates window scaling independent of the application side of the program
+///     and performed in symshell functions.
+///
+/// PL: Demonstruje skalowanie okna niezależne od aplikacyjnej strony programu
+///     i robione w funkcjach symshell'a.
+/// @include Testrand.cpp
 //-////////////////////////////////////////////////////////////////////////////
 #include "symshell.h"
 #include <cstdio>
 #include <cstdlib>
 #include <cfloat>
 #define USES_STDC_RAND
-#include "random.h"
+//#include "random.h"
 #include "wb_rand.hpp"
 #include "wb_cpucl.hpp"
 
@@ -59,18 +66,18 @@ void replot()
     flush_plot();
 }
 
-/*  OGÓLNA FUNKCJA MAIN  */
-/* ********************* */
+/* GENERAL MAIN FUNCTION/OGÓLNA FUNKCJA "MAIN" */
+/* ******************************************* */
 
 int main(int argc,const char* argv[])
 {
-    int i=0,click=0; //xpos=0,ypos=0, to dane myszowe.
-    int cont=1; //flaga kontynuacji
-    int std=0;  //flaga użycia stdout
+    int i=0;//click=0,xpos=0,ypos=0; this is mouse data/to dane myszowe.
+    int cont=1; // continuation flag/flaga kontynuacji
+    int std=0;  // stdout usage flag/flaga użycia stdout
 
-    mouse_activity(0);/* Mysz niepotrzebna */
+    mouse_activity(0); /* No mouse needed here./Tu mysz niepotrzebna. */
     set_background(128);
-    buffering_setup(1);/* Włączona animacja. Tu będzie potrzebna */
+    buffering_setup(1);/* Animation enabled. You'll need this./Włączona animacja. To będzie potrzebne. */
     shell_setup("SYMSHELL - RANDS",argc,argv);
     printf("COLORS= 256 q-quit s-switch stdout on/off\n");
 
@@ -80,20 +87,20 @@ int main(int argc,const char* argv[])
         exit(1);
     }
 
-    while(cont)  //PĘTLA GŁÓWNA
+    while(cont)  //MAIN LOOP/PĘTLA GŁÓWNA
     {
         int inpt;
 
-        while(!input_ready()) // Czekaj na jakieś wejście
-            replot(); // odrysowując
+        while(!input_ready()) // Wait for some input/Czekaj na jakieś wejście
+            replot(); //redrawing... / wciąż rysując.
 
-        inpt=get_char(); //Jest wejście. Trzeba przetworzyć.
+        inpt=get_char(); //There is input. It needs to be processed./Jest wejście. Trzeba je przetworzyć.
         switch(inpt)
         {
         default: printf("Event: %d x%x %c\n",inpt,inpt,inpt);
                  fflush(stdout);
                  break;
-        case '\0': /* A not important event */
+        case '\0': /* A not important event/Zdarzenie nieistotne */
                    printf("noImpEvent ");
                    break;
         case '\r': break;
@@ -118,7 +125,7 @@ int main(int argc,const char* argv[])
     }
 
     close_plot();
-    printf("Do widzenia!!!\n");
+    printf("Bye!/Do widzenia!!!\n");
     return 0;
 }
 

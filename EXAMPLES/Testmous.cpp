@@ -1,17 +1,20 @@
-//-/////////////////////////////////////////////////////////////////////////////////////////
-/// @page page_e4_mouse SYMSHELL TEST FOR Mouse
-/// @brief Program SYMSHELL'A obsługujący klikanie myszką
-///
-/// @section intro_sec_e4 Opis przykładu "Użycie myszy"
-/// Demonstruje obsługę zdarzeń myszowych.
-/// Zapamiętuje punkty kliknięć i potrafi je odrysować po naciśnięciu ENTER
-/// W tle miga napisem "Klikaj!"
-/// @include Testmous.cpp
-///
 /// @file
-/// @brief Przykładowy program SYMSHELLA demonstrujący obsługę myszy.
-/// @date 2026-04-17 (last update)
-//-/////////////////////////////////////////////////////////////////////////////////////////
+/// @brief A sample SYMSHELLA program demonstrating mouse support/
+///        Przykładowy program SYMSHELLA demonstrujący obsługę myszy.
+/// @date 2026-04-24 (last update)
+//-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// @page page_e4_mouse SYMSHELL TEST FOR Mouse
+/// @brief SYMSHELL'S program that handles mouse clicking/Program SYMSHELL'A obsługujący klikanie myszką.
+///
+/// @section intro_sec_e4 Description of the "Using the Mouse" example/Opis przykładu "Użycie myszy"
+///
+/// EN: Demonstrates mouse event handling. Remembers click points and can redraw them after pressing ENTER.
+/// Flashes "Click!" in the background.
+///
+/// PL: Demonstruje obsługę zdarzeń myszowych. Zapamiętuje punkty kliknięć i potrafi je odrysować po naciśnięciu ENTER
+/// W tle miga napisem "Click!"
+/// @include Testmous.cpp
+//-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <iostream>
 
@@ -71,7 +74,7 @@ void read_mouse()
         if(click_index<max_points-1)
         {
             click_index++;
-            printf(" Punkt %d ",click_index);
+            printf(" Point %d ",click_index);
         }
         table[click_index].x=xpos;
         table[click_index].y=ypos;
@@ -88,7 +91,7 @@ int main(int argc,const char* argv[])
     unsigned ysize=200;
     mouse_activity(1);
     shell_setup(argv[0],argc,argv); //Program file name used as window title!
-    cout<<"TEST OBSŁUGI MYSZY W PRZENOŚNEJ POWŁOCE GRAFICZNEJ SYMSHELL'A:\n q-quit\n";
+    cout<<"MOUSE OPERATION TEST IN SYMSHELL`S PORTABLE GRAPHIC SHELL:\n q-quit\n";
     cout.flush();
 
     init_plot(xsize,ysize,0,0); //No extra space for text in the margins
@@ -123,8 +126,8 @@ int main(int argc,const char* argv[])
 
         switch(step % WAIT)
         {
-        case 0:	printc(5,0,128,255,"Klikaj!");break;
-        case (WAIT/2):printc(5,0,255,28,"Klikaj!");break;
+        case 0:	printc(5,0,128,255,"Click! Click!!!");break;
+        case (WAIT/2):printc(5,0,255,28,"Click! Click!!!");break;
         }
 
         step++;

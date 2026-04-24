@@ -1,15 +1,18 @@
 /// @file
 /// @brief "Mrówka Langtona" z możliwością wariacji na temat (turmit prototypowy)
-// -------------------------------------------------------------------------------
-/// @date 2026-04-19 (last update)
-///
 ///                   (przykładowy program SYMSHELL-a)
+// -------------------------------------------------------------------------------
+/// @date 2026-04-24 (last update)
+/// @page page_e7_turmit MRÓWKA LANGTONA ZAKODOWANA W SYMSHELL-u
+/// @brief Turmit prototypowy, łatwy do modyfikacji
 ///
-/// Prosta obsługa grafiki, ale z odtwarzaniem ekranu i obsługą zdarzeń
-/// , oraz własne menu kontekstowe, różne od domyślnego.
+/// @section intro_sec_e7 Opis przykładu "Mrówka Langtona"
+///     Prosta obsługa grafiki, ale z odtwarzaniem ekranu i obsługą zdarzeń
+///     , oraz własne menu kontekstowe, różne od domyślnego.
 ///
-/// Turmit ma element aktywny i środowisko, tzw. głowicę albo "czoło" oraz pamięć
-/// , ponieważ turmit jest tak naprawdę 2 wymiarowym uogólnieniem maszyny Turinga
+///     Turmit ma element aktywny i środowisko, tzw. głowicę albo "czoło" oraz pamięć
+///     , ponieważ turmit jest tak naprawdę 2 wymiarowym uogólnieniem maszyny Turinga
+/// @include Turmit.cpp
 //-//////////////////////////////////////////////////////////////////////////////////
 
 
@@ -33,8 +36,8 @@
 /// Wyjściowy rozmiar świata i "ekranu" symulacji.
 const int size=700;
 
-unsigned char World[size][size]; ///< Tablica świata: wyzerowana na początku, bo globalna
-                                 ///< unsigned char, żeby było od 0 do 255, bo typ char bywa też "signed"
+unsigned char World[size][size]; ///< Tablica świata: wyzerowana na początku, bo globalna.
+                                 ///< Jest `unsigned char`, żeby było od 0 do 255, bo typ `char` bywa też "signed"
                                  ///< (zależnie od kompilatora)
 
 unsigned step_counter=0; ///< Licznik realnych kroków modelu
@@ -89,19 +92,19 @@ void stats() ///< Funkcja do obliczenia statystyk
   //TODO: Np średniej liczby odwiedzeń już odwiedzonych oraz liczby pustych.
 }
 
-//Do wizualizacji obsługi zdarzeń
-const int DELA=0; //Jak długie oczekiwanie w obrębie pętli zdarzeń
-const int VISUAL=1000; //Co ile kroków symulacji odrysowywać widok
-const char* CZEKAM="Tylko patrz! "; //Monit w pętli zdarzeń
-int x_mouse=10,y_mouse=10; //Pozycja ostatniego "kliku" myszy
+//Do wizualizacji obsługi zdarzeń:
+const int DELA=0;      ///< Jak długie oczekiwanie w obrębie pętli zdarzeń.
+const int VISUAL=1000; ///< Co ile kroków symulacji odrysowywać widok.
+const char* CZEKAM="Tylko patrz! "; ///< Monit w pętli zdarzeń.
+int x_mouse=10,y_mouse=10; ///< Pozycja ostatniego "kliku" myszy (na razie zbędne).
 
-//Kilka deklaracji zapowiadających inne funkcje obsługujące model
-void replot(); //Funkcja odrysowująca
-void read_mouse(); // Obsługa myszy. Używać, o ile potrzebne!
-void write_to_file(); // Obsługa zapisu do pliku. Używać, o ile potrzebne!
-void screen_to_file(); //Zapis ekranu do pliku
+//Kilka deklaracji zapowiadających inne funkcje obsługujące model:
+void replot();         // Funkcja odrysowująca
+void read_mouse();     // Obsługa myszy. Używać, o ile potrzebne!
+void write_to_file();  // Obsługa zapisu do pliku. Używać, o ile potrzebne!
+void screen_to_file(); // Zapis ekranu do pliku
 
-void replot() //Rysuje na ekranie
+void replot() ///< Rysuje na ekranie
 {
     for(int x=0;x<size;x++)
         for(int y=0;y<size;y++)
@@ -125,7 +128,8 @@ ssh_menu_item_definition  context_menu_default[]= {
 };
 unsigned context_menu_default_size= sizeof(context_menu_default) / sizeof(context_menu_default[0]);
 
-int main(int argc,const char* argv[])//Potrzebne są parametry wywołania programu
+/** Główna funkcja. Potrzebne są parametry wywołania programu do ustawień symulacji i grafiki. */
+int main(int argc,const char* argv[])
 {
     fix_size(1);        // Czy udajemy, że ekran ma zawsze taki sam rozmiar?
     mouse_activity(0);  // Czy mysz będzie obsługiwana?
@@ -201,8 +205,8 @@ void read_mouse() ///< Procedura obsługi myszy. SZKIELETOWA!
 
 void write_to_file() ///< Zapis stanu modelu do pliku. SZKIELET!
 {
-    const char* NazwaPliku= NAZWA_MODELU ".out";//Używamy sztuczki ze zlepianiem stałych
-    //łańcuchowych przez kompilator
+    const char* NazwaPliku= NAZWA_MODELU ".out"; // Używamy sztuczki ze zlepianiem stałych.
+                                                 // łańcuchowych przez kompilator
     std::ofstream out(NazwaPliku); //Nazwa na razie ustalona z góry
     //TODO - funkcja powinna zapisać wyniki modelu do pliku zamiast wyrysowywać na ekranie
     //Format - tabela liczb odpowiedniego typu rozdzielanych tabulacjami

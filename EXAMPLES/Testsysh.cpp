@@ -1,15 +1,18 @@
+/// @file
+/// @brief Colors and letters/Kolory i litery
+/// @date 2026-04-24 (last update)
 //-/////////////////////////////////////////////////////////////////////////////////////////
 /// @page page_e1_simplest VERY SIMPLE TEST
-/// @brief Najprostszy program SYMSHELL'A
+/// @brief SYMSHELL's simplest program/Najprostszy program SYMSHELL'A
 ///
-/// @section intro_sec_e1 Opis przykładu "Kolory i litery"
-/// Bardzo prosty test bez funkcji odtwarzania ekranu. Następuje odtwarzanie z bitmapy
+/// @section intro_sec_e1 Description of the "Colors and Letters" example/Opis przykładu "Kolory i litery"
+///
+/// EN: A very simple test without the screen playback function. It plays from a bitmap
+/// , but when you resize the window, the screen goes black!
+///
+/// PL: Bardzo prosty test bez funkcji odtwarzania ekranu. Następuje odtwarzanie z bitmapy
 /// , ale po zmianie rozmiaru okna ekran będzie czarny!
-/// @include Testsysh.cpp
-///
-/// @file
-/// @brief Kolory i litery
-/// @date 2026-02-02 (last update)
+/// @include Testsysh.cpp`
 //-/////////////////////////////////////////////////////////////////////////////////////////
 
 #include "symshell.h"

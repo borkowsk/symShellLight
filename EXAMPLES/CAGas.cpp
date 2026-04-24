@@ -1,16 +1,16 @@
-﻿//-//////////////////////////////////////////////////////////////////////////////
-/// @file
-///  Szablon automatu komórkowego zastosowany do algorytmu dyfuzji.
-///                   (przykładowy program SYMSHELL'a)
-///------------------------------------------------------------------------------
+﻿/// @file
+/// @brief Szablon automatu komórkowego zastosowany do algorytmu dyfuzji.
+///                   (przykładowy program SYMSHELL-a)
+//------------------------------------------------------------------------------
+/// @date 2026-04-24 (last update)
+/// @details
 /// Prosta obsługa grafiki, ale z odtwarzaniem ekranu i obsługą zdarzeń.
 /// Linux:
-///     Wymagane -lX11 -lXpm
+///     Wymagane opcje "biblioteczne" -lX11 -lXpm
 /// Windows:
 ///     VC++ linkuje biblioteki Windows automatycznie
-///     Dev-Cpp potrzebne są dwie bibloteki:
+///     Dev-Cpp potrzebne są dwie biblioteki:
 ///     ".../Dev-Cpp/lib/libgdi32.a" oraz "...Dev-Cpp/lib/libcomdlg32.a"
-/// @date 2026-04-19 (last update)
 //-//////////////////////////////////////////////////////////////////////////////
 //#define MULTITR (1)  //Jeśli chcemy użyć wielowątkowości, ale nie działa, bo jakieś niezdefiniowane "size"
 
@@ -52,77 +52,76 @@ int myrand()//Na wzór rand() Microsoftu
 #include "symshell.h"
 #include "wb_cpucl.hpp"
 #include "optParam.hpp"
-cticker MyCPUClock;         //Czas od startu programu do liczenia "średniego czasu kroku brutto"
 
-#define NAZWA_MODELU  "2x2 gas v1.0mt " //Użycie define, a nie const char* ułatwia montowanie stałych łańcuchów
+cticker MyCPUClock;        ///< Czas od startu programu do liczenia "średniego czasu kroku brutto"
 
-//Wyjściowy rozmiar świata i "ekranu" symulacji
-const int MAXSIDE=1000;
-int     curr_side=500; //Raczej powinno być parzyste!
+#define NAZWA_MODELU  "2x2 gas v1.0mt " ///< Nazwa jako łańcuch. Użycie makra, a nie const char* ułatwia montowanie stałych łańcuchów.
+
+/// Największy rozmiar świata i "ekranu" symulacji (dla stałej tablicy).
+const int MAX_SIDE=1000;
+int       curr_side=500;   ///< Bok świata. Raczej powinien być parzysty!
 
 //Do wizualizacji obsługi zdarzeń
-const char* CZEKAM="?>"; //Monit w pętli zdarzeń
-const int DELA=0; //Jak długie oczekiwanie w obrębie pętli zdarzeń
-unsigned VISUAL=1; //Co ile kroków symulacji odrysowywać widok
-int x_mouse=10,y_mouse=10; //Pozycja ostatniego "kliku" myszy
+const char* CZEKAM="?>";   ///< Monit w pętli zdarzeń
+const int   DELA=0;        ///< Jak długie oczekiwanie w obrębie pętli zdarzeń
+unsigned    VISUAL=1;      ///< Co ile kroków symulacji odrysowywać widok
+int x_mouse=10,y_mouse=10; ///< Pozycja ostatniego "kliku" myszy. Na razie nieużywana.
 
-time_t RANDOM_SEED=time(NULL);    //Zarodek generatora pseudolosowego 
-unsigned DENSITY=(curr_side*curr_side)/100; //Musi być tyle, żeby były miejsca z komórkami obok siebie
-                                  //TODO: manipulacja gęstością
+time_t   RANDOM_SEED=time(NULL);      ///< Zarodek generatora pseudolosowego
+unsigned DENSITY=(curr_side*curr_side)/100; ///< Gęstość zasiewu. Musi być tak, żeby były miejsca z komórkami obok siebie.
+                                            // TODO: manipulacja gęstością
                         
 wbrtm::OptionalParameterBase* Parameters[]={ //sizeof(Parameters)/sizeof(Parameters[])
 new wbrtm::ParameterLabel("PARAMETERS FOR SINGLE SIMULATION"),
 new wbrtm::OptionalParameter<unsigned>(DENSITY,1,10000,"DENSITY","How many particles"),
-new wbrtm::OptionalParameter<int>(curr_side,0,MAXSIDE,"SIDELEN","Side of the world"),
+new wbrtm::OptionalParameter<int>(curr_side, 0, MAX_SIDE, "SIDELEN", "Side of the world"),
 new wbrtm::ParameterLabel("TECHNICAL PARAMETERS"),
-new wbrtm::OptionalParameter<unsigned>(VISUAL,1,10000,"VISUAL","How many steps between visualisation"),
+new wbrtm::OptionalParameter<unsigned>(VISUAL,1,10000,"VISUAL","How many steps between visualizations?"),
 #ifdef MULTITR
 new wbrtm::OptionalParameter<unsigned>(prefered_threads,1,max_threads,"THREADS","How many threads"),
 #else
-new wbrtm::OptionalParameter<time_t>(RANDOM_SEED,1,0x1FFFFFF,"RANDSEED", //Do zasiewanie liczby losowej
-                        "Use, if you want the same simulation many times. Do not work with multithreated version"),
+new wbrtm::OptionalParameter<time_t>(RANDOM_SEED,1,0x1FFFFFF,"RANDSEED", //Do zasiewania liczby losowej.
+                        "Use if you want the same simulation many times! Do not work with a multithreading version."),
 #endif
-new wbrtm::ParameterLabel("END OF LIST")
+new wbrtm::ParameterLabel("END OF THIS LIST.")
 };    
 
 
-//Klasyczny automat komórkowy zmienia stan wszystkich komórek "jednocześnie"
-//co w praktyce oznacza, że potrzebna jest jedna tablica na stan aktualny 
-//i jedna na przyszły.
-typedef unsigned char WorldType[MAXSIDE][MAXSIDE]; //Zadeklarowanie takiego typu pomaga obejść
-                                             //pokrętny sposób deklaracji wskaźnika do tablicy
-//unsigned char żeby było od 0 do 255, bo typ char bywa też "signed" (zaleznie od kompilatora)
-//Dodatkowa zaleta że wystarczy zmienić ten typedef i zmieniają się wszystkie zmienne 
-//tego typu.
+/// @details Klasyczny automat komórkowy zmienia stan wszystkich komórek "jednocześnie"
+/// , co w praktyce oznacza, że potrzebna jest jedna tablica na stan aktualny i jedna na przyszły.
+/// Zadeklarowanie specjalnego typu tablicowego pomaga obejść pokrętny sposób deklaracji wskaźnika do tablicy.
+/// Używamy `unsigned char` żeby było od 0 do 255, bo typ `char` bywa też "signed" (zależnie od kompilatora)
+/// Dodatkowa zaleta jest taka, że wystarczy zmienić ten typedef i zmieniają się wszystkie zmienne tego typu.
+typedef unsigned char WorldType[MAX_SIDE][MAX_SIDE]; ///< @brief Świat jako typ.
 
-WorldType World1;//Pierwsze tablica świata - wyzerowana na poczatku bo globalna
-WorldType World2;//Druga tablica świata - j.w.
-WorldType* World=(&World1);//Aktualna tablica świata, a właściwie adres do niej
+WorldType  World1; ///< Pierwsze tablica świata. Wyzerowana na początku, bo globalna.
+WorldType  World2; ///< Druga tablica świata. @copydetails World1
+WorldType* World=(&World1); ///< Aktualna tablica świata, a właściwie wskaźnik do niej (czyli adres w pamięci).
 
-unsigned step_counter=0;//Licznik realnych kroków modelu
+unsigned step_counter=0; ///< Licznik realnych kroków modelu.
 
+/// Funkcja do "zapoczątkowania świata".
+/// Wsypujemy trochę jedynek w losowe miejsca, używając `rand` z C RTM.
 void init_world()
-//Funkcja do "zapoczątkowania świata"
-//Wsypujemy trochę jedynek w losowe miejsca używając rand() z C RTL
 {
     srand(RANDOM_SEED); //Inicjacja generatora liczb pseudolosowych
-    for(unsigned k=0;k<DENSITY;k++)
+    for(unsigned k=0;k<DENSITY;k++) // Gdzieniegdzie coś ma być...
     {
-        unsigned i=rand() % curr_side; //% operacja reszta z dzielenia
-        unsigned j=rand() % curr_side; //czyli "modulo". Chmmm... *
-        World1[i][j]=1; //Gdzieniegdzie coś ma być...
+        unsigned i=rand() % curr_side; // Znak `%` to w C operacja reszty z dzielenia!
+        unsigned j=rand() % curr_side; // Czyli "modulo". *
+        World1[i][j]=1;
     }
-    // * Robienie modulo z wynikiem funkcji rand() jest podobno odradzane przez znawców :-)
-    //   Przy tak małym "świecie" może jednak nie zobaczymy problemu
+    // * Robienie modulo z wynikiem funkcji `rand()` jest podobno odradzane przez znawców :-)
+    //   Przy tak małym "świecie" może jednak nie zobaczymy problemu.
 }
 
-//Funkcja do zamykania świata w torus
-inline //<-- To funkcja "rozwijana w kodzie" 
+/// Funkcja do zamykania świata w torus. Może już nie być używana.
+inline //<— To funkcja "rozwijana w kodzie" dla efektywności obliczeniowej.
 unsigned BezpiecznyOffset(int offset,unsigned start,unsigned WYMIAR)
 {
     //Operacje na typie BEZ ZNAKU! Główne założenie: nigdy nie przejść poniżej zera!!!!!
-    unsigned pom=WYMIAR;//Bezpieczna "głębia"
-    pom=pom+start+offset;//Problem byłby tylko, gdy offset ujemny i ABS(offset)>WYMIAR+start
+    unsigned pom=WYMIAR; //Bezpieczna "głębia"
+    pom=pom+start+offset; //Problem byłby tylko, gdy offset ujemny i ABS(offset)>WYMIAR+start
     //... ale to by była duża złośliwość :-)
     //Jednak teraz na pewno wychodzi poza WYMIAR od strony dodatniej
     pom=pom % WYMIAR;    //To załatwia "reszta z dzielenia", którą i tak byśmy robili
@@ -150,28 +149,28 @@ unsigned char Rules[16][7]={
                            // --
     { 2, 6, 5, 3,12,10, 9},// x-  1001 --> 0x9
                            // -x
-    { 2, 5, 3,12,10, 9, 6},// x-  1010 --> 0xa czyli 10
+    { 2, 5, 3,12,10, 9, 6},// x-  1010 --> 0xa, czyli 10
                            // x-
-    { 3,13,11, 7,14,13,11},// x-  1011 --> 0xb czyli 11
+    { 3,13,11, 7,14,13,11},// x-  1011 --> 0xb, czyli 11
                            // xx
-    { 2, 3,12,10, 9, 6, 5},// x-  1100 --> 0xc czyli 12
+    { 2, 3,12,10, 9, 6, 5},// x-  1100 —> 0xc, czyli 12
                            // x-
-    { 3,11, 7,14,13,11, 7},// xx  1101 --> 0xd czyli 13
+    { 3,11, 7,14,13,11, 7},// xx  1101 --> 0xd, czyli 13
                            // -x
-    { 3, 7,14,13,11, 7,14},// xx  1110 --> 0xe czyli 14
+    { 3, 7,14,13,11, 7,14},// xx  1110 --> 0xe, czyli 14
                            // x-
-    { 4,15,15,15,15,15,15} // xx  1111 --> 0xf czyli 15
+    { 4,15,15,15,15,15,15} // xx  1111 --> 0xf, czyli 15
                            // xx
 };
 
-//DEFINICJA FUNKCJI RegulaIZmiana()
-//Będącej właściwą implementacją automatu. Tu się ustala stan aktualny oraz wybiera następny
-inline //<-- To funkcja "rozwijana w kodzie"
-void RegulaIZmiana( unsigned i, //Wiersz startowej komórki bloku
-                    unsigned j, //Kolumna startowej komórki
-                    WorldType& SW,//Z jakiego świata?
-                    WorldType& TW //Do jakiego świata
-                                  //,unsigned& rstate //stan generatora rand_r //TODO PO CO ?
+/// DEFINICJA FUNKCJI IMPLEMENTACJI "reguł zmiany".
+/// Będącej właściwą implementacją automatu. Tu się ustala stan aktualny oraz wybiera następny.
+inline //<— To funkcja "rozwijana w kodzie".
+void RegulaIZmiana( unsigned i,     //!< Wiersz startowej komórki bloku.
+                    unsigned j,     //!< Kolumna startowej komórki
+                    WorldType& SW,  //!< Źródło, czyli z jakiego świata bierzemy.
+                    WorldType& TW   //!< Do jakiego świata zapisujemy.
+                                    //,unsigned& rstate //stan generatora rand_r //TODO PO CO ?
                             )
 {
     unsigned le=(j+1)%curr_side; //Zamknięcie w torus
@@ -182,7 +181,7 @@ void RegulaIZmiana( unsigned i, //Wiersz startowej komórki bloku
 #ifdef MULTITR
     unsigned randVal=myrand(); //używa wielowątkowo specyficznego stanu czyi każdy watek ma inny ciąg pseudolosowy
 #else
-    unsigned randVal=rand();   //Czy `rand()` jest jakoś zabezpieczone względem wątków? OGÓLNIE WĄTPIE. W  MSVC++ nie
+    unsigned randVal=rand();   //Czy `rand()` jest jakoś zabezpieczone względem wątków? OGÓLNIE WĄTPIĘ. W  MSVC++ nie.
 #endif
 
     unsigned char nex=old==0?0:old==15?15:Rules[old][1+randVal%6];//Sprawdzenie stanu, ale 0 i 15 nie mają szans na zmianę
@@ -195,6 +194,7 @@ void RegulaIZmiana( unsigned i, //Wiersz startowej komórki bloku
 }
 
 #ifdef MULTITR
+/// Funkcja pomagająca dzielić krok symulacji na wąttki.
 void doMove(int StartLine,int EndLine,int Parity, WorldType* pSW,WorldType* pTW)
 {
     //printf("%u %u\n",StartLine,EndLine);fflush(stdout);
@@ -208,8 +208,8 @@ void doMove(int StartLine,int EndLine,int Parity, WorldType* pSW,WorldType* pTW)
 }
 #endif
 
+/// Funkcja robiąca jeden SYNCHRONICZNY krok symulacji.
 void single_step()
-//Funkcja robiąca jeden SYNCHRONICZNY krok symulacji
 {
     //Ustalenie co jest stare a co nowe tym razem
     WorldType* OldWorld=NULL;//Dla pewności pusty wskaźnik
@@ -247,10 +247,13 @@ void single_step()
     step_counter++;
 }
 
-//Statystyki i ich liczenie oraz wyświetlanie
-unsigned alife_counter=0;//Licznik żywych komórek. Do użycia też w wyświetlaniu, więc globalny
+// Statystyki i ich liczenie oraz wyświetlanie:
+// --------------------------------------------
+
+unsigned alife_counter=0; ///< Licznik żywych komórek. Do użycia też w wyświetlaniu, więc globalny.
 
 #ifdef MULTITR
+/// Funkcja do pomagająca w WIELOWATKOWYM obliczaniu statystyk.
 void doStat(int StartLine,int EndLine,unsigned& Summ)
 {
     //printf("%u %u\n",StartLine,EndLine);fflush(stdout);
@@ -263,8 +266,8 @@ void doStat(int StartLine,int EndLine,unsigned& Summ)
 }
 #endif
 
+/// Funkcja do obliczenia statystyk.
 void statistics()
-//Funkcja do obliczenia statystyk
 {
     alife_counter=0;
 #ifdef MULTITR
@@ -292,46 +295,50 @@ void statistics()
 #else
     for(int x=0;x<curr_side;x++)
         for(int y=0;y<curr_side;y++)
-        {          //World jest wskaźnikiem na tablicę, więc trzeba go użyć jak
+        {   //World jest wskaźnikiem na tablicę, więc trzeba go użyć jak
             //wskaźnika, a dopiero potem jak tablicy. Nawias konieczny.
             if((*World)[y][x]!=0)
                 alife_counter++;
         }
 #endif
-    printc(curr_side/2,curr_side,200,64,"%06u  ",alife_counter);//Licznik kroków
+    printc(curr_side/2,curr_side,200,64,"%06u  ",alife_counter); //Licznik kroków
     // std::cout<<step_counter<<"      \t"<< alife_counter <<std::endl;
 }
 
 //TODO 3: zapis do pliku...
 
-//Kilka deklaracja zapowiadających inne funkcje obsługujące model
-void replot(); //Funkcja odrysowująca
-void read_mouse(); // Obsługa myszy. Używać tylko gdy potrzebne (spowalnia)
-void write_to_file(); // Obsługa zapisu do pliku.  Używać tylko gdy potrzebne (spowalnia)
-void screen_to_file(); //Zapis ekranu do pliku
+// Kilka deklaracji zapowiadających inne funkcje obsługujące model:
+// ----------------------------------------------------------------
+void replot();         // Funkcja odrysowująca.
+void read_mouse();     // Obsługa myszy. Używać tylko, gdy potrzebne (spowalnia).
+void write_to_file();  // Obsługa zapisu do pliku. Używać tylko, gdy potrzebne (spowalnia).
+void screen_to_file(); // Zapis ekranu do pliku.
 
-void replot() //Rysuje coś na ekranie
+void replot() ///< Rysuje świat na ekranie.
 {
     for(int x=0;x<curr_side-1;x++)
         for(int y=0;y<curr_side-1;y++)
-        {          //World jest wskaźnikiem na tablicę, więc trzeba go użyć jak
+        {   //World jest wskaźnikiem na tablicę, więc trzeba go użyć jak
             //wskaźnika, a dopiero potem jak tablicy. Nawias konieczny.
             unsigned z=(*World)[y][x]*200;//Spodziewana wartość to 0 lub 1
             z%=256; //Żeby nie przekroczyć kolorów
-            //z%=512; //Albo z szarościami
+            //z %= 512; //Albo z szarościami
             plot(x,y,z);
         }
     printc(curr_side/5,curr_side,128,255,"%06u MstT:%g  ",
-           step_counter,(double)MyCPUClock/step_counter);//Licznik kroków
-    //Ostatnie położenie kliku: biały krzyżyk
-    //line(x_mouse,y_mouse-10,x_mouse,y_mouse+10,255);
-    //line(x_mouse-10,y_mouse,x_mouse+10,y_mouse,255);
+           step_counter,(double)MyCPUClock/step_counter); //Licznik kroków
+    //Ostatnie położenie kliku: biały krzyżyk — aktualnie zbędne.
+    //line(x_mouse, y_mouse-10, x_mouse, y_mouse+10,255);
+    //line(x_mouse-10, y_mouse, x_mouse+10, y_mouse,255);
 }
 
-
-int main(int argc,const char* argv[]) //Potrzebne są parametry wywołania programu
+/// Funkcja zaczynająca wykonie programu.
+/// \param argc,argv - potrzebne są parametry wywołania programu, w których może być sterowanie symulacją
+///                    , ale także wizualizacją (parametry modułu graficznego zaczynające się od `-`).
+int main(int argc,const char* argv[])
 {
     printf("Model \"%s\". File version %s\n", NAZWA_MODELU, __TIMESTAMP__);
+    // Czytanie parametrów dla modelu.
     if(wbrtm::OptionalParameterBase::parse_options(argc,argv,Parameters,sizeof(Parameters)/sizeof(Parameters[0])))
     {
         exit(222);
@@ -344,19 +351,23 @@ int main(int argc,const char* argv[]) //Potrzebne są parametry wywołania progr
     fix_size(1);       // Czy udajemy, że ekran ma zawsze taki sam rozmiar?
     mouse_activity(0); // Czy mysz będzie obsługiwana?
     buffering_setup(1);// Czy będzie rysować poprzez bitmapę z zawartością ekranu?
-    shell_setup(NAZWA_MODELU, argc, argv);// Przygotowanie okna z użyciem parametrów wywołania
-    init_plot(curr_side,curr_side,0,1);// Otwarcie okna SIZExSIZE pikseli + 1 wiersz znaków za pikselami
 
-    // Teraz można rysować i pisać w oknie
-    init_world();  //Tu jest też wywołanie srand();
+    // Czytanie parametrów wizualizacji i ich użycie przy inicjalizacji.
+    shell_setup(NAZWA_MODELU, argc, argv); // Przygotowanie okna z użyciem parametrów wywołania
+    init_plot(curr_side,curr_side,0,1); // Otwarcie okna SIZE x SIZE pikseli + 1 wiersz znaków za pikselami
+
+    // Teraz można rysować i pisać w oknie po raz pierwszy.
+    init_world(); //Tu jest też wywołanie srand();
     replot();
     statistics();
-    flush_plot();	// Ekran (wirtualny) po inicjalizacji jest już gotowy
-    //screen_to_file();//ODKOMENTOWAĆ jak chcemy materiał do filmu
+    flush_plot(); // Ekran (wirtualny) po inicjalizacji jest już gotowy
+    //screen_to_file(); //ODKOMENTOWAĆ jak chcemy materiał do filmu
 
-    bool not_finished=true;//Zmienna sterująca zakończeniem programu
-    unsigned loop=0;    //Do zliczania nawrotów pętli zdarzeń
-    while(not_finished) //PĘTLA OBSŁUGI ZDARZEŃ
+    // TERAZ WŁAŚCIWE KROKI SYMULACJI:
+    // -------------------------------
+    bool not_finished=true; // Zmienna sterująca zakończeniem programu
+    unsigned loop=0;        // Do zliczania nawrotów pętli zdarzeń
+    while(not_finished)     // PĘTLA OBSŁUGI ZDARZEŃ
     {
         int pom; //NA ZNAK Z WEJŚCIE OKNA GRAFICZNEGO
         loop++;
@@ -376,13 +387,13 @@ int main(int argc,const char* argv[]) //Potrzebne są parametry wywołania progr
             case 'Q':
                         not_finished=false;break; // Wymuszenie zakończenia pętli
             default:
-                printbw(0,screen_height()-char_height('N'),"Nie wiem co znaczy %c [%d] ",pom,pom);
-                printf("Nie wiem co znaczy %c [%d] ",pom,pom);
+                printbw(0,screen_height()-char_height('N'),"Nie wiem, co znaczy %c [%d] ",pom,pom);
+                printf("Nie wiem, co znaczy %c [%d] ",pom,pom);
                 flush_plot();	// Grafika gotowa
                 break;
             }
         }
-        else //Symulacja - jako akcja na wypadek braku zdarzeń do obsługi
+        else //Symulacja, jako akcja na wypadek braku zdarzeń do obsługi.
         {
             single_step(); //Następny krok
             if(step_counter%VISUAL==0) //Odrysuj, gdy reszta z dzielenia równa 0
@@ -408,7 +419,7 @@ int main(int argc,const char* argv[]) //Potrzebne są parametry wywołania progr
     return 0;
 }
 
-void read_mouse() //Procedura obsługi myszy. SZKIELETOWA!
+void read_mouse() ///< Procedura obsługi myszy. Jest SZKIELETOWA, BO (na razie?) niepotrzebna.
 { 
    int xpos,ypos,click;
    if(get_mouse_event(&xpos,&ypos,&click)!=-1)//Operator & - pobranie adresu
@@ -419,7 +430,7 @@ void read_mouse() //Procedura obsługi myszy. SZKIELETOWA!
    }
 }
 
-void write_to_file()
+void write_to_file() ///< zapis stanu do pliku.
 {
     const char* NazwaPliku= NAZWA_MODELU ".out";//Używamy sztuczki ze zlepianiem stałych
                                               //łańcuchowych przez kompilator
@@ -442,13 +453,13 @@ void write_to_file()
     std::cout<<std::endl;
 }
 
-void screen_to_file() //Zapis ekranu do pliku (tylko Windows!)
+void screen_to_file() ///< Zapis ekranu do pliku.
 {  
-    char bufor[255];//Tymczasowe miejsce na utworzenie nazwy pliku
+    char bufor[255]; //Tymczasowe miejsce na utworzenie nazwy pliku
 #ifdef _MSC_VER /*MSVC*/
-    _snprintf_s(bufor,255,"%s%06u",NAZWA_MODELU,step_counter);//Nazwa + Numer kroku na 6 polach
+    _snprintf_s(bufor,255,"%s%06u",NAZWA_MODELU,step_counter); //Nazwa + Numer kroku na 6 polach
 #else
-    sprintf(bufor, "%s%06u", NAZWA_MODELU, step_counter);//Nazwa + Numer kroku na 6 polach
+    sprintf(bufor, "%s%06u", NAZWA_MODELU, step_counter); //Nazwa + Numer kroku na 6 polach
 #endif
     std::cout<<"Zapis ekranu do pliku \""<<bufor<<'"';
     dump_screen(bufor);
@@ -458,7 +469,7 @@ void screen_to_file() //Zapis ekranu do pliku (tylko Windows!)
 /* *******************************************************************/
 /*                 SYMSHELLLIGHT  version 2026                       */
 /* *******************************************************************/
-/*            THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
+/*             THIS CODE IS DESIGNED & COPYRIGHT BY:                 */
 /*             W O J C I E C H   B O R K O W S K I                   */
 /*     Instytut Studiów Społecznych Uniwersytetu Warszawskiego       */
 /*     WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI  */

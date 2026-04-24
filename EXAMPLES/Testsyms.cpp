@@ -1,15 +1,19 @@
-//-/////////////////////////////////////////////////////////////////////////////////////////
+/// @file
+/// @brief Example SYMSHELL program with "replot" function/
+///        Przykładowy program SYMSHELL'A z funkcją "replot"
+/// @date 2026-04-24 (last update)
+//-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// @page page_e5_replot SYMSHELL TEST WITH Replot
-/// @brief Program SYMSHELL'A z dużą funkcją odrysowywania
+/// @brief SYMSHELL program with large redraw function/Program SYMSHELL'A z dużą funkcją odrysowywania
 ///
-/// @section intro_sec_e5 Opis przykładu "Użycie replot()"
-/// Zawiera funkcje `replot()` odrysowująca główny wzorek oraz symulacje symulacji ;-)
+/// @section intro_sec_e5 Description of the example "Using replot()"/Opis przykładu "Użycie replot()"
+///
+/// EN: Includes a `replot` function that redraws the main pattern and simulates the actual simulation ;-)
+/// in the form of drawing growing bars interrupted by user actions.
+///
+/// PL: Zawiera funkcje `replot` odrysowująca główny wzorek oraz symulacje rzeczywistej symulacji ;-)
 /// w postaci rysowania rosnących kołek przerywanego akcjami użytkownika.
 /// @include Testsyms.cpp
-///
-/// @file
-/// @brief Przykładowy program SYMSHELL'A z funkcją "replot"
-/// @date 2026-04-17 (last update)
 //-/////////////////////////////////////////////////////////////////////////////////////////
 
 #include "symshell.h"

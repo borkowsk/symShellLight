@@ -1,23 +1,26 @@
-//-/////////////////////////////////////////////////////////////////////////////////////////
-/// @page page_e2_paleta SYMSHELL - RESKALOWALNA PALETA
-/// @brief Program SYMSHELL'A z automatycznym reskalowaniem i funkcją odrysowywania
-///
-/// @section intro_sec_e2 Opis przykładu "Reskalowalna paleta"
-/// Demonstruje skalowanie okna niezależne od aplikacyjnej strony programu
-/// i robione w funkcjach symshell'a. Pętla obsługi zdarzeń bez pracy w tle
-/// , czyli oczekuje na zdarzenia.
-/// @include Testpale.cpp
-///
 /// @file
-/// @brief Przykładowy program SYMSHELL'A z reskalowaniem
-/// @date 2026-02-16 (last update)
-//-/////////////////////////////////////////////////////////////////////////////////////////
+/// @brief Przykładowy program z reskalowaniem okna/Window rescaling example program.
+//         --------------------------------------------------------------------------
+/// @date 2026-04-24 (last update)
+//-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// @page page_e2_paleta SYMSHELL - RESKALOWALNA PALETA/RESCALABLE PALETTE
+/// @brief Program SYMSHELL'A z automatycznym reskalowaniem i funkcją odrysowywania/
+///        SYMSHELL application with automatic rescalling in replot function.
+/// @section intro_sec_e2 Opis przykładu "Reskalowalna paleta"/Example description: "Rescalable palette"
+///
+/// PL: Demonstruje skalowanie okna niezależne od aplikacyjnej strony programu
+///     i robione w funkcjach symshell'a. Pętla obsługi zdarzeń bez pracy w tle, czyli oczekuje na zdarzenia.
+///
+/// EN: Demonstrates window scaling independent of the application side of the program
+///     and performed within symshell functions. Event loop without background processing, i.e., it waits for events.
+/// @include Testpale.cpp
+//-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "symshell.h"
 #include <cstdio>
 #include <cstdlib>
 
-///On demand, it redraws the entire image - primitive but effective.
+/// On demand, it redraws the entire image - primitive but effective.
 void replot()
 {
     unsigned int i,j;
@@ -32,7 +35,7 @@ void replot()
             plot(j,i,pom);
         }
 
-    printbw(0,16,"%s","PALETA");
+    printbw(0,16,"%s","ENJOY PALETTE!");
     flush_plot();
     mouse_activity(old);
 }
@@ -48,7 +51,7 @@ int main(int argc,const char* argv[])
     mouse_activity(0); //We don't need the use_mouse now, so we deactivate it
     set_background(128);
     buffering_setup(0); //We don't need the animation, so we deactivate it
-    shell_setup("SYMSHELL - RESKALOWALNA PALETA ",argc,argv);
+    shell_setup("SYMSHELL - RESCALABLE PALETTE ",argc,argv);
     printf("COLORS= 256 q-quit s-switch stdout on/off\n"
            "setup options:\n"
            " -mapped -buffered -bestfont -traceevt\n"
@@ -93,7 +96,7 @@ int main(int argc,const char* argv[])
 
     //Terminating this application
     close_plot();
-    printf("Do widzenia!!! / Goodbye!!!\n");
+    printf("\nDo widzenia!!! / Goodbye!!!\n");
     return 0;
 }
 

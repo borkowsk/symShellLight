@@ -244,13 +244,13 @@ ssh_color background();
 
 /** \brief Aktualny kolor linii jako `ssh_color` (indeks koloru w tabeli).
     \details
-        Jeśli "pen" został ustawiony w trybie RBG(A), to zwraca wartość (unsigned)-1.
+        Jeśli "pen" został ustawiony w trybie RBG(A), to zwraca wartość `(unsigned)(-1)`.
         W przypadku implementacji SVG zawsze zwraca -1024. */
 ssh_color get_pen();
 
 /** \brief Aktualny kolor wypełnień jako `ssh_color`.
     \details
-        Jeśli "brush" został ustawiony w trybie RBG(A), to zwraca wartość (unsigned)-1.
+        Jeśli "brush" został ustawiony w trybie RBG(A), to zwraca wartość `(unsigned)(-1)`.
         W przypadku implementacji SVG zawsze zwraca 0 (czarny) */
 ssh_color get_brush();
 
@@ -573,17 +573,17 @@ ssh_mode  input_ready();
 /** \brief Blokująca funkcja odczytywania znaków sterowania i zdarzeń.
   * \return Indeks znaku z klawiatury, znak specjalny lub kod pozycji menu.
   * Niektóre znaki mają specjalne znaczenie:
-  *     * '\r': Wymagane odrysowanie co najmniej fragmentu ekranu. Można użyć `repaint_area` lub odrysować całość.
-  *     * '\b': Jest zdarzenie myszy do przetworzenia. Trzeba użyć `get_mouse_event` i odpowiednio zareagować.
-  *     * EOF: Zamknięto okno graficzne. Trzeba zakończyć program.
-  *     * NNN: Duża liczba reprezentującą komendę z menu (zazwyczaj powyżej 1024).
-  *     * '\0': neutralny komunikat. Zazwyczaj oznacza zdarzenie, które biblioteka sama przetworzyła. Należy zignorować. */
+  *  * '\r': Wymagane odrysowanie co najmniej fragmentu ekranu. Można użyć `repaint_area` lub odrysować całość.
+  *  * '\\b': Jest zdarzenie myszy do przetworzenia. Trzeba użyć `get_mouse_event` i odpowiednio zareagować.
+  *  *  EOF: Zamknięto okno graficzne. Trzeba zakończyć program.
+  *  *  NNN: Duża liczba reprezentującą komendę z menu (zazwyczaj powyżej 1024).
+  *  * '\0': neutralny komunikat. Zazwyczaj oznacza zdarzenie, które biblioteka sama przetworzyła. Należy zignorować. */
 ssh_msg   get_char();
 
 ssh_stat  set_char(ssh_msg ch); /**< \brief Odesłanie znaku na wejście. \return Zwraca 0, jeśli nie ma miejsca.
                                 * \details Gwarantowane jest tylko odesłanie jednego znaku! */
 
-/** \brief Funkcja odczytująca ostatnie zdarzenie myszy. \return 0 jeśli dane nie są dostępne. */
+/** \brief Funkcja odczytująca ostatnie zdarzenie myszy. \return 0, jeśli dane nie są dostępne. */
 ssh_stat  get_mouse_event(ssh_coordinate* x_pos,         /**< [out] Adres, na który wpisze poziome położenie kursora. */
                           ssh_coordinate* y_pos,         /**< [out] Adres, na który wpisze pionowe położenie kursora. */
                           ssh_coordinate* click          /**< [out] Adres, na który wpisze informacje o kliku lub 0.  */
@@ -678,9 +678,9 @@ inline void set_background(ssh_intensity r,ssh_intensity g,ssh_intensity b)
 }
 
 /// \brief Konwerter na referencje, żeby nie trzeba było używać adresów.
-inline ssh_stat  get_mouse_event(int& xpos,int& ypos,int& click)
+inline ssh_stat  get_mouse_event(int& x_pos,int& y_pos,int& click)
 {
-    return get_mouse_event(&xpos,&ypos,&click);
+    return get_mouse_event(&x_pos,&y_pos,&click);
 }
 
 /// \brief Konwerter na referencje, żeby nie trzeba było używać adresów.

@@ -18,7 +18,7 @@ Wyodrębnione z pełnej wersji w celach dydaktycznych i naukowych.
 >PL: Pliki nagłówkowe, umieszczone dotychczas w katalogu głównym repozytorium zostały od stycznia 2026 przeniesione 
 >do katalogu INCL (albo INCL_EN). Musicie poprawić tę ścieżkę w waszych projektach!
 
-**HISTORY**
+**HISTORICAL OUTLINE/RYS HISTORYCZNY**
 
 How could a programmer accustomed to "linear" simulation programming become adopted to the event-driven interface 
 of _X11_ or __MS Windows__ applications, in which control of the main program thread is transferred to the GUI?
@@ -33,7 +33,7 @@ __Windows__ and __DOS__ (under _GO32_) and modules for managing simulation resul
 (Currently available in the [_SymShell2AndRTM_](https://github.com/borkowsk/symShell2andRTM) package).
 
 In one way or another, it still serves me today. It can be also useful to any computer simulation developer who is no
-longer satisfied with _Python_ or _Matlab_, but who does not have the time to delve into the intricacies of Qt, or,  
+longer satisfied with _Python_ or _Matlab_, but who does not have the time to delve into the intricacies of Qt, or,
 even more so, the bare programming interfaces of windowing systems. Additionally, if you're using _Processing_ but find 
 the speed of its code execution in the Java virtual machine insufficient, you might be interested in the translator
 to C++, which I've been working on for several years. Its graphics translation is also based on the _SymShell_ library.
@@ -58,7 +58,7 @@ pracuję od kilku lat. Przekład grafiki w nim także opiera się na bibliotece 
 
 <img src="DOC/Just a linking test_16904.svg"/>
 
-**Quick start**
+**Quick start/dla niecierpliwych**
 
 The repository contains the library code and sample programs in the _EXAMPLES/_ directory
 To use, perform the following operations in the selected directory:
@@ -86,7 +86,7 @@ Current version does not work fully under __Windows__, because some functions ar
 PL: Zostało przetestowane na __UBUNTU 16.04__ z _gcc_, __UBUNTU 18.04__ z _gcc_, __UBUNTU 20.04__ z _gcc/g++_ oraz __POP OS 22.04__.
 Obecna wersja nie działa w pełni w __Windows__, ponieważ niektóre funkcje są pominięte lub nie można ich łatwo zaimplementować!!!
 
-**REQUIREMENTS**
+**REQUIREMENTS/WYMAGANIA**
 
 * cmake
 * make
@@ -96,11 +96,33 @@ Obecna wersja nie działa w pełni w __Windows__, ponieważ niektóre funkcje s�
 * _rofi_ for context menus
 * _Doxygen_, _DoxyWizard_ for creating documentation.
 
-**Licencing**
+**DOC/-kumentacja**
 
-You can use this software freely for educational and research purposes, but if you feel that it would be appropriate to repay somehow, please finance me a big coffee :-)
+If you can run the _Doxygen_ package in your system, simply run the *_makeDocs.sh* script. Everything
+is ready to generate documentation in Polish or English, or Polish/English (depending on the file).
+In modern IDEs, the Doxygen documentation should also work well as tooltips. The header files' language will 
+be adjusted to match your system's language, but you can also choose your own language by modifying two
+lines in the *CMakeFiles.txt* file.
 
-**COFFEE**
+PL: Jeśli możesz uruchomić u siebie pakiet _Doxygen_, to wystarczy, że uruchomisz skrypt *_makeDocs.sh*. Wszystko 
+jest przygotowane do wytworzenia dokumentacji w wersji polskiej lub angielskiej, lub polsko/angielskiej (w zależności 
+od pliku). W nowoczesnych IDE dokumentacja doxygen-owa powinna też dobrze działać jako podpowiedzi w trakcie pracy.
+Język plików nagłówkowych zostanie dopasowany do języka twojego systemu, ale możesz też wybrać sam modyfikując dwie 
+linie w pliku *CMakeFiles.txt*.
+
+
+**Licencing/Licencja**
+
+I've made every effort to ensure this software works properly, but of course, you use it at your own risk. 
+You can use it free of charge for educational and research purposes, and if you feel it's appropriate to give back 
+in some way, please buy me a large coffee :-)
+
+PL: Dołożyłem wszelkich starań, żeby to oprogramowanie działało, jak należy, ale oczywiście używasz na własną 
+    odpowiedzialność. Możesz używać go bezpłatnie w celach edukacyjnych i badawczych, a jeśli uznasz, że wypadałoby 
+    się w jakiś sposób odwdzięczyć, to proszę, postaw mi dużą kawę :-)
+
+
+**COFFEE/KAFKA**
 
 * [PayPal](https://www.paypal.com/paypalme/wborkowsk)
   OR

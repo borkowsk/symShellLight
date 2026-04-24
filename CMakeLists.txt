@@ -7,7 +7,7 @@
 # Manually define WITHTESTS=true, if you want build test applications!
 #
 # (c)ISS UW, @author Wojciech Borkowski
-# @date 2026-04-20 (last update)
+# @date 2026-04-24 (last update)
 ##################################################################################
 
 cmake_minimum_required(VERSION 3.20)
@@ -37,8 +37,8 @@ ENDIF()
 # ========================================
 
 # Pobieramy wartość zmiennej środowiskowej LANG. Uwaga! Windows nie zawsze ustawia zmienną $LANG w środowisku.
-#set(SYS_LANG $ENV{LANG})
-set(SYS_LANG en_EN.UTF-8) #wymuszenie EN
+set(SYS_LANG $ENV{LANG})
+#set(SYS_LANG en_EN.UTF-8) #EN enforcement
 #set(SYS_LANG pl_PL.UTF-8) #wymuszenie PL
 
 # Sprawdzamy, czy zawiera frazę "pl" lub "PL"

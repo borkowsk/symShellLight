@@ -572,11 +572,11 @@ ssh_mode  input_ready();
 /** \brief A blocking function for reading control characters and events.
   * \return A keyboard character index, a special character, or a menu item code.
   * Certain characters have special meanings:
-  * * '\r': A screen redraw (at least partial) is required. You can use `repaint_area` or redraw everything.
-  * * '\b': A mouse event is pending. You must use `get_mouse_event` and react accordingly.
-  * * EOF: The graphics window has been closed. The program must terminate.
-  * * NNN: A large number representing a menu command (typically above 1024).
-  * * '\0': A neutral input. Usually indicates an event processed internally by the library. Should be ignored. */
+  *     * '\r': A screen redraw (at least partial) is required. You can use `repaint_area` or redraw everything.
+  *     * '\\b': A mouse event is pending. You must use `get_mouse_event` and react accordingly.
+  *     *  EOF: The graphics window has been closed. The program must terminate.
+  *     *  NNN: A large number representing a menu command (typically above 1024).
+  *     * '\0': A neutral input. Usually indicates an event processed internally by the library. Should be ignored. */
 ssh_msg   get_char();
 
 ssh_stat  set_char(ssh_msg ch); /**< \brief Sending a character back to input. \return Returns 0 if no space.
@@ -681,9 +681,9 @@ inline void set_background(ssh_intensity r,ssh_intensity g,ssh_intensity b)
 }
 
 /// \brief Converter to references to avoid using addresses.
-inline ssh_stat  get_mouse_event(int& xpos,int& ypos,int& click)
+inline ssh_stat  get_mouse_event(int& x_pos,int& y_pos,int& click)
 {
-    return get_mouse_event(&xpos,&ypos,&click);
+    return get_mouse_event(&x_pos,&y_pos,&click);
 }
 
 /// \brief Converter to references to avoid using addresses.

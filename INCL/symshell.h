@@ -1,11 +1,13 @@
 /** @file
  * @brief SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++ (PL Doxygen).
- * @date 2026-04-21 (last modification)                                      */
+ * @date 2026-04-24 (last modification)                                      */
 /* ========================================================================= */
  /**
  * \details
- *             The whole file changed massively: 15.11.2020
- *             Comments changed massively: 3-4.01.2022
+ *      - Cały plik został znacząco zmieniony:     15.11.2020
+ *      - Komentarze zostały znacząco rozbudowane: 01.03-04.2022
+ *      - ... a potem zimą                         2025-2026
+ *      - Menu kontekstowe z użyciem „rofi” dodano w 2026 roku
  *
  * \note
  *      - https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI
@@ -13,7 +15,7 @@
  *
  ** \author     Designed by W. Borkowski from the University of Warsaw
  **
- ** \library    SYMSHELLLIGHT  version 2026b
+ ** \library    SYMSHELLLIGHT  version 2026c
  */
 #ifndef SYMSHELL_H_INCLUDED_
 #define SYMSHELL_H_INCLUDED_ (1)
@@ -302,8 +304,14 @@ void print_rgb(ssh_coordinate x,                                      /**< Wspó
 /* Zapalanie punktów na ekranie  
    ============================  */
 
-void plot_d(ssh_coordinate x,ssh_coordinate y);                       /**< Wyświetlenie punktu na ekranie w kolorze domyślnym. */
-void plot(ssh_coordinate x,ssh_coordinate y, ssh_color c);            /**< Wyświetlenie punktu w kolorze z palety. */
+/** Wyświetlenie punktu na ekranie w kolorze domyślnym.
+ *  \param x,y Współrzędne punktu. */
+void plot_d(ssh_coordinate x,ssh_coordinate y);
+
+/** Wyświetlenie punktu w kolorze z palety.
+ *  \param x,y Współrzędne punktu.
+ *  \param c Indeks koloru punktu. */
+void plot(ssh_coordinate x,ssh_coordinate y, ssh_color c);
 
 /** \brief Wyświetlenie punktu na ekranie w kolorze RGB. */
 void plot_rgb(ssh_coordinate x,                                       /**< Współrzędna pozioma. */
@@ -555,43 +563,53 @@ void fill_poly(ssh_coordinate vx,                                    /**< Poziom
 /* POBIERANIE ZNAKÓW Z KLAWIATURY i ZDARZEŃ OKIENNYCH (w tym z MENU) 
    ================================================================= */
 
-ssh_mode  input_ready(); /**< \brief Funkcja sprawdzająca, czy jest coś do wzięcia z wejścia. */
+/// @name POBIERANIE ZNAKÓW I ZDARZEŃ OKNA
+/// @{
 
-ssh_msg   get_char();    /**< \brief Funkcja odczytywania znaków sterowania i zdarzeń.
-                          * \return  Indeks znaku z klawiatury, znak specjalny lub kod z menu.
-                          * '/r': Wymagane odrysowanie co najmniej fragmentu ekranu.
-                          * '/b': Jest zdarzenie myszy do przetworzenia.
-                          *  EOF: Zamknięto okno graficzne.
-                          *  NNN: Liczba reprezentującą komendę z menu (zazwyczaj duża).
-                          *  '/0': znak neutralny. Należy zignorować.
-                          *  */
+/** \brief Nieblokująca funkcja sprawdzająca, czy jest coś do wzięcia z wejścia.
+ * @returns 1, gdy tak jest. W takiej sytuacji należy wykonać `get_char`. */
+ssh_mode  input_ready();
+
+/** \brief Blokująca funkcja odczytywania znaków sterowania i zdarzeń.
+  * \return Indeks znaku z klawiatury, znak specjalny lub kod pozycji menu.
+  * Niektóre znaki mają specjalne znaczenie:
+  *     * '\r': Wymagane odrysowanie co najmniej fragmentu ekranu. Można użyć `repaint_area` lub odrysować całość.
+  *     * '\b': Jest zdarzenie myszy do przetworzenia. Trzeba użyć `get_mouse_event` i odpowiednio zareagować.
+  *     * EOF: Zamknięto okno graficzne. Trzeba zakończyć program.
+  *     * NNN: Duża liczba reprezentującą komendę z menu (zazwyczaj powyżej 1024).
+  *     * '/0': znak neutralny. Zazwyczaj oznacza zdarzenie, które biblioteka sama przetworzyła. Należy zignorować.   */
+ssh_msg   get_char();
 
 ssh_stat  set_char(ssh_msg ch); /**< \brief Odesłanie znaku na wejście. \return Zwraca 0, jeśli nie ma miejsca.
                                 * \details Gwarantowane jest tylko odesłanie jednego znaku! */
 
-/** \brief Funkcja odczytująca ostatnie zdarzenie myszy. \return ??? */
-ssh_stat  get_mouse_event(ssh_coordinate* x_pos,         /**< [out] Adres, na który wpisać poziome położenie kursora. */
-                          ssh_coordinate* y_pos,         /**< [out] Adres, na który wpisać pionowe położenie kursora. */
-                          ssh_coordinate* click          /**< [out] Adres, na który wpisać informacje o kliku lub 0.  */
+/** \brief Funkcja odczytująca ostatnie zdarzenie myszy. \return 0 jeśli dane nie są dostępne. */
+ssh_stat  get_mouse_event(ssh_coordinate* x_pos,         /**< [out] Adres, na który wpisze poziome położenie kursora. */
+                          ssh_coordinate* y_pos,         /**< [out] Adres, na który wpisze pionowe położenie kursora. */
+                          ssh_coordinate* click          /**< [out] Adres, na który wpisze informacje o kliku lub 0.  */
                           );
 
 /** \brief Funkcja podaje obszar, który ma być odnowiony na żądanie '/r'.
- * \return  Zwraca 0 jak poprawnie (TODO?)
+ * \return  Zwraca 0 jak poprawnie (TODO CHECK?)
  *          Jeśli zwraca -1 to brak danych lub brak implementacji. Należy odrysować całość.
- *          Jeśli zwraca -2 to znaczy, że dane już były odczytane. Należy zignorować. */
+ *          Jeśli zwraca -2 to znaczy, że dane już były odczytane. Prawdopodobnie należy zignorować. */
 ssh_stat  repaint_area(ssh_coordinate* x,          /**< [out] Adres, na który wpisze poziomą współrzędną rogu obszaru. */
                        ssh_coordinate* y,          /**< [out] Adres, na który wpisze pionową współrzędną rogu obszaru. */
                        ssh_natural* width,         /**< [out] Adres, na który wpisze szerokość obszaru. */
                        ssh_natural* height         /**< [out] Adres, na który wpisze wysokość obszaru. */
                        );
+/// @}
 
 /* OBSŁUGA MENU KONTEKSTOWEGO */
 /* ========================== */
 
+/// @name TWORZENIE MENU KONTEKSTOWEGO
+/// @{
+
 /** \brief Struktura do definiowania prostego menu. */
 typedef struct ssh_menu_item_definition {
     const char* item_text;  /**< Tekst linii menu. Może być też etykieta różniąca się tym, że wartość jest 0. */
-    long long   item_value; /**< Wartość przekazywana poprzez funkcję `get_char()`. Dla etykiet 0. */
+    long long   item_value; /**< Wartość przekazywana poprzez funkcję `get_char`. Dla etykiet 0. */
 } ssh_menu_item_definition;
 
 /** \brief Struktura do przekazywania absolutnego położenia kliknięcia i innych danych do uruchomienia menu kontekstowego. */
@@ -602,9 +620,9 @@ typedef struct ssh_basic_win_place_context {
     unsigned Y; /**< Bezwzględne położenie `y` kursora w układzie wyświetlacza albo -1, gdy nie można obliczyć. */
 } ssh_basic_win_place_context;
 
-/** Funkcja uruchamiająca kontekstowe menu po kliknięciu prawym klawiszem myszy.
- * Wywoływana z biblioteki, z pętli zdarzeń. Użytkownik biblioteki może zaproponować swoją wersję, a wersja
- * domyślna znajduje się w odpowiednim katalogu źródłowym biblioteki, np. "X11/wb_context_menu_expected_rofi.c"
+/** \brief Funkcja uruchamiająca kontekstowe menu po kliknięciu prawym klawiszem myszy.
+ * \details Wywoływana z biblioteki, z pętli zdarzeń. Użytkownik biblioteki może zaproponować swoją wersję, a wersja
+ *          domyślna znajduje się w odpowiednim katalogu źródłowym biblioteki, np. "X11/wb_context_menu_expected_rofi.c"
  * @param x - współrzędna pozioma kursora myszy.
  * @param y - współrzędna pionowa kursora myszy.
  * @param other_data - wskaźnik do rekordu danych użytkownika zawierającego co najmniej uchwyt Display i uchwyt okna.
@@ -617,14 +635,16 @@ typedef struct ssh_basic_win_place_context {
  */
 extern long long ssh_context_menu_expected(unsigned x, unsigned y, struct ssh_basic_win_place_context* other_data);
 
-/** Domyślna definicja menu kontekstowego. W X11 dostarczana z biblioteki, ale można ją podmienić na poziomie linkowania.*/
+/** \brief Domyślna definicja menu kontekstowego. W X11 dostarczana z biblioteki, ale można ją podmienić na poziomie linkowania.*/
 extern ssh_menu_item_definition  context_menu_default[];
 
-/** Liczba itemów w domyślnym menu kontekstowym. Musi towarzyszyć `context_menu_default`. */
+/** \brief Liczba itemów w domyślnym menu kontekstowym. Musi towarzyszyć `context_menu_default`. */
 extern unsigned context_menu_default_size;
 
-/** Zmienna określająca poziom debugging-u funkcji menu. */
+/** \brief Zmienna określająca poziom debugging-u funkcji menu. */
 extern int 			ssh_menu_trace/*=0*/;
+
+/// @}
 
 #ifdef __cplusplus
 } //extern C
@@ -633,7 +653,9 @@ extern int 			ssh_menu_trace/*=0*/;
 #ifdef __cplusplus
 static_assert( sizeof(uchar8b)==1 , "Type `uchar8b` has more than 1 byte" ); //???
 
-/// \warning FUNKCJE INLINE DOSTĘPNE SĄ TYLKO Z POZIOMU C++ !!!\n
+/// @name FUNKCJE INLINE DOSTĘPNE SĄ TYLKO Z POZIOMU C++ !!!\n
+///@{
+
 //TODO namespace SYMSHELL ???
 
 /// \brief Budowanie wartości RGB ze składowych \return ssh_rgb
@@ -671,6 +693,9 @@ inline ssh_stat  repaint_area(ssh_coordinate& x, ssh_coordinate& y,ssh_natural& 
 inline ssh_mode   get_buffering() { return 	buffered(); }        /**< Zwraca 1, jeśli buforowane. */
 inline ssh_mode   get_fixed() { return fixed(); }                /**< Czy okno ma zafiksowana wielkość. */
 inline ssh_color  get_background(void) { return background(); }  /**< Aktualny kolor tła... */
+
+///@}
+
 #endif
 
 /// @}

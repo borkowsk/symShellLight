@@ -1,11 +1,12 @@
 /** @file
- * @brief SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++ (EN Doxygen).
- * @date 2026-04-21 (translated)                                             */
+ * @brief SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++ (EN version).
+ * @date 2026-04-24 (translated)                                             */
 /* ========================================================================= */
  /**
  * \details
- * The whole file changed massively: 15.11.2020
- * Comments changed massively: 3-4.01.2022
+ *  - The whole file changed massively: 15.11.2020
+ *  - Comments changed massively: 3-4.01.2022 and during winter 2026
+ *  - Context menu using "rofi" added in 2026
  *
  * \note
  * - https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI
@@ -13,14 +14,14 @@
  *
  ** \author     Designed by W. Borkowski from the University of Warsaw
  **
- ** \library    SYMSHELLLIGHT  version 2026b
+ ** \library    SYMSHELLLIGHT  version 2026c
  */
 #ifndef SYMSHELL_H_INCLUDED_
 #define SYMSHELL_H_INCLUDED_ (1)
 
 /**
 * @defgroup	GrxInterfaceEN Basic functions of the graphical interface
-* @brief	Portable drawing and associated functions between X11 and Windows.
+* @brief	Drawing and i/o functions portable between X11 and MS Windows.
 * @details
 *		Most are C modules, or at least provide such an interface.
 *		A C++ version that saves to SVG files is also implemented.
@@ -303,8 +304,14 @@ void print_rgb(ssh_coordinate x,                                      /**< Horiz
 /* Lighting up points on the screen
    ================================  */
 
-void plot_d(ssh_coordinate x,ssh_coordinate y);                       /**< Display a point on the screen in the default color. */
-void plot(ssh_coordinate x,ssh_coordinate y, ssh_color c);            /**< Display a point in a palette color. */
+/** Display a point on the screen in the default color.
+ *  @param x,y Horizontal and vertical coordinate of the point. */
+void plot_d(ssh_coordinate x,ssh_coordinate y);
+
+/** Display a point in a palette color.
+ *  @param x,y Horizontal and vertical coordinate of the point.
+ *  @param c Color index for the point. */
+void plot(ssh_coordinate x,ssh_coordinate y, ssh_color c);
 
 /** \brief Display a point on the screen in RGB color. */
 void plot_rgb(ssh_coordinate x,                                       /**< Horizontal coordinate. */
@@ -436,7 +443,7 @@ void earc(ssh_coordinate x,                                        /**< Horizont
           ssh_coordinate y,                                        /**< Vertical coordinate of a center. */
           ssh_natural a,                                           /**< Length of SEMIAXIS 'a' (horizontal). */
           ssh_natural b,                                           /**< Length of SEMIAXIS 'b' (vertical). */
-          ssh_radian start,                                        /**< Start angle in radians. */
+          ssh_radian start,                                        /**< Starting angle in radians. */
           ssh_radian stop,                                         /**< End angle in radians. */
           ssh_color c                                              /**< Color index. */
           );
@@ -469,7 +476,7 @@ void fill_ellipse(ssh_coordinate x,                            /**< Horizontal c
                   ssh_color c                                  /**< Color index. */
                   );
 
-/** \brief Fill a circular arc with radius `r` in default color. */
+/** \brief Fill a circular arc with the radius `r` in default color. */
 void fill_arc_d(ssh_coordinate x,                              /**< Horizontal coordinate of virtual center. */
                 ssh_coordinate y,                              /**< Vertical coordinate of virtual center. */
                 ssh_natural r,                                 /**< Radius of circle. */
@@ -478,11 +485,11 @@ void fill_arc_d(ssh_coordinate x,                              /**< Horizontal c
                 ssh_bool pie                                   /**< Determines whether to fill as a pie slice. */
                 );
 
-/** \brief Fill a circular arc with radius `r` in indexed color 'c'. */
+/** \brief Fill a circular arc with the radius `r` in indexed color 'c'. */
 void fill_arc(ssh_coordinate x,                                /**< Horizontal coordinate of virtual center. */
               ssh_coordinate y,                                /**< Vertical coordinate of virtual center. */
               ssh_natural r,                                   /**< Radius of circle. */
-              ssh_radian start,                                /**< Start angle in radians. */
+              ssh_radian start,                                /**< Starting angle in radians. */
               ssh_radian stop,                                 /**< End angle in radians. */
               ssh_bool pie,                                    /**< Determines whether to fill as a pie slice. */
               ssh_color c                                      /**< Color index. */
@@ -555,22 +562,27 @@ void fill_poly(ssh_coordinate vx,                                    /**< Horizo
 
 /* RETRIEVING CHARACTERS FROM KEYBOARD AND WINDOW EVENTS (INCLUDING MENUS)
    ======================================================================= */
+/// @name KEYBOARD AND EVENT HANDLING
+/// @{
 
-ssh_mode  input_ready(); /**< \brief Function checking if there is something to take from input. */
+/** \brief A non-blocking function that checks if there is any input available.
+ * @returns 1 if input is available. In such a case, `get_char` should be called. */
+ssh_mode  input_ready();
 
-ssh_msg   get_char();    /**< \brief Function for reading control characters and events.
-                          * \return  Keyboard character index, special character, or menu code.
-                          * '/r': Redrawing of at least a screen fragment is required.
-                          * '/b': There is a mouse event to process.
-                          * EOF: Graphics window closed.
-                          * NNN: Number representing a menu command (usually large).
-                          * '/0': Neutral character. Should be ignored.
-                          * */
+/** \brief A blocking function for reading control characters and events.
+  * \return A keyboard character index, a special character, or a menu item code.
+  * Certain characters have special meanings:
+  * * '\r': A screen redraw (at least partial) is required. You can use `repaint_area` or redraw everything.
+  * * '\b': A mouse event is pending. You must use `get_mouse_event` and react accordingly.
+  * * EOF: The graphics window has been closed. The program must terminate.
+  * * NNN: A large number representing a menu command (typically above 1024).
+  * * '/0': A neutral character. Usually indicates an event processed internally by the library. Should be ignored. */
+ssh_msg   get_char();
 
 ssh_stat  set_char(ssh_msg ch); /**< \brief Sending a character back to input. \return Returns 0 if no space.
                                 * \details Guaranteed to send back only one character! */
 
-/** \brief Function reading the last mouse event. \return ??? */
+/** \brief Function reading the last mouse event. \return 0 if data are not available. */
 ssh_stat  get_mouse_event(ssh_coordinate* x_pos,         /**< [out] Address to write horizontal cursor position. */
                           ssh_coordinate* y_pos,         /**< [out] Address to write vertical cursor position. */
                           ssh_coordinate* click          /**< [out] Address to write click information or 0.  */
@@ -580,14 +592,19 @@ ssh_stat  get_mouse_event(ssh_coordinate* x_pos,         /**< [out] Address to w
  * \return  Returns 0 if successful (TODO?)
  * If returns -1, no data or no implementation. Redraw everything.
  * If returns -2, data has already been read. Should be ignored. */
-ssh_stat  repaint_area(ssh_coordinate* x,          /**< [out] Address to write horizontal coordinate of area corner. */
-                       ssh_coordinate* y,          /**< [out] Address to write vertical coordinate of area corner. */
+ssh_stat  repaint_area(ssh_coordinate* x,          /**< [out] Address to write horizontal coordinate of an area corner. */
+                       ssh_coordinate* y,          /**< [out] Address to write vertical coordinate of an area corner. */
                        ssh_natural* width,         /**< [out] Address to write area width. */
                        ssh_natural* height         /**< [out] Address to write area height. */
                        );
 
+/// @}
+
 /* CONTEXT MENU HANDLING */
 /* ===================== */
+
+/// @name DEFINING THE CONTEXT MENU
+/// @{
 
 /** \brief Structure for defining a simple menu. */
 typedef struct ssh_menu_item_definition {
@@ -603,9 +620,10 @@ typedef struct ssh_basic_win_place_context {
     unsigned Y; /**< Absolute vertical `y` cursor position in display layout or -1 if cannot be calculated. */
 } ssh_basic_win_place_context;
 
-/** Function triggering a context menu after right-clicking.
- * Called from the library, from the event loop. The library user can propose their own version,
- * and the default version is located in the appropriate library source directory, e.g., "X11/wb_context_menu_expected_rofi.c"
+/** @brief Function triggering a context menu after right-clicking.
+ * @details Called from the library, from the event loop. The library user can propose their own version,
+ *          and the default version is located in the appropriate library source directory,
+ *          e.g., "X11/wb_context_menu_expected_rofi.c"
  * @param x - horizontal coordinate of the mouse cursor.
  * @param y - vertical coordinate of the mouse cursor.
  * @param other_data - pointer to user data record containing at least Display handle and window handle.
@@ -618,14 +636,16 @@ typedef struct ssh_basic_win_place_context {
  */
 extern long long ssh_context_menu_expected(unsigned x, unsigned y, struct ssh_basic_win_place_context* other_data);
 
-/** Default context menu definition. In X11 provided from the library, but can be replaced at link level. */
+/** \brief Default context menu definition. In X11 provided from the library, but can be replaced at link level. */
 extern ssh_menu_item_definition  context_menu_default[];
 
-/** Number of items in the default context menu. Must accompany `context_menu_default`. */
+/** \brief Number of items in the default context menu. Must accompany `context_menu_default`. */
 extern unsigned context_menu_default_size;
 
-/** Menu debugging level. */
+/** \brief Menu debugging level. */
 extern int 			ssh_menu_trace/*=0*/;
+
+/// @}
 
 #ifdef __cplusplus
 } //extern C
@@ -634,8 +654,12 @@ extern int 			ssh_menu_trace/*=0*/;
 #ifdef __cplusplus
 static_assert( sizeof(uchar8b)==1 , "Type `uchar8b` has more than 1 byte" ); //???
 
-/// \warning INLINE FUNCTIONS ARE ONLY AVAILABLE FROM C++ !!!\n
+// INLINE FUNCTIONS ARE ONLY AVAILABLE FROM C++ !!!
+//-------------------------------------------------
 //TODO namespace SYMSHELL ???
+
+/// @name SYMSHELL features only available in Cpp
+/// @{
 
 /// \brief Building RGB value from components \return ssh_rgb
 inline ssh_rgb RGB( ssh_intensity r,                                       /**< Red component. */
@@ -668,10 +692,15 @@ inline ssh_stat  repaint_area(ssh_coordinate& x, ssh_coordinate& y,ssh_natural& 
     return repaint_area(&x,&y,&width,&height);
 }
 
-/// \warning OBSOLETE FUNCTIONS ALSO AVAILABLE ONLY FOR C++ COMPILER
-inline ssh_mode   get_buffering() { return 	buffered(); }        /**< Returns 1 if buffered. */
-inline ssh_mode   get_fixed() { return fixed(); }                /**< Whether window has fixed size. */
-inline ssh_color  get_background(void) { return background(); }  /**< Current background color... */
+///@}
+
+/// @name OBSOLETE SYMSHELL FUNCTIONS AVAILABLE ONLY FOR Cpp COMPILER
+///@{
+inline ssh_mode   get_buffering() { return 	buffered(); }        /**< \brief Whether the window is buffered. */
+inline ssh_mode   get_fixed() { return fixed(); }                /**< \brief Whether the window has fixed size. */
+inline ssh_color  get_background(void) { return background(); }  /**< \brief Current background color... */
+///@}
+
 #endif
 
 /// @}

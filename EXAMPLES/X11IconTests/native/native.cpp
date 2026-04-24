@@ -1,8 +1,12 @@
-//https://marc.info/?l=kwin&m=115435217715650&w=2
-// Kompiluje się na UBUNTU, ale też już nie ma ikony, tak jak programy SymShell'a
-// gcc native.cpp -lstdc++ -L/usr/X11/lib -lX11 -lXpm -o native
+/// @file
+/// @brief Test do sprawdzania obecności ikony.
+/// @detail Kompiluje się na UBUNTU, ale też już nie ma ikony, tak jak programy SymShell'a
+///```bash
+///  $ gcc native.cpp -lstdc++ -L/usr/X11/lib -lX11 -lXpm -o native
+///```
+/// https://marc.info/?l=kwin&m=115435217715650&w=2
 
-#include <stdlib.h>
+#include <cstdlib>
 #include <X11/Xlib.h>
 
 int main( int argc, char **argv )

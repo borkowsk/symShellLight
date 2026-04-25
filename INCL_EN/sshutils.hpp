@@ -1,7 +1,7 @@
 /** @file   sshutils.hpp
  * @brief  Implementation of auxiliary symshell functions in a platform-independent manner.  */
 /* ===================================================================================== */
-/** @date 2026-04-20 (last modification)
+/** @date 2026-04-26 (last modification)
 * @details
 * Written ALMOST NON-OBJECT-ORIENTED but in C++
 * Contains: print_width(), empty rect(), bar3D(), arrow() ...etc...
@@ -167,11 +167,26 @@ extern "C" {
 /// \details In fact, it can be used for all types of files
 ///          that a browser can display.
 /// \param URL - full URL, but sometimes a filename will do :-D ...
+/// \note It comes from the WB_RTM library and is declared in "sshutils.h" for convenience.
 /// \return should return the execution code of the "child" program.
 MAYBE_UNUSED
 int ViewHtml(const char* url);
 // TODO `int view_html(const char* url);`
 }
+
+/// @name Simple support for a multi-language interface.
+/// @details Selection of text strings from one of two or three national languages.
+/// @{
+extern unsigned lang_selector; ///< @brief User variable for the `lang` set of functions.
+
+MAYBE_UNUSED inline  /// Selection of one of two text strings based on the `lang_selector` variable.
+const char* lang(const char* def,const char* alt)
+{ if(lang_selector!=0) return alt; else return def;}
+
+MAYBE_UNUSED inline  /// Selection of one of three text strings based on the `lang_selector` variable.
+const char* lang(const char* def,const char* alt1,const char* alt2)
+{ if(lang_selector==2) return alt2; if(lang_selector==1) return alt1; else return def;}
+/// @}
 
 /// @}
 

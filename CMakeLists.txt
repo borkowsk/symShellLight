@@ -7,7 +7,7 @@
 # Manually define WITHTESTS=true, if you want build test applications!
 #
 # (c)ISS UW, @author Wojciech Borkowski
-# @date 2026-04-24 (last update)
+# @date 2026-04-26 (last update)
 ##################################################################################
 
 cmake_minimum_required(VERSION 3.20)
@@ -69,6 +69,7 @@ if(true) # SVG SYMSHELL LIB
             "UTILS/strtorgb.cpp"
             "UTILS/wieloboki.cpp"
             "UTILS/wb_pchar.cpp" #used internally
+            "UTILS/viewHtmlPchar.cpp"
             "UTILS/wb_rand.cpp"
             "UTILS/wb_randg.c"
             "UTILS/sshmenufdummy.c" #dummy functions of menus
@@ -103,6 +104,7 @@ if(X11) # only for X11 LIB
             "UTILS/strtorgb.cpp"
             "UTILS/wieloboki.cpp"
             "UTILS/wb_pchar.cpp"
+            "UTILS/viewHtmlPchar.cpp"
             "UTILS/wb_rand.cpp"
             "UTILS/wb_randg.c"
             "UTILS/sshmenufdummy.c" #dummy functions of menus
@@ -121,6 +123,7 @@ if(WINDOWS) # only for WINDOWS - NOT TESTED IN THIS VERSION (after 2016)
             "UTILS/strtorgb.cpp"
             "UTILS/wieloboki.cpp"
             "UTILS/wb_pchar.cpp"
+            "UTILS/viewHtmlPchar.cpp"
             "UTILS/wb_rand.cpp"
             "UTILS/wb_randg.c"
             "WIN/sshmenufwin.c" #real functions for MS Windows menus.

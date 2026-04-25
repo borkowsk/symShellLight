@@ -1,7 +1,7 @@
 /** @file
  *  \brief                      SYMSHELL SVG IMPLEMENTATION
  *//* ******************************************************************************** */
-/// @date 2026-04-21 (last modification)
+/// @date 2026-04-26 (last modification)
 /** \details    SYMSHELL IS A SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++
  **             ==================================================================
  **
@@ -117,7 +117,8 @@ int         GrMouseC = -1; ///< Klik symulowanej myszy (0,1,2).
 bool        GrMouseActive = false;
 
 /// Nie ma też klawiatury, ale inny moduł może ją symulować przez linkowanie do tych zmiennych globalnych.
-int         GrCharMessage = -2;
+/// No i dla pewności za pierwszym razem zwraca "REPLOT", bo tak ma X11 i na tym bazują niektóre proste aplikacje.
+int         GrCharMessage = '\r';
 
 /// "Dummy window" handler for check and external use.
 [[maybe_unused]]  unsigned long    _ssh_window=0;
@@ -160,7 +161,7 @@ namespace {
 
     /// Flaga użycia skali szarości, np. do wydruków.
     static int          UseGrayScale = 0;  ///< Ustawiana jako parametr wywołania programu
-    ///< podobnie jak opcje śledzenia i buforowania
+    ///< Podobnie jak opcje śledzenia i buforowania
     ///< , ale dla skali kolorów to jedyny sposób na
     ///< włączenie
 
@@ -355,10 +356,17 @@ namespace {
         }
         else //NIE MA MIEJSCA!!!
         {
+            static bool first_time=true;
             size_t N = GrList.get_size() * 2;
-            if(N>maxN) N=maxN; //Nie więcej niż `maxN`
 
-            if(N<maxN) //Jeszcze można powiększyć
+            if(N>maxN && first_time)
+            {
+                N = maxN; //Nie więcej niż `maxN`
+                cerr<<"Limit for number of primitives achieved!"<<endl;
+                first_time=false;
+            }
+
+            if(N<=maxN) //Jeszcze można powiększyć
             {
                 //Przy powiększaniu nie chcemy użyć "expand", bo to by wywoływało destruktory i kopiowanie!
                 size_t oldSize;
@@ -497,7 +505,7 @@ ssh_stat init_plot(ssh_natural  a, ssh_natural   b,                 /* ile pikse
             maxN=10000;
     }
 
-    N+=N%2;maxN+=maxN%2; //Likwidacja ewentualnej nieparzystości, ważna przy przesuwaniu
+    N+=N%2; maxN+=maxN%2; //Likwidacja ewentualnej nieparzystości, ważna przy przesuwaniu
 
     GrList.alloc(N); //Tu nie może być zero
 
@@ -1889,7 +1897,6 @@ namespace {
         int curX = 0, curY = 0; //Do MoveTo i LineTo
         o << "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"no\"?>\n"
              "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">\n";
-
         o << "<svg "
              "xmlns:dc=\"http://purl.org/dc/elements/1.1/\" "
              "xmlns:cc=\"http://creativecommons.org/ns#\" "
@@ -1897,7 +1904,6 @@ namespace {
              "xmlns:svg=\"http://www.w3.org/2000/svg\" "
              "xmlns=\"http://www.w3.org/2000/svg\" "
              "version=\"1.1\" ";
-
         if (GrReloadInterval > 0)
             o << "onload=\"init(evt)\" "; //Sam skrypt może dopiero na końcu? TODO?
 
@@ -1921,7 +1927,13 @@ namespace {
               " }, " << GrReloadInterval << " ); "
                                             "}  ]]></script> " << endl;
         }
-
+        o << "<style>\n"
+             "  text {\n"
+             "    font-family: \"DejaVu Sans Mono\", \"Consolas\", \"Courier New\", monospace;\n"
+             "    font-size: 16px;\n"
+             "    white-space: pre;\n"
+             "  }\n"
+             "</style>";
         ssh_rgb bac = get_rgb_from(get_background());
         o << "<rect x=\"0px\" y=\"0px\" width=\"" << GrScreenWi << "px\" height=\"" << GrScreenHi
           << "px\" rx=\"0\" style=\"fill:"
@@ -2056,11 +2068,73 @@ namespace {
                             o << "fill=\"rgb(" << pr.r << ',' << pr.g << ',' << pr.b << ")\" />"; //FILL
                         }
                         auto realFont = (GrFontHi * 4) / 5;
-                        o << "<text style=\"font-size:" << realFont << "px; fill: rgb(" << pr.rf << ',' << pr.gf << ','
-                          << pr.bf << ");\" ";
-                        //o << "textLength=\""<< length*GrFontWi <<"px\" ";
+                        o << "<text style=\"fill: rgb(" << pr.rf << ',' << pr.gf << ',' << pr.bf << ");\" ";
+                        o << "textLength=\""<< length*GrFontWi <<"px\" ";
+                        //o << "textLength=\"8\" ";
                         o << "lengthAdjust=\"spacingAndGlyphs\" ";
-                        o << "x = \"" << pr.x << "\" y=\"" << pr.y + realFont << "\">" << pr.txt << "</text>" << endl;
+                        o << "x = \"" << pr.x << "\" y=\"" << pr.y + realFont << "\">";
+                        for(char* ptr=pr.txt;*ptr!='\0';ptr++)
+                        {
+                            unsigned char c=static_cast<unsigned char>(*ptr);
+                            switch(c) { //Wiele znaków jest w SVG-XML zakazanych. Uzywamy ich wizualizacji.
+                                case '<':  o << "&lt;"; break;
+                                case '>':  o << "&gt;"; break;
+                                case '&':  o <<"&amp;"; break;
+                                case '"':  o <<"&quot;"; break;
+                                case 0:  o<< "&#x2400;"; break; // NULL
+                                case 1:  o<< "&#x2401;"; break; // SOH
+                                case 2:  o<< "&#x2402;"; break; // STX
+                                case 3:  o<< "&#x2403;"; break; // ETX
+                                case 4:  o<< "&#x2404;"; break; // EOT
+                                case 5:  o<< "&#x2405;"; break; // ENQ
+                                case 6:  o<< "&#x2406;"; break; // ACK
+                                case 7:  o<< "&#x2407;"; break; // BEL
+                                case 8:  o<< "&#x2408;"; break; // BS
+                                case 9:  o<< "&#x2409;"; break; // HT (Tab)
+                                case 10: o<< "&#x240A;"; break; // LF (New Line)
+                                case 11: o<< "&#x240B;"; break; // VT
+                                case 12: o<< "&#x240C;"; break; // FF
+                                case 13: o<< "&#x240D;"; break; // CR
+                                case 14: o<< "&#x240E;"; break; // SO
+                                case 15: o<< "&#x240F;"; break; // SI
+                                case 16: o<< "&#x2410;"; break; // DLE
+                                case 17: o<< "&#x2411;"; break; // DC1
+                                case 18: o<< "&#x2412;"; break; // DC2
+                                case 19: o<< "&#x2413;"; break; // DC3
+                                case 20: o<< "&#x2414;"; break; // DC4
+                                case 21: o<< "&#x2415;"; break; // NAK
+                                case 22: o<< "&#x2416;"; break; // SYN
+                                case 23: o<< "&#x2417;"; break; // ETB
+                                case 24: o<< "&#x2418;"; break; // CAN
+                                case 25: o<< "&#x2419;"; break; // EM
+                                case 26: o<< "&#x241A;"; break; // SUB
+                                case 27: o<< "&#x241B;"; break; // ESC
+                                case 28: o<< "&#x241C;"; break; // FS
+                                case 29: o<< "&#x241D;"; break; // GS
+                                case 30: o<< "&#x241E;"; break; // RS
+                                case 31: o<< "&#x241F;"; break; // US
+                                case 127:o<< "&#x2421;"; break; // DEL
+                                //case 128:o<< "@" ; break;
+                                //Inne niebezpieczne...
+                                //case ....
+                                default:
+                                    // 2. Znaki sterujące C1 (128-159) -> Wizualizacja kodu w klamrach
+                                    if (c >= 128 && c <= 159) {
+                                        o << "[0x" << std::hex << (int)c << std::dec << "]";
+                                    }
+                                    // 3. Znaki rozszerzone (160-255) -> Encja numeryczna (np. ISO-8859-2 / Win-1250)
+                                    else if (c >= 160) {
+                                        // Traktujemy to jako surowy kod znaku z Twojej strony kodowej.
+                                        // XML zinterpretuje to zgodnie z kodowaniem zadeklarowanym w nagłówku pliku,
+                                        // ale encja numeryczna &#160; jest zawsze najbezpieczniejsza.
+                                        o << "&#" << std::dec << (unsigned int)c << ";";
+                                    }
+                                    else
+                                    o<<c;
+                                    break;
+                            }
+                        }
+                        o<< "</text>" << endl;
                     }
                         break;
                     case GrType::Poly: {
@@ -2096,9 +2170,23 @@ namespace {
     }
 } //local namespace
 
+extern "C" {
+/// \brief Wyświetlanie pliku HTML poprzez systemowy shell.
+/// \details Tak naprawdę można użyć do wszystkich typów plików
+///          , jakie może wyświetlić przeglądarka.
+/// \note Pochodzi z biblioteki WB_RTM, a w "sshutils.h" jest zadeklarowane dla wygody.
+/// \param URL - pełny URL, ale czasem ujdzie i nazwa pliku :-D ...
+/// \return powinien zwrócić kod wykonania programu "dziecka".
+MAYBE_UNUSED
+int ViewHtml(const char* url);
+// TODO int view_html(const char* url);
+}
+
+
 // Ostateczne uzgodnienie zawartości ekranu realnego z zawartością ekranu wirtualnego/tymczasowego w pamięci.
 void flush_plot()
 {
+    static bool first_time=true;
     /// \internal
     ///     W module SVG zapisuje listę operacji graficznych do pliku o ustalonym formacie
     ///     (najczęściej SVG).
@@ -2115,7 +2203,18 @@ void flush_plot()
     if(ssh_trace_level>0) cout <<'#'<< flush_counter <<SEP<< GrList.get_size() <<SEP<< GrListPosition << endl;
     wb_pchar name(MAX_PATH);
     name.prn("%s%s_%0u", GrTmpOutputDirectory,  ScreenTitle, PID );
+    for(int i=0;i<name.get_size();i++)
+        if(name[i]==' ') name[i]='_';
+
     dump_screen(name.get()); //Zapisuje listę operacji graficznych do pliku w ustalonym formacie
+
+    if(first_time) {
+        name.add(".%s",GrFileOutputByExtension);
+     //   if(ssh_trace_level>0)
+            cout <<name.get()<<"\n\n The best way to view SVG files is www browser! Change default for such extensions."<<endl;
+        ViewHtml(name.get());
+        first_time=false;
+    }
 }
 
 // Zapisuje zawartość ekranu do pliku graficznego w naturalnym formacie platformy.

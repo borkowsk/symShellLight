@@ -1,7 +1,7 @@
 /// @file
 /// @brief A sample SYMSHELLA program demonstrating mouse support/
 ///        Przykładowy program SYMSHELLA demonstrujący obsługę myszy.
-/// @date 2026-04-24 (last update)
+/// @date 2026-04-26 (last update)
 //-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// @page page_e4_mouse SYMSHELL TEST FOR Mouse
 /// @brief SYMSHELL'S program that handles mouse clicking/Program SYMSHELL'A obsługujący klikanie myszką.
@@ -90,7 +90,7 @@ int main(int argc,const char* argv[])
     unsigned xsize=320;
     unsigned ysize=200;
     mouse_activity(1);
-    shell_setup(argv[0],argc,argv); //Program file name used as window title!
+    shell_setup("MOUSE TEST",argc,argv); //Program file name used as window title!
     cout<<"MOUSE OPERATION TEST IN SYMSHELL`S PORTABLE GRAPHIC SHELL:\n q-quit\n";
     cout.flush();
 

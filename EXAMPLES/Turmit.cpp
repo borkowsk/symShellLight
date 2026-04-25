@@ -2,7 +2,7 @@
 /// @brief "Mrówka Langtona" z możliwością wariacji na temat (turmit prototypowy)
 ///                   (przykładowy program SYMSHELL-a)
 // -------------------------------------------------------------------------------
-/// @date 2026-04-24 (last update)
+/// @date 2026-04-26 (last update)
 /// @page page_e7_turmit MRÓWKA LANGTONA ZAKODOWANA W SYMSHELL-u
 /// @brief Turmit prototypowy, łatwy do modyfikacji
 ///
@@ -106,6 +106,7 @@ void screen_to_file(); // Zapis ekranu do pliku
 
 void replot() ///< Rysuje na ekranie
 {
+    invalidate_screen();
     for(int x=0;x<size;x++)
         for(int y=0;y<size;y++)
         {

@@ -1,7 +1,7 @@
 /// @file
 /// @brief Przykładowy program z reskalowaniem okna/Window rescaling example program.
 //         --------------------------------------------------------------------------
-/// @date 2026-04-24 (last update)
+/// @date 2026-04-26 (last update)
 //-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// @page page_e2_paleta SYMSHELL - RESKALOWALNA PALETA/RESCALABLE PALETTE
 /// @brief Program SYMSHELL'A z automatycznym reskalowaniem i funkcją odrysowywania/
@@ -73,7 +73,9 @@ int main(int argc,const char* argv[])
                 printf("(N)"); //Any event handled internally or requiring no handling
             break;
         case '@':
-        case '\r':replot();break;
+        case '\r':
+                replot();
+            break;
         case '\b':get_mouse_event(&xpos,&ypos,&click);break;
         case 's':std=!std;break;
         case 'q':

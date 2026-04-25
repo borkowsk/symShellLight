@@ -1,7 +1,7 @@
 /// @file
 /// @brief A sample SYMSHELL program demonstrating drawing bars and polygons/
 ///        Przykładowy program SYMSHELL-a demonstrujący rysowanie słupków i wielokątów.
-/// @date 2026-04-24 (last update)
+/// @date 2026-04-26 (last update)
 //-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// @page page_e3_bars_and_polygons SYMSHELL TEST FOR 3D bars and polygons
 /// @brief SYMSHELL's program that draws 3D bars and polygons by clicking the mouse/Program SYMSHELL'A rysujący słupki 3D i poligony na klikanie myszką
@@ -129,7 +129,7 @@ int main(int argc,const char* argv[])
     mouse_activity(1);
     set_background(128);
     buffering_setup(1); // WARNING! Animation enabled.
-    shell_setup("3D BARS & POLYGONS SYMSHELL TEST ",argc,argv);
+    shell_setup("3D BARS AND POLYGONS SYMSHELL TEST ",argc,argv);
     printf("COLORS= 256 q-quit s-switch stdout on/off\n"
            "setup options:\n"
            " -mapped -buffered -bestfont -traceevt\n"
@@ -159,7 +159,9 @@ int main(int argc,const char* argv[])
             //printf("(N)"); //Any event handled internally or requiring no handling
             break;
         case '@':
-        case '\r':replot();break;
+        case '\r':
+            replot();
+            break;
         case '\b':get_mouse_event(&xpos,&ypos,&click);
             list[i%numi].p.x=xpos;list[i%numi].p.y=ypos;
             list[i%numi].color=i%256;

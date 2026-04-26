@@ -1,6 +1,6 @@
 /** @file
  * @brief SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++ (EN version).
- * @date 2026-04-24 (translated)                                             */
+ * @date 2026-04-26 (translated)                                             */
 /* ========================================================================= */
  /**
  * \details
@@ -81,7 +81,9 @@ const ssh_mode  SSH_NO=0;                       /**< \brief Negation flag. */
  * Could be "X11", "WINDOWS" or "SVG". */
 extern const char* _ssh_grx_module_name;
 
-/** \brief If not 0, the window is usable. */
+/** \brief If not 0, the window is usable.
+ *  A non-zero value means at least that `init_plot` ran successfully.
+ *  Depending on the module, a window handle, a file handle (pipe) or just 1 may be written here. */
 extern unsigned long _ssh_window;
 
 /** \brief Determines whether to close immediately or allow viewing the content.

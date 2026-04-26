@@ -70,7 +70,7 @@ int main(int argc,const char* argv[])
         switch(inpt)
         {
         case '\0':
-                printf("(N)"); //Any event handled internally or requiring no handling
+                //printf("(N)"); //Any event handled internally or requiring no handling
             break;
         case '@':
         case '\r':
@@ -83,6 +83,7 @@ int main(int argc,const char* argv[])
             cont=0;
             break;
         default:
+            printc(16,16, 0,255,"%c",inpt);
             break;
         }
 
@@ -92,7 +93,6 @@ int main(int argc,const char* argv[])
             fflush(stdout);
         }
 
-        printc(16,16, 34,255,"%c",inpt);
         flush_plot();
     }
 

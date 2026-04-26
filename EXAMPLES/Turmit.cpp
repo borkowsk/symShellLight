@@ -30,6 +30,7 @@
 //#pragma warning(disable : 4244)
 #endif
 #include "symshell.h"
+#include "../SVG/symshsvgdef.h"
 
 #define NAZWA_MODELU  "Turmit_przyspieszony" //Użycie define ułatwia montowanie stałych łańcuchów
 
@@ -128,6 +129,9 @@ ssh_menu_item_definition  context_menu_default[]= {
         {"QUIT", 'q'}
 };
 unsigned context_menu_default_size= sizeof(context_menu_default) / sizeof(context_menu_default[0]);
+
+
+
 
 /** Główna funkcja. Potrzebne są parametry wywołania programu do ustawień symulacji i grafiki. */
 int main(int argc,const char* argv[])

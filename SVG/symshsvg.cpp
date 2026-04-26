@@ -65,6 +65,7 @@ static inline int  usleep(__int64 usec)
 #include "symshell.h"
 #define HIDE_WB_PTR_IO	1     //I/O NIEPOTRZEBNY
 #include "wb_ptr.hpp"
+#include "symshsvgdef.h"
 
 using namespace std;
 using namespace wbrtm;
@@ -83,48 +84,30 @@ using namespace wbrtm;
 /*  ************************************** */
 /** @} */
 extern "C" {
-    /** Identyfikator zalinkowanego modułu */
+    // Identyfikator zalinkowanego modułu
     [[maybe_unused]] const char *_ssh_grx_module_name="SVG";
 
-    /** Maska poziomów śledzenia 1-msgs 2-grafika 3-grafika detaliczna 4-alokacje/zwalnianie */
-    int                    ssh_trace_level = 0;
+    // Maska poziomów śledzenia 1-msgs 2-grafika 3-grafika detaliczna 4-alokacje/zwalnianie
+    [[maybe_unused]] int         ssh_trace_level = 0;
+
+    // "Dummy window" handler for check and external use.
+    [[maybe_unused]]  unsigned long   _ssh_window=0;
+
+    // Rozszerzenie nazwy pliku wyjściowego. Jednocześnie określa format pliku wyjściowego.
+    // Jak extension nieznane, to wyrzuca strumień obiektowy '.str'
+    const char* GrSVG_FileOutputByExtension = "svg";
+
+    // Myszy w SVG domyślnie nie ma, ale inny moduł może ją symulować przez linkowanie do tych zmiennych globalnych.
+    int         GrMouseX = -1; //< Pozycja X symulowanej myszy.
+    int         GrMouseY = -1; //< Pozycja Y symulowanej myszy.
+    int         GrMouseC = -1; //< Klik symulowanej myszy (0,1,2).
+
+    int        GrMouseActive = false;
+
+    // Nie ma też klawiatury, ale inny moduł może ją symulować przez linkowanie do tych zmiennych globalnych.
+    // No i dla pewności za pierwszym razem zwraca "REPLOT", bo tak ma X11 i na tym bazują niektóre proste aplikacje.
+    int         GrCharMessage = '\r';
 }
-
-/// Pid procesu. Przydaje się
-unsigned long     PID=_getpid();
-
-/// Jakiej długości inicjujemy tablice operacji graficznych (mnożone przez liczbę pikseli ekranu).
-double      INITIAL_LENGTH_RATIO = 0.005;
-
-/// Ile maksymalnie rekordów jest dopuszczalnych? (mnożone przez liczbę pikseli ekranu).
-double      MAXIMAL_LENGTH_RATIO = 0.999;
-
-/// Rozszerzenie nazwy pliku wyjściowego. Jednocześnie określa format pliku wyjściowego.
-/// Jak extension nieznane, to wyrzuca strumień obiektowy '.str'
-const char* GrFileOutputByExtension = "svg";
-
-/// Ścieżka, gdzie ma wrzucać zrzuty tymczasowe.
-const char* GrTmpOutputDirectory = "./";
-
-/// Co ile czasu skrypt w pliku SVG wymusza przeładowanie. Jak 0 to w ogóle nie ma skryptu.
-unsigned    GrReloadInterval = 1000;
-
-/// Myszy w SVG domyślnie nie ma, ale inny moduł może ją symulować przez linkowanie do tych zmiennych globalnych.
-int         GrMouseX = -1; ///< Pozycja X symulowanej myszy.
-int         GrMouseY = -1; ///< Pozycja Y symulowanej myszy.
-int         GrMouseC = -1; ///< Klik symulowanej myszy (0,1,2).
-
-bool        GrMouseActive = false;
-
-/// Nie ma też klawiatury, ale inny moduł może ją symulować przez linkowanie do tych zmiennych globalnych.
-/// No i dla pewności za pierwszym razem zwraca "REPLOT", bo tak ma X11 i na tym bazują niektóre proste aplikacje.
-int         GrCharMessage = '\r';
-
-/// "Dummy window" handler for check and external use.
-[[maybe_unused]]  unsigned long    _ssh_window=0;
-
-/// Separator wydruków.
-const char* SEP = "\t";
 
 /** @} */
 
@@ -133,6 +116,11 @@ const char* SEP = "\t";
 namespace {
     /* Zmienne 'static' czyli bez dostępu z zewnątrz modułu
     * **************************************************** */
+    /// Separator wydruków.
+    static const char*  SEP = "\t";
+
+/// Pid procesu. Przydaje się
+    static unsigned long     PID=_getpid();
 
     /// Nazwa "okna" czyli domyślnego pliku generowanego przez flush_plot().
     static const char*  ScreenTitle = "SSH_SVG";
@@ -344,7 +332,7 @@ namespace {
 
     static wb_dynarray<GrOperation> GrList; ///< Lista operacji rysowania.
     static int GrListPosition = -1;         ///< Aktualna pozycja na liście.
-    static int maxN=-1;                     ///< Przeliczane z MAXIMAL_LENGTH_RATIO.
+    static int maxN=-1;                     ///< Przeliczane z GrSVG_MAXIMAL_LENGTH_RATIO.
 
     /// Funkcja implementacyjna zwracająca dostęp do kolejnego "entry" tablicy operacji graficznych.
     /// W razie potrzeby alokuje więcej? TODO TEST!
@@ -425,10 +413,10 @@ void shell_setup(const char* title, int iArgc, const char* iArgv[])
         if (iArgv[i][0] == '-')
         {
             if (iArgv[i][1] == 'F' || iArgv[i][1] == 'e' || iArgv[i][1] == 'f')
-                GrFileOutputByExtension = iArgv[i] + 2;
+                GrSVG_FileOutputByExtension = iArgv[i] + 2;
             else
                 if (iArgv[i][1] == 'D' || iArgv[i][1] == 'd')
-                    GrTmpOutputDirectory = iArgv[i] + 2;
+                    GrSVG_TmpOutputDirectory = iArgv[i] + 2;
                 else
                     if (iArgv[i][1] == 'C' || iArgv[i][1] == 'a' || iArgv[i][1] == 'c') {
                         //GrCharMessage = atoi(iArgv[i] + 2);
@@ -442,11 +430,11 @@ void shell_setup(const char* title, int iArgc, const char* iArgv[])
                     }
                     else
                         if (iArgv[i][1] == 'R' || iArgv[i][1] == 'r') {
-                            GrReloadInterval = atoi(iArgv[i] + 2);
+                            GrSVG_ReloadInterval = atoi(iArgv[i] + 2);
                         }
                         else
                             if (iArgv[i][1] == 'B' || iArgv[i][1] == 'b') {
-                                MAXIMAL_LENGTH_RATIO = atof(iArgv[i] + 2);
+                                GrSVG_MAXIMAL_LENGTH_RATIO = atof(iArgv[i] + 2);
                             }
                             else
                                 if (iArgv[i][1] == 'T' || iArgv[i][1] == 't') {
@@ -489,14 +477,14 @@ ssh_stat init_plot(ssh_natural  a, ssh_natural   b,                 /* ile pikse
     GrScreenWi = a + GrFontWi* ca;  assert(a>0);
     GrScreenHi = b + GrFontHi* cb;  assert(b>0);
 
-    auto N = (unsigned)(((a + ca)*(b + cb)) * INITIAL_LENGTH_RATIO ); //Potem jest sprawdzane, czy nie za małe, warning zbędny
-    maxN=(int)(((a + ca)*(b + cb)) * MAXIMAL_LENGTH_RATIO ); //Potem jest sprawdzane, czy nie za małe, warning zbędny
+    auto N = (unsigned)(((a + ca)*(b + cb)) * GrSVG_INITIAL_LENGTH_RATIO ); //Potem jest sprawdzane, czy nie za małe, warning zbędny
+    maxN=(int)(((a + ca)*(b + cb)) * GrSVG_MAXIMAL_LENGTH_RATIO ); //Potem jest sprawdzane, czy nie za małe, warning zbędny
 
     if(N<1 || maxN<1 || N>maxN ) //N lub `maxN`, mniejsze od 1 to prawdopodobnie w inicjalizacji ekranu jest błąd
     {
         cerr << __FUNCTION__ << ": WARNING! : "
-             << "((a + ca)*(b + cb))*INITIAL_LENGTH_RATIO="
-             << "((" << a << " + " << ca << ")*(" << b << " + " << cb << "))*" << INITIAL_LENGTH_RATIO
+             << "((a + ca)*(b + cb))*GrSVG_INITIAL_LENGTH_RATIO="
+             << "((" << a << " + " << ca << ")*(" << b << " + " << cb << "))*" << GrSVG_INITIAL_LENGTH_RATIO
              << "=" << N << endl;
 
         N=100; //Awaryjna poprawka
@@ -1794,7 +1782,7 @@ namespace {
 /// \param o jakiś wyjściowy strumień C++
 /// \return 0, chyba że coś padło
     static int writeSTR_(ostream &o) {
-        // extern const char* GrFileOutputByExtension; // = "str"; //Tym można sterować format pliku wyjściowego.
+        // extern const char* GrSVG_FileOutputByExtension; // = "str"; //Tym można sterować format pliku wyjściowego.
         o << "#otx file - objects as text" << endl;
         o << "#enum GrType { Empty = 0, Point=1,LineTo=2,Line=3,Circle=4,Rect=5,Text=6,Poly=7 };" << endl;
         ssh_rgb bac = get_rgb_from(get_background());
@@ -1891,8 +1879,8 @@ namespace {
 /// \param o jakiś wyjściowy strumień C++
 /// \return 0, chyba że coś padło
     static int writeSVG_(ostream &o) {
-        // `extern` const char* GrFileOutputByExtension; // = "str"; //Tym można sterować format pliku wyjściowego.
-        // `extern` unsigned GrReloadInterval; // = 1000; //Co ile czasu skrypt w pliku SVG wymusza przeładowanie.
+        // `extern` const char* GrSVG_FileOutputByExtension; // = "str"; //Tym można sterować format pliku wyjściowego.
+        // `extern` unsigned GrSVG_ReloadInterval; // = 1000; //Co ile czasu skrypt w pliku SVG wymusza przeładowanie.
         //                                              Jak 0 to w ogóle nie ma skryptu przeładowania!!!
         int curX = 0, curY = 0; //Do MoveTo i LineTo
         o << "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"no\"?>\n"
@@ -1904,7 +1892,7 @@ namespace {
              "xmlns:svg=\"http://www.w3.org/2000/svg\" "
              "xmlns=\"http://www.w3.org/2000/svg\" "
              "version=\"1.1\" ";
-        if (GrReloadInterval > 0)
+        if (GrSVG_ReloadInterval > 0)
             o << "onload=\"init(evt)\" "; //Sam skrypt może dopiero na końcu? TODO?
 
         o << " x=\"0px\" ";
@@ -1913,18 +1901,18 @@ namespace {
         o << " height=\"" << GrScreenHi + 22 << "px\" >"
           << endl; //Trochę dodatkowego miejsca na wirtualnym ekranie na copyright
 
-        //if(GrReloadInterval>0)
+        //if(GrSVG_ReloadInterval>0)
         //{
-        //o<<"<META HTTP-EQUIV=\"Refresh\" CONTENT=\""<<int(GrReloadInterval/1000)<<"\">\n" //??? Tak to działa w HTMLu, ale w SVG nie bardzo
+        //o<<"<META HTTP-EQUIV=\"Refresh\" CONTENT=\""<<int(GrSVG_ReloadInterval/1000)<<"\">\n" //??? Tak to działa w HTMLu, ale w SVG nie bardzo
         //}
-        if (GrReloadInterval > 0) {
+        if (GrSVG_ReloadInterval > 0) {
             o <<
               "<script type=\"text/ecmascript\"><![CDATA[ "
               "function init(evt){ "
               "setTimeout(function(){ "
               //location.href='http://XXX.XXX.pl'; //gdyby miał ładować coć innego
               "location.reload(1); "
-              " }, " << GrReloadInterval << " ); "
+              " }, " << GrSVG_ReloadInterval << " ); "
                                             "}  ]]></script> " << endl;
         }
         o << "<style>\n"
@@ -2196,20 +2184,20 @@ void flush_plot()
         return;
     }
 
-    //GrTmpOutputDirectory ?
+    //GrSVG_TmpOutputDirectory ?
     static unsigned flush_counter = 0; //Zliczamy
     flush_counter++; //Jednak nie używamy w nazwie pliku...
     if(ssh_trace_level>0) cout << "SVG: " << WB_FUNCTION_NAME_ << SEP; //flush_plot
     if(ssh_trace_level>0) cout <<'#'<< flush_counter <<SEP<< GrList.get_size() <<SEP<< GrListPosition << endl;
     wb_pchar name(MAX_PATH);
-    name.prn("%s%s_%0u", GrTmpOutputDirectory,  ScreenTitle, PID );
+    name.prn("%s%s_%0u", GrSVG_TmpOutputDirectory, ScreenTitle, PID );
     for(int i=0;i<name.get_size();i++)
         if(name[i]==' ') name[i]='_';
 
     dump_screen(name.get()); //Zapisuje listę operacji graficznych do pliku w ustalonym formacie
 
     if(first_time) {
-        name.add(".%s",GrFileOutputByExtension);
+        name.add(".%s", GrSVG_FileOutputByExtension);
      //   if(ssh_trace_level>0)
             cout <<name.get()<<"\n\n The best way to view SVG files is www browser! Change default for such extensions."<<endl;
         ViewHtml(name.get());
@@ -2223,7 +2211,7 @@ ssh_stat	dump_screen(const char* Filename)
     /// \internal
     /// W module SVG dostępne są tekstowe formaty wektorowe, SVG (może kiedyś też EXM?) TODO?
     if(ssh_trace_level>0) cout << "SVG: " << WB_FUNCTION_NAME_ << SEP;
-    if(ssh_trace_level>0) cout << Filename <<'.'<< GrFileOutputByExtension << endl;
+    if(ssh_trace_level>0) cout << Filename << '.' << GrSVG_FileOutputByExtension << endl;
 
     wb_pchar name(MAX_PATH);
 
@@ -2239,8 +2227,8 @@ ssh_stat	dump_screen(const char* Filename)
 
     int ret = 0;
 
-    if (strcmp(GrFileOutputByExtension, "svg") == 0
-    || strcmp(GrFileOutputByExtension, "SVG") == 0)
+    if (strcmp(GrSVG_FileOutputByExtension, "svg") == 0
+    || strcmp(GrSVG_FileOutputByExtension, "SVG") == 0)
     {
         ret = writeSVG_(Out); // local, internal
     }
@@ -2258,7 +2246,7 @@ ssh_stat	dump_screen(const char* Filename)
 
     wb_pchar name2(MAX_PATH);
     //Sposób zapisu zależy od rozszerzenia nazwy pliku
-    name2.prn("%s.%s", Filename, GrFileOutputByExtension);
+    name2.prn("%s.%s", Filename, GrSVG_FileOutputByExtension);
 
     remove(name2.get()); //Na wypadek, gdyby był już plik o tej nazwie
     ret=rename(name.get(),name2.get());

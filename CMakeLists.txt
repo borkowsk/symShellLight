@@ -73,9 +73,10 @@ if(true) # SVG SYMSHELL LIB
             "UTILS/wb_rand.cpp"
             "UTILS/wb_randg.c"
             "UTILS/sshmenufdummy.c" #dummy functions of menus
+            "SVG/symshsvgdef.c"
             "UTILS/error_enter_before_clean.c"
-            "UTILS/context_menu_expected_tmpl.c"
-        )
+         #  "UTILS/context_menu_expected_tmpl.c"
+    )
     #target_compile_features(wbsyshSVG PUBLIC cxx_std_11)
 endif()
 
@@ -127,9 +128,8 @@ if(WINDOWS) # only for WINDOWS - NOT TESTED IN THIS VERSION (after 2016)
             "UTILS/wb_rand.cpp"
             "UTILS/wb_randg.c"
             "WIN/sshmenufwin.c" #real functions for MS Windows menus.
-            #"UTILS/sshmenufdummy.c" #dummy functions of menus
             "UTILS/error_enter_before_clean.c"
-            "WIN/wb_context_menu_expected.c"
+            #"WIN/wb_context_menu_expected.c"
     )
 
     #target_compile_features(wbsyshWIN PUBLIC cxx_std_11)
@@ -159,10 +159,10 @@ if(X11 AND WITHTESTS ) #X11 tests
     add_executable("TestpaleX11"	"EXAMPLES/Testpale.cpp"    	)
     add_executable("TestpolyX11"	"EXAMPLES/Testpoly.cpp"	)
     add_executable("TestrandX11"
-                    "EXAMPLES/Testrand.cpp"
-                    "UTILS/wb_randg.c"
-                    "UTILS/wb_rand.cpp"
-                )
+                   "EXAMPLES/Testrand.cpp"
+                   "UTILS/wb_randg.c"
+                   "UTILS/wb_rand.cpp"
+                  )
     add_executable("TestsymsX11"	"EXAMPLES/Testsyms.cpp"	)
     add_executable("TestsyshX11"	"EXAMPLES/Testsysh.cpp"	)
     add_executable("TurmitX11"	    "EXAMPLES/Turmit.cpp"	)
@@ -210,10 +210,10 @@ if( WINDOWS AND WITHTESTS ) #MS Windows tests
     add_executable("TestpaleWIN" "EXAMPLES/Testpale.cpp" )
     add_executable("TestpolyWIN" "EXAMPLES/Testpoly.cpp" )
     add_executable("TestrandWIN"
-                "EXAMPLES/Testrand.cpp"
-                "UTILS/wb_randg.c"
-                "UTILS/wb_rand.cpp"
-            )
+                   "EXAMPLES/Testrand.cpp"
+                   "UTILS/wb_randg.c"
+                   "UTILS/wb_rand.cpp"
+                  )
     add_executable("TestsymsWIN" "EXAMPLES/Testsyms.cpp" )
     add_executable("TestsyshWIN" "EXAMPLES/Testsysh.cpp" )
     add_executable("TurmitWIN"   "EXAMPLES/Turmit.cpp" )
@@ -264,13 +264,16 @@ if(WITHTESTS) #SVG tests
     add_executable("TestpaleSVG" "EXAMPLES/Testpale.cpp"    )
     add_executable("TestpolySVG" "EXAMPLES/Testpoly.cpp"    )
     add_executable("TestrandSVG"
-                    "EXAMPLES/Testrand.cpp"
-                    "UTILS/wb_randg.c"
-                    "UTILS/wb_rand.cpp"
-                )
+                   "EXAMPLES/Testrand.cpp"
+                   "UTILS/wb_randg.c"
+                   "UTILS/wb_rand.cpp"
+                  )
     add_executable("TestsymsSVG" "EXAMPLES/Testsyms.cpp" )
     add_executable("TestsyshSVG" "EXAMPLES/Testsysh.cpp" )
-    add_executable("TurmitSVG"   "EXAMPLES/Turmit.cpp"   )
+    add_executable("TurmitSVG"
+                   "EXAMPLES/Turmit.cpp"
+                   "EXAMPLES/Turmit_svgDefs.cpp"
+                  )
     add_executable("CAGasSVG"    "EXAMPLES/CAGas.cpp"    )
     add_executable("LinktestSVG" "EXAMPLES/Linktest.cpp" )
 

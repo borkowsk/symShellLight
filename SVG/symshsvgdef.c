@@ -1,7 +1,7 @@
 /// @file
 /// @brief Zmienne konfiguracyjne modułu SVG - definicje
 //------------------------------------------------------
-/// @date 2026 (created)
+/// @date 2026-04-26 (created)
 // Created by borkowsk on 26.04.26.
 //
 

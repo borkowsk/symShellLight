@@ -1,27 +1,31 @@
-/** ********************************************************************
- * @file symshx11.c                                                    *
- * @brief X11 implementation of SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++. */
-/*        =========================================================================== */
-/** @date 2026-04-21 (last modifications)                              */
-/* ******************************************************************* */
-/** \details Najprostszy interface wizualizacyjny zaimplementowany      *
- *          pod X-windows za pomocą biblioteki X11                      *
- *          Na Ubuntu/Debianie potrzebne pakiety:                       *
- *                  `libx11-dev` i `libxpm-dev`                         *
- *                                                                      *
- * \author W.Borkowski from University of Warsaw                        *
- * 	- https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI           *
- * 	- https://github.com/borkowsk                                       *
- *                                                                      *
- *      File changed massively: 21.10.2020                              *
- * \note                                                                *
- *  get_char() aktualnie zjada wszystkie nieznakowe komunikaty, jakie   *
- *  są w kolejce komunikatów, przez co EXPOSE działa jeszcze inaczej... *
- *  Czy błędnie to na razie trudno powiedzieć.                          *
- *                                                                      *
- ********************************************************************** *
- *                           SYMSHELLLIGHT                              *
- * ******************************************************************** */
+/** @file symshx11.c
+ *  @brief X11 implementation of SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++.
+ *  @date 2026-04-27 (last modifications)
+ *          SYMSHELL IS A SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++
+ *          ==================================================================
+ *          Najprostszy interface wizualizacyjny zaimplementowany
+ *          pod X-windows za pomocą biblioteki X11.
+ *          Używany conajmniej do 1997 roku.
+ *
+ *          Ostatnie duże zmiany: 21.10.2020 oraz 04.2026.
+ *
+ *          Poza biblioteką libx11 wymaga też libxpm.
+ *          Na Ubuntu/Debianie są to pakiety:
+ *                  `libx11-dev` i `libxpm-dev`
+ *
+ * \author     Designed by W. Borkowski from the University of Warsaw
+ *
+ *  ## See also
+ *     *          https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI
+ *     *          https://github.com/borkowsk
+ *
+ * \note
+ *  `get_char` aktualnie zjada wszystkie nieznakowe komunikaty, jakie
+ *   są w kolejce komunikatów, przez co EXPOSE działa jeszcze inaczej...
+ *   Czy błędnie to na razie trudno powiedzieć.
+ *
+ ******************************************************************************************************************** */
+
 
 #ifdef __cplusplus
 #warning This file is rather for pure "C" compilation.
@@ -36,33 +40,39 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/Xos.h>
-//#include <X11/Xatom.h>
+#include <X11/Xatom.h>
 #include <X11/xpm.h>  /*  THIS SHOULD LOOK LIKE WHEN Xpm IS NORMALLY INSTALLED */
 #include <errno.h>
 //#include "SYMSHELL/Xpm/xpm.h"
 
 #include "symshell.h"
+#include "maybe_unused.h"
 #include "icon.h"
 
-//#define BITMAPDEPTH 1
+#ifdef __cplusplus
+#error Nie przeznaczone do kompilacji w C++! / Not intended to be compiled in C++!
+#endif
+
+/// @brief Lokalne zabezpieczenie przed ostrzeżeniami o nieużywanych zmiennych i funkcjach.
+#define UNUSED_ATTR_    MAYBE_UNUSED
+
+/// Definicja kodu dla za małego okna.
 #define TOO_SMALL 0
+
+/// Definicja kodu dla okna o wystarczających rozmiarach.
 #define BIG_ENOUGH 1
 
-//#define FALSE 0
+/// Znak umowny oznaczający brak realnych danych w buforze znaków.
 #define NODATA '\0'
 
-/* For transparencies to work use: (TODO CHECK?) */
+// /// For transparencies to work use... (TODO CHECK? NIE DZIAŁ)
 //#define CREATE_FULL_WINDOW 32
 
 #ifndef NULL
+/// @brief Lokalne zabezpieczenie przed ostrzeżeniami o użyciu niezdefiniowanego NULL.
 #define NULL __null
 #endif
 
-#define UNUSED_ATTR_ __attribute__((unused))
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 UNUSED_ATTR_
 const char *_ssh_grx_module_name="SVG";
@@ -87,92 +97,93 @@ static Window          win;
 /** \brief Dla `close_plot`. Zerowane też gdy "broken-pipe". **/
 static int             opened=0;
 
-/** Domyślna nazwa programu, okna i ikony */
+/** \brief Domyślna nazwa programu, okna i ikony */
  static char            prog_name[1024] = "WB SIMULATION NAME NOT SET";
-/** Domyślna nazwa okna */
+/** \brief Domyślna nazwa okna */
  static char            window_name[1024] = "WB-sym-shell"; /* "WB X-window simulation shell" */
-/** Domyślna nazwa ikony */
+/** \brief Domyślna nazwa ikony */
  static char            icon_name[1024] = "WB-sym-shell";
 
-/** Zmienne do zapamiętania wskaźników przekazanych przez funkcje setup*/
- static unsigned        loc_argc=0;          /**< Liczba parametrów wywołania */
- static const char**    loc_argv=NULL;       /**< Wartości parametrów wywołania */
+/** \name Zmienne do zapamiętania wskaźników przekazanych przez funkcje setup */
+/** @{ */
+ static unsigned        loc_argc=0;          /**< \brief Liczba parametrów wywołania */
+ static const char**    loc_argv=NULL;       /**< \brief Wartości parametrów wywołania */
+/** @} */
 
-/** Parametry z inicjalizacji modułu (shell setup) */
- static int             is_buffered=0;       /**< Czy okno jest buforowane mapą pikseli? */
- static int             animate=0;           /**< Czy odświeżanie, tylko gdy flush_plot, czy na bieżąco? */
- static int             screen_clip=1;       /**< Czy przycinać okno do wielkości ekranu? */
- static int             use_gray_scale=0;    /**< Czy mapować kolory indeksowane na odcienie szarości? */
+/** \name Parametry z inicjalizacji modułu (shell setup) */
+/** @{ */
+ static int             is_buffered=0;       /**< \brief Czy okno jest buforowane mapą pikseli? */
+ static int             animate=0;           /**< \brief Czy odświeżanie, tylko gdy flush_plot, czy na bieżąco? */
+ static int             screen_clip=1;       /**< \brief Czy przycinać okno do wielkości ekranu? */
+ static int             use_gray_scale=0;    /**< \brief Czy mapować kolory indeksowane na odcienie szarości? */
+/** @} */
 
  /* These are used as arguments to nearly every Xlib routine, so it
    * saves routine arguments to declare them global; if there were
    * additional source files, they would be declared `extern` there */
- static Display         *display=0;                /**< HANDLER TO Display */
- static int             screen_num;                /**< SCREEN NUMBER */
- static char            *display_name = NULL;      /**< Display name. To be read. */
- static unsigned int    display_width=0;           /**< Will be filled during initialization */
- static unsigned int    display_height=0;          /**< Will be filled during initialization */
- static XSizeHints      *size_hints;               /**< To jest jeszcze gdzieś używane poza init_plot() Chyba do resize? TODO? */
+ static Display         *display=0;                /**< \brief HANDLER TO Display */
+ static int             screen_num;                /**< \brief SCREEN NUMBER */
+ static char            *display_name = NULL;      /**< \brief Display name. To be read. */
+ static unsigned int    display_width=0;           /**< \brief Will be filled during initialization */
+ static unsigned int    display_height=0;          /**< \brief Will be filled during initialization */
+ static XSizeHints      *size_hints;               /**< \brief To jest jeszcze gdzieś używane poza init_plot() Chyba do resize? TODO? */
 
- static unsigned int    mulX=1,mulY=1;             /**< Multiplication of x & y */
- static unsigned int    org_width,org_height;      /**< Starting Window size */
- static int             ini_a,ini_b,ini_ca,ini_cb; /**< Konieczne do działania */
+ static unsigned int    mulX=1,mulY=1;             /**< \brief Multiplication of x & y */
+ static unsigned int    org_width,org_height;      /**< \brief Starting Window size */
+ static int             ini_a,ini_b,ini_ca,ini_cb; /**< \brief Konieczne do działania */
                                                    /**< `screen_width()` i `screen_height()` i zmiany rozmiaru */
 
- static Atom            wmDeleteMessage=0;          /**< ATOM przypisywany przy rejestracji "protokołu" zamknięcia okna */
+ static Atom            wmDeleteMessage=0;          /**< \brief ATOM przypisywany przy rejestracji "protokołu" zamknięcia okna */
 
- static unsigned int    width,height;              /**< Window size */
- static int             iniX, iniY;                /**< Window position */
+ static unsigned int    width,height;              /**< \brief Window size */
+ static int             iniX, iniY;                /**< \brief Window position */
 
- /* For transparencies to work use: */
- //#define CREATE_FULL_WINDOW 32 TODO CHECK?
+ /* For transparencies to work use:
+    #define CREATE_FULL_WINDOW 32 TODO CHECK? */
 #if CREATE_FULL_WINDOW==32
  static unsigned int    default_depth = 32;
 #else
- static unsigned int    default_depth = 24;         /**< CURRENTLY 24bit deph WORK, BUT 32 NOT (TODO!) */
+ static unsigned int    default_depth = 24;         /**< \brief CURRENTLY 24bit deph WORK, BUT 32 NOT (TODO!) */
 #endif
- static unsigned int    border_width = 4;           /**< Four pixels margin */
- static int             window_size = TOO_SMALL;    /**< BIG_ENOUGH or TOO_SMALL to display contents */
+
+ static unsigned int    border_width = 4;           /**< \brief Four pixels margin */
+ static int             window_size = TOO_SMALL;    /**< \brief BIG_ENOUGH or TOO_SMALL to display contents */
 
 UNUSED_ATTR_
- static unsigned int    icon_width, icon_height;    /**< the height and width of the program icon */
- static Pixmap          icon_pixmap;                /**< program icon handle */
+ static unsigned int    icon_width, icon_height;    /**< \brief the height and width of the program icon */
+ static Pixmap          icon_pixmap;                /**< \brief program icon handle */
 
- static unsigned short  alloc_cont=0;               /**< Flag that pixmap has been allocated */
- static Pixmap          cont_pixmap=0;              /**< Handle for pixmap replacing / mirroring a window */
+ static unsigned short  alloc_cont=0;               /**< \brief Flag that pixmap has been allocated */
+ static Pixmap          cont_pixmap=0;              /**< \brief Handle for pixmap replacing / mirroring a window */
 
- static XTextProperty    windowName;
- static XTextProperty    iconName;
+ static XTextProperty    windowName;                /**< \brief Właściwość tekstowa: nazwa okna */
+ static XTextProperty    iconName;                  /**< \brief Właściwość tekstowa: nazwa ikony */
 
- static GC               gc=NULL;                   /**< GRAPHIC CONTEXT */
+ static GC               gc=NULL;                   /**< \brief GRAPHIC CONTEXT */
 
  /* FONT */
- static int              ResizeFont=0;              /**< Ustala czy spróbuje zmieniać rozmiar fontu. TODO? */
- static XFontStruct     *font_info=NULL;            /**< Current font */
+ static int              ResizeFont=0;              /**< \brief Ustala czy spróbuje zmieniać rozmiar fontu. TODO? */
+
+ static XFontStruct     *font_info=NULL;            /**< \brief Current font */
  static unsigned         ori_font_width = 8;
  static unsigned         ori_font_height = 16;
  static unsigned         font_width = 0;
  static unsigned         font_height = 0;
-
-UNUSED_ATTR_
-const char* event_name(int code);
-UNUSED_ATTR_
-const char* get_xevent_name(int type);
 
  /* REPAINT DATA */
  static struct XRect {
      int x,y,width,height;
  } last_repaint_data;
 
- static int             repaint_flag=0;          /**< Czy trzeba odrysować? */
+ static int             repaint_flag=0;          /**<  @brief Czy trzeba odrysować? */
 
  /* TŁO */
  static unsigned long   Black;
 UNUSED_ATTR_
- static unsigned long   White;                   /**< NIE UŻYWANE??? */
+ static unsigned long   White;                   /**<  @brief NIE UŻYWANE??? */
  static Colormap        colormap=0;
- static int             CurrForeground=-1;       /**< Index to last set color. */
- static unsigned        CurrBackground=0;        /**< Index koloru tła. */
+ static int             CurrForeground=-1;       /**<  @brief Index to last set color. */
+ static unsigned        CurrBackground=0;        /**<  @brief Index koloru tła. */
 
  /* PALETA */
  static unsigned        NumberOfColors=512; /* ??? */
@@ -183,16 +194,16 @@ UNUSED_ATTR_
  static unsigned int    BrushIndex=0;
 
  static XColor          ColorArray[512];
- static void SetScale(XColor RGB_array[512]);    /**< Funkcja ustawiania RGB dla kolorów indeksowanych. */
+ static void SetScale(XColor RGB_array[512]);    /**< @brief Funkcja ustawiania RGB dla kolorów indeksowanych. */
 
  /* Parametry rysowania */
- static unsigned        default_line_width=2;    /**< Grubość linii. */
- static int             transparent_print=0;     /**< Czy napisy transparentne... */
- static int             pieMode=-1;              /**< Tryb wypełniania fragmentu okręgu lub elipsy. */
+ static unsigned        default_line_width=2;    /**< @brief Grubość linii. */
+ static int             transparent_print=0;     /**< @brief Czy napisy transparentne... */
+ static int             pieMode=-1;              /**< @brief Tryb wypełniania fragmentu okręgu lub elipsy. */
 
  /* Wejście znakowe? */
  static KeySym          theKeyXID;
- static int             eventCharsBuf[2];        /**< Bufor na znaki z klawiatury. Tylko zerowy znak jest przekazywany */
+ static int             eventCharsBuf[2];        /**< @brief Bufor na znaki z klawiatury. Tylko zerowy znak jest przekazywany */
  //static char b_first = 0;                      /*< Zmienne na implementację cykliczną bufora.*/
  //static char b_last = 0;                       /*< Aktualnie nieużywane.*/
 
@@ -204,13 +215,20 @@ UNUSED_ATTR_
           unsigned buttons;}        LastMouse={0, 0, 0, 0};
 
  /* OBSŁUGA SYGNAŁÓW */
- const  int             error_limit=3;            /**< Limit odesłanych błędów od x-serwera */
- static int             error_count=3;            /**< Antylicznik błędów. Gdy osiąga 0 - koniec programu */
- static int             pipe_break=0;             /**< Informacja o zerwaniu połączenia z X serwerem */
-UNUSED_ATTR_
- static int             DelayAction=0;            /**< Sterowanie zasypianiem, jeśli program czeka. NIEUŻYWANE. TODO? */
+ static const  int      error_limit=3;            /**< @brief Limit odesłanych błędów od x-serwera */
+ static int             error_count=3;            /**< @brief Antylicznik błędów. Gdy osiąga 0 - koniec programu */
+ static int             pipe_break=0;             /**< @brief Informacja o zerwaniu połączenia z X serwerem */
 
- /** Default signal handler. */
+UNUSED_ATTR_
+ static int             DelayAction=0;            /**< @brief Sterowanie zasypianiem, jeśli program czeka. NIEUŻYWANE. TODO? */
+
+UNUSED_ATTR_
+ const char* event_name(int code);
+
+UNUSED_ATTR_
+ const char* get_xevent_name(int type);
+
+ /** @brief Default signal handler. */
  static void SigPipe(int num)
  {
      pipe_break=1;
@@ -220,7 +238,7 @@ UNUSED_ATTR_
      exit(num);
  }
 
- /** Default X IO handler.
+ /** @brief Default X IO handler.
   * \warning TODO: How to distinguish X11 network error from the window shutdown? */
  static int MyXIOHandler(Display* d)
  /* \internal
@@ -1471,6 +1489,7 @@ int  get_char()
 static char mem_guard1=0x77; /**< Strażnik czy nie nastąpiło wyjście przed bufor wyjściowy zestawu funkcji "print*". */
 static char bufor[2048];     /**< Bufor wyjściowy zestawu funkcji "print*". */
 static char mem_guard2=0x77; /**< Strażnik czy nie nastąpiło wyjście za bufor wyjściowy zestawu funkcji "print*". */
+
 static int ox,oy; /* TODO Do czego to miałoby służyć? Jest przypisywane w funkcjach "print*" ale nie używane. */
 
 /* Wyprowadzenie tekstu na ekran (bw). */

@@ -1,21 +1,27 @@
-/*****************************************************************************************
-* @file
-* @brief Implementacja najprostrzego interface-u wizualizacyjnego dla MS Windows 32.
-* ====================================================================================== */
-/// @date 2026-04-21 (last modification)
-/**
-* @details
-*   Używano w of 1997 roku w różnych kompilatorach C++ Borland i Microsoftu oraz w GCC na Windows
-*   Ostatnia modyfikacja/Last modification: 28.10.2014
-*   UWAGA: `ProcessMsg` używa aktualnie, zamiast NULL, uchwytu okna pobierając komunikat — to powinno
-*   działać lepiej, ale pewności nie ma.
-* */
+/** @file
+*   @brief Implementacja najprostrzego interface-u wizualizacyjnego dla MS Windows 32.
+*   @date 2026-04-27 (last modification)
+*           SYMSHELL IS A SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++
+*           ==================================================================
+*           Implementacja grafiki SYMSHELL-a dla Microsoft Windows.
+*           Używano od 1997 roku w różnych kompilatorach C++ Borland i Microsoftu oraz w GCC na Windows
+*           Ostatnia duża modyfikacja: 28.10.2014
+*
+* @note `ProcessMsg` używa aktualnie, zamiast NULL, uchwytu okna pobierając komunikat — to powinno
+*       działać lepiej, ale pewności nie ma.
+** \author     Designed by W. Borkowski from the University of Warsaw
+**
+*  ## See also
+**     *          https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI
+**     *          https://github.com/borkowsk
+**
+* ***************************************************************************************** */
 
 //Partially based on Borland and Microsoft examples
 static char* Copyright=	"SYMSHELL LIBRARY(c)1997-2014 ;\n"
                         "By Wojciech Borkowski, Warsaw University\n("
                         __DATE__" - compilation timestamp)\n";
-//Define EXTERN_WB_ABOUT and function of following prototype for redefine usage of ShellAbout
+//Define EXTERN_WB_ABOUT and function of the following prototype for redefined usage of ShellAbout
 //int wb_about(const char* window_name); //Z biblioteki albo dostarczona z programem
 
 extern int WB_error_enter_before_clean; /* For controlling a closing graphics window on error. */
@@ -41,7 +47,7 @@ extern int WB_error_enter_before_clean; /* For controlling a closing graphics wi
 /// @file
 /// @brief SYMSHELL FOR MS WINDOWS - PROGRAMMED BY W.Borkowski BASED OD Microsoft EXAMPLES
 //         -------------------------------------------------------------------------------
-/// @date 2026-04-21 (modified)
+/// @date 2026-04-27 (modified)
 #if defined(_MSC_VER)
 //#pragma warning(disable:4068)
 #pragma warning(disable : 4996) //deprecated functions

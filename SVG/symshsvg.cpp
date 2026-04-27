@@ -1,24 +1,20 @@
 /** @file
- *  \brief                      SYMSHELL SVG IMPLEMENTATION
- *//* ******************************************************************************** */
-/// @date 2026-04-26 (last modification)
-/** \details    SYMSHELL IS A SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++
- **             ==================================================================
- **
+ *  @brief                      SYMSHELL SVG IMPLEMENTATION
+ *  @date 2026-04-27 (last modification)
+ *              SYMSHELL IS A SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++
+ *              ==================================================================
  **             Simplest graphics interface implemented for SVG vector graphics.
  **             All graphic operations are buffered in a large list, and write
- **             into an SVG file when flush_screen() is called.
- **             Also dump_screen() produces an SVG file.
+ **             into an SVG file when `flush_screen()` is called.
+ **             Also `dump_screen()` produces an SVG file.
  **
- ** \note       This source file was changed massively: 17.11.2020, then 17.12.2021.
- **
+ ** \note       This source file was changed massively: 17.11.2020, 17.12.2021 and 04.2026.
  **
  ** \author     Designed by W. Borkowski from the University of Warsaw
  **
- ** \n          https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI
- ** \n          https://github.com/borkowsk
- **
- ** \library    SYMSHELLLIGHT  version 2026a
+ *  ## See also
+ **     *          https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI
+ **     *          https://github.com/borkowsk
  **
  */
 #include <iostream>
@@ -92,10 +88,6 @@ extern "C" {
 
     // "Dummy window" handler for check and external use.
     [[maybe_unused]]  unsigned long   _ssh_window=0;
-
-    // Rozszerzenie nazwy pliku wyjściowego. Jednocześnie określa format pliku wyjściowego.
-    // Jak extension nieznane, to wyrzuca strumień obiektowy '.str'
-    const char* GrSVG_FileOutputByExtension = "svg";
 
     // Myszy w SVG domyślnie nie ma, ale inny moduł może ją symulować przez linkowanie do tych zmiennych globalnych.
     int         GrMouseX = -1; //< Pozycja X symulowanej myszy.

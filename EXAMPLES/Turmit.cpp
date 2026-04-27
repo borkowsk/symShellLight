@@ -1,8 +1,20 @@
 /// @file
-/// @brief "Mrówka Langtona" z możliwością wariacji na temat (turmit prototypowy)
-///                   (przykładowy program SYMSHELL-a)
+/// @brief "Mrówka Langtona"/Langton Ant
+/// @date 2026-04-27 (last update)
 // -------------------------------------------------------------------------------
-/// @date 2026-04-26 (last update)
+#ifdef USE_ENGLISH_IF_POSSIBLE
+/// @page page_e7_turmit LANGTON'S ANT IMPLEMENTED IN SYMSHELL
+/// @brief A prototype turmite, designed for easy modification.
+///
+/// @section intro_sec_e7 Description of the "Langton's Ant" Example
+///     Example of simple graphics handling featuring screen refreshing and event management,
+///     along with a custom context menu that differs from the default.
+///
+///     A turmite consists of an active element and an environment—specifically a head
+///     and memory—since a turmite is essentially a 2-dimensional generalization of
+///     a Turing machine.
+/// @include Turmit.cpp
+#else
 /// @page page_e7_turmit MRÓWKA LANGTONA ZAKODOWANA W SYMSHELL-u
 /// @brief Turmit prototypowy, łatwy do modyfikacji
 ///
@@ -13,59 +25,72 @@
 ///     Turmit ma element aktywny i środowisko, tzw. głowicę albo "czoło" oraz pamięć
 ///     , ponieważ turmit jest tak naprawdę 2 wymiarowym uogólnieniem maszyny Turinga
 /// @include Turmit.cpp
+#endif
 //-//////////////////////////////////////////////////////////////////////////////////
 
-
-#include <stdio.h> //Wyjście na konsole à la język C - printf(....)
-//#include <math.h>
+#include <cstdio> //Wyjście na konsole à la język C - printf(....)
 #include <fstream>
 
-#if defined(_MSC_VER)
-//#pragma warning(disable:4068)
-#pragma warning(disable : 4996) //deprecated functions
-#pragma warning(disable : 4521) //multiple copy constructor
-#pragma warning(disable : 4522) //multiple assigment operator
-//TYMCZASEM - OSTRZEŻENIA O "conversion from 'A' to 'B', possible loss of data"
-//#pragma warning(disable : 4267)
-//#pragma warning(disable : 4244)
-#endif
 #include "symshell.h"
+#include "sshutils.hpp"
 #include "../SVG/symshsvgdef.h"
 
-#define NAZWA_MODELU  "Turmit_przyspieszony" //Użycie define ułatwia montowanie stałych łańcuchów
+#ifdef USE_ENGLISH_IF_POSSIBLE
+#define NAZWA_MODELU  "Turmit_the_fast" ///< Model name. Using "define" makes it easier to mount const character strings.
+#else
+#define NAZWA_MODELU  "Turmit_przyspieszony" ///< Nazwa modelu. Użycie "define" ułatwia montowanie stałych łańcuchów
+#endif
 
-/// Wyjściowy rozmiar świata i "ekranu" symulacji.
+/// @brief Wyjściowy rozmiar świata i "ekranu" symulacji.
+/// EN: The output size of the world and the simulation "screen".
 const int size=700;
 
-unsigned char World[size][size]; ///< Tablica świata: wyzerowana na początku, bo globalna.
+unsigned char World[size][size]; ///< @brief Tablica świata: wyzerowana na początku, bo globalna.
+                                 ///<        EN: World table: zeroed at the beginning because it is global.
                                  ///< Jest `unsigned char`, żeby było od 0 do 255, bo typ `char` bywa też "signed"
                                  ///< (zależnie od kompilatora)
 
-unsigned step_counter=0; ///< Licznik realnych kroków modelu
+unsigned step_counter=0; ///< @brief Licznik realnych kroków modelu. EN:Counter of actually completed model steps.
 
-void init_world() ///< Funkcja do zapoczątkowania świata.
+/// @brief Funkcja do zapoczątkowania świata. Tu pusta, choć można by pokombinować.
+/// EN: A function to start the world. It's empty here, though it could be tweaked.
+void init_world()
 {
-    //World[0][0]=255;//TODO: ewentualna inicjalizacja świata (losowo?)
+    //World[0][0]=255; //TODO: ewentualna inicjalizacja świata (losowo?)
 }
 
-/// Struktura definiująca stan turmita.
+/// @brief Struktura definiująca stan turmita.
+/// EN: The structure defining the turmite state.
 struct Turmit
 {
-    int x,y;//położenie
-    int stan;//I pamięć robocza. Np. aktualny kierunek
-    Turmit(int ix,int iy,int is):x(ix),y(iy),stan(is) //KONSTRUKTOR TURMITA!
+    int x,y;  //!< położenie/position.
+    int stan; //!< Pamięć robocza "głowicy", czyli aktualny kierunek. EN:Working memory of the "head", i.e. the current direction.
+    Turmit(int ix,int iy,int is):x(ix),y(iy),stan(is) ///< KONSTRUKTOR.
     {}
 };
 
-/// Struktura anonimowa dla kierunków ruchu. Kolejność góra, prawo, dół, lewo.
+/// @brief Struktura anonimowa dla kierunków ruchu. Kolejność góra, prawo, dół, lewo.
+/// EN:Anonymous structure for movement directions. Order: up, right, down, left.
 struct
 {
     int dx,dy;
 } Directions[4]={{0,-1},{1,0},{0,1},{-1,0}};
 
-Turmit LaAnt(size/2,size/2,0); ///< Nasz turmit. Inicjalizacja turmita na środku z kierunkiem "góra".
 
-void single_step() ///< Funkcja robiąca jeden krok symulacji
+#ifdef USE_ENGLISH_IF_POSSIBLE
+unsigned int lang_selector=1; ///< @brief Setting the language for on-screen "subtitles".
+
+/// @brief Variable representing the turmite. Initialize the turmite in the center with the direction "up".
+#else
+unsigned int lang_selector=0; ///< @brief Ustalenie języka dla napisów na ekranie.
+
+/// @brief Zmienna reprezentująca turmita. Inicjalizacja turmita na środku z kierunkiem "góra".
+#endif
+Turmit LaAnt(size/2,size/2,0);
+
+/// @brief Funkcja robiąca jeden krok symulacji.
+/// EN: A function that performs one simulation step.
+void single_step()
 {
     LaAnt.x=( LaAnt.x+Directions[LaAnt.stan].dx //Przesunięcie po X
             + size ) % size; //i zabezpieczenie, żeby nie wyjść za tablicę
@@ -76,36 +101,44 @@ void single_step() ///< Funkcja robiąca jeden krok symulacji
     {
         plot(LaAnt.x,LaAnt.y,128);
         World[LaAnt.y][LaAnt.x]=1;  //Może być inna liczba. To tylko marker odwiedzin
-        LaAnt.stan=(LaAnt.stan+1)%4;//Mrówka jest czterokierunkowa
+        LaAnt.stan=(LaAnt.stan+1)%4; //Mrówka jest czterokierunkowa
     }
     else
     {
         plot(LaAnt.x,LaAnt.y,255);
         World[LaAnt.y][LaAnt.x]=0;
-        LaAnt.stan=(LaAnt.stan+4-1)%4;//Mrówka jest czterokierunkowa
+        LaAnt.stan=(LaAnt.stan+4-1)%4; //Mrówka jest czterokierunkowa
     }
 
-    step_counter++;//Licznik kroków mrówki
+    step_counter++; //Licznik kroków mrówki
 }
 
-void stats() ///< Funkcja do obliczenia statystyk
+/// @brief Funkcja do obliczenia statystyk.
+/// EN: Function to calculate statistics.
+void stats()
 {
   //TODO: Np średniej liczby odwiedzeń już odwiedzonych oraz liczby pustych.
 }
 
-//Do wizualizacji obsługi zdarzeń:
-const int DELA=0;      ///< Jak długie oczekiwanie w obrębie pętli zdarzeń.
-const int VISUAL=1000; ///< Co ile kroków symulacji odrysowywać widok.
-const char* CZEKAM="Tylko patrz! "; ///< Monit w pętli zdarzeń.
-int x_mouse=10,y_mouse=10; ///< Pozycja ostatniego "kliku" myszy (na razie zbędne).
+// Do wizualizacji obsługi zdarzeń:
+// EN: To visualize event handling:
+const int DELA=0;          ///< @brief Jak długie oczekiwanie w obrębie pętli zdarzeń.
+                           ///< EN: Specifies the length of the wait within the event loop.
+const int VISUAL=1000;     ///< @brief Co ile kroków symulacji odrysowywać widok.
+                           ///< EN: Number of simulation steps between full screen refreshes.
+const char* CZEKAM=lang("Tylko patrz!","Just look!"); ///< @brief Prompt in event loop. EN: Prompt in event loop.
+
+int x_mouse=10,y_mouse=10; ///< UNUSED FOR NOW.
 
 //Kilka deklaracji zapowiadających inne funkcje obsługujące model:
+//EN: A few declarations announcing other model handling functions:
 void replot();         // Funkcja odrysowująca
 void read_mouse();     // Obsługa myszy. Używać, o ile potrzebne!
 void write_to_file();  // Obsługa zapisu do pliku. Używać, o ile potrzebne!
 void screen_to_file(); // Zapis ekranu do pliku
 
-void replot() ///< Rysuje na ekranie
+/// @brief Rysuje na ekranie. EN: Restores the entire contents of the window.
+void replot()
 {
     invalidate_screen();
     for(int x=0;x<size;x++)
@@ -116,24 +149,24 @@ void replot() ///< Rysuje na ekranie
             // z %= 512; //Albo wersja  z szarościami
             plot(x,y,z); //Rysowanie punktu "świata"
         }
-    printc(size/3,size,128,255,"%06u  ",step_counter);//Licznik kroków
+    printc(size/3,size,128,255,"%06u  ",step_counter); //Licznik kroków
     //Ostatnie położenie kliku — biały krzyżyk
     //line(x_mouse, y_mouse-10, x_mouse, y_mouse+10,255);
     //line(x_mouse-10, y_mouse, x_mouse+10, y_mouse,255);
 }
 
-/** Własna definicja menu kontekstowego. */
+/** @brief Specyficzna dla tego programu definicja menu kontekstowego.
+ *  EN: A context menu definition specific to this program. */
 ssh_menu_item_definition  context_menu_default[]= {
-        {"TO TEXT", 'p'},
-        {"DUMP GRAPHIC", 'd'},
-        {"QUIT", 'q'}
+        {lang("ZAPISZ TEKST","TO TEXT"), 'p'},
+        {lang("ZAPISZ GRAFIKĘ","DUMP GRAPHIC"), 'd'},
+        {lang("KONIEC","QUIT"), 'q'}
 };
 unsigned context_menu_default_size= sizeof(context_menu_default) / sizeof(context_menu_default[0]);
 
 
-
-
-/** Główna funkcja. Potrzebne są parametry wywołania programu do ustawień symulacji i grafiki. */
+/** @brief Główna funkcja. Potrzebne są parametry wywołania programu do ustawień symulacji i grafiki.
+ *  EN: Main function. Program call parameters are needed for simulation and graphics settings. */
 int main(int argc,const char* argv[])
 {
     fix_size(1);        // Czy udajemy, że ekran ma zawsze taki sam rozmiar?
@@ -165,14 +198,14 @@ int main(int argc,const char* argv[])
             case 'd': screen_to_file();break; //"Zrzut" grafiki
             case 'p': write_to_file();break; //Zapis do pliku tekstowego
             case '\r': replot(); flush_plot();break; //Wymagane odrysowanie
-            case '\b': read_mouse();break;//Jest zdarzenie myszy
+            case '\b': read_mouse();break; //Jest zdarzenie myszy
             case EOF:  //Typowe zakończenie
             case  27:  //ESC
             case 'q':  //Zakończenie zdefiniowane przez programistę
             case 'Q': not_finished=false;break;
             default:
-                printbw(screen_width()/2,screen_height()-char_height('C'),"Co znaczy %c [%d] ?",pom,pom);
-                printf("Nie wiem, co znaczy %c [%d] ",pom,pom);
+                printbw(screen_width()/2,screen_height()-char_height('C'),lang("Co znaczy %c [%d] ?","What means  %c [%d] ?"),pom,pom);
+                printf(lang("Nie wiem, co znaczy %c [%d] ","I don't know what means %c [%d] "),pom,pom);
                 flush_plot();	// Grafika gotowa
                 break;
             }
@@ -182,22 +215,26 @@ int main(int argc,const char* argv[])
             single_step(); //Następny krok symulacji
             if(step_counter%VISUAL==0) //Odrysuj "świat", gdy reszta z dzielenia równa 0
             {
-                flush_plot();//Żeby to, co rysowane w trakcie choć przez chwilę błysnęło
-                replot();//Pełny replot() jest najbardziej kosztowny!
+                flush_plot(); //Żeby to, co rysowane w trakcie choć przez chwilę błysnęło
+                replot(); //Pełny replot() jest najbardziej kosztowny!
                 printc(0,screen_height()-char_height('C'),128,(step_counter%3?255:250),CZEKAM);
-                flush_plot();// obraz gotowy. Właściwie "co chwila" wywoływane.
-                delay_ms(DELA);//Wymuszenie oczekiwania, żeby aktywna pętla nie zjadała całego czasu procesora
+                flush_plot(); // obraz gotowy. Właściwie "co chwila" wywoływane.
+                delay_ms(DELA); //Wymuszenie oczekiwania, żeby aktywna pętla nie zjadała całego czasu procesora
             }
         }
     }
 
-    printf("Wykonano %d obrotów pętli.\nDo widzenia!\n",loop);
-    close_plot();/* Zamykamy okno; jest po zabawie */
-    printf("Do widzenia!\n");
+    printf(lang("Wykonano %d obrotów pętli.\n",
+                "%d loop iterations completed.\n"),loop);
+
+    close_plot();/* Zamykamy okno i jest po zabawie. EN: We close the window and the fun is over. */
+
+    printf("%s",lang("Do widzenia!\n","Goodbye!\n"));
     return 0;
 }
 
-void read_mouse() ///< Procedura obsługi myszy. SZKIELETOWA!
+/// @brief SZKIELETOWA procedura obsługi myszy. EN: SKELETON mouse handler.
+void read_mouse()
 { 
     int x_pos,y_pos,click;
     if(get_mouse_event(&x_pos, &y_pos, &click) != -1)//Operator & - pobranie adresu
@@ -208,22 +245,27 @@ void read_mouse() ///< Procedura obsługi myszy. SZKIELETOWA!
     }
 }
 
-void write_to_file() ///< Zapis stanu modelu do pliku. SZKIELET!
+/// @brief Zapis stanu modelu do pliku. EN: Saving the model state to a file. TODO !!!
+void write_to_file()
 {
     const char* NazwaPliku= NAZWA_MODELU ".out"; // Używamy sztuczki ze zlepianiem stałych.
                                                  // łańcuchowych przez kompilator
     std::ofstream out(NazwaPliku); //Nazwa na razie ustalona z góry
+
     //TODO - funkcja powinna zapisać wyniki modelu do pliku zamiast wyrysowywać na ekranie
-    //Format - tabela liczb odpowiedniego typu rozdzielanych tabulacjami
+    //       Format: tabela liczb odpowiedniego typu rozdzielanych tabulacjami
+    //       EN: The function should save the model results to a file instead of plotting them on the screen.
+    //       Format: a table of tab-delimited numbers of the appropriate type.
     //out<<"L i c z b y:\n"<<a[]<<'\t'<<std::endl;
 
     out.close();
 }
 
-void screen_to_file() ///< Zapis ekranu do pliku.
+/// @brief Zapis ekranu do pliku. EN: Saving the screen to a file
+void screen_to_file()
 {
-    char bufor[255];//Tymczasowe miejsce na utworzenie nazwy pliku
-    sprintf(bufor, "%s%06u", NAZWA_MODELU, step_counter);//Nazwa + Numer kroku na 6 polach
+    char bufor[255]; //Tymczasowe miejsce na utworzenie nazwy pliku
+    sprintf(bufor, "%s%06u", NAZWA_MODELU, step_counter); //Nazwa + Numer kroku na 6 polach
     dump_screen(bufor);
 }
 

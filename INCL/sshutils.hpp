@@ -1,7 +1,7 @@
 /** @file   sshutils.hpp
  *  @brief  Implementacja pomocniczych funkcji symshell-a w sposób już niezależny od platformy.  */
 /*         ===================================================================================== */
-/** @date 2026-04-26 (last modification)
+/** @date 2026-04-27 (last modification)
 *   @details
 *          Napisane PRAWIE NIEOBIEKTOWO ale w C++
 *          Jest tu: print_width() , puste rect(), bar3D(), arrow() ...itp...
@@ -33,7 +33,7 @@
 
 /**
  * @defgroup SymShellUtils Różne dodatkowe narzędzia do grafiki
- * \brief    Zdefiniowane kolory i dodatkowe kształty.
+ * \brief    Zdefiniowane kolory, dodatkowe kształty i inne funkcjonalności pomocnicze.
  */
 /// @{
 

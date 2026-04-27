@@ -1,9 +1,12 @@
-//
+/// @file
+/// @brief Alternatywna konfiguracja modułu SVG dla przykładu "Turmit".
+///        EN: Alternative SVG module configuration for the "Turmit" example.
+/// @date 2026-04-27 (modified)
+//        -------------------------------------------------------------------
 // Created by borkowsk on 26.04.26.
 //
 
 #include "../SVG/symshsvgdef.h"
-
 
 // Jakiej długości inicjujemy tablice operacji graficznych (mnożone przez liczbę pikseli ekranu).
 double      GrSVG_INITIAL_LENGTH_RATIO = 0.05;
@@ -16,3 +19,6 @@ unsigned    GrSVG_ReloadInterval = 3000;
 
 // Ścieżka, gdzie ma wrzucać zrzuty tymczasowe.
 const char* GrSVG_TmpOutputDirectory = "./";
+
+// Domyślne rozszerzenie nazwy pliku wyjściowego.
+const char* GrSVG_FileOutputByExtension = "svg";

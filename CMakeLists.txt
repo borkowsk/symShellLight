@@ -7,7 +7,7 @@
 # Manually define WITHTESTS=true, if you want build test applications!
 #
 # (c)ISS UW, @author Wojciech Borkowski
-# @date 2026-04-26 (last update)
+# @date 2026-04-27 (last update)
 ##################################################################################
 
 cmake_minimum_required(VERSION 3.20)
@@ -48,6 +48,7 @@ if(SYS_LANG MATCHES "pl" OR SYS_LANG MATCHES "PL")
 else()
     set(RESOURCE_LANG "EN")
     include_directories("./INCL_EN")
+    add_definitions( -DUSE_ENGLISH_IF_POSSIBLE )
 endif()
 
 # Opcjonalnie: wyświetl informację podczas konfiguracji
@@ -74,6 +75,7 @@ if(true) # SVG SYMSHELL LIB
             "UTILS/wb_randg.c"
             "UTILS/sshmenufdummy.c" #dummy functions of menus
             "SVG/symshsvgdef.c"
+            "SVG/symshsvgdef.h"
             "UTILS/error_enter_before_clean.c"
          #  "UTILS/context_menu_expected_tmpl.c"
     )
@@ -112,6 +114,7 @@ if(X11) # only for X11 LIB
             "UTILS/error_enter_before_clean.c"
             "X11/context_menu_expected_rofi.c"
             "X11/context_menu_default.c"
+            "X11/context_menu_default.h"
     )
 
     #target_compile_features(wbsyshX11 PUBLIC cxx_std_11)

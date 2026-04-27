@@ -52,16 +52,16 @@ cat << EOF >> tmpX11.cpp
 #include <X11/xpm.h>    // sudo apt install libxpm-dev ?
 EOF
 
-g++ -c tmpX11.cpp
+g++ -c tmpX11.cpp 2>&1 | tee error.txt
 
 echo -e $COLOR1'\n libx11-dev and libxpm-dev are configured for compilation.'$COLOR2
 
-rm -f tmpX11.cpp
+rm -f tmpX11.cpp tmpX11.o
 
 echo -e $COLOR2"\nNow you can try to make whole library...\n"$COLOR1
 
 echo    "	cmake ."
-echo -e "	nano CMakeLists.txt" $COLOR3  "#if something was wrong." $COLOR1
+echo -e "	nano CMakeLists.txt" $COLOR3  "#if something seems wrong." $COLOR1
 echo    "	make"
 echo -e "       ./_makeDocs.sh" $COLOR3  "#if you want doxygen documentation." $COLOR1
 

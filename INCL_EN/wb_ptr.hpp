@@ -1,7 +1,7 @@
 /// \file wb_ptr.hpp
 /// \brief Simple templates for smart pointers and dynamic arrays.
+/// @date 2026-04-29 (modified)
 //         ===================================================================
-/// @date 2026-04-21 (modified)
 /// \details
 /// CONTENTS:
 ///	    - wb_sptr		: smart pointer for scalars.
@@ -482,14 +482,14 @@ namespace wbrtm {
         }
 
         /// \brief Multi-parameter constructor initializing items.
-        explicit wb_dynarray(size_t s,T /*first,second,...*/...):size(s)
+        explicit wb_dynarray(size_t s,T first/*,second,third, etc...*/...):size(s)
         {
             WBPTRLOG( "wb_dynarray::CONSTRUCTOR("<<size<<",T ...)" )                                        assert(size>=1);
             ptr=new T[s];                                                             /*After allocation*/assert(ptr!=NULL);
-
+            ptr[0]=first;
             va_list list;
-            va_start(list,s);
-            for(size_t i=0;i<s;i++)
+            va_start(list,first);
+            for(size_t i=1;i<s;i++)
                 ptr[i]=va_arg(list,T);
             va_end(list);
         }
@@ -719,14 +719,17 @@ namespace wbrtm {
 
         /// \brief Konstruktor inicjujący listą wskaźników. @note DZIWNY I CHYBA NIE PRZETESTOWANY. TODO?
         MAYBE_UNUSED
-        explicit wb_dynmatrix(size_t s,wb_dynarray<T>* ...):wb_dynarray<wb_dynarray<T> >(s)
+        explicit wb_dynmatrix(size_t s,wb_dynarray<T>* first ...):wb_dynarray<wb_dynarray<T> >(s)
         {
             WBPTRLOG( "wb_dynmatrix::CONSTRUCTOR("<<get_size()<<",wb_dynarray<T>* ...)" )
                     assert( wb_sptr<T>::get_size()>=1 );
 
+            alloc(s);
+            (*this)[0]=first;
+
             va_list list;
-            va_start(list,s);
-            for(size_t i=0;i<s;i++)
+            va_start(list,first);
+            for(size_t i=1;i<s;i++)
                 (*this)[i]=*(va_arg(list,wb_dynarray<T>*));//Czy to wskaźnik, czy referencja to rybka
 
             va_end(list);

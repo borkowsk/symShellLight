@@ -1,6 +1,8 @@
 # Prerequisites
 *.d
 *.*~
+._bak/
+clean_list.txt
 
 # Compiled Object files
 *.slo

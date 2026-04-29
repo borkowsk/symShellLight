@@ -1,5 +1,7 @@
-## IKONA APLIKACJI
-## @date 2026-04-13 (created)
+# IKONA APLIKACJI
+## @date 2026-04-29 (modified)
+<BR>
+## Gdy aplikacja nie ma ikony w Gnome?
 
 **Aplikacje symulacyjne SymShella teoretycznie mają własną, czarno białą ikonę. Dawniej to działało, ale od którejś wersji gnome przestało. Ta ikona nigdy i nigdzie nie jest widoczna i aplikacja ma jakąś standardową albo w ogóle jakby pustą.**
 
@@ -7,7 +9,7 @@ Jest to klasyczny problem w nowoczesnych środowiskach graficznych Linuxa (szcze
 
 Jeśli stara aplikacja "straciła" ikonę, prawdopodobnie system nie wie, jak powiązać uruchomiony proces z plikiem graficznym na dysku. Oto jak możesz to naprawić, wykorzystując Fluttera jako "zarządcę" lub po prostu naprawiając strukturę aplikacji:
 
-### **1\. Rozwiązanie "Naprawcze" (StartupWMClass)**
+## 1. Rozwiązanie "Naprawcze" (StartupWMClass)
 
 Nawet jeśli Twoja aplikacja w C++ ma wewnątrz zakodowaną ikonę, GNOME jej nie wyświetli, jeśli nie znajdzie pasującego pliku `.desktop`.
 
@@ -36,7 +38,7 @@ Bez tego GNOME widzi "nieznane okno" i przypisuje mu domyślną ikonę (lub pust
 
 ---
 
-### **2\. Rozwiązanie "Flutterowe" (Eleganckie)**
+## 2. Rozwiązanie "Flutterowe" (Eleganckie)
 
 Skoro i tak planujesz użyć Fluttera do menu, możesz sprawić, by to **Flutter był głównym punktem wejścia (entry point)** aplikacji.
 
@@ -48,14 +50,14 @@ W ten sposób w systemie "głównym" procesem z perspektywy UI jest Flutter, kt�
 
 ---
 
-### **3\. Dlaczego stara ikona "zniknęła"?**
+## 3. Dlaczego stara ikona "zniknęła"?
 
 GNOME i Wayland odchodzą od pobierania ikon z protokołu X11, ponieważ:
 
 * **Skalowanie:** Ikony w X11 były często małymi bitmapami (np. 32x32). Na ekranach 4K wyglądają tragicznie.  
 * **Bezpieczeństwo i porządek:** System chce mieć centralną bazę ikon w `/usr/share/icons`, a nie ufać binarkom, że "coś tam sobie narysują" w rogu okna.
 
-### **Co możesz więcej zrobić?**
+### Co możesz więcej zrobić?
 
 Jeśli chcesz, aby Twoje menu we Flutterze "przejęło" reprezentowanie aplikacji:
 
@@ -66,11 +68,11 @@ Jeśli chcesz, aby Twoje menu we Flutterze "przejęło" reprezentowanie aplikacj
 Dzięki temu Twoja aplikacja wreszcie przestanie wyglądać jak "puste okno" i zyska profesjonalny wygląd na pasku zadań.
 
 
-## **Katalog lokalny**
+## Katalog lokalny
 
 Jeśli chodzi o lokalny katalog dla użytkownika (bez uprawnień roota), to w systemach Linux zgodnych ze standardem **XDG**, pliki `.desktop` (które w Twoim przypadku pełnią rolę "opisu aplikacji", choć mają składnię INI, a nie TOML) należy umieszczać tutaj...
 
-### **Ścieżka lokalna**
+### Ścieżka lokalna
 
 Definicje aplikacji lokalne dla użytkownika oczekiwane są w katalogu: `\~/.local/share/applications/`  
 
@@ -80,7 +82,7 @@ Jeśli ten katalog nie istnieje, możesz go utworzyć komendą:
 mkdir \-p \~/.local/share/applications
 ```
 
-### **Jak to się ma do TOML?**
+## Jak to się ma do TOML?
 
 Warto tutaj wyjaśnić pewne nieporozumienie terminologiczne:
 
@@ -89,7 +91,7 @@ Warto tutaj wyjaśnić pewne nieporozumienie terminologiczne:
 
 ---
 
-### **Jak powinien wyglądać ten plik, aby naprawić nasz problem z ikoną?**
+### Jak powinien wyglądać ten plik, aby naprawić nasz problem z ikoną?
 
 Stwórz plik o nazwie np. symulator.desktop w powyższym katalogu i wypełnij go tak:
 
@@ -107,13 +109,13 @@ Terminal=false
 StartupWMClass=symulator\_bin
 ```
 
-### **Co to daje?**
+### Co to daje?
 
 1. **Ikona w Menu**: Aplikacja pojawi się w wyszukiwarce systemowej z Twoją grafiką.  
 2. **Grupowanie okien**: Gdy uruchomisz program, GNOME "zobaczy" `StartupWMClass`, dopasuje go do pliku `.desktop` i podświetli właściwą ikonę na pasku zadań (zamiast pokazywać znak zapytania lub puste okno).  
 3. **Brak potrzeby roota**: Instalujesz to tylko dla swojego użytkownika, nie psując nic w systemie.
 
-### **Jak sprawdzić czy działa?**
+### Jak sprawdzić czy działa?
 
 Po zapisaniu pliku w `~/.local/share/applications/`, system powinien go wykryć automatycznie w ciągu kilku sekund. Możesz też wymusić odświeżenie bazy komendą: 
 ```

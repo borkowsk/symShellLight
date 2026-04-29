@@ -1,7 +1,7 @@
 /// \file wb_cpucl.hpp
 /// \brief CPU stopwatch class
-//        ==================================
-/** @date 2026-04-20 (last modification) */
+/// @date 2026-04-29 (last modification)
+//        ==============================
 /// \author borkowsk
 /// \warning OBSOLETE
 // ///////////////////////////////////////////////////////

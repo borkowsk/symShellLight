@@ -1,7 +1,7 @@
 /// @file
 /// @brief   LIMITS FOR SCALAR TYPES (Designed before a similar solution appeared in the C++ standard).
-//           -------------------------------------------------------------------------------------------------------
-/// @date 2026-04-20 (last modification)
+/// @date 2026-04-29 (last modification)
+//           ------------------------------------------------------------------------------------------
 /// \details Class template implementing limits for scalars
 ///          with the possibility of adding custom specializations.
 ///          This one is in the 'wbrtm::' namespace.
@@ -10,7 +10,7 @@
 ///          ADD_OWN_SPECIALISATION_TO_WB_LIMITS_H before including
 ///          this file.
 /// \author borkowsk
-// ////////////////////////////////////////////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /// @ingroup OBSOLETE
 #ifdef _MSC_VER

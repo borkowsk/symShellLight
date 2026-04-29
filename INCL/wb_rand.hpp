@@ -1,24 +1,20 @@
 /** \file wb_rand.hpp
- * \brief PODSTAWOWE KLASY GENERATORÓW LICZB PSEUDOLOSOWYCH  */
-/* ================================================= */
-/** @date 2026-04-20 (ostatnia modyfikacja) */
-/**
+ * \brief PODSTAWOWE KLASY GENERATORÓW LICZB PSEUDOLOSOWYCH
+ *  @date 2026-04-29 (ostatnia modyfikacja)
+ *        -------------------------------------------------
+ *
  * \details
  * - RandomGenerator - interfejs do generatorów losowych.
  * - RandSTDC - generator losowy zbudowany w oparciu o standard C.
  * - RandG - generator losowy napisany w C na podstawie "Numerical Recipes".
  * \author Wojciech Borkowski @ Instytut Studiów Społecznych UW.
- *//*\
-* \warning PRZESTARZAŁE (OBSOLETE)
-* * RandBSD - generator losowy z BSD UNIX.
-* * RandSVR4 - generator losowy z System V UNIX.
-*/
+ */
+#ifndef _WB_RAND_HPP_INCLUDED_
+#define _WB_RAND_HPP_INCLUDED_  1
+
 #ifndef __cplusplus
 #error Obsługiwany jest tylko język C++!!!
 #endif
-
-#ifndef _WB_RAND_HPP_INCLUDED_
-#define _WB_RAND_HPP_INCLUDED_  1
 
 #include <assert.h>
 #include <limits.h>

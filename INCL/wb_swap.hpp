@@ -1,9 +1,9 @@
 /** @file
- * @brief Szablon zamiany dwóch wartości tego samego typu niezależnie od typu. */
-/*        ==================================================================== */
-/** @date 2026-04-20 (last modification)
- * Created by borkowsk on 06.01.26.                                            */
-/* *************************************************************************** */
+ * @brief Szablon zamiany dwóch wartości tego samego typu niezależnie od typu.       *
+ * @date 2026-04-29 (last modification)                                              */
+/*        ========================================================================== */
+/* Created by borkowsk on 06.01.26.                                                  */
+/* ********************************************************************************* */
 #ifndef WB_SWAP_HPP_INCLUDED_
 #define WB_SWAP_HPP_INCLUDED_
 

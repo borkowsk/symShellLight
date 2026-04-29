@@ -11,6 +11,16 @@
 # REALNY KOD PONIŻEJ:
 # ===================
 
+case "$OSTYPE" in
+  solaris*) echo "SOLARIS" ;;
+  darwin*)  echo "macOS (Unix)" ;; 
+  linux*)   echo "LINUX (Unix)" ;;
+  bsd*)     echo "BSD (Unix)" ;;
+  msys*)    echo "Git Bash / MINGW (Windows)" ;;
+  cygwin*)  echo "Cygwin (Windows)" ;;
+  *)        echo "Nieznany system: $OSTYPE" ;;
+esac
+
 # Funkcja sprawdzająca dostępność komponentu
 check_dependency() {
     if ! whereis "$1" | grep -q "/$1"; then
@@ -21,15 +31,18 @@ check_dependency() {
 }
 
 # 1. Sprawdzenie zależności
-check_dependency "doxygen"
-check_dependency "doxywizard"
-check_dependency "rofi"
+if [[ "$OSTYPE" != "msys"* ]]; then
+    #echo "To nie jest Git Bash. Wykonuję operacje dla systemów Unix/Linux..."
+    # Tutaj umieść kod dla systemów innych niż Windows (Git Bash)
+	check_dependency "doxywizard"
+	check_dependency "doxygen"
+	check_dependency "rofi"
+else
+    echo -e "Wykryto Git Bash na Windows.\nUpewnij się że doxywizzard jest zainstalowany\n".
+fi
 
-# 2. Zapytanie użytkownika o język
-#echo "Wybierz język / Choose language:"
-#echo "1) Polski"
-#echo "2) English"
-#read -p "Wybór (1/2): " choice
+
+
 
 # 2. Wybór języka za pomocą rofi
 # Tworzymy listę opcji oddzielonych nową linią
@@ -40,6 +53,15 @@ choice=$(echo "$OPTIONS" | rofi -dmenu -p "Język/language:" -i \
     -theme-str 'window { width: 300px; border: 2px; border-radius: 15px; border-color: #444444; }' \
     -theme-str 'listview { lines: 2; scrollbar: false; }' \
     -theme-str 'element { border-radius: 10px; }')
+	
+if [ $? -ne 0 ]; then
+    echo "Wywołanie rofi zakończyło się niepowodzeniem."
+    # 2. Zapytanie użytkownika o język
+	echo "Wybierz język / Choose language:"
+	echo "1) Polski"
+	echo "2) English"
+	read -p "Wybór (1/2): " choice
+fi	
 
 case $choice in
     1)
@@ -66,7 +88,7 @@ esac
 
 # 3. Uruchomienie Doxygen-a
 if [ -f "$FILE" ]; then
-    echo "\nRUNNING Doxygen ($FILE):\n"
+    echo -e "\nRUNNING Doxygen ($FILE):\n"
     doxywizard "$FILE"
 else
     echo "BŁĄD: Plik $FILE nie istnieje w bieżącym katalogu!"
@@ -75,3 +97,4 @@ fi
 
 #run Doxygen directly
 #doxygen  $FILE
+

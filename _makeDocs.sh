@@ -1,6 +1,10 @@
 #!/bin/sh
-# How to install and check required componets:
-# ============================================
+#      DOXUMENTATION "MANAGER"
+# =================================
+# @date 2026-04-29 (modification)
+#
+# Instalation of prerequisities under Ubuntu:
+# ===========================================
 # sudo apt install rofi
 # (whereis rofi | grep "/rofi") && "OK, doxywizard available"
 # sudo apt install doxygen
@@ -40,9 +44,6 @@ if [[ "$OSTYPE" != "msys"* ]]; then
 else
     echo -e "Wykryto Git Bash na Windows.\nUpewnij się że doxywizzard jest zainstalowany\n".
 fi
-
-
-
 
 # 2. Wybór języka za pomocą rofi
 # Tworzymy listę opcji oddzielonych nową linią
@@ -88,8 +89,9 @@ esac
 
 # 3. Uruchomienie Doxygen-a
 if [ -f "$FILE" ]; then
-    echo -e "\nRUNNING Doxygen ($FILE):\n"
-    doxywizard "$FILE"
+    echo -e "\nSTARTING Doxygen Wizard ($FILE):\n"
+    doxywizard "$FILE" &
+    exit 0
 else
     echo "BŁĄD: Plik $FILE nie istnieje w bieżącym katalogu!"
     exit 1

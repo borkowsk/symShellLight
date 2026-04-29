@@ -1,7 +1,7 @@
 //{{NO_DEPENDENCIES}}
-// @date 2026-04-21 (modified)
-// Microsoft Developer Studio generated include file.
-// Used by Symshmsc.rc
+/// @date 2026-04-29 (modified)
+/// Microsoft Developer Studio generated include file.
+/// Used by Symshmsc.rc
 //
 
 // Next default values for new objects

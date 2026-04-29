@@ -1,39 +1,44 @@
 /// @file
-/// @brief Implementacja Popup Menu w Windows. TODO -- NIE DOKOÑCZONE JESZCZE!
+/// @brief Implementacja Popup Menu w Windows.
 /// @date 2026-04-29 (created)
 /// 
-/// Zadanie wymaga u¿ycia kilku kluczowych funkcji WinAPI : `CreatePopupMenu`, `AppendMenu` oraz `TrackPopupMenu`. Poniewa¿ chcesz u¿yæ "czystego" API, musimy pamiêtaæ o obs³udze uchwytu okna(`HWND`), do którego menu bêdzie wysy³aæ komunikaty.
+/// Zadanie wymaga uÅ¼ycia kilku kluczowych funkcji WinAPI:
+/// `CreatePopupMenu`, `AppendMenu` oraz `TrackPopupMenu`.
+///
+/// PoniewaÅ¼ chcesz uÅ¼yÄ‡ "czystego" API, musimy pamiÄ™taÄ‡ o obsÅ‚udze uchwytu okna(`HWND`),
+/// do ktÃ³rego menu bÄ™dzie wysyÅ‚aÄ‡ komunikaty.
 ///
 /// ### Struktura i Funkcja
 ///
 /// ...
 /// 
-/// ### Kluczowe detale techniczne :
+/// ### Kluczowe detale techniczne:
 /// 
-/// ***`AppendMenuA`* * : U¿y³em wersji z liter¹ * *A * *(ANSI), poniewa¿ w Twojej strukturze u¿ywasz `const char* `. 
-///     Jeœli projekt jest skompilowany w UNICODE, jawne u¿ycie wersji ANSI zapobiegnie b³êdom rzutowania.
-/// *** `SetForegroundWindow(hwnd)`** : To absolutnie krytyczny "hack" wymagany przez WinAPI.Bez tego menu czêsto nie znika, 
-///     gdy u¿ytkownik kliknie gdzieœ indziej na pulpicie.
-/// *** Identyfikatory(Msg)** : Wartoœci `Msg` przekazane w strukturze trafi¹ do Twojej procedury okienkowej(`WndProc`) jako 
+/// * **AppendMenuA**: UÅ¼yÅ‚em wersji z literÄ… **A** (ANSI), poniewaÅ¼ w Twojej strukturze uÅ¼ywasz `const char* `.
+///     JeÅ›li projekt jest skompilowany w UNICODE, jawne uÅ¼ycie wersji ANSI zapobiegnie bÅ‚Ä™dom rzutowania.
+/// * **SetForegroundWindow(hwnd)**: To absolutnie krytyczny "hack" wymagany przez WinAPI. Bez tego menu czÄ™sto nie znika,
+///     gdy uÅ¼ytkownik kliknie gdzieÅ› indziej na pulpicie.
+/// * **Identyfikatory(Msg)**: WartoÅ›ci `Msg` przekazane w strukturze trafiÄ… do Twojej procedury okienkowej(`WndProc`) jako
 ///     `LOWORD(wParam)` w komunikacie `WM_COMMAND`.
-/// *** Koordynaty(x, y)** : Pamiêtaj, ¿e `TrackPopupMenu` oczekuje wspó³rzêdnych** ekranowych** (Screen Coordinates).
-///     Jeœli masz wspó³rzêdne relatywne do okna(Client Coordinates), musisz je najpierw przeliczyæ funkcj¹ `ClientToScreen`.
+/// * **Koordynaty(x, y)**: PamiÄ™taj, Å¼e `TrackPopupMenu` oczekuje wspÃ³Å‚rzÄ™dnych **ekranowych** (Screen Coordinates).
+///     JeÅ›li masz wspÃ³Å‚rzÄ™dne relatywne do okna (Client Coordinates), musisz je najpierw przeliczyÄ‡ funkcjÄ…
+///     `ClientToScreen`.
 /// 
-/// ### Przyk³ad u¿ycia :
+/// ### PrzykÅ‚ad uÅ¼ycia:
 /// 
 /// ```Cpp
-/// MenuItem mojeMenu[] = {
-///    {"Otwórz", 101},
-///    { "Edytuj", 102 },
-///    { "Usuñ", 103 }
+/// ssh_menu_item_definition mojeMenu[] = {
+///    {"OtwÃ³rz", 101},
+///    {"Edytuj", 102},
+///    {"UsuÅ„", 103}
 /// };
 /// 
-/// // Wywo³anie np. w reakcji na WM_RBUTTONUP
+/// // WywoÅ‚anie np. w reakcji na WM_RBUTTONUP
 /// UseContextMenu(hwnd, point.x, point.y, mojeMenu, 3);
 /// 
 /// ```
 /// 
-/// Ten kod jest "lekki", nie wymaga zewnêtrznych bibliotek i idealnie pasuje do starszych projektów utrzymywanych w czystym WinAPI.
+/// Ten kod jest "lekki", nie wymaga zewnÄ™trznych bibliotek i idealnie pasuje do starszych projektÃ³w utrzymywanych w czystym WinAPI.
 /// 
 
 #include <windows.h>
@@ -49,29 +54,41 @@ unsigned UseContextMenu(HWND hwnd, int x, int y, ssh_menu_item_definition* eleme
 {
     // 1. Tworzymy pusty kontener menu
     HMENU hMenu = CreatePopupMenu();
-    if (!hMenu) return;
+    if (!hMenu) return -1;
 
-    // 2. Wype³niamy menu elementami z tablicy
+    // 2. WypeÅ‚niamy menu elementami z tablicy
     for (int i = 0; i < liczbaElementow; ++i) {
-        // U¿ywamy MF_STRING dla zwyk³ego tekstu. 
-        // ID elementu to Msg, który zostanie wys³any w komunikacie WM_COMMAND.
+        // UÅ¼ywamy MF_STRING dla zwykÅ‚ego tekstu. 
+        // ID elementu to Msg, ktÃ³ry zostanie wysÅ‚any w komunikacie WM_COMMAND.
         AppendMenuA(hMenu, MF_STRING, elementy[i].item_value, elementy[i].item_text);
     }
 
-    // Ustawienie okna na foreground jest wymagane przez Windows, aby menu znika³o po klikniêciu obok.
+    // Ustawienie okna na foreground jest wymagane przez Windows, aby menu znikaÅ‚o po klikniÄ™ciu obok.
     SetForegroundWindow(hwnd);
 
-    // 3. Wyœwietlamy menu. 
-    // TPM_RETURNCMD sprawia, ¿e funkcja zwraca ID wybranego elementu zamiast wysy³aæ go do okna.
-    // Dziêki temu mo¿esz obs³u¿yæ klikniêcie bezpoœrednio tutaj (alternatywnie pozwoliæ systemowi wys³aæ WM_COMMAND).
-    // Ale z TPM_RETURNCMD jest proœciej.
+    // 3. WyÅ›wietlamy menu. 
+    // TPM_RETURNCMD sprawia, Å¼e funkcja zwraca ID wybranego elementu zamiast wysyÅ‚aÄ‡ go do okna.
+    // DziÄ™ki temu moÅ¼esz obsÅ‚uÅ¼yÄ‡ klikniÄ™cie bezpoÅ›rednio tutaj (alternatywnie pozwoliÄ‡ systemowi wysÅ‚aÄ‡ WM_COMMAND).
+    // Ale z TPM_RETURNCMD jest proÅ›ciej.
     POINT point = { x,y };
     ClientToScreen(hwnd, &point);
     unsigned ret=TrackPopupMenu(hMenu, TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_RETURNCMD, point.x, point.y, 0, hwnd, NULL);
 
-    // 4. Sprz¹tamy zasoby
+    // 4. SprzÄ…tamy zasoby
     DestroyMenu(hMenu);
 
     return ret;
 }
+
+/* ******************************************************************/
+/*                 SYMSHELLLIGHT  version 2026                      */
+/* ******************************************************************/
+/*            THIS CODE IS DESIGNED & COPYRIGHT BY:                 */
+/*            W O J C I E C H   B O R K O W S K I                   */
+/*    Instytut StudiÃ³w SpoÅ‚ecznych Uniwersytetu Warszawskiego       */
+/*    WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI  */
+/*    GITHUB: https://github.com/borkowsk                           */
+/*                                                                  */
+/*                               (Don't change or remove this note) */
+/* ******************************************************************/
 

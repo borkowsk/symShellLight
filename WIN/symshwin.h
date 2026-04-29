@@ -1,19 +1,21 @@
 /// @file
-/// @brief SYMSHELL FOR MS WINDOWS - IMPLEMENTATION HEADER.
-//         ------------------------------------------------
-/// @date 2026-04-21 (modified)
+/// @brief SYMSHELL FOR MS WINDOWS - declarations for all globally scoped names.
+/// @date 2026-04-29 (modified)
+//        ----------------------------------------------------------------------
+// BASED ON MICROSOFT & BORLAND EXAMPLES
+//
+// PURPOSE:
+//    Contains declarations for all globally scoped names in the program.
+//
 #ifndef SYMSHELL_WIN_H_INCLUDED_
 #define SYMSHELL_WIN_H_INCLUDED_
+
 // THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF
 // ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO
 // THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
 // PARTICULAR PURPOSE.
 //
 // Copyright (C) 1993-1995  Microsoft Corporation.  All Rights Reserved.
-//
-// PURPOSE:
-//    Contains declarations for all globally scoped names in the program.
-//
 
 #ifdef __cplusplus
 extern "C" {
@@ -38,17 +40,13 @@ int		raw_char_height(void);
 int		raw_char_width(void);
 /// @}
 
-//------------------------------------------------------------------------------------------------------------------
 /// @name Functions for handling main window messages.
 /// @details The message-dispatching mechanism expects all message-handling functions to have the following prototype:
 /// ```
-//     LRESULT FunctionName(HWND, UINT, WPARAM, LPARAM);
+///     LRESULT FunctionName(HWND, UINT, WPARAM, LPARAM);
 /// ```
+///
 /// @{
-
-// **TODO**  Add message-handling function prototypes here.  Be sure to
-//           add the function names to the main window message table.
-
 LRESULT MsgCommand(HWND, UINT, WPARAM, LPARAM);
 LRESULT MsgSysCommand(HWND, UINT, WPARAM, LPARAM);
 LRESULT MsgCreate(HWND, UINT, WPARAM, LPARAM);
@@ -70,44 +68,45 @@ LRESULT MsgTimer(HWND, UINT, WPARAM, LPARAM);
 LRESULT MsgScroll(HWND, UINT, WPARAM, LPARAM);
 LRESULT MsgScroll(HWND, UINT, WPARAM, LPARAM);
 LRESULT MsgPaint(HWND, UINT, WPARAM, LPARAM);
-
 /// @}
-
-//------------------------------------------------------------------------------------------------------------------
+// **TODO**  Add message-handling function prototypes here.  Be sure to
+//           add the function names to the main window message table.
 
 /// @name Global function prototypes.
 /// @{
-
-// **TODO**  Add global function prototypes here.
 BOOL InitApplication(HINSTANCE);
 BOOL InitInstance(HINSTANCE);
 BOOL InitInput(HWND);
+/// @}
+// **TODO**  Add global function prototypes here.
 
-/// Callback function called by Windows.
-// **TODO**  Add new callback function prototypes here.  Win16 compiles
-//           require the __export keyword to generate proper prolog
-//           and epilog code for exported functions.
+/// @brief Callback function called by Windows.
 #ifdef WIN16
 LRESULT CALLBACK __export WndProc(HWND, UINT, WPARAM, LPARAM);
 #else
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 #endif
+// **TODO**  Add new callback function prototypes here.
+// @deprecated Win16 compiles require the __export keyword to generate proper prolog
+//             and epilog code for exported functions.
+//----------------------------------------------------------------------------------
+
+/// @name Global variable declarations.
+/// @{
+extern HINSTANCE hInst;				///< The current instance handle.
+extern HWND      MyHwnd;			///< Okno aplikacji/Main app. window handle.
+extern char      szAppName[];		///< The name of this application.
+extern char      szClassName[];		///< The name of window class.
+extern char      szTitle[];			///< The title bar text.
 /// @}
 
-//-------------------------------------------------------------------------
-// Global variable declarations.
-
-extern HINSTANCE hInst;				///< The current instance handle
-extern HWND      MyHwnd;			///< Okno aplikacji/Main app. window handle.
-extern char      szAppName[];		///< The name of this application
-extern char      szClassName[];		///< The name of window class
-extern char      szTitle[];			///< The title bar text
-
-// **TODO**  For NON-MDI applications, uncomment line 1 below and comment
+// TODO      For NON-MDI applications, uncomment line 1 below and comment
 //           line 2.  For MDI applications, uncomment line 2 below, comment
 //           line 1, and then define hwndMDIClient as a global variable in
 //           INIT.C
-#define hwndMDIClient NULL        /**< For NON-MDI applications. */
+
+/** For NON-MDI applications. */
+#define hwndMDIClient NULL
 
 
 //-------------------------------------------------------------------------
@@ -118,39 +117,39 @@ extern char      szTitle[];			///< The title bar text
 /// Function pointer prototype for message handling functions.
 typedef LRESULT (*PFNMSG)(HWND,UINT,WPARAM,LPARAM);
 
-/// Enumerated type used to determine which default window procedure.
-/// It should be called by the message- and command-dispatching mechanism
-/// if a message or command is not handled explicitly.
+/// @brief Enumerated type used to determine which default window procedure.
+///     It should be called by the message- and command-dispatching mechanism
+///     if a message or command is not handled explicitly.
 typedef enum
 {
    edwpNone,            ///< Do not call any default procedure.
-   edwpWindow,          ///< Call DefWindowProc.
-   edwpDialog,          ///< Call DefDlgProc (This should be used only for custom dialogs - standard dialog use edwpNone).
-   edwpMDIChild,        ///< Call DefMDIChildProc.
-   edwpMDIFrame         ///< Call DefFrameProc.
-} EDWP;                 ///< Enumeration for Default Window Procedures
+   edwpWindow,          ///< Call `DefWindowProc`.
+   edwpDialog,          ///< Call `DefDlgProc` (This should be used only for custom dialogs - standard dialog use edwpNone).
+   edwpMDIChild,        ///< Call `DefMDIChildProc`.
+   edwpMDIFrame         ///< Call `DefFrameProc`.
+} EDWP;                 ///< Enumeration for Default Window Procedures.
 
-/// Structure maps messages to message handling functions.
+/// Structure maps messages to message handling functions. ("MeSsage" Dispatch structure)
 typedef struct _MSD
 {
     UINT   uMessage;
     PFNMSG pfnmsg;
-} MSD;                 ///< MeSsage Dispatch structure
+} MSD;
 
-/// This structure contains all the information that a window procedure passes to DispMessage.
+/// This structure contains all the information that a window procedure passes to `DispMessage`.
 /// ... in order to define the message dispatching behavior for the window.
 typedef struct _MSDI
 {
     int  cmsd;          ///< Number of message dispatch structs in rgmsd.
     MSD *rgmsd;         ///< Table of message dispatch structures.
     EDWP edwp;          ///< Type of default window handler needed.
-} MSDI, FAR *LPMSDI;    ///< MeSsage Dispatch Information.
+} MSDI, FAR *LPMSDI;    ///< "MeSsage" Dispatch Information.
 
 /// Message dispatching function.
 /// This looks up messages in the dispatch table and call the appropriate handler function.
 LRESULT DispMessage(LPMSDI, HWND, UINT, WPARAM, LPARAM);
 
-// Message dispatch information for the main window
+/// Message dispatch information for the main window.
 extern MSDI msdiMain;
 
 #ifdef __cplusplus

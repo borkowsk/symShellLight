@@ -1,20 +1,21 @@
 /** @file
 *   @brief Implementacja najprostrzego interface-u wizualizacyjnego dla MS Windows 32.
-*   @date 2026-04-27 (last modification)
+*   @date 2026-04-29 (last modification)
 *           SYMSHELL IS A SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++
 *           ==================================================================
 *           Implementacja grafiki SYMSHELL-a dla Microsoft Windows.
 *           Używano od 1997 roku w różnych kompilatorach C++ Borland i Microsoftu oraz w GCC na Windows
 *           Ostatnia duża modyfikacja: 28.10.2014
 *
-* @note `ProcessMsg` używa aktualnie, zamiast NULL, uchwytu okna pobierając komunikat — to powinno
+*   @note `ProcessMsg` używa aktualnie, zamiast NULL, uchwytu okna pobierając komunikat — to powinno
 *       działać lepiej, ale pewności nie ma.
-** \author     Designed by W. Borkowski from the University of Warsaw
-**
+*
+*   \author     Designed by W. Borkowski from the University of Warsaw
+*
 *  ## See also
-**     *          https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI
-**     *          https://github.com/borkowsk
-**
+*     *          https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI
+*     *          https://github.com/borkowsk
+*
 * ***************************************************************************************** */
 
 //Partially based on Borland and Microsoft examples

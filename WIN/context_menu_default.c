@@ -1,7 +1,7 @@
 /// @file
 /// @brief Default context menu definition.
-//         ================================
-/// @date 2026-04-21 (last modification)
+/// @date 2026-04-29 (last modification)
+//        ================================+
 // Created by borkowsk on 17.04.26.
 
 #ifdef __cplusplus

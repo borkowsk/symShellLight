@@ -1,8 +1,7 @@
 /** @file
- *  @brief IMPLEMENTATION FOR SYMSHELL MENU AND RELEATED FEATURES */
+ *  @brief IMPLEMENTATION FOR SYMSHELL MENU AND RELATED FEATURES
+ *  @date 2026-04-29 (last modification)                          */
 /*  ************************************************************* */
-/** @date 2026-04-21 (last modification)                          */
-
 
 #if defined(_MSC_VER) || defined(__MSWINDOWS__) 
 #include <windows.h> //bo Menu itp
@@ -21,7 +20,7 @@
 extern "C" 
 #endif
 
-extern HWND	WB_Hwnd; //W symshwin.c
+extern HWND	WB_Hwnd; ///< Import z symshwin.c
 
 // <summary>
 // Ustala tekst nazwy okna w jego belce

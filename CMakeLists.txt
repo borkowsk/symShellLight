@@ -7,7 +7,7 @@
 # Manually define WITHTESTS=true, if you want build test applications!
 #
 # (c)ISS UW, @author Wojciech Borkowski
-# @date 2026-04-27 (last update)
+# @date 2026-04-29 (last update)
 ##################################################################################
 
 cmake_minimum_required(VERSION 3.20)
@@ -132,8 +132,8 @@ if(WINDOWS) # only for WINDOWS - NOT TESTED IN THIS VERSION (after 2016)
             "UTILS/wb_randg.c"
             "WIN/sshmenufwin.c" #real functions for MS Windows menus.
             "UTILS/error_enter_before_clean.c"
-            #"WIN/wb_context_menu_expected.c"
-    )
+            "WIN/context_menu_default.c"
+     "WIN/sshpopupmenu.c")
 
     #target_compile_features(wbsyshWIN PUBLIC cxx_std_11)
 endif(WINDOWS)
@@ -197,15 +197,15 @@ endif()
 if( WINDOWS AND WITHTESTS ) #MS Windows tests
     # 1. Definiujemy listę nazw programów, aby uniknąć powtórzeń
     set(WIN_EXAMPLES
-            "TestmousSVG"
-            "TestpaleSVG"
-            "TestpolySVG"
-            "TestrandSVG"
-            "TestsymsSVG"
-            "TestsyshSVG"
-            "TurmitSVG"
-            "CAGasSVG"
-            "LinktestSVG"
+            "TestmousWIN"
+            "TestpaleWIN"
+            "TestpolyWIN"
+            "TestrandWIN"
+            "TestsymsWIN"
+            "TestsyshWIN"
+            "TurmitWIN"
+            "CAGasWIN"
+            "LinktestWIN"
     )
 
     #2. Definicja źródeł (także dla tych z niestandardowymi plikami)
@@ -216,6 +216,8 @@ if( WINDOWS AND WITHTESTS ) #MS Windows tests
                    "EXAMPLES/Testrand.cpp"
                    "UTILS/wb_randg.c"
                    "UTILS/wb_rand.cpp"
+                   "WIN/symshmsc.rc"
+                   "WIN/symshwin.ico"
                   )
     add_executable("TestsymsWIN" "EXAMPLES/Testsyms.cpp" )
     add_executable("TestsyshWIN" "EXAMPLES/Testsysh.cpp" )

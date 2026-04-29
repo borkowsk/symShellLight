@@ -1,7 +1,19 @@
 #!/bin/bash
 #Checking for required dependencies
+# @date 2026-04-29 (last update)
 EDIT=nano
 echo -e $COLOR1"Running" `realpath $0` $NORMCO
+
+case "$OSTYPE" in
+  solaris*) echo -e "SOLARIS\nNever tested!" ;;
+  darwin*)  echo -e "macOS (Unix)\nNever tested!" ;; 
+  linux*)   echo -e "LINUX (Unix)\nFavorite platform :-)" ;;
+  bsd*)     echo -e "BSD (Unix)\nNever tested!" ;;
+  msys*)    echo -e "Git Bash / MINGW (Windows)\n Use MSVC++ !" && exit 0 ;;
+  cygwin*)  echo -e "Cygwin (Windows)\nNever tested!" ;;
+  *)        echo "Unknown OS: $OSTYPE" ;;
+esac
+
 source "./screen.ini" > /dev/null
 
 if [ -s "error.txt" ]; #exist and has any information inside!

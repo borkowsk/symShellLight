@@ -1,7 +1,7 @@
-#/bin/bash
-# @date 2026-04-28 (last modification)
-# ==============================
-#Ten skrypt aktualizuje SymShellLight zainstalowany jako submodul innego repo.
+#!/bin/bash
+# @date 2026-04-29 (last modification)
+# ====================================
+# Ten skrypt aktualizuje SymShellLight zainstalowany jako submodul innego repo.
 
 cd ..
 git submodule update --remote --merge --recursive

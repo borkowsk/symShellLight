@@ -1,5 +1,5 @@
 #!/bin/bash
-# @date 2026-01-29 (last update)
+# @date 2026-04-29 (last update)
 
 if [ $# -ne 0 ]; 
 then
@@ -14,10 +14,10 @@ rm -f CMakeCache.txt
 rm -f CMakeLists.txt.user
 rm -f Makefile
 rm -f cmake_install.cmake
-rm *.cbp
+rm -f *.cbp
 
 rm -Rf CMakeFiles/
 rm -Rf bin/CMakeFiles/
-rm -R cmake-build-*/
+rm -Rf cmake-build-*/
 
 

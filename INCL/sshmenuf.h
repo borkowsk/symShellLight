@@ -1,12 +1,11 @@
 /** \file   sshmenuf.h
-* \brief INTERFEJS DLA MENU SYMSHELL I POWIĄZANYCH FUNKCJI.       */
-/* =================================================       */
-/** @date 2026-04-20 (ostatnia modyfikacja)
-* \warning TYLKO DLA MS WINDOWS. W innym przypadku dostarczana jest wersja pusta (zaślepka).
-* \note Wersja Unix używająca Motif jest przestarzała.
-* \note Pod X11 dostępne jest menu podręczne (popup) używające rofi.
-* \author  borkowsk
-* **************************************************************** */
+*  \brief INTERFEJS DLA MENU SYMSHELL I POWIĄZANYCH FUNKCJI.
+*  @date 2026-04-29 (ostatnia modyfikacja)
+*  \warning TYLKO DLA MS WINDOWS. W innym przypadku dostarczana jest wersja pusta (zaślepka).
+*  \note Wersja Unix używająca Motif jest przestarzała.
+*  \note Pod X11 dostępne jest menu podręczne (popup) używające _rofi_, a pod Windows natywne.
+*  \author  borkowsk
+* ********************************************************************************************* */
 #ifndef SYMSHELL_MENU_FUNCTIONS_H_INCLUDED_
 #define SYMSHELL_MENU_FUNCTIONS_H_INCLUDED_
 

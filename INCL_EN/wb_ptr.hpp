@@ -1,7 +1,7 @@
 /// \file wb_ptr.hpp
 /// \brief Simple templates for smart pointers and dynamic arrays.
 /// @date 2026-04-29 (modified)
-//         ===================================================================
+///
 /// \details
 /// CONTENTS:
 ///	    - wb_sptr		: smart pointer for scalars.
@@ -18,7 +18,7 @@
 ///
 /// \copyright Wojciech Borkowski wborkowski (_at_) uw.edu.pl
 /// \author    borkowsk
-// ////////////////////////////////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #ifndef __WB_PTR_HPP__
 #define __WB_PTR_HPP__

@@ -1,14 +1,13 @@
 /** \file wb_rand.hpp
  * \brief PODSTAWOWE KLASY GENERATORÓW LICZB PSEUDOLOSOWYCH
  *  @date 2026-04-29 (ostatnia modyfikacja)
- *        -------------------------------------------------
  *
  * \details
  * - RandomGenerator - interfejs do generatorów losowych.
  * - RandSTDC - generator losowy zbudowany w oparciu o standard C.
  * - RandG - generator losowy napisany w C na podstawie "Numerical Recipes".
  * \author Wojciech Borkowski @ Instytut Studiów Społecznych UW.
- */
+ * ****************************************************************************************************************** */
 #ifndef _WB_RAND_HPP_INCLUDED_
 #define _WB_RAND_HPP_INCLUDED_  1
 

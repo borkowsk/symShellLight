@@ -1,10 +1,9 @@
 /// \file wb_cpucl.hpp
 /// \brief Klasa stopera liczącego czas CPU
-//        ==================================
-/** @date 2026-04-20 (last modification */
+/// @date 2026-04-29 (last modification)
 /// \author borkowsk
 /// \warning OBSOLETE
-// ///////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #ifndef __CPU_CLOCK_HPP_
 #define __CPU_CLOCK_HPP_
 

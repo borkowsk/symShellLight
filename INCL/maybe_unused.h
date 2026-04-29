@@ -1,7 +1,6 @@
 /// @file
 /// @brief Uniwersalne makro do zaznaczania być może nieużywanych obiektów.
-//         ================================================================
-/// @date 2026-04-18 (last modification)
+/// @date 2026-04-29 (last modification)
 //  Created by borkowsk on 17.04.26.
 // ////////////////////////////////////////////////////////////////////////
 #ifndef WB_RTM_MAYBE_UNUSED_H_INCLUDED_

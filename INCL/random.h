@@ -1,6 +1,6 @@
 /** @file
  * @brief INTERFACE "C" DO ROZMAITYCH GENERATORÓW LICZB PSEUDOLOSOWYCH.
- * @date 2026-04-20 (last modification)                                */
+ * @date 2026-04-29 (last modification)                                 */
 /* -------------------------------------------------------------------- */
 #ifndef WB_RTM_RANDOM_H_INCLUDED_
 #define WB_RTM_RANDOM_H_INCLUDED_  (1)

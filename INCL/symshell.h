@@ -1,13 +1,12 @@
 /** @file
  * @brief SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++ (PL Doxygen).
- * @date 2026-04-26 (last modification)                                      */
-/* ========================================================================= */
- /**
+ * @date 2026-04-29 (last modification)
+ *
  * \details
  *      - Cały plik został znacząco zmieniony:     15.11.2020
  *      - Komentarze zostały znacząco rozbudowane: 01.03-04.2022
  *      - ... a potem zimą                         2025-2026
- *      - Menu kontekstowe z użyciem „rofi” dodano w 2026 roku
+ *      - Menu kontekstowe (w X11 z użyciem _rofi_) dodano w 2026 roku
  *
  * \note
  *      - https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI
@@ -15,8 +14,8 @@
  *
  ** \author     Designed by W. Borkowski from the University of Warsaw
  **
- ** \library    SYMSHELLLIGHT  version 2026c
- */
+ ** \version    SYMSHELLLIGHT  version 2026c
+ * ****************************************************************************************************************** */
 #ifndef SYMSHELL_H_INCLUDED_
 #define SYMSHELL_H_INCLUDED_ (1)
 

@@ -1,14 +1,13 @@
 /** \file wb_clone.hpp
-* \brief  WB CLONING SUPPORT FOR ANY C++ OBJECTS */
-/* ************************************** */
-/** @date 2026-04-20 (last modification) */
-/** \author borkowsk
+* \brief  WB CLONING SUPPORT FOR ANY C++ OBJECTS
+* @date 2026-04-29 (last modification)
+* \author borkowsk
 * \details
 * - Function for cloning strings;
 * - Template function for cloning scalars;
 * - Template class for forced cloning;
 * - For class pointers to char could be handled intuitively - by contents, not by pointer value.
-*/
+* ******************************************************************************************************************** */
 #ifndef WB_CLONE_HPP_INCLUDED_
 #define WB_CLONE_HPP_INCLUDED_
 

@@ -1,8 +1,8 @@
 /** @file
- * @brief Numeric type conversion template secured with assertions. */
-/* ============================================================ */
-/** @date 2026-04-19 (last modification)
- * Created by borkowsk on 06.01.26. */
+ * @brief Numeric type conversion template secured with assertions.
+ * @date 2026-04-29 (last modification)
+ * Created by borkowsk on 06.01.26.                                    */
+ /* ****************************************************************** */
 
 #ifndef WB_RTM_ASSERTED_H_
 #define WB_RTM_ASSERTED_H_ (1)

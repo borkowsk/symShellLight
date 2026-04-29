@@ -1,9 +1,8 @@
 /** @file
- * @brief Szablon konwersji typów liczbowych zabezpieczonej asercjami. */
-/* ============================================================ */
-/** @date 2026-04-20 (ostatnia modyfikacja)
- * Autor: borkowsk, 06.01.26. */
-
+ * @brief Szablon konwersji typów liczbowych zabezpieczonej asercjami.
+ * @date 2026-04-29 (ostatnia modyfikacja)
+ * @author borkowsk, 06.01.26.                                        */
+/* ================================================================= */
 #ifndef WB_RTM_ASSERTED_H_
 #define WB_RTM_ASSERTED_H_ (1)
 

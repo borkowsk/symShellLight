@@ -1,8 +1,6 @@
-
 /// @file
 /// @brief Universal macro for marking potentially unused objects.
-//         ================================================================
-/// @date 2026-04-20 (last modification)
+/// @date 2026-04-29 (last modification)
 //  Created by borkowsk on 17.04.26.
 // ////////////////////////////////////////////////////////////////////////
 #ifndef WB_RTM_MAYBE_UNUSED_H_INCLUDED_

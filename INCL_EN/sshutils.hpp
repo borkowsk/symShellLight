@@ -1,11 +1,10 @@
 /** @file   sshutils.hpp
- * @brief  Implementation of auxiliary symshell functions in a platform-independent manner.  */
-/* ===================================================================================== */
-/** @date 2026-04-27 (last modification)
+ * @brief  Implementation of auxiliary symshell functions in a platform-independent manner.
+ * @date 2026-04-29 (last modification)
 * @details
-* Written ALMOST NON-OBJECT-ORIENTED but in C++
-* Contains: print_width(), empty rect(), bar3D(), arrow() ...etc...
-* @author borkowsk                                                                             */
+*       Written ALMOST NON-OBJECT-ORIENTED but in C++
+*       Contains: print_width(), empty rect(), bar3D(), arrow() ...etc...
+* @author borkowsk                                                                               */
 /* ********************************************************************************************* */
 #ifndef SYMSHELL_UTILS_HPP_INCLUDED_
 #define SYMSHELL_UTILS_HPP_INCLUDED_

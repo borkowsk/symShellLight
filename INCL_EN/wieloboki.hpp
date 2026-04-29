@@ -1,7 +1,7 @@
 /// \file
 /// \brief Polygon class and a library of various polygons
-//        ************************************************
-/** @date 2026-04-20 (last modification) */
+///        ************************************************
+/// @date 2026-04-29 (last modification)
 /// \details Created as an example of defining a fairly simple class, which later became more complex.
 ///          However, for historical reasons, it retained Polish naming in the "camelCase" convention.
 /// \author  borkowsk
@@ -19,7 +19,6 @@
 /// @{
 
 /// \brief Definition of the Wielobok (Polygon) class — ALMOST without any method implementations inside.
-/// \brief Definition of the Wielobok (Polygon) class.
 class Wielobok
 {
 private:
@@ -87,11 +86,9 @@ public:
     ///          Creation is based on patterns, i.e., arrays or other `Wielobok` objects.
     ///          There is no possibility to create an empty "Wielobok", although it can be "zeroed" if forced.
     /// @{
-
     Wielobok(const Wielobok& model);    //!< Copy constructor.
     Wielobok(const ssh_point model[], unsigned n); //!< Constructor from an array of points.
     Wielobok(unsigned n, float r);     //!< Constructor for an n-gon with a variable number of sides and size.
-
     /// @}
 
     /// \brief Destructor. Frees the auxiliary array. \note "virtual" - because it is safer with inheritance.

@@ -1,7 +1,7 @@
 /// \file wb_ptr.hpp
 /// \brief Proste szablony inteligentnych wskaźników oraz tablic dynamicznych.
 /// @date 2026-04-29 (modified)
-//         ===================================================================
+///
 /// \details
 /// ZAWARTOŚĆ:
 ///	    - wb_sptr		: inteligentny wskaźnik na scalary.
@@ -18,7 +18,7 @@
 ///
 /// \copyright Wojciech Borkowski wborkowski (_at_) uw.edu.pl
 /// \author    borkowsk
-// ////////////////////////////////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #ifndef __WB_PTR_HPP__
 #define __WB_PTR_HPP__

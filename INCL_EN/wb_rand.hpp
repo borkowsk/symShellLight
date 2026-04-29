@@ -1,14 +1,13 @@
 /** \file wb_rand.hpp
  * \brief BASIC CLASSES OF PSEUDORANDOM NUMBER GENERATORS
  * @date 2026-04-29 (last modification)
- *       -------------------------------------------------
  *
  * \details
  *       - RandomGenerator - interface to random generators
  *       - RandSTDC	- Random generator build in standard C
  *       - RandG	- Random generator wrote in C based on "Numerical Recipes"
  * \author Wojciech Borkowski @ Instytut Studiów Społecznych UW
- */
+ * ****************************************************************************************************************** */
 #ifndef _WB_RAND_HPP_INCLUDED_
 #define _WB_RAND_HPP_INCLUDED_  1
 

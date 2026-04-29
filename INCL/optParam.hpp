@@ -1,7 +1,6 @@
 /// @file optParam.hpp
 /// @brief KLASY potrzebne do obsługi parametrów wywołania programu.
-//         /////////////////////////////////////////////////////////
-/// @date 2026-04-18 (last modification)
+/// @date 2026-04-29 (last modification)
 // /////////////////////////////////////////////////////////////////
 #ifndef OPTIONAL_PARAMETERS_HPP_
 #define OPTIONAL_PARAMETERS_HPP_

@@ -1,12 +1,11 @@
 /** @file
  * @brief SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++ (EN version).
- * @date 2026-04-26 (translated)                                             */
-/* ========================================================================= */
- /**
+ * @date 2026-04-29 (translated)
+ *
  * \details
  *  - The whole file changed massively: 15.11.2020
  *  - Comments changed massively: 3-4.01.2022 and during winter 2026
- *  - Context menu using "rofi" added in 2026
+ *  - Context menu (under X11 using _rofi_) added in 2026
  *
  * \note
  * - https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI
@@ -14,8 +13,8 @@
  *
  ** \author     Designed by W. Borkowski from the University of Warsaw
  **
- ** \library    SYMSHELLLIGHT  version 2026c
- */
+ ** \version    SYMSHELLLIGHT  version 2026c
+ * ****************************************************************************************************************** */
 #ifndef SYMSHELL_H_INCLUDED_
 #define SYMSHELL_H_INCLUDED_ (1)
 

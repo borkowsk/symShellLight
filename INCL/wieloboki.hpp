@@ -1,7 +1,7 @@
 /// \file
 /// \brief Klasa wielobok i biblioteka różnych wieloboków
-//        ************************************************
-/** @date 2026-04-20 (last modification */
+///        ************************************************
+/// @date 2026-04-29 (last modification)
 /// \details Powstała jako przykład definiowania dosyć prostej klasy, a potem się skomplikowała.
 ///          Jednak z przyczyn historycznych zachowała polskie nazewnictwo w konwencji "wielbłądowej".
 /// \author  borkowsk

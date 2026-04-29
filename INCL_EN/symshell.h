@@ -62,7 +62,7 @@ const ssh_mode  SSH_LINE_DASHED=3;              /**< \brief Dashed line. */
 const ssh_mode  SSH_YES=1;                      /**< \brief Confirmation flag. */
 const ssh_mode  SSH_NO=0;                       /**< \brief Negation flag. */
 #else
-#define PALETTE_LENGTH      (512)               /**< Length of the predefined color palette. */
+#define PALETTE_LENGTH      (512)               /**< \brief Length of the predefined color palette. */
 #define PALETE_LENGHT       (512)               /**< \brief Length of the predefined color palette (old name). */
 #define SSH_SOLID_TEXT       (0)                /**< \brief Text on a filled background bar. */
 #define SSH_TRANSPARENT_TEXT (1)                /**< \brief Text on a transparent background. */

@@ -63,16 +63,17 @@ const ssh_mode  SSH_LINE_DASHED=3;                /**< \brief Linia przerywana. 
 const ssh_mode  SSH_YES=1;                        /**< \brief Flaga potwierdzająca. */
 const ssh_mode  SSH_NO=0;                         /**< \brief Flaga zaprzeczająca. */
 #else
-#define PALETTE_LENGTH      (512)                /**< Długość palety predefiniowanych kolorów. */
-#define SSH_SOLID_TEXT       (0)                /**< \brief Tekst na wypełnionym pasku tła. */
-#define SSH_TRANSPARENT_TEXT (1)                /**< \brief Tekst na przezroczystym tle. */
-#define SSH_SOLID_PUT        (1)                /**< \brief Zawartość nakładana na tło. */
-#define SSH_XOR_PUT          (2)                /**< \brief Zawartość XOR-owane z tłem. */
-#define SSH_LINE_SOLID       (1)                /**< \brief Linia ciągła. */
-#define SSH_LINE_DOTTED      (2)                /**< \brief Linia kropkowana. */
-#define SSH_LINE_DASHED      (3)                /**< \brief Linia przerywana. */
-#define SSH_YES              (1)                /**< \brief Flaga potwierdzająca. */
-#define SSH_NO               (0)                /**< \brief Flaga zaprzeczająca. */
+#define PALETTE_LENGTH      (512)                 /**< \brief Długość palety predefiniowanych kolorów. */
+#define PALETE_LENGHT       (512)                 /**< \brief Długość palety predefiniowanych kolorów (stara nazwa). */
+#define SSH_SOLID_TEXT       (0)                  /**< \brief Tekst na wypełnionym pasku tła. */
+#define SSH_TRANSPARENT_TEXT (1)                  /**< \brief Tekst na przezroczystym tle. */
+#define SSH_SOLID_PUT        (1)                  /**< \brief Zawartość nakładana na tło. */
+#define SSH_XOR_PUT          (2)                  /**< \brief Zawartość XOR-owane z tłem. */
+#define SSH_LINE_SOLID       (1)                  /**< \brief Linia ciągła. */
+#define SSH_LINE_DOTTED      (2)                  /**< \brief Linia kropkowana. */
+#define SSH_LINE_DASHED      (3)                  /**< \brief Linia przerywana. */
+#define SSH_YES              (1)                  /**< \brief Flaga potwierdzająca. */
+#define SSH_NO               (0)                  /**< \brief Flaga zaprzeczająca. */
 #endif
 
 /* ZMIENNE I STAŁE ZALEŻNE OD MODUŁU

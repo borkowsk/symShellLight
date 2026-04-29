@@ -43,11 +43,11 @@ extern int WB_error_enter_before_clean; /* For controlling a closing graphics wi
 #include "_sig_msg.h"       // for compatibility with wb_posix.
 #include "symshwin.h"       // prototypes specific to this application
 
+// Funkcja do uruchamiania menu kontekstowego zdefiniowana w "sshpopupmenu.c"  (do użycia w `MsgRButtonDown`)
+unsigned UseContextMenu(HWND hwnd, int x, int y, ssh_menu_item_definition* elementy, int liczbaElementow);
+
 #define OLD_COLOUR_SCALE (0)   //Skala kolorów jak na mapie fizycznej
-/// @file
-/// @brief SYMSHELL FOR MS WINDOWS - PROGRAMMED BY W.Borkowski BASED OD Microsoft EXAMPLES
-//         -------------------------------------------------------------------------------
-/// @date 2026-04-27 (modified)
+
 #if defined(_MSC_VER)
 //#pragma warning(disable:4068)
 #pragma warning(disable : 4996) //deprecated functions
@@ -61,7 +61,8 @@ extern int WB_error_enter_before_clean; /* For controlling a closing graphics wi
 #define MINUSERCOMMAND	IDM_EXIT		///< Komenda użytkownika o najniższym możliwym numerze (komunikatu).
 
 /* FOR OTHER MODULES */
-const char *_ssh_grx_module_name="WINDOWS";
+const char *_ssh_grx_module_name="WINDOWS";         // Nazwa modułu do sprawdzania co jest zlinkowane.
+
 HINSTANCE		WB_Instance=0;
 HINSTANCE		WB_PrevInstance=0;
 HWND			WB_Hwnd=0;
@@ -146,7 +147,7 @@ static HDC GetRealScreen(void);
 
 // Wewnętrzne śledzenie wywołań.
 // /////////////////////////////
-static  int trace_level=0;			//Maska poziomów śledzenia 1-msgs 2-grafika 4-alokacje/zwalnianie
+static  int trace_level=0;			///< Maska poziomów śledzenia 1-msgs 2-grafika 4-alokacje/zwalnianie
 //  np:
 //  if(trace_level & 4)
 //      fprintf(stderr," FREE RESOURCES.\n");
@@ -157,10 +158,12 @@ static  int trace_level=0;			//Maska poziomów śledzenia 1-msgs 2-grafika 4-alo
 //  fprintf(stderr," FREE RESOURCES.\n");
 // _TREND
 
+/// @name WEWNĘTRZNE ŚLEDZENIE WYKONANIA
+/// @{
 #define _TRACE(__LL__)   if(trace_level & __LL__) { fprintf(stderr,"SYMSHWIN:::%s ",__FUNCTION__);
-#define _TREND        fprintf(stderr,"\n"); }
+#define _TREND           fprintf(stderr,"\n"); }
+/// @}
 
-#define LOCAL static
 
 #ifdef EXTERN_WB_ABOUT
 extern int wb_about(const char* window_name); //Z biblioteki albo dostarczona z programem
@@ -375,7 +378,7 @@ static HBRUSH GetMyBrush(ssh_color color)
 
     if(brushes[color]==0) //Trzeba alokować pędzel
     {
-        DeleteObject(brushes[color]); //???
+        //DeleteObject(brushes[color]); //??? Jak zerowy to nie ma sensu usuwać!
         brushes[color]=CreateSolidBrush(colors[color]);
     }
     return curent_brush=brushes[color];
@@ -420,7 +423,11 @@ void set_brush_rgb(ssh_intensity r,ssh_intensity g,ssh_intensity b)
     curr_fill=-1; //Funkcje same ustawiające brush muszą to zrobić po użyciu set_brush
 }
 
-/* Ustala aktualny kolor wypełnień za pomocą składowych RGB */
+/* Ustala aktualny kolor wypełnień za pomocą składowych RGB. */
+/* Standardowa funkcja CreateSolidBrush i obiekt HBRUSH (używany w GDI) 
+   niestety nie obsługują kanału alfa. Tradycyjne GDI operuje na pełnych kolorach 
+   24-bitowych. Thrba by napisać moduł od nowa z użyciem GDI++ albo bawic się 
+   w jakies pomocnicze alpha-blend. */
 void set_brush_rgba(ssh_intensity r, ssh_intensity g, ssh_intensity b, ssh_intensity a )
 {
     COLORREF MyColor = RGB(r, g, b);
@@ -1375,7 +1382,7 @@ JESZCZE_RAZ:
         return ret;
 }
 
-LOCAL 
+static 
 int first_to_read=0;
 
 /* (nie)zależna od platformy funkcja sprawdzająca, czy jest wejście */
@@ -2016,9 +2023,14 @@ void clear_screen()
     FillRect (GetMyHdc(), &rc, GetMyBrush(Background));
 }
 
+ssh_stat invalidate_screen()
+{
+    // Dla okna Windows nie robi nic.
+    return 1;
+}
 
 // MESSAGE SUPPORT COPIED FROM BORLAND SAMPLE
-LOCAL
+static
 LRESULT DispDefault(EDWP, HWND, UINT, WPARAM, LPARAM);
 
 //
@@ -2044,7 +2056,7 @@ LRESULT DispDefault(EDWP, HWND, UINT, WPARAM, LPARAM);
 //    structure.  In either case, return the value received from the
 //    message or default function.
 //
-LOCAL 
+static 
 LRESULT DispMessage(LPMSDI lpmsdi,
                     HWND   hwnd,
                     UINT   uMessage,
@@ -2086,7 +2098,7 @@ LRESULT DispMessage(LPMSDI lpmsdi,
 //    Calls the default procedure associated with edwp using the specified
 //    parameters.
 //
-LOCAL
+static
 LRESULT DispDefault(EDWP   edwp,
                     HWND   hwnd,
                     UINT   uMessage,
@@ -2109,7 +2121,7 @@ LRESULT DispDefault(EDWP   edwp,
     return 0;
 }
 
-LOCAL
+static
 BOOL InitApplication(HINSTANCE hInstance)
 {
     #ifdef __WIN16__
@@ -2203,7 +2215,7 @@ FAIL:
     }
 }
 
-LOCAL
+static
 BOOL InitInstance(HINSTANCE hInstance)
 {
 
@@ -2312,7 +2324,7 @@ static int  nTimerCount = 0;        //  current timer count
 //    Call the DispMessage() function with the main window's message dispatch
 //    information (msdiMain) and the message specific information.
 //
-LOCAL
+static
 LRESULT CALLBACK WndProc
     (HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
 {
@@ -2336,7 +2348,7 @@ LRESULT CALLBACK WndProc
 //  COMMENTS:
 //
 //
-LOCAL
+static
 LRESULT MsgCommand(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
 {
     LRESULT lRet = 0;
@@ -2368,7 +2380,7 @@ LRESULT MsgCommand(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
 }
 
 // Handler for WM_SYSCOMMAND
-LOCAL
+static
 LRESULT MsgSysCommand(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
 {
     LRESULT lRet = 0;
@@ -2420,7 +2432,7 @@ LRESULT MsgSysCommand(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
 //  COMMENTS:
 //
 //
-LOCAL
+static
 LRESULT MsgCreate(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
 {
     // Set the timer for five-second intervals
@@ -2432,7 +2444,7 @@ LRESULT MsgCreate(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
      return 0;
 }
 
-LOCAL
+static
 LRESULT MsgClose(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
 {
      _TRACE( 1)
@@ -2462,7 +2474,7 @@ LRESULT MsgClose(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
 //  COMMENTS:
 //
 //
-LOCAL
+static
 LRESULT MsgGetMinMaxInfo(HWND   hwnd,
                          UINT   uMessage,
                          WPARAM wparam,
@@ -2529,7 +2541,7 @@ LRESULT MsgGetMinMaxInfo(HWND   hwnd,
 //  COMMENTS:
 //
 //
-LOCAL
+static
 LRESULT MsgDestroy(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
 {
     _TRACE( 1)
@@ -2561,7 +2573,7 @@ LRESULT MsgDestroy(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
 //  COMMENTS:
 //
 //
-LOCAL
+static
 LRESULT MsgLButtonDown(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
 {
     WORD xPos = LOWORD(lparam);  // horizontal position of cursor
@@ -2576,9 +2588,9 @@ LRESULT MsgLButtonDown(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
                 );
        _TREND
            InputXpos=xPos;
-            InputYpos=yPos;
-            InputClick=1;
-            MouseInput=1;
+           InputYpos=yPos;
+           InputClick=1;
+           MouseInput=1;
            InputChar='\b';
         }
     return 0;
@@ -2604,7 +2616,7 @@ LRESULT MsgLButtonDown(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
 //  COMMENTS:
 //
 //
-LOCAL
+static
 LRESULT MsgXButtonDown(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
 {
     WORD xPos = LOWORD(lparam);  // horizontal position of cursor
@@ -2619,9 +2631,9 @@ LRESULT MsgXButtonDown(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
                 );
        _TREND
            InputXpos=xPos;
-            InputYpos=yPos;
-            InputClick=4;
-            MouseInput=1;
+           InputYpos=yPos;
+           InputClick=4;
+           MouseInput=1;
            InputChar='\b';
         }
     return 0;
@@ -2646,7 +2658,7 @@ LRESULT MsgXButtonDown(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
 //  COMMENTS:
 //
 //
-LOCAL
+static
 LRESULT MsgLButtonDoubleClick(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
 {
     WORD xPos = LOWORD(lparam);  // horizontal position of cursor
@@ -2690,12 +2702,12 @@ LRESULT MsgLButtonDoubleClick(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lp
 //  COMMENTS:
 //
 //
-LOCAL
+static
 LRESULT MsgRButtonDown(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
 {
     WORD xPos = LOWORD(lparam);  // horizontal position of cursor
     WORD yPos = HIWORD(lparam);  // vertical position of cursor
-    if(is_mouse)
+   // if(is_mouse) //Menu ma działać nawet gdy program nie życzy sobie myszy!
         {
             _TRACE( 1)
                 fprintf(stderr,
@@ -2703,11 +2715,17 @@ LRESULT MsgRButtonDown(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
                 wparam, LOWORD(lparam), HIWORD(lparam)
                 );
             _TREND
+
+            // Funkcja do uruchamiania menu kontekstowego zdefiniowana w "sshpopupmenu.c"  (do uzycia w `MsgRButtonDown`)
+            unsigned ret=UseContextMenu(hwnd, xPos, yPos, context_menu_default, context_menu_default_size );
+            /*
             InputXpos=xPos;
             InputYpos=yPos;
             InputClick=2;
             MouseInput=1;
             InputChar='\b';
+            */
+            InputChar = ret;
         }
     return 0;
 }
@@ -2732,7 +2750,7 @@ LRESULT MsgRButtonDown(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
 //  COMMENTS:
 //
 //
-LOCAL
+static
 LRESULT MsgRButtonDoubleClick(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
 {
     _TRACE( 1)
@@ -2762,7 +2780,7 @@ LRESULT MsgRButtonDoubleClick(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lp
 //  COMMENTS:
 //
 //
-LOCAL
+static
 LRESULT MsgKeyDown(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
 {
     _TRACE(1)
@@ -2793,7 +2811,7 @@ LRESULT MsgKeyDown(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
 //  COMMENTS:
 //
 //
-LOCAL
+static
 LRESULT MsgKeyUp(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
 {
     _TRACE( 1)
@@ -2824,7 +2842,7 @@ LRESULT MsgKeyUp(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
 //  COMMENTS:
 //
 //
-LOCAL
+static
 LRESULT MsgChar(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
 {
     _TRACE( 1)
@@ -2855,7 +2873,7 @@ LRESULT MsgChar(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
 //  COMMENTS:
 //
 //
-LOCAL
+static
 LRESULT MsgTimer(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
 {
     /*
@@ -2896,7 +2914,7 @@ LRESULT MsgTimer(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
 static struct {LONG left,top,right,bottom;} forrepaint;
 static int repaint_flag=0;
 
-LOCAL
+static
 LRESULT MsgPaint(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
 {
     PAINTSTRUCT ps;
@@ -2999,7 +3017,7 @@ int  repaint_area(ssh_coordinate* x, ssh_coordinate* y,
         return -1; //Nie było nic odczytania (?)
 }
 
-LOCAL
+static
 LRESULT MsgSize(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
 {
   //WORD	fwSizeType = wparam;      // resizing flag
@@ -3112,7 +3130,7 @@ MSDI msdiMain =
 //  COMMENTS:
 //
 //
-LOCAL
+static
 BOOL InitInput(HWND hwnd)
 {
     /*HDC hdc;
@@ -3145,7 +3163,7 @@ void errhandler(const char* text,HWND hwnd,int Errnum)
     exit(Errnum);//Debug
 }
 
-LOCAL
+static
 PBITMAPINFO CreateBitmapInfoStruct(HWND hwnd, HBITMAP hBmp) {
     BITMAP bmp;
     PBITMAPINFO pbmi;
@@ -3233,7 +3251,8 @@ PBITMAPINFO CreateBitmapInfoStruct(HWND hwnd, HBITMAP hBmp) {
 
 //The following example code defines a function that initializes the remaining structures, retrieves the array of palette indices, opens the file, copies the data, and closes the file.
 static LPBYTE lpBits=NULL;              /* memory pointer */
-LOCAL
+
+static
 void CreateBMPFile(HWND hwnd, LPTSTR pszFile, PBITMAPINFO pbi,
                   HBITMAP hBMP, HDC hDC)
  {

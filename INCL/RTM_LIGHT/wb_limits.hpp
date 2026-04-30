@@ -1,7 +1,7 @@
 /// @file
 /// @brief   LIMITY DLA TYPÓW SKALARNYCH (Zaprojektowane, zanim podobne rozwiązanie pojawiło się w standardzie C++).
 ///
-/// @date 2026-04-29 (last modification)
+/// @date 2026-04-30 (last modification)
 /// \details Szablon klas implementujących limity dla skalarów
 ///          z możliwością dodania własnych specjalizacji.
 ///          Ten jest w przestrzeni nazw 'wbrtm::'.
@@ -11,6 +11,9 @@
 ///          tego pliku
 /// \author borkowsk
 /// \warning OBSOLETE
+/// @note Jeśli używasz biblioteki `SymShellLight` razem z pełną wersją WB_RTM to upewnij się, czy ten plik i jego
+///       wersja w pełnej bibliotece są zgodne. A najlepiej tak ustal kolejność ścieżek INCLUDE, żeby korzystać
+///       tylko z pełnej wersji.
 // /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /// @ingroup OBSOLETE

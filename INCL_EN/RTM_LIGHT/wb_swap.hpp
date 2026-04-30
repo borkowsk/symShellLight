@@ -1,9 +1,10 @@
 /** @file
- * @brief Template for swapping two values of the same type, regardless of the type. *
- * @date 2026-04-29 (last modification)                                              */
-/*        ========================================================================== */
-/* Created by borkowsk on 06.01.26.                                                  */
-/* ********************************************************************************* */
+ * @brief Template for swapping two values of the same type, regardless of the type.
+ * @date 2026-04-30 (last modification)
+ * Created by borkowsk on 06.01.26.
+ * @note If you're using the `SymShellLight` library with the full version of WB_RTM, make sure this file and its version
+ *       in the full library are compatible. Ideally, arrange the include paths so that you only use the full version.
+ * ****************************************************************************************************************** */
 #ifndef WB_SWAP_HPP_INCLUDED_
 #define WB_SWAP_HPP_INCLUDED_
 

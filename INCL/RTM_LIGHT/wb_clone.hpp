@@ -1,12 +1,15 @@
 /** \file wb_clone.hpp
 *   \brief WSPARCIE DLA KLONOWANIA DOWOLNYCH OBIEKTÓW C++.
-*   @date 2026-04-29 (ostatnia modyfikacja)
+*   @date 2026-04-30 (ostatnia modyfikacja)
 *   \author borkowsk
 *   \details
 *   - Funkcja do klonowania łańcuchów znaków (string);
 *   - Szablon funkcji do klonowania skalarów;
 *   - Szablon klasy do wymuszonego klonowania;
 *   - Dla wskaźników typu char obsługa intuicyjna — kopiowanie zawartości, a nie wartości wskaźnika.
+ *   @note Jeśli używasz biblioteki `SymShellLight` razem z pełną wersją WB_RTM to upewnij się, czy ten plik i jego
+ *         wersja w pełnej bibliotece są zgodne. A najlepiej tak ustal kolejność ścieżek INCLUDE, żeby korzystać
+ *         tylko z pełnej wersji.
 * ******************************************************************************************************************** */
 #ifndef WB_CLONE_HPP_INCLUDED_
 #define WB_CLONE_HPP_INCLUDED_

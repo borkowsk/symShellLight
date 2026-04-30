@@ -1,8 +1,11 @@
 /// \file wb_cpucl.hpp
 /// \brief Klasa stopera liczącego czas CPU
-/// @date 2026-04-29 (last modification)
+/// @date 2026-04-30 (last modification)
 /// \author borkowsk
 /// \warning OBSOLETE
+/// @note Jeśli używasz biblioteki `SymShellLight` razem z pełną wersją WB_RTM to upewnij się, czy ten plik i jego
+///       wersja w pełnej bibliotece są zgodne. A najlepiej tak ustal kolejność ścieżek INCLUDE, żeby korzystać
+///       tylko z pełnej wersji.
 // /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #ifndef __CPU_CLOCK_HPP_
 #define __CPU_CLOCK_HPP_

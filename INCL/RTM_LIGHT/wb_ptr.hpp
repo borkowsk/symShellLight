@@ -1,6 +1,6 @@
 /// \file wb_ptr.hpp
 /// \brief Proste szablony inteligentnych wskaźników oraz tablic dynamicznych.
-/// @date 2026-04-29 (modified)
+/// @date 2026-04-30 (modified)
 ///
 /// \details
 /// ZAWARTOŚĆ:
@@ -18,6 +18,9 @@
 ///
 /// \copyright Wojciech Borkowski wborkowski (_at_) uw.edu.pl
 /// \author    borkowsk
+/// @note Jeśli używasz biblioteki `SymShellLight` razem z pełną wersją WB_RTM to upewnij się, czy ten plik i jego
+///       wersja w pełnej bibliotece są zgodne. A najlepiej tak ustal kolejność ścieżek INCLUDE, żeby korzystać
+///       tylko z pełnej wersji.
 // /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #ifndef __WB_PTR_HPP__

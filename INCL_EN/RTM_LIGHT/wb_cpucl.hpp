@@ -1,9 +1,11 @@
 /// \file wb_cpucl.hpp
 /// \brief CPU stopwatch class
-/// @date 2026-04-29 (last modification)
+/// @date 2026-04-30 (last modification)
 /// \author borkowsk
 /// \warning OBSOLETE
-// ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// @note If you're using the `SymShellLight` library with the full version of WB_RTM, make sure this file and its version
+///       in the full library are compatible. Ideally, arrange the include paths so that you only use the full version.
+// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #ifndef __CPU_CLOCK_HPP_
 #define __CPU_CLOCK_HPP_
 

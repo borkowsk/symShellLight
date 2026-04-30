@@ -1,6 +1,6 @@
 /// @file
 /// @brief   LIMITS FOR SCALAR TYPES (Designed before a similar solution appeared in the C++ standard).
-/// @date 2026-04-29 (last modification)
+/// @date 2026-04-30 (last modification)
 ///
 /// \details Class template implementing limits for scalars
 ///          with the possibility of adding custom specializations.
@@ -11,6 +11,8 @@
 ///          this file.
 /// \author borkowsk
 /// \warning OBSOLETE
+/// @note If you're using the `SymShellLight` library with the full version of WB_RTM, make sure this file and its version
+///       in the full library are compatible. Ideally, arrange the include paths so that you only use the full version.
 // /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /// @ingroup OBSOLETE

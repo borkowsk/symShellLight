@@ -1,12 +1,14 @@
 /** \file wb_clone.hpp
 * \brief  WB CLONING SUPPORT FOR ANY C++ OBJECTS
-* @date 2026-04-29 (last modification)
+* @date 2026-04-30 (last modification)
 * \author borkowsk
 * \details
 * - Function for cloning strings;
 * - Template function for cloning scalars;
 * - Template class for forced cloning;
 * - For class pointers to char could be handled intuitively - by contents, not by pointer value.
+* @note If you're using the `SymShellLight` library with the full version of WB_RTM, make sure this file and its version
+*       in the full library are compatible. Ideally, arrange the include paths so that you only use the full version.
 * ******************************************************************************************************************** */
 #ifndef WB_CLONE_HPP_INCLUDED_
 #define WB_CLONE_HPP_INCLUDED_

@@ -1,6 +1,6 @@
 /// \file wb_ptr.hpp
 /// \brief Simple templates for smart pointers and dynamic arrays.
-/// @date 2026-04-29 (modified)
+/// @date 2026-04-30 (modified)
 ///
 /// \details
 /// CONTENTS:
@@ -18,6 +18,8 @@
 ///
 /// \copyright Wojciech Borkowski wborkowski (_at_) uw.edu.pl
 /// \author    borkowsk
+/// @note If you're using the `SymShellLight` library with the full version of WB_RTM, make sure this file and its version
+///       in the full library are compatible. Ideally, arrange the include paths so that you only use the full version.
 // /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #ifndef __WB_PTR_HPP__

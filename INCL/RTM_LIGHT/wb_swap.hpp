@@ -1,9 +1,11 @@
 /** @file
- * @brief Szablon zamiany dwóch wartości tego samego typu niezależnie od typu.       *
- * @date 2026-04-29 (last modification)                                              */
-/*        ========================================================================== */
-/* Created by borkowsk on 06.01.26.                                                  */
-/* ********************************************************************************* */
+ * @brief Szablon zamiany dwóch wartości tego samego typu niezależnie od typu.
+ * @date 2026-04-30 (last modification)
+ * Created by borkowsk on 06.01.26.
+ * @note Jeśli używasz biblioteki `SymShellLight` razem z pełną wersją WB_RTM to upewnij się, czy ten plik i jego
+ *         wersja w pełnej bibliotece są zgodne. A najlepiej tak ustal kolejność ścieżek INCLUDE, żeby korzystać
+ *         tylko z pełnej wersji.
+ * ****************************************************************************************************************** */
 #ifndef WB_SWAP_HPP_INCLUDED_
 #define WB_SWAP_HPP_INCLUDED_
 

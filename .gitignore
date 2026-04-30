@@ -29,14 +29,11 @@ clean_list.txt
 *.a
 *.lib
 
-# Executables
-*.exe
+# Temporary executables
 *.out
-*.app
 
 # Linux executables - specific for this repository
-*X11
-*SVG
+bin/
 TESTS/RawTests/native/native
 
 

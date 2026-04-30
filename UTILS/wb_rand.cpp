@@ -1,7 +1,7 @@
 /** \file
  *  \brief STATICS FOR PSEUDORANDOM NUMBER GENERATOR CLASSES. */
 /*        =================================================== */
-/** @date 2026-04-21 (last modification) */
+/** @date 2026-04-30 (last modification) */
 
 #include "wb_rand.hpp"
 

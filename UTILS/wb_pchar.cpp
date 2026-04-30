@@ -1,7 +1,7 @@
 /** @file
  * @brief Implementation of more "sophisticated" methods for class "wb_pchar".                       */
 /*        ****************************************************************************************** */
-/// @date 2026-04-21 (last modification)
+/// @date 2026-04-30 (last modification)
 
 #include <stdio.h>
 #include <ctype.h>

@@ -1,7 +1,7 @@
 /** @file
  * @brief Zmienna wymagana dla prawidłowego linkowania, jeśli twórca aplikacji nie dostarczy swojej. */
 /*        ****************************************************************************************** */
-/// @date 2026-04-21 (last modification)
+/// @date 2026-04-30 (last modification)
 
 // For debugging purposes - externally accessible
 int 			ssh_menu_trace=0;

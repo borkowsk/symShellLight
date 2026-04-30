@@ -1,6 +1,6 @@
 /** @file
  *  @brief                      SYMSHELL SVG IMPLEMENTATION
- *  @date 2026-04-27 (last modification)
+ *  @date 2026-04-30 (last modification)
  *              SYMSHELL IS A SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++
  *              ==================================================================
  **             Simplest graphics interface implemented for SVG vector graphics.

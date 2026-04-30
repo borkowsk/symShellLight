@@ -1,7 +1,7 @@
 /** \file
  *  \brief IMPLEMENTATION FOR PSEUDORANDOM NUMBER GENERATOR "randg". */
 /*        ========================================================== */
-/** @date 2026-04-21 (last modification) */
+/** @date 2026-04-30 (last modification) */
 
 #include <stdlib.h>
 #include <stdio.h>

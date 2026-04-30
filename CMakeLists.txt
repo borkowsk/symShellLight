@@ -44,10 +44,10 @@ set(SYS_LANG $ENV{LANG})
 # Sprawdzamy, czy zawiera frazę "pl" lub "PL"
 if(SYS_LANG MATCHES "pl" OR SYS_LANG MATCHES "PL")
     set(RESOURCE_LANG "PL")
-    include_directories("./INCL")
+    include_directories("./INCL" "./INCL/RTM_LIGHT/")
 else()
     set(RESOURCE_LANG "EN")
-    include_directories("./INCL_EN")
+    include_directories("./INCL_EN" "./INCL_EN/RTM_LIGHT/")
     add_definitions( -DUSE_ENGLISH_IF_POSSIBLE )
 endif()
 
@@ -69,13 +69,11 @@ if(true) # SVG SYMSHELL LIB
             "UTILS/sshutils.cpp"
             "UTILS/strtorgb.cpp"
             "UTILS/wieloboki.cpp"
-            "UTILS/wb_pchar.cpp" #used internally
             "UTILS/viewHtmlPchar.cpp"
-            "UTILS/wb_rand.cpp"
-            "UTILS/wb_randg.c"
             "UTILS/sshmenufdummy.c" #dummy functions of menus
             "SVG/symshsvgdef.c"
             "SVG/symshsvgdef.h"
+            "UTILS/RTM_LIGHT/wb_pchar.cpp"
             "UTILS/error_enter_before_clean.c"
          #  "UTILS/context_menu_expected_tmpl.c"
     )
@@ -106,15 +104,13 @@ if(X11) # only for X11 LIB
             "UTILS/sshutils.cpp"
             "UTILS/strtorgb.cpp"
             "UTILS/wieloboki.cpp"
-            "UTILS/wb_pchar.cpp"
             "UTILS/viewHtmlPchar.cpp"
-            "UTILS/wb_rand.cpp"
-            "UTILS/wb_randg.c"
             "UTILS/sshmenufdummy.c" #dummy functions of menus
-            "UTILS/error_enter_before_clean.c"
             "X11/context_menu_expected_rofi.c"
             "X11/context_menu_default.c"
             "X11/context_menu_expected.h"
+            "UTILS/RTM_LIGHT/wb_pchar.cpp"
+            "UTILS/error_enter_before_clean.c"
     )
 
     #target_compile_features(wbsyshX11 PUBLIC cxx_std_11)
@@ -126,14 +122,13 @@ if(WINDOWS) # only for WINDOWS - NOT TESTED IN THIS VERSION (after 2016)
             "UTILS/sshutils.cpp"
             "UTILS/strtorgb.cpp"
             "UTILS/wieloboki.cpp"
-            "UTILS/wb_pchar.cpp"
             "UTILS/viewHtmlPchar.cpp"
-            "UTILS/wb_rand.cpp"
-            "UTILS/wb_randg.c"
             "WIN/sshmenufwin.c" #real functions for MS Windows menus.
-            "UTILS/error_enter_before_clean.c"
             "WIN/context_menu_default.c"
-     "WIN/sshpopupmenu.c")
+            "WIN/sshpopupmenu.c"
+            "UTILS/RTM_LIGHT/wb_pchar.cpp"
+            "UTILS/error_enter_before_clean.c"
+    )
 
     #target_compile_features(wbsyshWIN PUBLIC cxx_std_11)
 endif(WINDOWS)
@@ -163,8 +158,8 @@ if(X11 AND WITHTESTS ) #X11 tests
     add_executable("TestpolyX11"	"EXAMPLES/Testpoly.cpp"	)
     add_executable("TestrandX11"
                    "EXAMPLES/Testrand.cpp"
-                   "UTILS/wb_randg.c"
-                   "UTILS/wb_rand.cpp"
+                   "UTILS/RTM_LIGHT/wb_randg.c"
+                   "UTILS/RTM_LIGHT/wb_rand.cpp"
                   )
     add_executable("TestsymsX11"	"EXAMPLES/Testsyms.cpp"	)
     add_executable("TestsyshX11"	"EXAMPLES/Testsysh.cpp"	)
@@ -214,8 +209,8 @@ if( WINDOWS AND WITHTESTS ) #MS Windows tests
     add_executable("TestpolyWIN" "EXAMPLES/Testpoly.cpp" )
     add_executable("TestrandWIN"
                    "EXAMPLES/Testrand.cpp"
-                   "UTILS/wb_randg.c"
-                   "UTILS/wb_rand.cpp"
+                   "UTILS/RTM_LIGHT/wb_randg.c"
+                   "UTILS/RTM_LIGHT/wb_rand.cpp"
                    "WIN/symshmsc.rc"
                    "WIN/symshwin.ico"
                   )
@@ -270,8 +265,8 @@ if(WITHTESTS) #SVG tests
     add_executable("TestpolySVG" "EXAMPLES/Testpoly.cpp"    )
     add_executable("TestrandSVG"
                    "EXAMPLES/Testrand.cpp"
-                   "UTILS/wb_randg.c"
-                   "UTILS/wb_rand.cpp"
+                   "UTILS/RTM_LIGHT/wb_randg.c"
+                   "UTILS/RTM_LIGHT/wb_rand.cpp"
                   )
     add_executable("TestsymsSVG" "EXAMPLES/Testsyms.cpp" )
     add_executable("TestsyshSVG" "EXAMPLES/Testsysh.cpp" )

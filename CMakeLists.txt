@@ -10,7 +10,7 @@
 # @date 2026-04-30 (last update)
 ##################################################################################
 
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.30)
 
 project(symshelllight)
 set(CMAKE_CXX_STANDARD 11) # See: https://matgomes.com/setting-cpp-standard-cmake/
@@ -132,6 +132,13 @@ if(WINDOWS) # only for WINDOWS - NOT TESTED IN THIS VERSION (after 2016)
 
     #target_compile_features(wbsyshWIN PUBLIC cxx_std_11)
 endif(WINDOWS)
+
+# PRZYKŁAD ZEWNĘTRZNEGO PROJEKTU / EXTERNAL PROJECT EXAMPLE    #
+# BODAJ NAJSTARSZE REALNE UŻYCIE /AT LEAST THE OLDEST REAL USE #
+################################################################
+
+set(SYMSHELLLIGHT_ALREADY_CONFIGURED true)
+#add_subdirectory("../../archivals/Coevo1_model" "../../archivals/Coevo1_model")
 
 
 ## PROGRAMY TESTOWE  ##

@@ -1,7 +1,8 @@
 /** \file
- *  \brief STATICS FOR PSEUDORANDOM NUMBER GENERATOR CLASSES. */
-/*        =================================================== */
-/** @date 2026-04-30 (last modification) */
+ *  \brief STATICS FOR PSEUDORANDOM NUMBER GENERATOR CLASSES.
+ * @date 2026-04-30 (last modification)
+ * @note When using the full RTM library there is no need to add this file in your project!
+ * ****************************************************************************************************************** */
 
 #include "wb_rand.hpp"
 

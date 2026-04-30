@@ -1,7 +1,8 @@
 /** \file
- *  \brief IMPLEMENTATION FOR PSEUDORANDOM NUMBER GENERATOR "randg". */
-/*        ========================================================== */
-/** @date 2026-04-30 (last modification) */
+ *  \brief IMPLEMENTATION FOR PSEUDORANDOM NUMBER GENERATOR "randg".
+ * @date 2026-04-30 (last modification)
+ * @note When using the full RTM library there is no need to add this file in your project!
+ * ****************************************************************************************************************** */
 
 #include <stdlib.h>
 #include <stdio.h>

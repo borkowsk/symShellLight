@@ -1,7 +1,12 @@
 /** @file
- * @brief Implementation of more "sophisticated" methods for class "wb_pchar".                       */
-/*        ****************************************************************************************** */
-/// @date 2026-04-30 (last modification)
+ * @brief Implementacja bardziej „wyrafinowanych” metod dla klasy „wb_pchar” /
+ *        Implementation of more "sophisticated" methods for class "wb_pchar".
+ * @date 2026-04-30 (last modification)
+ * @note Plik "pożyczony" z biblioteki RTM może powodować konflikt przy jednoczesnym użyciu
+ *       (zwłaszcza gdy wersje się "rozjadą").
+ *       EN: A file "borrowed" from the RTM library may cause conflict when used simultaneously
+ *       (especially when the versions "different").
+ * ******************************************************************************************************************* */
 
 #include <stdio.h>
 #include <ctype.h>

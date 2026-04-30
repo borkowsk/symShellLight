@@ -1,6 +1,6 @@
 /// @file
 /// @brief "Mrówka Langtona"/Langton Ant
-/// @date 2026-04-27 (last update)
+/// @date 2026-04-30 (last update)
 // -------------------------------------------------------------------------------
 #ifdef USE_ENGLISH_IF_POSSIBLE
 /// @page page_e7_turmit LANGTON'S ANT IMPLEMENTED IN SYMSHELL
@@ -78,11 +78,17 @@ struct
 
 
 #ifdef USE_ENGLISH_IF_POSSIBLE
-unsigned int lang_selector=1; ///< @brief Setting the language for on-screen "subtitles".
+/// @brief Setting the language for on-screen "subtitles".
+///        User variable for the `lang` or `_lingo` function set.
+///        A value of 0 indicates Polish, 1 English, and 2 has never been used.
+unsigned int lang_selector=1;
 
 /// @brief Variable representing the turmite. Initialize the turmite in the center with the direction "up".
 #else
-unsigned int lang_selector=0; ///< @brief Ustalenie języka dla napisów na ekranie.
+/// @brief Ustalenie języka dla napisów na ekranie.
+///        Zmienna użytkownika dla zestawu funkcji `lang` albo `_lingo`.
+///        Wartość 0 oznacza język polski, 1 angielski, 2 nigdy nie była używana.
+unsigned int lang_selector=0;
 
 /// @brief Zmienna reprezentująca turmita. Inicjalizacja turmita na środku z kierunkiem "góra".
 #endif

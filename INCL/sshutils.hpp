@@ -1,6 +1,6 @@
 /** @file   sshutils.hpp
  *  @brief  Implementacja pomocniczych funkcji symshell-a w sposób już niezależny od platformy.
- * @date 2026-04-29 (last modification)
+ * @date 2026-04-30 (last modification)
 *   @details
 *          Napisane PRAWIE NIEOBIEKTOWO ale w C++
 *          Jest tu: print_width() , puste rect(), bar3D(), arrow() ...itp...
@@ -195,10 +195,14 @@ int ViewHtml(const char* url);
 // TODO int view_html(const char* url);
 }
 
+#ifndef lang
 ///@name Proste wsparcie dla interfejsu wielojęzycznego.
 ///@details Wybór łańcuchów tekstowych z jednego z dwóch albo trzech języków narodowych.
 /// @{
-extern unsigned lang_selector; ///< @brief Zmienna użytkownika dla zestawu funkcji `lang`.
+
+/// @brief Zmienna użytkownika dla zestawu funkcji `lang` albo `_lingo`.
+///        Wartość 0 oznacza język polski, 1 angielski, 2 nigdy nie była używana.
+extern unsigned lang_selector;
 
 MAYBE_UNUSED inline /// Wybór jednego z dwóch łańcuchów tekstowych na podstawie zmiennej `lang_selector`.
 const char* lang(const char* def,const char* alt)
@@ -208,6 +212,7 @@ MAYBE_UNUSED inline /// Wybór jednego z trzech łańcuchów tekstowych na podst
 const char* lang(const char* def,const char* alt1,const char* alt2)
 { if(lang_selector==2) return alt2;if(lang_selector==1)return alt1; else return def;}
 /// @}
+#endif
 
 /// @}
 

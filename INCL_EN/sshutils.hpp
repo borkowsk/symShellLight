@@ -1,6 +1,6 @@
 /** @file   sshutils.hpp
  * @brief  Implementation of auxiliary symshell functions in a platform-independent manner.
- * @date 2026-04-29 (last modification)
+ * @date 2026-04-30 (last modification)
 * @details
 *       Written ALMOST NON-OBJECT-ORIENTED but in C++
 *       Contains: print_width(), empty rect(), bar3D(), arrow() ...etc...
@@ -173,6 +173,7 @@ int ViewHtml(const char* url);
 // TODO `int view_html(const char* url);`
 }
 
+#ifndef lang
 /// @name Simple support for a multi-language interface.
 /// @details Selection of text strings from one of two or three national languages.
 /// @{
@@ -186,6 +187,7 @@ MAYBE_UNUSED inline  /// Selection of one of three text strings based on the `la
 const char* lang(const char* def,const char* alt1,const char* alt2)
 { if(lang_selector==2) return alt2; if(lang_selector==1) return alt1; else return def;}
 /// @}
+#endif
 
 /// @}
 

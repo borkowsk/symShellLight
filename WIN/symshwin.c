@@ -1,6 +1,6 @@
 /** @file
 *   @brief Implementacja najprostrzego interface-u wizualizacyjnego dla MS Windows 32.
-*   @date 2026-04-29 (last modification)
+*   @date 2026-04-30 (last modification)
 *           SYMSHELL IS A SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++
 *           ==================================================================
 *           Implementacja grafiki SYMSHELL-a dla Microsoft Windows.
@@ -45,7 +45,7 @@ extern int WB_error_enter_before_clean; /* For controlling a closing graphics wi
 #include "symshwin.h"       // prototypes specific to this application
 
 // Funkcja do uruchamiania menu kontekstowego zdefiniowana w "sshpopupmenu.c"  (do użycia w `MsgRButtonDown`)
-unsigned UseContextMenu(HWND hwnd, int x, int y, ssh_menu_item_definition* elementy, int liczbaElementow);
+long UseContextMenu(HWND hwnd, int x, int y, ssh_menu_item_definition* elementy, int liczbaElementow);
 
 #define OLD_COLOUR_SCALE (0)   //Skala kolorów jak na mapie fizycznej
 
@@ -2718,16 +2718,22 @@ LRESULT MsgRButtonDown(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
             _TREND
 
             // Funkcja do uruchamiania menu kontekstowego zdefiniowana w "sshpopupmenu.c"  (do uzycia w `MsgRButtonDown`)
-            unsigned ret=UseContextMenu(hwnd, xPos, yPos, context_menu_default, context_menu_default_size );
-            /*
-            InputXpos=xPos;
-            InputYpos=yPos;
-            InputClick=2;
-            MouseInput=1;
-            InputChar='\b';
-            */
-            InputChar = ret;
+            long ret=UseContextMenu(hwnd, xPos, yPos, context_menu_default, context_menu_default_size );
+
+            if(ret==-1 && is_mouse) //Zrezygnowano z obsługi. Może program ma swój pomysł na obsługę prawego klawisza.
+            {
+                InputXpos = xPos;
+                InputYpos = yPos;
+                InputClick = 2;
+                MouseInput = 1;
+                InputChar = '\b';
+            }
+            else
+            {
+                InputChar = ret;
+            }
         }
+
     return 0;
 }
 

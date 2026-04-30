@@ -1,8 +1,7 @@
 /** @file
  * @brief SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++ (PL Doxygen).
- * @date 2026-04-29 (last modification)
- *
- * \details
+ * @date 2026-04-30 (last modification)
+ * @details
  *      - Cały plik został znacząco zmieniony:     15.11.2020
  *      - Komentarze zostały znacząco rozbudowane: 01.03-04.2022
  *      - ... a potem zimą                         2025-2026
@@ -606,38 +605,21 @@ ssh_stat  repaint_area(ssh_coordinate* x,          /**< [out] Adres, na który w
 /* ========================== */
 
 /// @name TWORZENIE MENU KONTEKSTOWEGO
+/// @details Menu kontekstowe jest uruchamiane przez bibliotekę i jego wersja domyślna jest przez bibliotekę dostarczana.
+///          Można je podmienić na poziomie linkowania. Porównaj: "context_menu_default.c" i "Turmit.cpp".
 /// @{
 
-/** \brief Struktura do definiowania prostego menu. */
+/** \brief Struktura do definiowania prostego menu.
+ *         Wartości w `item_value` mogą być znakami ASCII albo kodami menu. Natomiast wartość ujemne oznaczają błędy i
+ *         nie powinny być używane, poza -1, które oznacza przekazanie obsługi z powrotem do programu jako naciśnięcie
+ *         prawego klawisza myszy. */
 typedef struct ssh_menu_item_definition {
     const char* item_text;  /**< Tekst linii menu. Może być też etykieta różniąca się tym, że wartość jest 0. */
     long long   item_value; /**< Wartość przekazywana poprzez funkcję `get_char`. Dla etykiet 0. */
 } ssh_menu_item_definition;
 
-/** \brief Struktura do przekazywania absolutnego położenia kliknięcia i innych danych do uruchomienia menu kontekstowego. */
-typedef struct ssh_basic_win_place_context {
-    unsigned long long ScrIdentifier; /**< Dane identyfikacji systemu wyświetlania. Np. Display handle w X11 */
-    unsigned long long WinIdentifier; /**< Dane identyfikacji wywołującego okna. Np. Window handle w X11 */
-    unsigned X; /**< Bezwzględne położenie `x` kursora w układzie wyświetlacza albo -1, gdy nie można obliczyć. */
-    unsigned Y; /**< Bezwzględne położenie `y` kursora w układzie wyświetlacza albo -1, gdy nie można obliczyć. */
-} ssh_basic_win_place_context;
-
-/** \brief Funkcja uruchamiająca kontekstowe menu po kliknięciu prawym klawiszem myszy.
- * \details Wywoływana z biblioteki, z pętli zdarzeń. Użytkownik biblioteki może zaproponować swoją wersję, a wersja
- *          domyślna znajduje się w odpowiednim katalogu źródłowym biblioteki, np. "X11/wb_context_menu_expected_rofi.c"
- * @param x - współrzędna pozioma kursora myszy.
- * @param y - współrzędna pionowa kursora myszy.
- * @param other_data - wskaźnik do rekordu danych użytkownika zawierającego co najmniej uchwyt Display i uchwyt okna.
- * @return 0 gdy menu nic nie zwróciło albo oczekujemy, że wynik wróci później jako message.
- *        -1 gdy funkcja zaniechała obsługi i kliknięcie ma być przekazane normalnej obsłudze w aplikacji (przez `\b`).
- *         Każda wartość dodatnia jest traktowana jako komunikat do zwrócenia przez funkcję `get_char`.
- *         Inna wartość ujemna powoduje wyświetlenie informacji o błędzie, ze sprawdzeniem wartości zmiennej `errno`.
- * @details Funkcja może być blokująca lub nieblokująca (np. odpalać osobny wątek). Podstawową implementację dostarcza
- *          biblioteka SYMSHELL, ale zdefiniowanie własnej przez użytkownika biblioteki blokuje linkowanie wersji domyślnej.
- */
-extern long long ssh_context_menu_expected(unsigned x, unsigned y, struct ssh_basic_win_place_context* other_data);
-
-/** \brief Domyślna definicja menu kontekstowego. W X11 dostarczana z biblioteki, ale można ją podmienić na poziomie linkowania.*/
+/** \brief Domyślna definicja menu kontekstowego.
+ *  Dostarczana z biblioteki, ale można ją podmienić na poziomie linkowania.*/
 extern ssh_menu_item_definition  context_menu_default[];
 
 /** \brief Liczba itemów w domyślnym menu kontekstowym. Musi towarzyszyć `context_menu_default`. */
@@ -653,9 +635,9 @@ extern int 			ssh_menu_trace/*=0*/;
 #endif
 
 #ifdef __cplusplus
-static_assert( sizeof(uchar8b)==1 , "Type `uchar8b` has more than 1 byte" ); //???
+static_assert( sizeof(uchar8b)==1 , "Type `uchar8b` has more than 1 byte?" ); //???
 
-/// @name FUNKCJE INLINE DOSTĘPNE SĄ TYLKO Z POZIOMU C++ !!!\n
+/// @name FUNKCJE INLINE DOSTĘPNE SĄ TYLKO Z POZIOMU C++ !!!
 ///@{
 
 //TODO namespace SYMSHELL ???

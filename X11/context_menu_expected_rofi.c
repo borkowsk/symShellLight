@@ -1,7 +1,7 @@
 /// @file
 /// @brief SymshellLight default implementation of `ssh_context_menu_expected` using rofi (blocking).
 //  Created by borkowsk on 16.04.26.
-/// @date 2026-04-21 (last modification)
+/// @date 2026-04-30 (last modification)
 
 #ifdef __cplusplus
 #error This file is only for pure "C" compilation.
@@ -13,7 +13,7 @@
 #include <string.h>
 #include <assert.h>
 #include "symshell.h"
-//#include "wb_context_menu_default.h"
+#include "context_menu_expected.h"
 
 /**< Z symshx11.c — maska poziomów śledzenia 1-msgs 2-grafika 3-grafika detaliczna 4-alokacje/zwalnianie */
 extern int    ssh_trace_level;
@@ -115,7 +115,7 @@ long long ssh_context_menu_expected(unsigned x, unsigned y, struct ssh_basic_win
         }
         else return -2;
     }
-    // To poniżej już bezużyteczne.
+    // To poniżej już bezużyteczne. Ale -1 może pojawić się jako kod w menu.
     // return -1; /* OBSŁUGA ZANIECHANA! Poślij dane domyślnej obsłudze `\b` */
 }
 

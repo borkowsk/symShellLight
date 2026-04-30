@@ -1,8 +1,7 @@
 /** @file
  * @brief SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++ (EN version).
- * @date 2026-04-29 (translated)
- *
- * \details
+ * @date 2026-04-30 (translated)
+ * @details
  *  - The whole file changed massively: 15.11.2020
  *  - Comments changed massively: 3-4.01.2022 and during winter 2026
  *  - Context menu (under X11 using _rofi_) added in 2026
@@ -605,39 +604,20 @@ ssh_stat  repaint_area(ssh_coordinate* x,          /**< [out] Address to write h
 /* ===================== */
 
 /// @name DEFINING THE CONTEXT MENU
+/// @details The context menu is triggered by the library, and its default version is provided by the library.
+///          It can be overridden at the linking level. See "context_menu_default.c" and "Turmit.cpp" example.
 /// @{
 
-/** \brief Structure for defining a simple menu. */
+/** \brief Structure for defining a simple menu.
+ *         Values in `item_value` can be ASCII characters or menu codes. Negative values indicate errors
+ *         and should not be used, except for -1, which passes the handling back to the program as a right-click.*/
 typedef struct ssh_menu_item_definition {
     const char* item_text;  /**< Menu line text. Can also be a label differing in that value is 0. */
     long long   item_value; /**< Value passed through `get_char()` function. For labels, 0. */
 } ssh_menu_item_definition;
 
-/** \brief Structure for passing absolute click position and other data to trigger a context menu. */
-typedef struct ssh_basic_win_place_context {
-    unsigned long long ScrIdentifier; /**< Display system identification data. E.g., Display handle in X11. */
-    unsigned long long WinIdentifier; /**< Calling window identification data. E.g., Window handle in X11. */
-    unsigned X; /**< Absolute horizontal `x` cursor position in display layout or -1 if cannot be calculated. */
-    unsigned Y; /**< Absolute vertical `y` cursor position in display layout or -1 if cannot be calculated. */
-} ssh_basic_win_place_context;
-
-/** @brief Function triggering a context menu after right-clicking.
- * @details Called from the library, from the event loop. The library user can propose their own version,
- *          and the default version is located in the appropriate library source directory,
- *          e.g., "X11/wb_context_menu_expected_rofi.c"
- * @param x - horizontal coordinate of the mouse cursor.
- * @param y - vertical coordinate of the mouse cursor.
- * @param other_data - pointer to user data record containing at least Display handle and window handle.
- * @return 0 when a menu returned nothing or we expect a result later as a message.
- *  -1 when function declined handling and click should be passed to normal application handling (via `\b`).
- *  Any positive value is treated as a message to be returned by the `get_char` function.
- *  Any other negative value causes error info display, checking the `errno` variable value.
- * @details Function can be blocking or non-blocking (e.g., fire a separate thread). Basic implementation
- *  is provided by the SYMSHELL library, but defining one's own by the library user blocks linking the default version.
- */
-extern long long ssh_context_menu_expected(unsigned x, unsigned y, struct ssh_basic_win_place_context* other_data);
-
-/** \brief Default context menu definition. In X11 provided from the library, but can be replaced at link level. */
+/** \brief Default context menu definition.
+ *  It is provided from the library, but can be replaced at link level. */
 extern ssh_menu_item_definition  context_menu_default[];
 
 /** \brief Number of items in the default context menu. Must accompany `context_menu_default`. */
@@ -653,7 +633,7 @@ extern int 			ssh_menu_trace/*=0*/;
 #endif
 
 #ifdef __cplusplus
-static_assert( sizeof(uchar8b)==1 , "Type `uchar8b` has more than 1 byte" ); //???
+static_assert( sizeof(uchar8b)==1 , "Type `uchar8b` has more than 1 byte?" ); //???
 
 // INLINE FUNCTIONS ARE ONLY AVAILABLE FROM C++ !!!
 //-------------------------------------------------

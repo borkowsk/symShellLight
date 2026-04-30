@@ -1,6 +1,6 @@
 /** @file symshx11.c
  *  @brief X11 implementation of SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++.
- *  @date 2026-04-27 (last modifications)
+ *  @date 2026-04-30 (last modifications)
  *          SYMSHELL IS A SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++
  *          ==================================================================
  *          Najprostszy interface wizualizacyjny zaimplementowany
@@ -46,6 +46,7 @@
 //#include "SYMSHELL/Xpm/xpm.h"
 
 #include "symshell.h"
+#include "context_menu_expected.h"
 #include "maybe_unused.h"
 #include "icon.h"
 

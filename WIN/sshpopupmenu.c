@@ -1,6 +1,6 @@
 /// @file
 /// @brief Implementacja Popup Menu w Windows.
-/// @date 2026-04-29 (created)
+/// @date 2026-04-30 (created)
 /// 
 /// Zadanie wymaga użycia kilku kluczowych funkcji WinAPI:
 /// `CreatePopupMenu`, `AppendMenu` oraz `TrackPopupMenu`.
@@ -50,7 +50,7 @@
 //    long long   item_value;  /**< Value passed through `get_char()` function. For labels, 0. */
 // } ssh_menu_item_definition;
 
-unsigned UseContextMenu(HWND hwnd, int x, int y, ssh_menu_item_definition* elementy, int liczbaElementow)
+long UseContextMenu(HWND hwnd, int x, int y, ssh_menu_item_definition* elementy, int liczbaElementow)
 {
     // 1. Tworzymy pusty kontener menu
     HMENU hMenu = CreatePopupMenu();

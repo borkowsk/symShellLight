@@ -7,7 +7,7 @@
 # Manually define WITHTESTS=true, if you want build test applications!
 #
 # (c)ISS UW, @author Wojciech Borkowski
-# @date 2026-04-29 (last update)
+# @date 2026-04-30 (last update)
 ##################################################################################
 
 cmake_minimum_required(VERSION 3.20)
@@ -114,7 +114,7 @@ if(X11) # only for X11 LIB
             "UTILS/error_enter_before_clean.c"
             "X11/context_menu_expected_rofi.c"
             "X11/context_menu_default.c"
-            "X11/context_menu_default.h"
+            "X11/context_menu_expected.h"
     )
 
     #target_compile_features(wbsyshX11 PUBLIC cxx_std_11)

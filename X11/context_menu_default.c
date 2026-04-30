@@ -1,7 +1,7 @@
 /// @file
 /// @brief Default context menu definition.
-//         ================================
-/// @date 2026-04-21 (last modification)
+/// @date 2026-04-30 (last modification)
+//        =================================
 // Created by borkowsk on 17.04.26.
 
 #ifdef __cplusplus
@@ -12,10 +12,11 @@
 //#include "wb_context_menu_default.h"
 
 /* Domyślna definicja menu kontekstowego/Default context menu definition.
- * (file: "context_menu_default.c") */
+ * Default context menu definition. */
 ssh_menu_item_definition  context_menu_default[]= {
-        {"HELP", 'H'}, //To nigdzie nie jest zaimplementowane.
+        //{"HELP", 'H'}, //To nigdzie nie jest zaimplementowane.
         {"DUMP", 'D'},
+        {"... ", -1 }, //Oddaj obsługę programowi (jak prawy klawisz myszy)
         {"QUIT", 'q'}
     };
 

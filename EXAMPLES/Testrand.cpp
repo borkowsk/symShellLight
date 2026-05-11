@@ -2,7 +2,7 @@
 /// @brief Random points in a resizable window/
 ///        Losowe punkty w oknie, którego rozmiar można zmieniać.
 //-------------------------------------------------------------------------
-/// @date 2026-04-24 (last update)
+/// @date 2026-05-11 (last update)
 /// @page page_e8_randpoints RANDOM POINTS/LOSOWE PUNKTY
 /// @brief Random points in a resizable window/Losowe punkty w oknie, którego rozmiar można zmieniać
 /// @section intro_sec_e8 Random points in a resizable window/Losowe punkty w oknie o zmiennym rozmiarze
@@ -17,7 +17,8 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cfloat>
-#define USES_STDC_RAND
+//#define USES_STDC_RAND
+#define USES_RANDG
 //#include "random.h"
 #include "wb_rand.hpp"
 #include "wb_cpucl.hpp"

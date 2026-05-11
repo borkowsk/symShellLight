@@ -1,0 +1,22 @@
+# Biblioteki x11 są wymagane tylko dla systemów Linux/macOS.
+# Dla Windows SYMSHELL używa natywnego GDI, więc nie wymaga dodatkowych pakietów.
+# @date 2026-05-11 (introduced)
+from conan import ConanFile
+
+class MyProjectConan(ConanFile):
+    settings = "os", "compiler", "build_type", "arch"
+    generators = "CMakeDeps", "CMakeToolchain"
+
+    def requirements(self):
+        # Na Linuxie potrzebujemy X11, ale nie chcemy wszystkiego
+        if self.settings.os == "Linux":
+            self.requires("xorg/system")
+            self.requires("libxpm/3.5.13")
+
+    def configure(self):
+        if self.settings.os == "Linux":
+            # Tutaj "oszukujemy" system, wyłączając zbędne moduły xorg, 
+            # jeśli przepis na to pozwala (zależy od wersji przepisu)
+            self.options["xorg"].with_xaw = False
+            self.options["xorg"].with_xinerama = False
+            # itd.

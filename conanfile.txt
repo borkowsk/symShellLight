@@ -1,0 +1,21 @@
+[requires]
+# @date 2026-05-11 (introduced)
+# --- SEKCJA BIBLIOTEK ---
+# Te biblioteki są wymagane tylko dla systemów Linux/macOS.
+# Windows używa natywnego GDI, więc nie wymaga dodatkowych pakietów.
+
+# Odkomentuj poniższe linie tylko jeśli budujesz na Linux/Unix.
+# Ale to może zmusić cię do instalacji wszystkich pakietów deweloperskich X11.
+# Alternatywnie odpal "_manage_X11_libs.sh", a potem "_check_installation", 
+# a potem twoje ulubione IDE do C++.
+
+#xorg/system
+#libxpm/3.5.13
+
+
+[generators]
+CMakeDeps
+CMakeToolchain
+
+[layout]
+cmake_layout

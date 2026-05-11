@@ -7,7 +7,7 @@
 # Manually define WITHTESTS=true, if you want build test applications!
 #
 # (c)ISS UW, @author Wojciech Borkowski
-# @date 2026-04-30 (last update)
+# @date 2026-05-11 (last update)
 ##################################################################################
 
 cmake_minimum_required(VERSION 3.30)
@@ -77,7 +77,7 @@ if(true) # SVG SYMSHELL LIB
             "UTILS/error_enter_before_clean.c"
          #  "UTILS/context_menu_expected_tmpl.c"
     )
-    #target_compile_features(wbsyshSVG PUBLIC cxx_std_11)
+    #target_compile_features(wbsyshLightSVG PUBLIC cxx_std_11)
 endif()
 
 if(X11) # only for X11 LIB
@@ -113,7 +113,8 @@ if(X11) # only for X11 LIB
             "UTILS/error_enter_before_clean.c"
     )
 
-    #target_compile_features(wbsyshX11 PUBLIC cxx_std_11)
+    #target_compile_features(wbsyshLight PUBLIC cxx_std_11)
+    target_link_libraries(wbsyshLight PRIVATE X11 Xpm)
 endif(X11)
 
 if(WINDOWS) # only for WINDOWS - NOT TESTED IN THIS VERSION (after 2016)
@@ -130,7 +131,7 @@ if(WINDOWS) # only for WINDOWS - NOT TESTED IN THIS VERSION (after 2016)
             "UTILS/error_enter_before_clean.c"
     )
 
-    #target_compile_features(wbsyshWIN PUBLIC cxx_std_11)
+    #target_compile_features(wbsyshLight PUBLIC cxx_std_11)
 endif(WINDOWS)
 
 # PRZYKŁAD ZEWNĘTRZNEGO PROJEKTU / EXTERNAL PROJECT EXAMPLE    #
@@ -170,9 +171,9 @@ if(X11 AND WITHTESTS ) #X11 tests
                   )
     add_executable("TestsymsX11"	"EXAMPLES/Testsyms.cpp"	)
     add_executable("TestsyshX11"	"EXAMPLES/Testsysh.cpp"	)
-    add_executable("TurmitX11"	    "EXAMPLES/Turmit.cpp"	)
-    add_executable("CAGasX11"	    "EXAMPLES/CAGas.cpp"	)
-    add_executable("LinktestX11"    "EXAMPLES/Linktest.cpp" )
+    add_executable("TurmitX11"		"EXAMPLES/Turmit.cpp"	)
+    add_executable("CAGasX11"		"EXAMPLES/CAGas.cpp"	)
+    add_executable("LinktestX11"	"EXAMPLES/Linktest.cpp" )
 
     # 3. Masowe ustawienie bibliotek i katalogu wyjściowego
     foreach(test_target ${X11_EXAMPLES})
@@ -185,7 +186,7 @@ if(X11 AND WITHTESTS ) #X11 tests
         )
 
         # Wspólne biblioteki dla wszystkich
-        target_link_libraries(${test_target} wbsyshLight X11 Xpm rt)
+        target_link_libraries(${test_target} wbsyshLight ) #rt już tu nie potrzebne.
     endforeach()
 
     # Specyficzny przypadek dla CAGas (dodatkowy pthread)
@@ -211,9 +212,9 @@ if( WINDOWS AND WITHTESTS ) #MS Windows tests
     )
 
     #2. Definicja źródeł (także dla tych z niestandardowymi plikami)
-    add_executable("TestmousWIN" "EXAMPLES/Testmous.cpp" )
-    add_executable("TestpaleWIN" "EXAMPLES/Testpale.cpp" )
-    add_executable("TestpolyWIN" "EXAMPLES/Testpoly.cpp" )
+    add_executable("TestmousWIN"	"EXAMPLES/Testmous.cpp" )
+    add_executable("TestpaleWIN"	"EXAMPLES/Testpale.cpp" )
+    add_executable("TestpolyWIN"	"EXAMPLES/Testpoly.cpp" )
     add_executable("TestrandWIN"
                    "EXAMPLES/Testrand.cpp"
                    "UTILS/RTM_LIGHT/wb_randg.c"
@@ -221,11 +222,11 @@ if( WINDOWS AND WITHTESTS ) #MS Windows tests
                    "WIN/symshmsc.rc"
                    "WIN/symshwin.ico"
                   )
-    add_executable("TestsymsWIN" "EXAMPLES/Testsyms.cpp" )
-    add_executable("TestsyshWIN" "EXAMPLES/Testsysh.cpp" )
-    add_executable("TurmitWIN"   "EXAMPLES/Turmit.cpp" )
-    add_executable("CAGasWIN"    "EXAMPLES/CAGas.cpp" )
-    add_executable("LinktestWIN" "EXAMPLES/Linktest.cpp" )
+    add_executable("TestsymsWIN"	"EXAMPLES/Testsyms.cpp" )
+    add_executable("TestsyshWIN"	"EXAMPLES/Testsysh.cpp" )
+    add_executable("TurmitWIN"		"EXAMPLES/Turmit.cpp" )
+    add_executable("CAGasWIN"		"EXAMPLES/CAGas.cpp" )
+    add_executable("LinktestWIN"	"EXAMPLES/Linktest.cpp" )
 
     # 3. Masowe ustawienie katalogu wyjściowego
     foreach(test_target ${WIN_EXAMPLES})
@@ -267,22 +268,22 @@ if(WITHTESTS) #SVG tests
     )
 
     #2. Definicja źródeł (także dla tych z niestandardowymi plikami)
-    add_executable("TestmousSVG" "EXAMPLES/Testmous.cpp"    )
-    add_executable("TestpaleSVG" "EXAMPLES/Testpale.cpp"    )
-    add_executable("TestpolySVG" "EXAMPLES/Testpoly.cpp"    )
+    add_executable("TestmousSVG"	"EXAMPLES/Testmous.cpp"    )
+    add_executable("TestpaleSVG"	"EXAMPLES/Testpale.cpp"    )
+    add_executable("TestpolySVG"	"EXAMPLES/Testpoly.cpp"    )
     add_executable("TestrandSVG"
                    "EXAMPLES/Testrand.cpp"
                    "UTILS/RTM_LIGHT/wb_randg.c"
                    "UTILS/RTM_LIGHT/wb_rand.cpp"
                   )
-    add_executable("TestsymsSVG" "EXAMPLES/Testsyms.cpp" )
-    add_executable("TestsyshSVG" "EXAMPLES/Testsysh.cpp" )
+    add_executable("TestsymsSVG"	"EXAMPLES/Testsyms.cpp" )
+    add_executable("TestsyshSVG"	"EXAMPLES/Testsysh.cpp" )
     add_executable("TurmitSVG"
                    "EXAMPLES/Turmit.cpp"
                    "EXAMPLES/Turmit_svgDefs.cpp"
                   )
-    add_executable("CAGasSVG"    "EXAMPLES/CAGas.cpp"    )
-    add_executable("LinktestSVG" "EXAMPLES/Linktest.cpp" )
+    add_executable("CAGasSVG"		"EXAMPLES/CAGas.cpp"    )
+    add_executable("LinktestSVG"	"EXAMPLES/Linktest.cpp" )
 
     # 3. Masowe ustawienie katalogu wyjściowego
     foreach(test_target ${SVG_EXAMPLES})

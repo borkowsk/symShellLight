@@ -1,7 +1,7 @@
 /// @file
 /// @brief SymshellLight default implementation of `ssh_context_menu_expected` using rofi (blocking).
 //  Created by borkowsk on 16.04.26.
-/// @date 2026-04-30 (last modification)
+/// @date 2026-09-17 (last modification)
 
 #ifdef __cplusplus
 #error This file is only for pure "C" compilation.
@@ -31,7 +31,7 @@ const char* command_tmpl=
                                 "placeholder:    \"abcd...\";\n"
                                 "}\n"
                         "window {\n"
-                                "width:          300px;\n"
+                                "width:          %dpx;\n"
                                 "border:         2px;\n"
                                 "border-radius:  10px;\n"
                                 "location: north west;\n"
@@ -42,8 +42,8 @@ const char* command_tmpl=
 
 /* BUFORY NA STRINGI KONIECZNE DO URUCHOMIENIA rofi */
 /* ================================================ */
-char menu_str[1024]; /**< Menu przetworzone na listę dla programu rofi. */
-char command[2048]; /**< Ostateczna treść komendy dla popen. */
+char menu_str[4096]; /**< Menu przetworzone na listę dla programu rofi. */
+char command[4096+1024]; /**< Ostateczna treść komendy dla popen. */
 char answer[1024]; /**< Bufor na odpowiedź z komendy. */
 
 /** Opakowanie dla popen z obsługą błędów wypisywaną na `stderr`.
@@ -70,6 +70,7 @@ static int run_popen(const char command[],char out_str[],size_t exp_size);
  */
 long long ssh_context_menu_expected(unsigned x, unsigned y, struct ssh_basic_win_place_context* other_data)
 {
+    int menu_width=200;
     if(other_data==NULL)
     {
         fprintf(stderr,"The default context menu launcher requires the other_data structure to be populated.\n");
@@ -89,14 +90,27 @@ long long ssh_context_menu_expected(unsigned x, unsigned y, struct ssh_basic_win
         fflush(stderr);
 
         *menu_str='\0'; // Początek "stakowania" definicji menu na string-u.
-        for(int i=0; i < context_menu_default_size; i++) {
-            strcat(menu_str, context_menu_default[i].item_text);
+        for(int i=0; i < context_menu_default_size; i++)
+        {
+            if(context_menu_default[i].item_text)
+            {
+                strcat(menu_str, context_menu_default[i].item_text);
+                unsigned long tmp = strlen(context_menu_default[i].item_text);
+                tmp*=11;
+                if(tmp>menu_width)
+                    menu_width=tmp;
+            }
+            else
+            {
+                strcat(menu_str,"NULL");
+            }
             strcat(menu_str,"\n");
-        }                                                                  assert(strlen(menu_str)<sizeof(menu_str));
+        }                                                                    assert(strlen(menu_str)<sizeof(menu_str));
 
         sprintf(command, command_tmpl,
                 menu_str,
                 context_menu_default_size,
+                menu_width,
                 other_data->X,
                 other_data->Y);                                              assert(strlen(command)<sizeof(command));
 
@@ -115,7 +129,7 @@ long long ssh_context_menu_expected(unsigned x, unsigned y, struct ssh_basic_win
         }
         else return -2;
     }
-    // To poniżej już bezużyteczne. Ale -1 może pojawić się jako kod w menu.
+    // To poniżej już bezużyteczne, ale -1 może pojawić się jako kod w menu.
     // return -1; /* OBSŁUGA ZANIECHANA! Poślij dane domyślnej obsłudze `\b` */
 }
 

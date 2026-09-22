@@ -1,12 +1,13 @@
 /** @file
- *  @brief DEFINITION of old style declaration of main icon.       */
-/*         =================================================       */
-/** @date 2026-04-21 (last modifications)                          */
-/*   VISIBLE BY symshx11.c IN VERY OLD X11 Window Managers ONLY!   */
-/* *************************************************************** */
+ *  @brief DEFINITION of old style declaration of main icon.       *
+ *         =================================================       *
+ ** @date 2026-09-22 (last modifications)                          *
+ *   VISIBLE BY symshx11.c IN VERY OLD X11 Window Managers ONLY!   *
+ * *************************************************************** */
 #include "icon.h"
 
-int basic_line_with=1;int WB_icon_bitmap_width=100;
+int basic_line_with=1;
+int WB_icon_bitmap_width=100;
 int WB_icon_bitmap_height=120;
 
 char WB_icon_bitmap_bits[] = {

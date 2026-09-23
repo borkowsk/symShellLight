@@ -64,7 +64,7 @@ message(STATUS "Setting RESOURCE_LANG to: ${RESOURCE_LANG}")
 
 if(true) # SVG SYMSHELL LIB
     add_library( wbsyshLightSVG STATIC
-            "SVG/symshsvg.cpp"
+            "SVG/symshsvg.cxx"
             "UTILS/sshdefs.c"
             "UTILS/sshutils.cpp"
             "UTILS/strtorgb.cpp"

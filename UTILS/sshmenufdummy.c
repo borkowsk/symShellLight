@@ -1,7 +1,7 @@
 /** @file
- *  @brief Atrapowa implementacja menu SYMSHELL i powiązanych funkcji. */
-/*         =========================================================== */
-/** @date 2026-04-21 (ostatnia modyfikacja)
+ *  @brief Atrapowa implementacja menu SYMSHELL i powiązanych funkcji.
+ *         ===========================================================
+ ** @date 2026-09-23 (ostatnia modyfikacja)
  *  @details Rodzaj "zaślepki", która pozwala na likowanie i w bezpieczny
  *           sposób nic nie robi. Wymagane dla prawidłowego linkowania
  *           pod X11 i SVG, gdzie teraz nie ma implementacji menu.

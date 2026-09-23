@@ -1,6 +1,6 @@
 /** @file   sshutils.hpp
  *  @brief  Implementacja pomocniczych funkcji symshell-a w sposób już niezależny od platformy.
- * @date 2026-04-30 (last modification)
+ * @date 2026-09-23 (last modification)
 *   @details
 *          Napisane PRAWIE NIEOBIEKTOWO ale w C++
 *          Jest tu: print_width() , puste rect(), bar3D(), arrow() ...itp...
@@ -42,9 +42,9 @@ inline NUM sqr(const NUM& x)
 { return x*x; }
 
 /// \brief Obliczanie odległości Euklidesa. Często potrzebne w takich programach.
-/// @note NIEINTUICYJNY UKŁAD PARAMETRÓW!
+/// @note NIEINTUICYJNY UKŁAD PARAMETRÓW! RACZEJ JUŻ NIEUŻYWANE.
 MAYBE_UNUSED
-double distance(double X1,double X2,double Y1,double Y2);
+double distance(double X1,double X2,double Y1,double Y2); //TODO Change name!!!
 
 /// \brief Alias dla typu `ssh_color`.
 /// \note W funkcjach rysujących modułu 'sshutils' używany jest kolor indeksowany.
@@ -82,11 +82,20 @@ unsigned strtorgb(const char *s, char **end_ptr);
  * @{
  */
 
-extern int def_frame_width; /* =1;*/                  ///< Domyślna grubość ramki.
-extern int def_cross_width; /* =5;*/                  ///< Domyślna szerokość krzyżyka.
-extern int def_scale_width; /* =10;*/                 ///< Domyślna szerokość skali.
-extern double def_arrow_size; /* =15;*/               ///< Domyślna długość grota strzałki.
-extern double def_arrow_theta; /*=M_PI/6.0+M_PI;*/    ///< Domyślne rozwarcie grota strzałki.
+/// Domyślna grubość ramki.
+extern int def_frame_width; /* =1;*/
+
+/// Domyślna szerokość krzyżyka.
+extern int def_cross_width; /* =5;*/
+
+/// Domyślna szerokość skali.
+extern int def_scale_width; /* =10;*/
+
+/// Domyślna długość grota strzałki.
+extern double def_arrow_size; /* =15;*/
+
+/// Domyślne rozwarcie grota strzałki.
+extern double def_arrow_theta; /*=M_PI/6.0+M_PI;*/
 
 /// \brief Struktura konfiguracji słupków 3D.
 struct settings_bar3d
@@ -136,6 +145,7 @@ MAYBE_UNUSED
 void bar3dRGB(int x,int y,int h,int R,int G,int B,int ShadowDiv);
 
 /// \brief  Rysuje kwadratową ramkę o zadanej grubości.
+/// \param x, y to współrzędne punktu startowego
 MAYBE_UNUSED
 void rect(int x1,int y1,int x2,int y2,wb_color frame_c,int width=def_frame_width);
 
@@ -148,10 +158,12 @@ MAYBE_UNUSED
 void ver_scale(int x1,int y1,int width=def_scale_width,wb_color start=0,wb_color end=255);
 
 /// \brief  Rysuje poziomą skalę kolorów.
+/// \param x1, y1 to współrzędne punktu startowego
 MAYBE_UNUSED
 void hor_scale(int x1,int y1,int high=def_scale_width,wb_color start=0,wb_color end=255);
 
 /// \brief  Rysuje krzyżyk.
+/// \param x, y to współrzędne punktu startowego
 MAYBE_UNUSED
 void cross(int x,int y,wb_color color,int line_width=def_cross_width);
 
@@ -169,8 +181,9 @@ MAYBE_UNUSED
 void vert_arrow(int x1,int x2,int y,wb_color color,double size=def_arrow_size);
 
 /// \brief  Efektywnie rysuje pionową strzałkę.
+/// \param x1, y1 to współrzędne punktu startowego
 MAYBE_UNUSED
-void hor_arrow(int x,int y1,int y2,wb_color  color,double size=def_arrow_size);
+void hor_arrow(int x1,int y1,int y2,wb_color  color,double size=def_arrow_size);
 
 /// \brief   Drukuje tekst w obszarze nie szerszym niż `max_width`.\
 /// \param x, y to współrzędne punktu startowego tekstu.
@@ -188,7 +201,7 @@ extern "C" {
 /// \details Tak naprawdę można użyć do wszystkich typów plików
 ///          , jakie może wyświetlić przeglądarka.
 /// \note Pochodzi z biblioteki WB_RTM, a w "sshutils.h" jest zadeklarowane dla wygody.
-/// \param URL - pełny URL, ale czasem ujdzie i nazwa pliku :-D ...
+/// \param URL - pełny URL, ale czasem ujdzie i prosta nazwa pliku.
 /// \return powinien zwrócić kod wykonania programu "dziecka".
 MAYBE_UNUSED
 int ViewHtml(const char* url);

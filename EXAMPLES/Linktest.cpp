@@ -1,18 +1,18 @@
 /// @file
-/// @brief Test linkowania podprogramów SYMSHELL'a.
-///        ----------------------------------------
-/// @date 2026-04-24 (last update)
-/// @author W.Borkowski: https://github.com/borkowsk
+/// @brief SYMSHELL library linking test./Test linkowania biblioteki SYMSHELL'a.
+/// @date 2026-09-23 (last update)
 /// @details
-/// ##Linking test for:
+/// Linking test for:
 ///     SYMSHELL.H - SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++
 ///     *****************************************************************
-/// ##HISTORY
+///
+/// HISTORY
 /// - Last changed massively:         22.06.2007
 /// - Comments edition:               19.11.2021
 /// - Small changes:                  06.02.2023
 /// - Cleaning for bi-lingual version    04.2026
 /// - Next...
+/// @author W.Borkowski: https://github.com/borkowsk
 
 #include "symshell.h"
 

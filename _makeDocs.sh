@@ -1,7 +1,7 @@
-#!/bin/sh
+#!/bin/bash
 #      DOXUMENTATION "MANAGER"
 # =================================
-# @date 2026-04-29 (modification)
+# @date 2026-09-23 (modification)
 #
 # Instalation of prerequisities under Ubuntu:
 # ===========================================
@@ -50,7 +50,7 @@ fi
 OPTIONS="Polski\nEnglish"
 
 # Wyświetlamy menu rofi i przechwytujemy wybór
-choice=$(echo "$OPTIONS" | rofi -dmenu -p "Język/language:" -i \
+choice=$(echo -e "$OPTIONS" | rofi -dmenu -p "Język/language:" -i \
     -theme-str 'window { width: 300px; border: 2px; border-radius: 15px; border-color: #444444; }' \
     -theme-str 'listview { lines: 2; scrollbar: false; }' \
     -theme-str 'element { border-radius: 10px; }')
@@ -82,7 +82,7 @@ case $choice in
         echo "English language selected."
         ;;        
     *)
-        echo "Nieprawidłowy wybór. Przerywam."
+        echo "Nieprawidłowy wybór. Przerywam./Invalid selection. Program halted."
         exit 1
         ;;
 esac

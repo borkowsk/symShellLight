@@ -1,11 +1,12 @@
 /// @file
-/// @brief Przykładowy program z reskalowaniem okna/Window rescaling example program.
-//         --------------------------------------------------------------------------
-/// @date 2026-04-26 (last update)
+/// @brief Window rescaling example program./Przykładowy program z reskalowaniem okna.
+//         ---------------------------------------------------------------------------
+/// @date 2026-09-23 (last update)
 //-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// @page page_e2_paleta SYMSHELL - RESKALOWALNA PALETA/RESCALABLE PALETTE
-/// @brief Program SYMSHELL'A z automatycznym reskalowaniem i funkcją odrysowywania/
-///        SYMSHELL application with automatic rescalling in replot function.
+/// @page page_e2_paleta SYMSHELL RESCALABLE PALETTE/RESKALOWALNA PALETA
+/// @brief SYMSHELL application with automatic rescaling in replot function./
+///        Program SYMSHELL'A z automatycznym reskalowaniem i funkcją odrysowywania
+///
 /// @section intro_sec_e2 Opis przykładu "Reskalowalna paleta"/Example description: "Rescalable palette"
 ///
 /// PL: Demonstruje skalowanie okna niezależne od aplikacyjnej strony programu

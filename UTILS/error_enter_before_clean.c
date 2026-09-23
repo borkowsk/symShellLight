@@ -1,7 +1,6 @@
 /// @file
-/// @brief Definicja flagi kończenia z zapytaniem.
-//        ****************************************
-/// @date 2026-04-21 (last modification)
+/// @brief Definicja flagi kończenia z zapytaniem./Definition of the query completion flag.
+/// @date 2026-09-23 (last modification)
 
 #include "symshell.h"
 

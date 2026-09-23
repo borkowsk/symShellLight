@@ -1,6 +1,6 @@
 /// @file
-/// @brief "Mrówka Langtona"/Langton Ant
-/// @date 2026-04-30 (last update)
+/// @brief Langton's Ant/"Mrówka Langtona"
+/// @date 2026-09-23 (last update)
 // -------------------------------------------------------------------------------
 #ifdef USE_ENGLISH_IF_POSSIBLE
 /// @page page_e7_turmit LANGTON'S ANT IMPLEMENTED IN SYMSHELL
@@ -15,8 +15,8 @@
 ///     a Turing machine.
 /// @include Turmit.cpp
 #else
-/// @page page_e7_turmit MRÓWKA LANGTONA ZAKODOWANA W SYMSHELL-u
-/// @brief Turmit prototypowy, łatwy do modyfikacji
+/// @page page_e7_turmit LANGTON'S ANT CODED IN SYMSHELL/MRÓWKA LANGTONA W SYMSHELL-u
+/// @brief Prototype Turmite, easy to modify/Turmit prototypowy, łatwy do modyfikacji
 ///
 /// @section intro_sec_e7 Opis przykładu "Mrówka Langtona"
 ///     Prosta obsługa grafiki, ale z odtwarzaniem ekranu i obsługą zdarzeń

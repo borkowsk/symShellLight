@@ -1,7 +1,7 @@
 /// @file
-/// @brief Linux handling of context menu.
-/// @date 2026-04-30 (last modification)
-//        ===============================
+/// @brief Linux handling of a context menu.
+/// @date 2026-09-23 (last modification)
+//        ==================================
 // Created by borkowsk on 17.04.26.
 #ifndef SYMSHELLLIGHT_WB_CONTEXT_MENU_DEFAULT_H
 #define SYMSHELLLIGHT_WB_CONTEXT_MENU_DEFAULT_H
@@ -12,10 +12,11 @@
 extern "C" {
 #endif
 
+/* ZADEKLAROWANE W symshell.h : */
 /* Domyślna definicja menu kontekstowego. Dostarczana z biblioteki, ale można ją podmienić na poziomie linkowania.*/
-//extern ssh_menu_item_definition  context_menu_default[];
+/* extern ssh_menu_item_definition  context_menu_default[]; */
 /* Liczba itemów w domyślnym menu kontekstowym. Musi towarzyszyć `context_menu_default`. */
-//extern unsigned context_menu_default_size;
+/* extern unsigned context_menu_default_size; */
 
 #ifdef USE_ENGLISH_IF_POSSIBLE
 /** \brief Structure for passing absolute click position and other data to trigger a context menu. */
@@ -57,8 +58,8 @@ typedef struct ssh_basic_win_place_context {
  * @param x - współrzędna pozioma kursora myszy w układzie obszaru roboczego okna X11.
  * @param y - współrzędna pionowa kursora myszy w układzie obszaru roboczego okna X11.
  * @param other_data - wskaźnik do rekordu danych użytkownika zawierającego co najmniej uchwyt Display i uchwyt okna.
- * @return 0 gdy menu nic nie zwróciło albo oczekujemy, że wynik wróci później jako message.
- *        -1 gdy funkcja zaniechała obsługi i kliknięcie ma być przekazane normalnej obsłudze w aplikacji (przez `\b`).
+ * @return 0, gdy menu nic nie zwróciło albo oczekujemy, że wynik wróci później jako message.
+ *        -1, gdy funkcja zaniechała obsługi i kliknięcie ma być przekazane normalnej obsłudze w aplikacji ( przez `\b` ).
  *         Każda wartość dodatnia jest traktowana jako komunikat do zwrócenia przez funkcję `get_char`.
  *         Inna wartość ujemna powoduje wyświetlenie informacji o błędzie, ze sprawdzeniem wartości zmiennej `errno`.
  * @details Funkcja może być blokująca lub nieblokująca (np. odpalać osobny wątek). Podstawową implementację dostarcza

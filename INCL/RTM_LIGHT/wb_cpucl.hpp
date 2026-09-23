@@ -1,6 +1,6 @@
 /// \file wb_cpucl.hpp
 /// \brief Klasa stopera liczącego czas CPU
-/// @date 2026-04-30 (last modification)
+/// @date 2026-09-23 (last modification)
 /// \author borkowsk
 /// \warning OBSOLETE
 /// @note Jeśli używasz biblioteki `SymShellLight` razem z pełną wersją WB_RTM to upewnij się, czy ten plik i jego
@@ -10,16 +10,23 @@
 #ifndef __CPU_CLOCK_HPP_
 #define __CPU_CLOCK_HPP_
 
+/// Makro określające czy będą definiowane operatory strumieni i/o.
 #define USES_IOSTREAM
-#include <time.h>
+
+#ifdef USES_IOSTREAM
 #include <iostream>
+#endif
+
+#include <time.h>
 #include "asserted.h"
 #include "maybe_unused.h"
 
 /// \namespace wbrtm \brief WOJCIECH BORKOWSKI RUN TIME LIBRARY.
 namespace wbrtm {
+#ifdef USES_IOSTREAM
     using std::ostream;
     using std::istream;
+#endif
 
     /// \brief   Klasa stopera liczącego czas CPU.
     /// \details Liczy czas od momentu utworzenia lub wywołania `reset` do chwili pobrania wartości za pomocą "operator `double`".
@@ -85,15 +92,15 @@ namespace wbrtm {
 
     };
 
-    /// Wymuszanie eleganckiego wypisywania na strumień w wersji dosyć generalnej.
-    class  MAYBE_UNUSED pretty
+    /// Wymuszanie eleganckiego wypisywania "clockera" na strumień w wersji dosyć generalnej.
+    class MAYBE_UNUSED pretty
     {
         const wb_cpu_clock& what;
     public:
         /// Konstruktor rejestruje referencje do "clockera".
         pretty(const wb_cpu_clock& iw):what(iw){}
     friend
-        /// Wypisanie "wartości" klasy na strumień.
+        /// Wypisanie na strumień "wartości" klasy wymuszającej formatowanie.
         ostream& operator << (ostream& o, const pretty& c)
         {
             c.what.PrettyPrint(o);

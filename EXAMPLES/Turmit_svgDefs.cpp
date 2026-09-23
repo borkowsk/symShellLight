@@ -1,7 +1,8 @@
 /// @file
-/// @brief Alternatywna konfiguracja modułu SVG dla przykładu "Turmit".
+/// @brief
 ///        EN: Alternative SVG module configuration for the "Turmit" example.
-/// @date 2026-04-27 (modified)
+///        PL: Alternatywna konfiguracja modułu SVG dla przykładu "Turmit".
+/// @date 2026-09-23 (modified)
 //        -------------------------------------------------------------------
 // Created by borkowsk on 26.04.26.
 //

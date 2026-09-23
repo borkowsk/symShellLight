@@ -1,6 +1,6 @@
 /** @file
  * @brief SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++ (EN version).
- * @date 2026-04-30 (translated)
+ * @date 2026-09-23 (translated)
  * @details
  *  - The whole file changed massively: 15.11.2020
  *  - Comments changed massively: 3-4.01.2022 and during winter 2026
@@ -613,7 +613,7 @@ ssh_stat  repaint_area(ssh_coordinate* x,          /**< [out] Address to write h
  *         and should not be used, except for -1, which passes the handling back to the program as a right-click.*/
 typedef struct ssh_menu_item_definition {
     const char* item_text;  /**< Menu line text. Can also be a label differing in that value is 0. */
-    long long   item_value; /**< Value passed through `get_char()` function. For labels, 0. */
+    long long   item_value; /**< Value passed through `get_char()` function. For labels use 0. */
 } ssh_menu_item_definition;
 
 /** \brief Default context menu definition.

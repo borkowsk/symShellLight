@@ -1,7 +1,6 @@
 /** @file
- * @brief Implementacja funkcji interpretującej string jako wartość RGB.                             */
-/*        ****************************************************************************************** */
-/// @date 2026-04-21 (last modification)
+ * @brief Implementacja funkcji interpretującej string jako wartość RGB.
+ * @date 2026-09-23 (last modification) */
 
 #include <cctype>
 #include <cstdlib>
@@ -119,7 +118,7 @@ unsigned strtorgb(const char *s, char **end_ptr)
 /* *******************************************************************/
 /*                   SYMSHELLLIGHT  version 2026                     */
 /* *******************************************************************/
-/*            THIS CODE IS DESIGNED & COPYRIGHT  BY:                 */
+/*            THIS CODE IS DESIGNED & COPYRIGHT BY:                  */
 /*             W O J C I E C H   B O R K O W S K I                   */
 /*     Instytut Studiów Społecznych Uniwersytetu Warszawskiego       */
 /*     WWW: https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI  */

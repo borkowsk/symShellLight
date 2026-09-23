@@ -1,11 +1,11 @@
 /** @file symshx11.c
  *  @brief X11 implementation of SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++.
- *  @date 2026-04-30 (last modifications)
+ *  @date 2026-09-23 (last modifications)
  *          SYMSHELL IS A SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++
  *          ==================================================================
  *          Najprostszy interface wizualizacyjny zaimplementowany
  *          pod X-windows za pomocą biblioteki X11.
- *          Używany conajmniej do 1997 roku.
+ *          Używany co najmniej od 1997 roku.
  *
  *          Ostatnie duże zmiany: 21.10.2020 oraz 04.2026.
  *

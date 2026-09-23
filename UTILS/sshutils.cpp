@@ -1,7 +1,7 @@
 /** @file
  *  @brief Implementacja pomocniczych funkcji Symshell'a w sposób juz niezależny od platformy. */
 /*         =================================================================================== */
-/** @date 2026-04-21 (last modification)                                                       */
+/** @date 2026-09-23 (last modification)                                                       */
 /** \details
  * Napisane NIEOBIEKTOWO, ale w C++
  * Jest tu: print_width() , rect(), bar3D(), cross(), *_arrow(), distance() ...itp...          */
@@ -31,15 +31,15 @@
 
 using namespace std;
 
-// Funkcja ta drukuje w obszarze nie większym niż 'maxwidth' z justowaniem.
+// Funkcja ta drukuje w obszarze nie większym niż 'max_width' z justowaniem.
 // Sekwencje określające justowanie muszą być na początku i są to:
 // %@L - left , %@R - right oraz %@C - center.
 // Wewnętrzny bufor ma nie więcej niż 1024 znaki.
 MAYBE_UNUSED
-int print_width(int x,int y,int maxwidth,wb_color col,wb_color bcg,const char* format ...)
+int print_width(int x, int y, int max_width, wb_color col, wb_color bcg, const char* format ...)
 {
-    const size_t BUFSIZE=1024;
-    char bufor[BUFSIZE];
+    const size_t BUF_SIZE=1024;
+    char bufor[BUF_SIZE];
     char  yust='L';
     int   width=0; //Skalkulowana szerokość tekstu
 
@@ -52,7 +52,7 @@ if(strchr(format,'%')!=nullptr) //Są jakieś znaki formatujące
     {
     va_list list;
     va_start(list,format); //??? undeclared identifier?
-    if(vsprintf(bufor,format,list)>=BUFSIZE)
+    if(vsprintf(bufor,format,list) >= BUF_SIZE)
         {
         errno=ENOMEM;
         perror("print_width internal bufor exceed");
@@ -60,23 +60,23 @@ if(strchr(format,'%')!=nullptr) //Są jakieś znaki formatujące
     }
     else
     {
-    strcpy(bufor,format);	
+    strcpy(bufor,format);
     }
 
-while( (width=string_width(bufor)) >maxwidth ) // Gdy za mało miejsca
+while((width=string_width(bufor)) > max_width ) // Gdy za mało miejsca
         {
         int size=strlen(bufor);
         if(size==1) break;
         bufor[size-2]='*';
         bufor[size-1]='\0';
         }
-//rect(x,y,x+maxwidth,y+string_height(bufor),128); //DEBUG
-if(width<=maxwidth)
+//rect(x,y,x+max_width,y+string_height(bufor),128); //DEBUG
+if(width <= max_width)
     {
     switch(yust){
     case 'L':printc(x,y,col,bcg,"%s",bufor);break;
-    case 'R':printc((x+maxwidth)-width,y,col,bcg,"%s",bufor);break;
-    case 'C':printc(x+maxwidth/2-width/2-1,y,col,bcg,"%s",bufor);break;
+    case 'R':printc((x + max_width) - width, y, col, bcg, "%s", bufor);break;
+    case 'C':printc(x + max_width / 2 - width / 2 - 1, y, col, bcg, "%s", bufor);break;
     default:
         ;	}
     return width;

@@ -1,9 +1,9 @@
 /** @file   sshutils.hpp
  * @brief  Implementation of auxiliary symshell functions in a platform-independent manner.
- * @date 2026-04-30 (last modification)
+ * @date 2026-09-23 (last modification)
 * @details
 *       Written ALMOST NON-OBJECT-ORIENTED but in C++
-*       Contains: print_width(), empty rect(), bar3D(), arrow() ...etc...
+*       Contains: print_width(), empty rect(), bar3D(), arrow(), etc.
 * @author borkowsk                                                                               */
 /* ********************************************************************************************* */
 #ifndef SYMSHELL_UTILS_HPP_INCLUDED_
@@ -31,7 +31,7 @@
 
 /**
  * @defgroup SymShellUtilsEN Various additional tools for graphics
- * \brief    Defined colors, additional shapes and other auxiliary functionalities.
+ * \brief    Defined colors, additional shapes, and other auxiliary functionalities.
  */
 /// @{
 
@@ -80,17 +80,25 @@ unsigned strtorgb(const char *s, char **end_ptr);
  * @details Configuration values for frames, crosses, arrows, etc...
  * @{
  */
+/// Default frame thickness.
+extern int def_frame_width; /* =1;*/
 
-extern int def_frame_width; /* =1;*/                  ///< Default frame thickness.
-extern int def_cross_width; /* =5;*/                  ///< Default cross width.
-extern int def_scale_width; /* =10;*/                 ///< Default scale width.
-extern double def_arrow_size; /* =15;*/               ///< Default arrow head length.
-extern double def_arrow_theta; /*=M_PI/6.0+M_PI;*/    ///< Default arrow head opening angle.
+/// Default width of "cross".
+extern int def_cross_width; /* =5;*/
+
+/// Default scale width.
+extern int def_scale_width; /* =10;*/
+
+/// Default arrow head length.
+extern double def_arrow_size; /* =15;*/
+
+/// Default arrow head opening angle.
+extern double def_arrow_theta; /*=M_PI/6.0+M_PI;*/
 
 /// \brief Configuration structure for 3D bars.
 struct settings_bar3d
 {
-    ///Constructor for the 3D bar configuration structure.
+    /// Constructor for the 3D bar configuration structure.
     settings_bar3d(
             int ia=10,
             int ib=10,
@@ -115,38 +123,48 @@ const settings_bar3d* bar3d_config(settings_bar3d* st);
 /** @} */
 
 /// \brief  Draws a 3D bar using indexed colors.
+/// \param x, y starting point coordinates
 MAYBE_UNUSED
 void bar3d(int x,int y,int h,wb_color col1,wb_color col2);
 
 /// \brief  Draws a 3D bar in RGB color with a shadow.
+/// \param x, y starting point coordinates
 MAYBE_UNUSED
 void bar3dRGB(int x,int y,int h,int R,int G,int B,int ShadowDiv);
 
 /// \brief  Draws a square frame with a specified thickness.
+/// \param x1, y1 starting point coordinates
 MAYBE_UNUSED
 void rect(int x1,int y1,int x2,int y2,wb_color frame_c,int width=def_frame_width);
 
 /// \brief  Draws a vertical color scale.
+/// \param x1, y1 starting point coordinates
 MAYBE_UNUSED
 void ver_scale(int x1,int y1,int width=def_scale_width,wb_color start=0,wb_color end=255);
 
 /// \brief  Draws a horizontal color scale.
+/// \param x1, y1 starting point coordinates
 MAYBE_UNUSED
 void hor_scale(int x1,int y1,int high=def_scale_width,wb_color start=0,wb_color end=255);
 
 /// \brief  Draws a cross.
+/// \param x, y starting point coordinates
 MAYBE_UNUSED
 void cross(int x,int y,wb_color color,int line_width=def_cross_width);
 
 /// \brief  Draws a freely oriented arrow from point x1,y1 to x2,y2.
+/// \param x1, y1 starting point coordinates
+/// \param x2, y2 target point coordinates
 MAYBE_UNUSED
 void arrow(int x1,int y1,int x2,int y2,wb_color color,double size=def_arrow_size,double theta=def_arrow_theta);
 
 /// \brief  Efficiently draws a horizontal arrow.
+/// \param x1, y starting point coordinates
 MAYBE_UNUSED
 void vert_arrow(int x1,int x2,int y,wb_color color,double size=def_arrow_size);
 
 /// \brief  Efficiently draws a vertical arrow.
+/// \param x, y1 starting point coordinates
 MAYBE_UNUSED
 void hor_arrow(int x,int y1,int y2,wb_color  color,double size=def_arrow_size);
 

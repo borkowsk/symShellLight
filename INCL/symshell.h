@@ -1,6 +1,6 @@
 /** @file
  * @brief SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++ (PL Doxygen).
- * @date 2026-04-30 (last modification)
+ * @date 2026-09-23 (last modification)
  * @details
  *      - Cały plik został znacząco zmieniony:     15.11.2020
  *      - Komentarze zostały znacząco rozbudowane: 01.03-04.2022
@@ -615,7 +615,7 @@ ssh_stat  repaint_area(ssh_coordinate* x,          /**< [out] Adres, na który w
  *         prawego klawisza myszy. */
 typedef struct ssh_menu_item_definition {
     const char* item_text;  /**< Tekst linii menu. Może być też etykieta różniąca się tym, że wartość jest 0. */
-    long long   item_value; /**< Wartość przekazywana poprzez funkcję `get_char`. Dla etykiet 0. */
+    long long   item_value; /**< Wartość przekazywana poprzez funkcję `get_char`. Dla etykiet używaj 0. */
 } ssh_menu_item_definition;
 
 /** \brief Domyślna definicja menu kontekstowego.
@@ -626,7 +626,7 @@ extern ssh_menu_item_definition  context_menu_default[];
 extern unsigned context_menu_default_size;
 
 /** \brief Zmienna określająca poziom debugging-u funkcji menu. */
-extern int 			ssh_menu_trace/*=0*/;
+extern int      ssh_menu_trace/*=0*/;
 
 /// @}
 

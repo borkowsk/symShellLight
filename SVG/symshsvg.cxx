@@ -1,6 +1,7 @@
 /** @file
- *  @brief                      SYMSHELL SVG IMPLEMENTATION
- *  @date 2026-04-30 (last modification)
+ *  @brief      SYMSHELL SVG IMPLEMENTATION (cxx extension is used intentionally!)
+ *  @date 2026-09-23 (last modification)
+ *  @details
  *              SYMSHELL IS A SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++
  *              ==================================================================
  **             Simplest graphics interface implemented for SVG vector graphics.
@@ -8,9 +9,9 @@
  **             into an SVG file when `flush_screen()` is called.
  **             Also `dump_screen()` produces an SVG file.
  **
- ** \note       This source file was changed massively: 17.11.2020, 17.12.2021 and 04.2026.
+ ** @note       This source file was changed massively: 17.11.2020, 17.12.2021 and 04.2026.
  **
- ** \author     Designed by W. Borkowski from the University of Warsaw
+ ** @author     Designed by W. Borkowski from the University of Warsaw
  **
  *  ## See also
  **     *          https://www.researchgate.net/profile/WOJCIECH_BORKOWSKI

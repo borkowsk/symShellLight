@@ -1,7 +1,7 @@
 /// @file
 /// @brief Example SYMSHELL program with "replot" function/
 ///        Przykładowy program SYMSHELL'A z funkcją "replot"
-/// @date 2026-04-24 (last update)
+/// @date 2026-09-25 (last update)
 //-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// @page page_e5_replot SYMSHELL TEST WITH Replot
 /// @brief SYMSHELL program with large redraw function/Program SYMSHELL'A z dużą funkcją odrysowywania
@@ -9,10 +9,10 @@
 /// @section intro_sec_e5 Description of the example "Using replot()"/Opis przykładu "Użycie replot()"
 ///
 /// EN: Includes a `replot` function that redraws the main pattern and simulates the actual simulation ;-)
-/// in the form of drawing growing bars interrupted by user actions.
+/// in the form of drawing growing circles interrupted by user actions.
 ///
 /// PL: Zawiera funkcje `replot` odrysowująca główny wzorek oraz symulacje rzeczywistej symulacji ;-)
-/// w postaci rysowania rosnących kołek przerywanego akcjami użytkownika.
+/// w postaci rysowania rosnących kółek przerywanego akcjami użytkownika.
 /// @include Testsyms.cpp
 //-/////////////////////////////////////////////////////////////////////////////////////////
 
@@ -84,8 +84,8 @@ int main(int argc,const char* argv[])
             switch(tab)
             {
             case '\0': /* do nothing */ break;
-            case '@':					//Manual spell to fire replot()
-            case '\r':replot();break;	//Systematic code to fire of replot()
+            case '@':					//Manual spell to fire `replot()`
+            case '\r':replot();break;	//Systematic code to fire of `replot()`
             case '\b':get_mouse_event(&xpos,&ypos,&click); //Handling a use_mouse event
                 if(click&0x1)
                     set_char('X');

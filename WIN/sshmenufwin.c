@@ -1,9 +1,9 @@
 /** @file
  *  @brief IMPLEMENTATION FOR SYMSHELL MENU AND RELATED FEATURES
- *  @date 2026-04-29 (last modification)                          */
-/*  ************************************************************* */
+ *  @date 2026-09-25 (last modification)                          */
 
-#if defined(_MSC_VER) || defined(__MSWINDOWS__) 
+#if defined(_MSC_VER) || defined(__MSWINDOWS__)
+
 #include <windows.h> //bo Menu itp
 #include <assert.h>
 #include "sshmenuf.h"

@@ -1,6 +1,6 @@
 /** \file   sshmenuf.h
 *  \brief INTERFEJS DLA MENU SYMSHELL I POWIĄZANYCH FUNKCJI.
-*  @date 2026-04-29 (ostatnia modyfikacja)
+*  @date 2026-09-25 (ostatnia modyfikacja)
 *  \warning TYLKO DLA MS WINDOWS. W innym przypadku dostarczana jest wersja pusta (zaślepka).
 *  \note Wersja Unix używająca Motif jest przestarzała.
 *  \note Pod X11 dostępne jest menu podręczne (popup) używające _rofi_, a pod Windows natywne.
@@ -28,7 +28,7 @@
 extern "C" {
 #endif
 
-    /** \brief Zmienia tytuł okna. */
+    /** \brief Zmienia tytuł okna. Przestarzałe i zastąpione przez `set_title`.*/
     int ssh_set_window_name(const char* WindowName);
 
     /** \brief Typ uchwytu do menu. */

@@ -7,7 +7,7 @@
 # Manually define WITHTESTS=true, if you want build test applications!
 #
 # (c)ISS UW, @author Wojciech Borkowski
-# @date 2026-09-23 (last update)
+# @date 2026-09-25 (last update)
 ##################################################################################
 
 cmake_minimum_required(VERSION 3.20)
@@ -65,14 +65,18 @@ message(STATUS "Setting RESOURCE_LANG to: ${RESOURCE_LANG}")
 if(true) # SVG SYMSHELL LIB
     add_library( wbsyshLightSVG STATIC
             "SVG/symshsvg.cxx"
+            "SVG/symshsvgdef.c"
+            "SVG/symshsvgdef.h"
+
             "UTILS/sshdefs.c"
             "UTILS/sshutils.cpp"
             "UTILS/strtorgb.cpp"
             "UTILS/wieloboki.cpp"
-            "UTILS/viewHtmlPchar.cpp"
+
             "UTILS/sshmenufdummy.c" #dummy functions of menus
-            "SVG/symshsvgdef.c"
-            "SVG/symshsvgdef.h"
+            "UTILS/sshsetwinname.c" #dummy sh_set_window_name()
+
+            "UTILS/RTM_LIGHT/viewHtmlPchar.cpp"
             "UTILS/RTM_LIGHT/wb_pchar.cpp"
             "UTILS/error_enter_before_clean.c"
          #  "UTILS/context_menu_expected_tmpl.c"
@@ -100,15 +104,19 @@ if(X11) # only for X11 LIB
     add_library( wbsyshLight STATIC
             "X11/symshx11.c"
             "X11/wbx11ico.c"
+            "X11/context_menu_expected_rofi.c"
+            "X11/context_menu_default.c"
+            "X11/context_menu_expected.h"
+
             "UTILS/sshdefs.c"
             "UTILS/sshutils.cpp"
             "UTILS/strtorgb.cpp"
             "UTILS/wieloboki.cpp"
-            "UTILS/viewHtmlPchar.cpp"
+
             "UTILS/sshmenufdummy.c" #dummy functions of menus
-            "X11/context_menu_expected_rofi.c"
-            "X11/context_menu_default.c"
-            "X11/context_menu_expected.h"
+            "UTILS/sshsetwinname.c" #dummy sh_set_window_name()
+
+            "UTILS/RTM_LIGHT/viewHtmlPchar.cpp"
             "UTILS/RTM_LIGHT/wb_pchar.cpp"
             "UTILS/error_enter_before_clean.c"
     )
@@ -120,13 +128,15 @@ endif(X11)
 if(WINDOWS) # only for WINDOWS - NOT TESTED IN THIS VERSION (after 2016)
     add_library( wbsyshLight STATIC
             "WIN/symshwin.c"
-            "UTILS/sshutils.cpp"
-            "UTILS/strtorgb.cpp"
-            "UTILS/wieloboki.cpp"
-            "UTILS/viewHtmlPchar.cpp"
             "WIN/sshmenufwin.c" #real functions for MS Windows menus.
             "WIN/context_menu_default.c"
             "WIN/sshpopupmenu.c"
+
+            "UTILS/sshutils.cpp"
+            "UTILS/strtorgb.cpp"
+            "UTILS/wieloboki.cpp"
+            "UTILS/RTM_LIGHT/viewHtmlPchar.cpp"
+
             "UTILS/RTM_LIGHT/wb_pchar.cpp"
             "UTILS/error_enter_before_clean.c"
     )

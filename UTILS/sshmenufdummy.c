@@ -1,7 +1,7 @@
 /** @file
  *  @brief Atrapowa implementacja menu SYMSHELL i powiązanych funkcji.
  *         ===========================================================
- ** @date 2026-09-23 (ostatnia modyfikacja)
+ ** @date 2026-09-25 (ostatnia modyfikacja)
  *  @details Rodzaj "zaślepki", która pozwala na likowanie i w bezpieczny
  *           sposób nic nie robi. Wymagane dla prawidłowego linkowania
  *           pod X11 i SVG, gdzie teraz nie ma implementacji menu.
@@ -13,16 +13,6 @@
 // Pełno tutaj nieużywanych parametrów.
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "UnusedParameter"
-
-// Ustala tekst nazwy okna w jego belce
-// \param WindowName - nowa nazwa.
-// \return TRUE - success!
-// \note Wygląda, że stało się redundantne z nowszą funkcją set_title()
-MAYBE_UNUSED
-int ssh_set_window_name(const char* WindowName)
-{
-    return 0;
-}
 
 // Normalnie tworzy/koduje uchwyt do głównego menu, który powinien być raczej niezerowy.
 // Zatem zero wskazuje, że nie należy tego używać.
@@ -44,7 +34,7 @@ ssh_menu_handle ssh_sub_menu(ssh_menu_handle hMenu, unsigned Position)
 MAYBE_UNUSED
 unsigned ssh_get_item_position(ssh_menu_handle hMenu, const char* ItemName)
 {
-    return 3;// dlaczego 3?
+    return 3; // TODO dlaczego akurat 3?
 }
 
 // Dodaje item do menu

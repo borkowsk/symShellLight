@@ -18,7 +18,7 @@ Wyodrębnione z pełnej wersji w celach dydaktycznych i naukowych.
 >PL: Pliki nagłówkowe, umieszczone dotychczas w katalogu głównym repozytorium zostały od stycznia 2026 przeniesione 
 >do katalogu INCL (albo INCL_EN). Musicie poprawić tę ścieżkę w waszych projektach!
 
-<img src="./DOC/renovation.gif" width="100" title="Under renovation">
+<img src="./DOC/renovation.gif" width="300" title="Under renovation">
 
 **HISTORICAL OUTLINE/RYS HISTORYCZNY**
 

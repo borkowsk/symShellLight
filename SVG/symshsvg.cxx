@@ -1,6 +1,6 @@
 /** @file
  *  @brief      SYMSHELL SVG IMPLEMENTATION (cxx extension is used intentionally!)
- *  @date 2026-09-23 (last modification)
+ *  @date 2026-09-28 (last modification)
  *  @details
  *              SYMSHELL IS A SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++
  *              ==================================================================
@@ -73,8 +73,10 @@ using namespace wbrtm;
 //#define STR(x) STR_HELPER(x)
 //#define WB_FUNCTION_NAME_  ("SYMSHSVG_" STR( __LINE__ ) )
 #define WB_FUNCTION_NAME_  __FUNCTION__
+#define MAYBE_UNUSED 
 #else
-#define WB_FUNCTION_NAME_  __func__ //C11
+#define WB_FUNCTION_NAME_  __func__   //C11
+#define MAYBE_UNUSED [[maybe_unused]] //C++17
 #endif
 
 /** @name Zmienne eksportowane na zewnątrz */
@@ -82,13 +84,13 @@ using namespace wbrtm;
 /** @} */
 extern "C" {
     // Identyfikator zalinkowanego modułu
-    [[maybe_unused]] const char *_ssh_grx_module_name="SVG";
+    MAYBE_UNUSED const char *_ssh_grx_module_name="SVG";
 
     // Maska poziomów śledzenia 1-msgs 2-grafika 3-grafika detaliczna 4-alokacje/zwalnianie
-    [[maybe_unused]] int         ssh_trace_level = 0;
+    MAYBE_UNUSED int         ssh_trace_level = 0;
 
     // "Dummy window" handler for check and external use.
-    [[maybe_unused]]  unsigned long   _ssh_window=0;
+    MAYBE_UNUSED  unsigned long long   _ssh_window=0;
 
     // Myszy w SVG domyślnie nie ma, ale inny moduł może ją symulować przez linkowanie do tych zmiennych globalnych.
     int         GrMouseX = -1; //< Pozycja X symulowanej myszy.
@@ -381,14 +383,14 @@ namespace {
 /* Operacje konfiguracyjne o działaniu gwarantowanym przed inicjacją */
 
 // Ustalanie innego tytułu okna niż nazwa aplikacji.
-[[maybe_unused]]
+MAYBE_UNUSED
 void set_title(const char* window_name)
 {
     strncpy(ScreenHeader,window_name,1023);
 }
 
 // Obsługa parametrów wywołania programu.
-[[maybe_unused]]
+MAYBE_UNUSED
 void shell_setup(const char* title, int iArgc, const char* iArgv[])
 {
     if(ssh_trace_level>0) //shell_setup
@@ -492,7 +494,7 @@ ssh_stat init_plot(ssh_natural  a, ssh_natural   b,                 /* ile pikse
 
     GrClosed = false;
 
-    _ssh_window=(unsigned long int)&GrList; //Czy to użyteczne to nie wiadomo, ale przynajmniej nie jest 0.
+    _ssh_window=(unsigned long long)&GrList; //Czy to użyteczne to nie wiadomo, ale przynajmniej nie jest 0.
                                             //Bo 0 wskazywałoby, że inicjacja grafiki się nie powiodła.
     cerr<<GrScreenWi<<"x"<<GrScreenHi<<"-N:"<<N<<":"<<maxN<<endl;
 
@@ -512,7 +514,7 @@ void close_plot()
 }
 
 // Przełączanie buforowanie okna. Może nie zadziałać wywołane po inicjacji.
-[[maybe_unused]]
+MAYBE_UNUSED
 void buffering_setup(int Yes)
 {
     /// \internal W module SVG aktualnie nie robi nic poza ewentualnym wyświetleniem na konsolę śladu użycia.
@@ -523,7 +525,7 @@ void buffering_setup(int Yes)
 }
 
 // Czy symulować niezmienność rozmiarów okna?
-[[maybe_unused]]
+MAYBE_UNUSED
 void fix_size(int Yes)
 {
     /// \internal W module SVG aktualnie nie robi nic poza ewentualnym wyświetleniem na konsolę śladu użycia.
@@ -534,7 +536,7 @@ void fix_size(int Yes)
 }
 
 // Zawieszenie wykonania programu na pewną liczbę milisekund.
-[[maybe_unused]]
+MAYBE_UNUSED
 void delay_ms(unsigned ms)
 {
     /// \internal
@@ -547,7 +549,7 @@ void delay_ms(unsigned ms)
 }
 
 // Zawieszenie wykonania programu na pewną liczbę mikrosekund.
-[[maybe_unused]]
+MAYBE_UNUSED
 void delay_us(unsigned us)
 {
     /// \internal
@@ -563,7 +565,7 @@ void delay_us(unsigned us)
  ************************************************************** */
 
 // Ustala czy mysz ma być obsługiwana.
-[[maybe_unused]]
+MAYBE_UNUSED
 int mouse_activity(ssh_mode Yes)
 {
     if(ssh_trace_level>0) cout << "SVG: " << WB_FUNCTION_NAME_ << SEP; //mouse_activity
@@ -574,7 +576,7 @@ int mouse_activity(ssh_mode Yes)
 }
 
 // Ustala index koloru do czyszczenia tła.
-[[maybe_unused]]
+MAYBE_UNUSED
 void set_background(ssh_color c)
 {
     /// \internal
@@ -588,7 +590,7 @@ void set_background(ssh_color c)
  * ********************************************************* */
 
 // Czyści ekran lub ekran wirtualny. Zależnie czy jest buforowanie, czy nie.
-[[maybe_unused]]
+MAYBE_UNUSED
 void clear_screen()
 {
     /// \internal
@@ -602,7 +604,7 @@ void clear_screen()
 }
 
 // Czyszczenie optymalizujące. \return 1 always
-[[maybe_unused]]
+MAYBE_UNUSED
 int invalidate_screen()
 {
     /// \internal
@@ -617,7 +619,7 @@ int invalidate_screen()
 }
 
 // Włącza drukowanie tekstu bez zamazywania tła/lub z.
-[[maybe_unused]]
+MAYBE_UNUSED
 ssh_mode     print_transparently(ssh_mode Yes)
 {
     if(ssh_trace_level>2) cout << "SVG: " << WB_FUNCTION_NAME_ << SEP; //print_transparently
@@ -629,7 +631,7 @@ ssh_mode     print_transparently(ssh_mode Yes)
 
 // Ustala szerokość linii. Szerokie linie mogą być kosztowne (?).
 // Zwraca ustawienie poprzednie.
-[[maybe_unused]]
+MAYBE_UNUSED
 ssh_natural     line_width(ssh_natural width)
 {
     if(ssh_trace_level>2) cout << "SVG: " << WB_FUNCTION_NAME_ << SEP; //line_width
@@ -653,7 +655,7 @@ ssh_natural     line_width(ssh_natural width)
 }
 
 // Ustala styl rysowania linii: `SSH_LINE_SOLID`, `SSH_LINE_DOTTED`, `SSH_LINE_DASHED`
-[[maybe_unused]]
+MAYBE_UNUSED
 ssh_mode    line_style(ssh_mode Style)
 {
     if(ssh_trace_level>2) cout << "SVG: " << WB_FUNCTION_NAME_ << SEP; //line_style
@@ -664,7 +666,7 @@ ssh_mode    line_style(ssh_mode Style)
 }
 
 // Ustala stosunek nowego rysowania do starej zawartości ekranu.
-[[maybe_unused]]
+MAYBE_UNUSED
 ssh_mode    put_style(ssh_mode Style)
 {
     /// \internal W module SVG nie ma efektu. TODO SVG put_style?
@@ -674,7 +676,7 @@ ssh_mode    put_style(ssh_mode Style)
 }
 
 // Zmienia definicje pojedynczego koloru indeksowanego.
-[[maybe_unused]]
+MAYBE_UNUSED
 void set_rgb(ssh_color color,ssh_intensity r,ssh_intensity g,ssh_intensity b)
 {
     /// \internal
@@ -692,7 +694,7 @@ void set_rgb(ssh_color color,ssh_intensity r,ssh_intensity g,ssh_intensity b)
 }
 
 // Zmienia definicje pojedynczego odcienia szarości w palecie szarości.
-[[maybe_unused]]
+MAYBE_UNUSED
 void set_gray(ssh_color shade,ssh_intensity intensity)
 {
     /// \internal
@@ -710,7 +712,7 @@ void set_gray(ssh_color shade,ssh_intensity intensity)
 }
 
 // Ustala aktualny kolor linii za pomocą indeksu do palety.
-[[maybe_unused]]
+MAYBE_UNUSED
 void set_pen(ssh_color c,ssh_natural line_width, ssh_mode Style)
 {
     /// \internal
@@ -746,7 +748,7 @@ void set_pen(ssh_color c,ssh_natural line_width, ssh_mode Style)
 }
 
 // Ustala aktualny kolor linii za pomocą składowych RGB.
-[[maybe_unused]]
+MAYBE_UNUSED
 void set_pen_rgb(ssh_intensity r,ssh_intensity g, ssh_intensity b,
                  ssh_natural line_width,ssh_mode Style)
 {
@@ -779,7 +781,7 @@ void set_pen_rgb(ssh_intensity r,ssh_intensity g, ssh_intensity b,
 }
 
 // Ustala aktualny kolor linii za pomocą składowych RGBA.
-[[maybe_unused]]
+MAYBE_UNUSED
 void set_pen_rgba(ssh_intensity r,ssh_intensity g,ssh_intensity b,ssh_intensity a,
                   ssh_natural line_width,ssh_mode style)
 {
@@ -810,7 +812,7 @@ void set_pen_rgba(ssh_intensity r,ssh_intensity g,ssh_intensity b,ssh_intensity 
 }
 
 // Ustala aktualny kolor wypełnień za pomocą typu ssh_color.
-[[maybe_unused]]
+MAYBE_UNUSED
 void set_brush(ssh_color c)
 {
     /// \internal
@@ -823,7 +825,7 @@ void set_brush(ssh_color c)
 }
 
 // Ustala aktualny kolor wypełnień za pomocą składowych RGB.
-[[maybe_unused]]
+MAYBE_UNUSED
 void set_brush_rgb(ssh_intensity r,ssh_intensity g,ssh_intensity b)
 {
     /// \internal
@@ -838,7 +840,7 @@ void set_brush_rgb(ssh_intensity r,ssh_intensity g,ssh_intensity b)
 }
 
 // Ustala aktualny kolor wypełnień za pomocą składowych RGBA.
-[[maybe_unused]]
+MAYBE_UNUSED
 void set_brush_rgba(ssh_intensity r,ssh_intensity g,ssh_intensity b,
                    ssh_intensity a)
 {
@@ -855,7 +857,7 @@ void set_brush_rgba(ssh_intensity r,ssh_intensity g,ssh_intensity b,
  * **************************************************** */
 
 // Zwraca `1`, jeśli okno graficzne (lub wirtualne) jest buforowane.
-[[maybe_unused]]
+MAYBE_UNUSED
 ssh_mode  buffered()
 {
     /// \internal W przypadku implementacji SVG zawsze zwraca 1
@@ -865,7 +867,7 @@ ssh_mode  buffered()
 }
 
 // Sprawdza, czy okno ma zafiksowana wielkość?
-[[maybe_unused]]
+MAYBE_UNUSED
 ssh_mode fixed()
 {
     /// \internal W przypadku implementacji SVG zawsze zwraca SSH_YES
@@ -875,7 +877,7 @@ ssh_mode fixed()
 }
 
 // Aktualny kolor tła.
-[[maybe_unused]]
+MAYBE_UNUSED
 ssh_color background()
 {
     if(ssh_trace_level>2) cout << "SVG: " << WB_FUNCTION_NAME_ << SEP << "return " << curr_background; //background
@@ -884,7 +886,7 @@ ssh_color background()
 }
 
 // Aktualna grubość linii.
-[[maybe_unused]]
+MAYBE_UNUSED
 ssh_natural get_line_width()
 {
     if(ssh_trace_level>2) cout << "SVG: " << WB_FUNCTION_NAME_ << SEP << "return " << GrLineWidth; //get_line_width
@@ -893,7 +895,7 @@ ssh_natural get_line_width()
 }
 
 // Aktualny kolor linii jako ssh_color (indeks).
-[[maybe_unused]]
+MAYBE_UNUSED
 ssh_color get_pen()
 {
     /// \internal W przypadku implementacji SVG zawsze zwraca -1.
@@ -903,7 +905,7 @@ ssh_color get_pen()
 }
 
 // Aktualny kolor wypełnień jako `ssh_color`.
-[[maybe_unused]]
+MAYBE_UNUSED
 ssh_color get_brush()
 {
     /// \internal
@@ -916,7 +918,7 @@ ssh_color get_brush()
 
 // Aktualne rozmiary pionowe okna z init_plot po przeliczeniach...
 // Oraz ewentualnych zmianach uczynionych "ręcznie" przez operatora.
-[[maybe_unused]]
+MAYBE_UNUSED
 ssh_natural screen_height()
 {
     if(ssh_trace_level>2) cout << "SVG: " << WB_FUNCTION_NAME_ << SEP << "return " << GrScreenHi; //screen_height
@@ -926,7 +928,7 @@ ssh_natural screen_height()
 
 // Aktualne rozmiary poziome okna z init_plot po przeliczeniach...
 // Oraz ewentualnych zmianach uczynionych "ręcznie" przez operatora.
-[[maybe_unused]]
+MAYBE_UNUSED
 ssh_natural screen_width()
 {
     if(ssh_trace_level>2) cout << "SVG: " << WB_FUNCTION_NAME_ << SEP << "return " << GrScreenWi; //screen_width
@@ -936,7 +938,7 @@ ssh_natural screen_width()
 
 // Aktualne rozmiary znaku — wysokość.
 // Potrzebne do pozycjonowania tekstu.
-[[maybe_unused]]
+MAYBE_UNUSED
 ssh_natural char_height(char znak)
 {
     if(ssh_trace_level>2) cout << "SVG: " << WB_FUNCTION_NAME_ << SEP << znak << SEP << "return " << GrFontHi; //char_height
@@ -946,7 +948,7 @@ ssh_natural char_height(char znak)
 
 // Aktualne rozmiary znaku — szerokość.
 // Potrzebne do pozycjonowania tekstu.
-[[maybe_unused]]
+MAYBE_UNUSED
 ssh_natural char_width(char znak)
 {
     if(ssh_trace_level>2) cout << "SVG: " << WB_FUNCTION_NAME_ << SEP << znak << SEP << "return " << GrFontWi; //char_width
@@ -956,7 +958,7 @@ ssh_natural char_width(char znak)
 
 // Aktualne rozmiary wyświetlania całego łańcucha znaków — wysokość.
 // Tu zazwyczaj może być to samo co `char_height`.
-[[maybe_unused]]
+MAYBE_UNUSED
 ssh_natural string_height(const char* str)
 {
     if(ssh_trace_level>2) cout << "SVG: " << WB_FUNCTION_NAME_ << SEP ; //string_height
@@ -966,7 +968,7 @@ ssh_natural string_height(const char* str)
 
 // Aktualne rozmiary wyświetlania całego łańcucha znaków — szerokość.
 // W najgorszym razie odpowiednia wielokrotność `char_width`
-[[maybe_unused]]
+MAYBE_UNUSED
 ssh_natural string_width(const char* str)
 {
     if(ssh_trace_level>2) cout << "SVG: " << WB_FUNCTION_NAME_ << SEP; //string_width
@@ -979,7 +981,7 @@ ssh_natural string_width(const char* str)
  * ******************************* */
 
 // Wyświetla tekst w kolorach użytkownika wybranych z palety.
-[[maybe_unused]]
+MAYBE_UNUSED
 void printc(int x, int y,ssh_color fore, ssh_color back,const char* format, ...)
 {
     //extern int GrPrintTransparently; // = 0;
@@ -1015,7 +1017,7 @@ void printc(int x, int y,ssh_color fore, ssh_color back,const char* format, ...)
 }
 
 // Drukuje czarno na białym.
-[[maybe_unused]]
+MAYBE_UNUSED
 void printbw(int x,int y,const char* format,...)
 {
     // extern int GrPrintTransparently; // = 0;
@@ -1051,7 +1053,7 @@ void printbw(int x,int y,const char* format,...)
 }
 
 // Drukuje w kolorach domyślnych pen & brush.
-[[maybe_unused]]
+MAYBE_UNUSED
 void print_d(ssh_coordinate x,ssh_coordinate y,const char* format,...)
 {
     //extern int GrPrintTransparently; // = 0;
@@ -1088,7 +1090,7 @@ void print_d(ssh_coordinate x,ssh_coordinate y,const char* format,...)
 
 
 //  Drukuje w kolorze RBG na tle z palety.
-[[maybe_unused]]
+MAYBE_UNUSED
 void print_rgb(int x, int y,unsigned r, unsigned g, unsigned b,ssh_color back,const char* format, ... )
 {
     // extern int GrPrintTransparently; // = 0;
@@ -1128,7 +1130,7 @@ void print_rgb(int x, int y,unsigned r, unsigned g, unsigned b,ssh_color back,co
  * **************** */
 
 // Wyświetlenie punktu na ekranie (wirtualnym) w kolorze domyślnym pisaka.
-[[maybe_unused]]
+MAYBE_UNUSED
 void plot_d(ssh_coordinate x, ssh_coordinate y)
 {
     if(ssh_trace_level>2) cout << "SVG: " << WB_FUNCTION_NAME_ << SEP << SEP; //plot
@@ -1183,7 +1185,7 @@ void plot_rgb(ssh_coordinate x, ssh_coordinate y,                       /* Wspó
 }
 
 // Wypełnia powodziowo lub algorytmem siania w kolorze indeksowanym.
-[[maybe_unused]]
+MAYBE_UNUSED
 void fill_flood(ssh_coordinate x, ssh_coordinate y, ssh_color fill, ssh_color border)
 {
     /// \internal Jednak SVG chyba tego nie ma? TODO CHECK ?
@@ -1206,7 +1208,7 @@ void fill_flood(ssh_coordinate x, ssh_coordinate y, ssh_color fill, ssh_color bo
 }
 
 // Wypełnia powodziowo lub algorytmem siania w kolorze RGB.
-[[maybe_unused]]
+MAYBE_UNUSED
 void fill_flood_rgb(int x,int y,int rf,int gf,int bf,int rb,int gb,int bb)
 {
     /// \internal Jednak SVG chyba tego nie ma? TODO CHECK ?
@@ -1296,7 +1298,7 @@ void circle_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r)
 }
 
 // Wyświetlenie elipsy w kolorze ustawionego pisaka (także rgb).
-[[maybe_unused]]
+MAYBE_UNUSED
 void ellipse_d(ssh_coordinate x,ssh_coordinate y, ssh_natural a, ssh_natural b)
 {
     if(ssh_trace_level>2) cout << "SVG: " << WB_FUNCTION_NAME_ << SEP; //circle_d
@@ -1317,7 +1319,7 @@ void ellipse_d(ssh_coordinate x,ssh_coordinate y, ssh_natural a, ssh_natural b)
 }
 
 // Wyświetlenie elipsy w kolorze indeksowanym.
-[[maybe_unused]]
+MAYBE_UNUSED
 void ellipse(ssh_coordinate x,ssh_coordinate y, ssh_natural a, ssh_natural b, ssh_color c)
 {
     if(ssh_trace_level>2) cout << "SVG: " << WB_FUNCTION_NAME_ << SEP; //circle_d
@@ -1340,7 +1342,7 @@ void ellipse(ssh_coordinate x,ssh_coordinate y, ssh_natural a, ssh_natural b, ss
 }
 
 // Wyświetlenie okręgu w kolorze z palety.
-[[maybe_unused]]
+MAYBE_UNUSED
 void circle(ssh_coordinate x,ssh_coordinate y,ssh_natural r,ssh_color c)
 {
     if(ssh_trace_level>2) cout << "SVG: " << WB_FUNCTION_NAME_ << SEP << SEP; //circle
@@ -1365,7 +1367,7 @@ void circle(ssh_coordinate x,ssh_coordinate y,ssh_natural r,ssh_color c)
 }
 
 // Wyświetlenie koła w kolorach domyślnych (pen & fill — także rgb).
-[[maybe_unused]]
+MAYBE_UNUSED
 void fill_circle_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r)
 {
     if(ssh_trace_level>2) cout << "SVG: " << WB_FUNCTION_NAME_ << SEP; //fill_circle_d
@@ -1392,7 +1394,7 @@ void fill_circle_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r)
 }
 
 // Wypełnienie elipsy w kolorach domyślnych (pen & fill — także rgb).
-[[maybe_unused]]
+MAYBE_UNUSED
 void fill_ellipse_d(ssh_coordinate x, ssh_coordinate y, ssh_natural a, ssh_natural b)
 {
     if(ssh_trace_level>2) cout << "SVG: " << WB_FUNCTION_NAME_ << SEP; //fill_circle_d
@@ -1419,7 +1421,7 @@ void fill_ellipse_d(ssh_coordinate x, ssh_coordinate y, ssh_natural a, ssh_natur
 }
 
 // Wyświetlenie koła w kolorze c z palety
-[[maybe_unused]]
+MAYBE_UNUSED
 void fill_circle(ssh_coordinate x,ssh_coordinate y,ssh_natural r,
                  ssh_color c)
 {
@@ -1448,7 +1450,7 @@ void fill_circle(ssh_coordinate x,ssh_coordinate y,ssh_natural r,
 }
 
 // Wypełnienie elipsy kolorem c z palety.
-[[maybe_unused]]
+MAYBE_UNUSED
 void fill_ellipse(ssh_coordinate x, ssh_coordinate y, ssh_natural a, ssh_natural b, ssh_color c)
 {
     if(ssh_trace_level>2) cout << "SVG: " << WB_FUNCTION_NAME_ << SEP; //fill_circle
@@ -1474,7 +1476,7 @@ void fill_ellipse(ssh_coordinate x, ssh_coordinate y, ssh_natural a, ssh_natural
 }
 
 
-[[maybe_unused]]
+MAYBE_UNUSED
 void arc_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r,            /*rysuje łuk kołowy o promieniu r*/
            ssh_radian start,ssh_radian stop)
 {
@@ -1483,7 +1485,7 @@ void arc_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r,            /*rysuje 
 }
 
 
-[[maybe_unused]]
+MAYBE_UNUSED
 void arc(ssh_coordinate x,ssh_coordinate y,ssh_natural r,
            ssh_radian start,ssh_radian stop,ssh_color c)               /* w kolorze c */
 {
@@ -1492,7 +1494,7 @@ void arc(ssh_coordinate x,ssh_coordinate y,ssh_natural r,
 }
 
 
-[[maybe_unused]]
+MAYBE_UNUSED
 void earc_d(ssh_coordinate x,ssh_coordinate y,                         /*rysuje łuk eliptyczny */
             ssh_natural a,ssh_natural b,                               /* o półosiach `a` i `b` */
             ssh_radian start,ssh_radian stop)
@@ -1502,7 +1504,7 @@ void earc_d(ssh_coordinate x,ssh_coordinate y,                         /*rysuje 
 }
 
 
-[[maybe_unused]]
+MAYBE_UNUSED
 void earc(ssh_coordinate x,ssh_coordinate y,
           ssh_natural a,ssh_natural b,
           ssh_radian start,ssh_radian stop,ssh_color c)               /* w kolorze c */
@@ -1512,7 +1514,7 @@ void earc(ssh_coordinate x,ssh_coordinate y,
 }
 
 
-[[maybe_unused]]
+MAYBE_UNUSED
 void fill_arc_d(ssh_coordinate x, ssh_coordinate y, ssh_natural r,       /* wypełnia łuk kołowy o promieniu r*/
                 ssh_radian start, ssh_radian stop, ssh_bool pie)         /* początek i koniec łuku */
 {
@@ -1521,7 +1523,7 @@ void fill_arc_d(ssh_coordinate x, ssh_coordinate y, ssh_natural r,       /* wype
 }
 
 
-[[maybe_unused]]
+MAYBE_UNUSED
 void fill_arc(ssh_coordinate x, ssh_coordinate y, ssh_natural r,         /* wirtualny środek i promień łuku */
               ssh_radian start, ssh_radian stop, ssh_bool pie, ssh_color c)            /* w kolorze c */
 {
@@ -1530,7 +1532,7 @@ void fill_arc(ssh_coordinate x, ssh_coordinate y, ssh_natural r,         /* wirt
 }
 
 
-[[maybe_unused]]
+MAYBE_UNUSED
 void fill_earc_d(ssh_coordinate x, ssh_coordinate y,                    /* wypełnia łuk eliptyczny */
                  ssh_natural a, ssh_natural b,                          /* o półosiach `a` i `b` */
                  ssh_radian start, ssh_radian stop, ssh_bool pie)       /* początek i koniec łuku */
@@ -1540,7 +1542,7 @@ void fill_earc_d(ssh_coordinate x, ssh_coordinate y,                    /* wype�
 }
 
 
-[[maybe_unused]]
+MAYBE_UNUSED
 void fill_earc(ssh_coordinate x, ssh_coordinate y,                      /* wirtualny środek łuku */
                ssh_natural a, ssh_natural b,                            /* o półosiach `a` i `b` */
                ssh_radian start, ssh_radian stop, ssh_bool pie, ssh_color c)           /* w kolorze `c` */
@@ -1550,7 +1552,7 @@ void fill_earc(ssh_coordinate x, ssh_coordinate y,                      /* wirtu
 }
 
 // Wypełnienie prostokąta kolorem rgb.
-[[maybe_unused]]
+MAYBE_UNUSED
 void fill_rect_rgb(ssh_coordinate x1,ssh_coordinate y1,
                    ssh_coordinate x2,ssh_coordinate y2,
                    ssh_intensity r,ssh_intensity g,ssh_intensity b)  /* w kolorze rbg określonym składowymi koloru */
@@ -1579,7 +1581,7 @@ void fill_rect_rgb(ssh_coordinate x1,ssh_coordinate y1,
 }
 
 // Wypełnia prostokąt w kolorach domyślnych (pen & fill).
-[[maybe_unused]]
+MAYBE_UNUSED
 void fill_rect_d(ssh_coordinate x1, ssh_coordinate y1, ssh_coordinate x2, ssh_coordinate y2)
 {
     if(ssh_trace_level>2) cout << "SVG: " << WB_FUNCTION_NAME_ << SEP; //fill_rect_d
@@ -1606,7 +1608,7 @@ void fill_rect_d(ssh_coordinate x1, ssh_coordinate y1, ssh_coordinate x2, ssh_co
 }
 
 // Wypełnia prostokąt w kolorze z palety.
-[[maybe_unused]]
+MAYBE_UNUSED
 void fill_rect(ssh_coordinate x1, ssh_coordinate y1, ssh_coordinate x2, ssh_coordinate y2, ssh_color c)
 {
     if(ssh_trace_level>2) cout << "SVG: " << WB_FUNCTION_NAME_ << SEP; //fill_rect
@@ -1634,7 +1636,7 @@ void fill_rect(ssh_coordinate x1, ssh_coordinate y1, ssh_coordinate x2, ssh_coor
 }
 
 // Wypełnia wielokąt przesunięty o vx, vy w kolorach domyślnych (pen & fill).
-[[maybe_unused]]
+MAYBE_UNUSED
 void fill_poly_d(ssh_coordinate vx, ssh_coordinate vy,
                  const ssh_point points[], ssh_length n_of_points)
 {
@@ -1668,7 +1670,7 @@ void fill_poly_d(ssh_coordinate vx, ssh_coordinate vy,
 
 
 // Wypełnia wielokąt przesunięty o vx, vy kolorem z palety
-[[maybe_unused]]
+MAYBE_UNUSED
 void fill_poly(ssh_coordinate vx, ssh_coordinate vy,
                const ssh_point points[], ssh_length n_of_points,
                ssh_color c)
@@ -1707,7 +1709,7 @@ namespace {
 
 /// Wewnętrzna implementacja termicznej skali kolorów.
 ///  Czyli wypełnienie palety RGB dla kolorów indeksowanych.
-    [[maybe_unused]]
+    MAYBE_UNUSED
     static void SetScale() {
 #ifndef M_PI
         const double M_PI=3.141595;
@@ -2257,7 +2259,7 @@ i nazwy pliku wykonywalnego.
  **/
 
 // Funkcja sprawdza, czy jest do odczytania jakieś zdarzenie wejściowe
-[[maybe_unused]]
+MAYBE_UNUSED
 ssh_mode input_ready()
 {
     if(ssh_trace_level>2) cout << "SVG: " << WB_FUNCTION_NAME_ << SEP << GrCharMessage << endl; //input_ready
@@ -2268,7 +2270,7 @@ ssh_mode input_ready()
 }
 
 // Funkcja odczytywania znaków sterowania i zdarzeń.
-[[maybe_unused]]
+MAYBE_UNUSED
 ssh_msg get_char()
 {
     /// \internal W module SVG nigdy nie staje na tej funkcji jak przy zwykłym oknie
@@ -2285,7 +2287,7 @@ ssh_msg get_char()
 }
 
 // Odesłanie znaku na wejście.
-[[maybe_unused]]
+MAYBE_UNUSED
 ssh_stat set_char(ssh_msg c)
 {
     if(ssh_trace_level>2) cout << "SVG: " << WB_FUNCTION_NAME_ << SEP << c << endl; //set_char
@@ -2299,7 +2301,7 @@ ssh_stat set_char(ssh_msg c)
 }
 
 // Funkcja odczytująca ostatnie zdarzenie myszy.
-[[maybe_unused]]
+MAYBE_UNUSED
 ssh_stat get_mouse_event(ssh_coordinate *xpos, ssh_coordinate *ypos, ssh_coordinate *click)
 {
     if(ssh_trace_level>1) cout << "SVG: " << WB_FUNCTION_NAME_ << endl; //get_mouse_event
@@ -2315,7 +2317,7 @@ ssh_stat get_mouse_event(ssh_coordinate *xpos, ssh_coordinate *ypos, ssh_coordin
 }
 
 // Podaje obszar okna (/ekranu wirtualnego), który ma byc odrysowany
-[[maybe_unused]]
+MAYBE_UNUSED
 ssh_stat repaint_area(int* x,int* y,unsigned* width,unsigned* height)
 {
     if(ssh_trace_level>0) cout << "SVG: " << WB_FUNCTION_NAME_ << endl; //repaint_area
@@ -2328,7 +2330,7 @@ ssh_stat repaint_area(int* x,int* y,unsigned* width,unsigned* height)
 }
 
 // Jakie są ustawienia RGB konkretnego koloru w palecie
-[[maybe_unused]]
+MAYBE_UNUSED
 ssh_rgb get_rgb_from(ssh_color c)
 {
     ssh_rgb pom;

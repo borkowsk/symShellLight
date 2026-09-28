@@ -1,6 +1,6 @@
 /** @file
  * @brief SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++ (PL Doxygen).
- * @date 2026-09-23 (last modification)
+ * @date 2026-09-28 (last modification)
  * @details
  *      - Cały plik został znacząco zmieniony:     15.11.2020
  *      - Komentarze zostały znacząco rozbudowane: 01.03-04.2022
@@ -83,7 +83,7 @@ extern const char*  _ssh_grx_module_name;
 /** \brief Jeśli nie jest to 0, to okno można używać.
  *         Niezerowa wartość oznacza co najmniej, że `init_plot` zadziałał z sukcesem.
  *         W zależności od modułu może tu być zapisany uchwyt okna, uchwyt pliku (pipe) albo po prostu 1. */
-extern unsigned long _ssh_window;
+extern unsigned long long _ssh_window;
 
 /** \brief Określa czy zamykać od razu, czy dać szanse na przejrzenie zawartości.
 * Do sterowania `close_plot` - czy wymaga ono potwierdzenia od użytkownika. */

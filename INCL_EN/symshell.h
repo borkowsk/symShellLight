@@ -1,6 +1,6 @@
 /** @file
  * @brief SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++ (EN version).
- * @date 2026-09-23 (translated)
+ * @date 2026-09-28 (translated)
  * @details
  *  - The whole file changed massively: 15.11.2020
  *  - Comments changed massively: 3-4.01.2022 and during winter 2026
@@ -82,7 +82,7 @@ extern const char* _ssh_grx_module_name;
 /** \brief If not 0, the window is usable.
  *  A non-zero value means at least that `init_plot` ran successfully.
  *  Depending on the module, a window handle, a file handle (pipe) or just 1 may be written here. */
-extern unsigned long _ssh_window;
+extern unsigned long long _ssh_window;
 
 /** \brief Determines whether to close immediately or allow viewing the content.
 * Used to control `close_plot` - whether it requires user confirmation. */

@@ -1,10 +1,11 @@
 /** \file
  *  \brief IMPLEMENTATION FOR PSEUDORANDOM NUMBER GENERATOR "randg". */
 /*        ========================================================== */
-/** @date 2026-05-11 (last modification) */
+/** @date 2026-09-28 (last modification) */
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdint.h>
 #include <assert.h>
 #include <math.h>
 

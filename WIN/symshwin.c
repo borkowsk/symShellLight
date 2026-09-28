@@ -1,6 +1,6 @@
 /** @file
 *   @brief Implementacja najprostrzego interface-u wizualizacyjnego dla MS Windows 32.
-*   @date 2026-04-30 (last modification)
+*   @date 2026-09-28 (last modification)
 *           SYMSHELL IS A SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++
 *           ==================================================================
 *           Implementacja grafiki SYMSHELL-a dla Microsoft Windows.
@@ -63,6 +63,7 @@ long UseContextMenu(HWND hwnd, int x, int y, ssh_menu_item_definition* elementy,
 
 /* FOR OTHER MODULES */
 const char *_ssh_grx_module_name="WINDOWS";         // Nazwa modułu do sprawdzania co jest zlinkowane.
+unsigned long long _ssh_window = 0;                 // Uchwyt okna, jakby co...
 
 HINSTANCE		WB_Instance=0;
 HINSTANCE		WB_PrevInstance=0;
@@ -1937,9 +1938,7 @@ void fill_circle_d(ssh_coordinate x,ssh_coordinate y,ssh_natural r)
 }
 
 /* Wypełnia wielokąt przesunięty o vx, vy w kolorze c */
-void fill_poly(int vx,int vy,
-                    const ssh_point points[],int number,
-                    ssh_color color)
+void fill_poly(int vx,int vy,const ssh_point *points,ssh_length number,ssh_color color)
 {
     static POINT _LocalTable[10];
     POINT* LocalPoints=_LocalTable;
@@ -1982,7 +1981,7 @@ void fill_poly(int vx,int vy,
 
 
 /* Wypełnia wielokąt przesunięty o vx, vy w kolorach domyślnych */
-void fill_poly_d(int vx,int vy, const ssh_point points[],int number)
+void fill_poly_d(int vx,int vy, const ssh_point *points,ssh_length number)
 {
     static POINT _LocalTable[10];
     POINT* LocalPoints=_LocalTable;
@@ -2236,6 +2235,7 @@ BOOL InitInstance(HINSTANCE hInstance)
         return FALSE;
 
     WB_Hwnd=MyHwnd; //Save to global variable
+    _ssh_window=(unsigned long long)(void*)MyHwnd;
 
     //
     // Call module-specific instance initialization functions here.
@@ -2584,8 +2584,8 @@ LRESULT MsgLButtonDown(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
         {
        _TRACE(1)
         fprintf(stderr,
-              "WM_LBUTTONDOWN: %x, %d, %d\n",
-              wparam, LOWORD(lparam), HIWORD(lparam)
+              "WM_LBUTTONDOWN: 0x%llx, %d, %d\n",
+            (unsigned long long)wparam, LOWORD(lparam), HIWORD(lparam)
                 );
        _TREND
            InputXpos=xPos;
@@ -2627,8 +2627,8 @@ LRESULT MsgXButtonDown(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
         {
        _TRACE( 1)
         fprintf(stderr,
-              "WM_XBUTTONDOWN: %x, %d, %d\n",
-              wparam, LOWORD(lparam), HIWORD(lparam)
+              "WM_XBUTTONDOWN: 0x%llx, %d, %d\n",
+            (unsigned long long)wparam, LOWORD(lparam), HIWORD(lparam)
                 );
        _TREND
            InputXpos=xPos;
@@ -2669,8 +2669,8 @@ LRESULT MsgLButtonDoubleClick(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lp
         {
     _TRACE( 1)
          fprintf(stderr,
-              "WM_LBUTTONDBLCLK: %x, %d, %d\n",
-              wparam, LOWORD(lparam), HIWORD(lparam)
+              "WM_LBUTTONDBLCLK: 0x%llx, %d, %d\n",
+             (unsigned long long)wparam, LOWORD(lparam), HIWORD(lparam)
                 );
     _TREND
            InputXpos=xPos;
@@ -2712,8 +2712,8 @@ LRESULT MsgRButtonDown(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
         {
             _TRACE( 1)
                 fprintf(stderr,
-                  "WM_RBUTTONDOWN: %x, %d, %d\n",
-                wparam, LOWORD(lparam), HIWORD(lparam)
+                  "WM_RBUTTONDOWN: 0x%llx, %d, %d\n",
+                    (unsigned long long)wparam, LOWORD(lparam), HIWORD(lparam)
                 );
             _TREND
 
@@ -2762,8 +2762,8 @@ LRESULT MsgRButtonDoubleClick(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lp
 {
     _TRACE( 1)
          fprintf(stderr,
-            "WM_RBUTTONDBLCLK: %x, %d, %d\n",
-            wparam, LOWORD(lparam), HIWORD(lparam)
+            "WM_RBUTTONDBLCLK: 0x%llx, %d, %d\n",
+             (unsigned long long)wparam, LOWORD(lparam), HIWORD(lparam)
         );
     _TREND
     return 0;
@@ -2792,8 +2792,8 @@ LRESULT MsgKeyDown(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
 {
     _TRACE(1)
         fprintf(stderr,
-            "WM_KEYDOWN: %x, %x, %x\n",
-            wparam, LOWORD(lparam), HIWORD(lparam)
+            "WM_KEYDOWN: 0x%llx, %x, %x\n",
+            (unsigned long long)wparam, LOWORD(lparam), HIWORD(lparam)
         );
     _TREND
 
@@ -2823,8 +2823,8 @@ LRESULT MsgKeyUp(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
 {
     _TRACE( 1)
         fprintf(stderr,
-            "WM_KEYUP: %x, %x, %x\n",
-            wparam, LOWORD(lparam), HIWORD(lparam)
+            "WM_KEYUP: 0x%llx, %x, %x\n",
+            (unsigned long long)wparam, LOWORD(lparam), HIWORD(lparam)
         );
     _TREND
     //	 InputChar='\0';
@@ -2854,8 +2854,8 @@ LRESULT MsgChar(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
 {
     _TRACE( 1)
         fprintf(stderr,
-            "WM_CHAR: %c, %x, %x\n",
-            wparam, LOWORD(lparam), HIWORD(lparam)
+            "WM_CHAR: 0x%llx, %x, %x\n",
+            (unsigned long long)wparam, LOWORD(lparam), HIWORD(lparam)
                 );
     _TREND
     InputChar=wparam;
@@ -2894,8 +2894,8 @@ LRESULT MsgTimer(HWND hwnd, UINT uMessage, WPARAM wparam, LPARAM lparam)
     */
     _TRACE( 1)
         fprintf(stderr,
-            "WM_TIMER: %c, %x, %x\n",
-            wparam, LOWORD(lparam), HIWORD(lparam)
+            "WM_TIMER:  0x%llx, %x, %x\n",
+            (unsigned long long)wparam, LOWORD(lparam), HIWORD(lparam)
                 );
     _TREND
     return 0;
@@ -3218,10 +3218,15 @@ PBITMAPINFO CreateBitmapInfoStruct(HWND hwnd, HBITMAP hBmp) {
          pbmi = (PBITMAPINFO) LocalAlloc(LPTR,
                     sizeof(BITMAPINFOHEADER));
 
+    /* For tobe sure! ;-) */
+    if (pbmi == NULL) {
+        fprintf(stderr, "LocalAlloc ENOMEM");
+        errhandler("LocalAlloc", hwnd, ENOMEM);
+        return NULL;
+    }
 
 
     /* Initialize the fields in the BITMAPINFO structure. */
-
     pbmi->bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
     pbmi->bmiHeader.biWidth = bmp.bmWidth;
     pbmi->bmiHeader.biHeight = bmp.bmHeight;
@@ -3376,6 +3381,7 @@ int  dump_screen(const char* Filename)
     HDC hdcCompatible=0;
     PBITMAPINFO info;
     char bufor[2048];
+
     //TODO - problemy z za małym rozmiarem obrazka!
     if(strlen(Filename)+6 > 2048)
     {
@@ -3394,8 +3400,10 @@ int  dump_screen(const char* Filename)
     {
         if(hbmScreen)
             DeleteObject(hbmScreen);
+
         if(hdcCompatible )
             DeleteDC( hdcCompatible );
+
         if(lpBits)
         {
             GlobalFree((HGLOBAL)lpBits);
@@ -3419,13 +3427,17 @@ int  dump_screen(const char* Filename)
     // GetDeviceCaps(hdcScreen, HORZRES),
     // GetDeviceCaps(hdcScreen, VERTRES));
 
-    if (hbmScreen == 0)
-        errhandler("Create Compatible Bitmap (hdcScreen)", MyHwnd, ENOMEM );
+    if (hbmScreen == 0) {
+        errhandler("Create Compatible Bitmap (hdcScreen)", MyHwnd, ENOMEM);
+        return -1; //Dla pewności
+    }
 
     /* Select the bitmaps into the compatible DC. */
 
-    if (!SelectObject(hdcCompatible, hbmScreen))
-        errhandler("Compatible Bitmap Selection", MyHwnd , -1);
+    if (!SelectObject(hdcCompatible, hbmScreen)) {
+        errhandler("Compatible Bitmap Selection", MyHwnd, -1);
+        return -1; //Dla pewności
+    }
 
     /*
         * Copy color data for the entire display into a
@@ -3466,13 +3478,18 @@ void shell_setup(const char* title,int iargc,const char* iargv[])
     int i;
     int largc=iargc;
     const char** largv=iargv;
+
     if(largv && largv[0])
         progname=largv[0];
         else
-        progname="SYMSHELL TESTING PROGRAM";
+        progname="SYMSHELL PROGRAM";
 
+    if(largv!=NULL)
     for(i=1;i<largc;i++)
     {
+        if (largv[i] == NULL) //Chyba nie powinno się zdarzać, ale...
+            continue;
+
         if(strcmp(largv[i],"-logo")==0)
         {
             symshell_about(title);

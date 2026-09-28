@@ -7,7 +7,7 @@
 # Manually define WITHTESTS=true, if you want build test applications!
 #
 # (c)ISS UW, @author Wojciech Borkowski
-# @date 2026-09-25 (last update)
+# @date 2026-09-28 (last update)
 ##################################################################################
 
 cmake_minimum_required(VERSION 3.20)

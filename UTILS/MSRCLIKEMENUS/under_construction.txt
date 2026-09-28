@@ -1,5 +1,5 @@
 #Under construction!
-# @date 2026 (created)
+# @date 2026-09-28 (created)
 
 ##TODO
 - Parser/decoder for menu definitions from Microsoft "rc" files into a hierarchical structure

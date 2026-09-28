@@ -1,0 +1,272 @@
+//Microsoft Developer Studio generated resource script.
+//
+#include "opiresource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#define APSTUDIO_HIDDEN_SYMBOLS
+#include "windows.h"
+#undef APSTUDIO_HIDDEN_SYMBOLS
+#include "symshwin.h"
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Polish resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_PLK)
+#ifdef _WIN32
+LANGUAGE LANG_NEUTRAL, SUBLANG_DEFAULT
+#pragma code_page(1250)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_APPICON             ICON    DISCARDABLE     "symshwin.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+#ifndef LOCAL_VERSION
+SYMSHELLMSC MENU DISCARDABLE
+BEGIN
+    POPUP "Pliki"
+    BEGIN
+        MENUITEM "Ruszaj 'a'",                      _SPS_RUN_
+        MENUITEM "Pauzuj 'p'",                      _SPS_PAUSE_
+        MENUITEM SEPARATOR
+        MENUITEM "Prêdzej  'f'",                      _FASTER_
+        MENUITEM "Wolniej  's'",                      _SLOWER_
+        MENUITEM SEPARATOR
+        MENUITEM "Logowanie dok³adniejsze",             _LOG_MORE_DET_
+        MENUITEM "Mniej dok³adne logowanie",            _LOG_LESS_DET_
+        MENUITEM SEPARATOR
+        MENUITEM "Zakoñcz  Ctrl-Q",                   IDM_EXIT
+    END
+    MENUITEM "Czyœæ 'c'",                            _SPS_CLEAN_
+    MENUITEM "Grubsze ³¹cza",                        _THICK_LINKS_
+    MENUITEM "Cieñsze ³¹cza",                         _THIN_LINKS_
+    POPUP "Wizualizacja"
+    BEGIN
+                MENUITEM "Odœwie¿aj komunikaty 'm'",             _REFR_MESSG_
+                MENUITEM "Odœwie¿aj linki      'l'",             _REFR_LINKS_
+                MENUITEM "Odœwie¿aj procesy    'r'",             _REFR_PROCS_
+                MENUITEM "Odœwie¿aj wêz³y      'n'",             _REFR_NODES_
+        MENUITEM SEPARATOR
+                MENUITEM "Kom. nieformalne OFF/ON",             _SOCIAL_INFO_ONOFF
+	        MENUITEM "Kom. oficjalne   OFF/ON",		_OFICIAL_INFO_ONOFF
+		MENUITEM "Kom. finansowe   OFF/ON",		_FINANC_INFO_ONOFF
+                MENUITEM "Paczki produktów OFF/ON",		_PACK_INFO_ONOFF
+		MENUITEM "Inne komunikaty  OFF/ON",		_GEN_INFO_ONOFF
+        MENUITEM SEPARATOR
+		MENUITEM "£¹cza nieformalne     OFF/ON",	_SOCIAL_LINK_ONOFF
+		MENUITEM "£¹cza kooperacyjne    OFF/ON",	_COOP_LINK_ONOFF
+		MENUITEM "£. administracyjne    OFF/ON",	_ADMIN_LINK_ONOFF
+		MENUITEM "Skierowane ³. giête   OFF/ON",	_DIR_PARA_LINK_ONOFF
+		MENUITEM "Inne ³¹cza giête      OFF/ON",	_PARA_LINK_ONOFF
+                MENUITEM "Skierowane ³. proste  OFF/ON",	_DIR_GEN_LINK_ONOFF
+                MENUITEM "Inne ³¹cza proste     OFF/ON",	_GEN_LINK_ONOFF
+        MENUITEM SEPARATOR
+		MENUITEM "Proc. spo³eczne       OFF/ON",	_SOCIAL_PROC_ONOFF
+		MENUITEM "Proc. raportowane     OFF/ON",	_REPORT_PROC_ONOFF
+                MENUITEM "Proc. badawcze        OFF/ON",         _RESEARCH_PROC_ONOFF
+                MENUITEM "Szukanie inspiracji   OFF/ON",         _TTINSPIR_PROC_ONOFF
+                MENUITEM "Proc. transferu       OFF/ON",         _TTRANSFER_PROC_ONOFF
+		MENUITEM "Proc. produkcyjne     OFF/ON",	_PRODUCT_PROC_ONOFF
+		MENUITEM "Inne procesy          OFF/ON",	_GEN_PROC_ONOFF
+        MENUITEM SEPARATOR
+		MENUITEM "UOTT             OFF/ON",		_UOTT_NODE_ONOFF
+		MENUITEM "BOTT             OFF/ON",		_BOTT_NODE_ONOFF
+	        MENUITEM "Zespo³y badawcze OFF/ON",     	_RESEARCH_U_NODE_ONOFF
+		MENUITEM "Admin. naukowa   OFF/ON",		_RES_ADMIN_NODE_ONOFF
+                MENUITEM "Firmy            OFF/ON",		_BUSINESS_NODE_ONOFF
+		MENUITEM "Rynki            OFF/ON",		_MARKET_NODE_ONOFF
+                MENUITEM "Systemy informacji OFF/ON",           _PATENT_NODE_ONOFF
+		MENUITEM "Wêz³y macie¿owe  OFF/ON",		_MATT_NODE_ONOFF
+		MENUITEM "Inne wêz³y       OFF/ON",		_GEN_NODE_ONOFF
+    END
+    POPUP "Pomoc"
+    BEGIN
+        MENUITEM "WWW OPI",                          _WWW_OPI_
+        MENUITEM "WWW ISS",                          _WWW_ISS_
+        MENUITEM "Strona programu",                  _STRONA_
+        MENUITEM "O programie",                      _ABOUT_
+        MENUITEM "Dokumentacja (mht)",               _MANUAL_
+        MENUITEM "Dokumentacja (pdf)",              _MANUAL_PDF_
+    END
+END
+#else
+SYMSHELLMSC MENU DISCARDABLE
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "R&un   'a'",                      _SPS_RUN_
+        MENUITEM "P&ause 'p'",                      _SPS_PAUSE_
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit  Ctrl-Q",                   IDM_EXIT
+    END
+    MENUITEM "C&lean 'c'",                          _SPS_CLEAN_
+    MENUITEM "Thicker links",                        _THICK_LINKS_
+    MENUITEM "Thiner links",                         _THIN_LINKS_
+    POPUP "Visualisation",
+    BEGIN
+        MENUITEM "Faster   'f'",                      _FASTER_
+        MENUITEM "Slower   's'",                      _SLOWER_
+        MENUITEM SEPARATOR
+        MENUITEM "Refresh nodes     'n'",             _REFR_NODES_
+        MENUITEM "Refresh procesess 'r'",             _REFR_PROCS_
+        MENUITEM "Refresh links     'l'",             _REFR_LINKS_
+        MENUITEM "Refresh messages  'm'",             _REFR_MESSG_
+        MENUITEM SEPARATOR
+        MENUITEM "Social messg. visible",          _SOC_INF_ONOFF
+	        MENUITEM "OficialInfo OFF/ON",		_OFICIAL_INFO_ONOFF
+		MENUITEM "FinancInfo OFF/ON",		_FINANC_INFO_ONOFF
+		MENUITEM "GenInfo OFF/ON",		_GEN_INFO_ONOFF
+		MENUITEM "PackInfo OFF/ON",		_PACK_INFO_ONOFF
+		MENUITEM "SocialLink OFF/ON",		_SOCIAL_LINK_ONOFF
+		MENUITEM "CoopLink OFF/ON",		_COOP_LINK_ONOFF
+		MENUITEM "AdminLink OFF/ON",		_ADMIN_LINK_ONOFF
+		MENUITEM "DirParaLink OFF/ON",		_DIR_PARA_LINK_ONOFF
+		MENUITEM "ParaLink OFF/ON",		_PARA_LINK_ONOFF
+                MENUITEM "DirGenLink OFF/ON",		_DIR_GEN_LINK_ONOFF
+                MENUITEM "GenLink OFF/ON",		_GEN_LINK_ONOFF
+		MENUITEM "SocialProc OFF/ON",		_SOCIAL_PROC_ONOFF
+		MENUITEM "ReportProc OFF/ON",		_REPORT_PROC_ONOFF
+		MENUITEM "ProductProc OFF/ON",		_PRODUCT_PROC_ONOFF
+		MENUITEM "GenProc OFF/ON",		_GEN_PROC_ONOFF
+		MENUITEM "UOTTNode OFF/ON",		_UOTT_NODE_ONOFF
+		MENUITEM "BOTTNode OFF/ON",		_BOTT_NODE_ONOFF
+	        MENUITEM "ResearchUNode OFF/ON",	_RESEARCH_U_NODE_ONOFF
+		MENUITEM "ResAdminNode OFF/ON",		_RES_ADMIN_NODE_ONOFF
+                MENUITEM "BusinessNode OFF/ON",		_BUSINESS_NODE_ONOFF
+		MENUITEM "MarketNode OFF/ON",		_MARKET_NODE_ONOFF
+		MENUITEM "MattNode OFF/ON",		_MATT_NODE_ONOFF
+		MENUITEM "GenNode OFF/ON",		_GEN_NODE_ONOFF
+    END
+    POPUP "Help"
+    BEGIN
+        MENUITEM "WWW OPI",                          _WWW_OPI_
+        MENUITEM "WWW ISS",                          _WWW_ISS_
+        MENUITEM "About"                             _ABOUT_
+    END
+END
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+SYMSHELLMSC ACCELERATORS MOVEABLE PURE 
+BEGIN
+    "Q",            IDM_EXIT,               VIRTKEY, CONTROL
+END
+
+
+#ifndef _MAC
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 0,9,0,0
+ PRODUCTVERSION 0,9,0,0
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0xbL
+#else
+ FILEFLAGS 0xaL
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "00000000"
+        BEGIN
+            VALUE "CompanyName", "Warsaw University\0"
+            VALUE "FileDescription", "SPS Model for OPI\0"
+            VALUE "FileVersion", "Version 0.5\0"
+            VALUE "InternalName", "OPI\0"
+            VALUE "LegalCopyright", "Copyright © ISS UW & Wojciech Borkowski 2011\0"
+            VALUE "LegalTrademarks", "Microsoft® is a registered trademark of Microsoft Corporation. Windows(TM) is a trademark of Microsoft Corporation\0"
+            VALUE "OriginalFilename", "\0"
+            VALUE "ProductName", "OPI\0"
+            VALUE "ProductVersion", "Version 0.5 release 09.2011\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x0, 0
+    END
+END
+
+#endif    // !_MAC
+
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#define APSTUDIO_HIDDEN_SYMBOLS\r\n"
+    "#include ""windows.h""\r\n"
+    "#undef APSTUDIO_HIDDEN_SYMBOLS\r\n"
+    "#include ""symshwin.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_APPNAME             "SymShellMSC"
+    IDS_DESCRIPTION         "SymShell (Example) Application for MSVC++"
+END
+
+#endif    // Polish resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

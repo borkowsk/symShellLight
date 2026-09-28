@@ -1,0 +1,234 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resamngr.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include <windows.h>
+//#include "afxres.h"
+//#include "amngrcmd.h"
+#include "symshwin.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Neutral resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NEU)
+LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
+#pragma code_page(1250)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 0,9,0,0
+ PRODUCTVERSION 0,9,0,0
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x2bL
+#else
+ FILEFLAGS 0x2aL
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "000004b0"
+        BEGIN
+            VALUE "CompanyName", "Warsaw University"
+            VALUE "FileDescription", "Dimensions - Symshell Application"
+            VALUE "FileVersion", "1, 5, 0, 1"
+            VALUE "InternalName", "DimeSymShellAMngrApp"
+            VALUE "LegalCopyright", "Copyright © 2010"
+            VALUE "OriginalFilename", "Dimensions.exe"
+            VALUE "ProductName", "Warsaw University Dimension Symshell Application"
+            VALUE "ProductVersion", "1, 6, 0, 0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x0, 1200
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_APPICON             ICON                    "Dimensions48x48.ico"
+
+#endif    // Neutral resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// English (United States) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+SSH_AREAMNGR MENU
+BEGIN
+    POPUP "Models&&Files"
+    BEGIN
+        MENUITEM "Advanced generic model of negot.(v0.3-2012-3)", RUN_GENMESG
+        MENUITEM "Choose definition file for A", CHOOSE_A_DEF_FILE
+        MENUITEM "Choose definition file for B", CHOOSE_B_DEF_FILE
+        MENUITEM SEPARATOR
+        MENUITEM SEPARATOR
+        MENUITEM "Visualise data from an exp. file", RUN_FROM_FILE
+        MENUITEM "Run dummy model (v0.0-2010)", RUN_DUMMY_MODEL
+        MENUITEM "Run messg. model (v0.1-2010)", RUN_MESG1_MODEL
+        MENUITEM SEPARATOR
+        MENUITEM "Run adv.msg. model (v0.2-2011) on defaults", RUN_ADVMESG_DEF
+        MENUITEM "Run issue o. vs. issue o.",   RUN_ADVMESG_I2I
+        MENUITEM "Run honor o. vs. honor o.",   RUN_ADVMESG_H2H
+        MENUITEM "Run 50/50 issue/honor vs. 50/50", RUN_ADVMESG_5050
+        MENUITEM "Run issue/honor 60/40  vs. 40/60 well notion", RUN_ADVMESG_6040_WELL
+        MENUITEM "Run issue/honor 60/40  vs. 40/60 wrong notion", RUN_ADVMESG_6040_WRONG
+        MENUITEM "Run issue/honor 80/20  vs. 20/80 well notion", RUN_ADVMESG_8020_WELL
+        MENUITEM "Run issue/honor 80/20  vs. 20/80 wrong notion", RUN_ADVMESG_8020_WRONG
+        MENUITEM "Run honor o. vs. issue o. well notion", RUN_ADVMESG_H2I_WELL
+        MENUITEM "Run honor o. vs. issue o. wrong notion", RUN_ADVMESG_H2I_WRONG
+        MENUITEM SEPARATOR
+        MENUITEM SEPARATOR
+        MENUITEM "No detailed loging",          NO_DETAILED_LOG
+        MENUITEM "More detailed loging",        MORE_DETAILED_LOG
+        MENUITEM "Less detailed loging",        LESS_DETAILED_LOG
+        MENUITEM "Log next history to file",    LOG_HISTORY_TO_FILE
+        MENUITEM "View final statistics",       CALCULATE_STATISTICS
+        MENUITEM SEPARATOR
+        MENUITEM "Auto stop negotiations",      RUN_AUTOSTOP
+        MENUITEM "Run 10 repetitions",          RUN_10_REPLICATIONS
+        MENUITEM "Run 100 repetitions",         RUN_100_REPLICATIONS
+        MENUITEM "Run 1000 repetitions",        RUN_1000_REPLICATIONS
+        MENUITEM "Dump screen",                 SSH_FILE_DUMPSCREEN
+        MENUITEM SEPARATOR
+        MENUITEM "Exit",                        SSH_FILE_EXIT
+    END
+    POPUP "Startup settings"
+    BEGIN
+        MENUITEM "Will be used from next initialisation!", 0
+        MENUITEM SEPARATOR
+    END
+    MENUITEM "Start/Stop",                  SSH_STARTSTOP
+    MENUITEM "One step",                    SSH_ONESTEP
+    POPUP "Advise to A"
+    BEGIN
+        MENUITEM "Action for the side: ",       SSH_ONESTEP, GRAYED
+        MENUITEM SEPARATOR
+    END
+    POPUP "Advise to B"
+    BEGIN
+        MENUITEM "Action for the side: ",       SSH_ONESTEP, GRAYED
+        MENUITEM SEPARATOR
+    END
+    POPUP "Window"
+    BEGIN
+        MENUITEM "Simplified layout",           HIDE_SCATTERPLOTS
+        MENUITEM "Advanced layout",             UNCOVER_SCATTERPLOTS
+        MENUITEM "Time series layout",          ONLY_TIMESERIES
+        MENUITEM "Uncover hidden areas",        SSH_WINDOWS_UNCOVERHIDDENAREAS
+        MENUITEM "Tile all",                    SSH_WINDOWS_TILE_ALL
+        MENUITEM SEPARATOR
+        MENUITEM "-right click to mark",        SSH_HELP_SHORTCUTHELP, GRAYED
+        MENUITEM "-left click to maximize/restore", SSH_HELP_SHORTCUTHELP, GRAYED
+        MENUITEM "Mark all areas",              SSH_WINDOWS_MARKALLAREAS
+        MENUITEM "Unmark all areas",            SSH_WINDOWS_UNMARKALLAREAS
+        MENUITEM "Tile marked areas",           SSH_WINDOWS_TILEMARKEDAREAS
+        MENUITEM "Hide marked areas",           SSH_WINDOWS_HIDEMARKEDAREAS
+        MENUITEM "Restore marked to orginal position", SSH_WINDOWS_RESTORETOORGINALPOSITION
+        MENUITEM SEPARATOR
+        MENUITEM "Subwindows:",                 SSH_HELP_SHORTCUTHELP, GRAYED, MENUBREAK
+        MENUITEM SEPARATOR
+    END
+    POPUP "Help"
+    BEGIN
+        MENUITEM "Author's WWW page",           SSH_HELP_AUTHORSWWWPAGE
+        MENUITEM "Shortcut help",               SSH_HELP_SHORTCUTHELP
+    END
+END
+
+SSH_SIMPLE_MENU MENU
+BEGIN
+    POPUP "FILE"
+    BEGIN
+        MENUITEM "QUIT",                        SSH_FILE_EXIT
+    END
+END
+
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resamngr.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "#include ""amngrcmd.h""\r\n"
+    "#include ""resamngr.h""\r\n"
+    "#include ""symshwin.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE
+BEGIN
+    IDS_APPNAME             "SSH_AREAMNGR"
+    IDS_DESCRIPTION         "Symshell library by Wojciech Borkowski (http://borkowski.iss.uw.edu.pl/)"
+END
+
+#endif    // English (United States) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

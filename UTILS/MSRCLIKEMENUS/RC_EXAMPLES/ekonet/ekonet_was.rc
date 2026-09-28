@@ -1,0 +1,273 @@
+//Microsoft Developer Studio generated resource script.
+//
+#include "ekonet_was_rc.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#define APSTUDIO_HIDDEN_SYMBOLS
+#include "windows.h"
+#undef APSTUDIO_HIDDEN_SYMBOLS
+#include "symshwin.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Polish resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_PLK)
+#ifdef _WIN32
+LANGUAGE LANG_POLISH, SUBLANG_DEFAULT
+#pragma code_page(1250)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+EKONETWAS MENU DISCARDABLE 
+BEGIN
+    POPUP "&Pliki"
+    BEGIN
+        MENUITEM "Zapisz arkusz wynikowy",      ID_PLIKI_ZAPISZARKUSZWYNIKOWY
+
+        MENUITEM "Koniec    Ctrl-Q",            IDM_EXIT
+    END
+    POPUP "Dane"
+    BEGIN
+        MENUITEM "1995",                        ID_DANE_1995
+        MENUITEM "1996",                        ID_DANE_1996
+        MENUITEM "1997",                        ID_DANE_1997
+        MENUITEM "1998",                        ID_DANE_1998
+        MENUITEM "1999",                        ID_DANE_1999
+        MENUITEM "2000",                        ID_DANE_2000
+        MENUITEM "2001",                        ID_DANE_2001
+        MENUITEM "2002",                        ID_DANE_2002
+        MENUITEM "Dane domyœlne",               ID_DEFAULT_DATA
+    END
+    MENUITEM "Symuluj nastêpny rok",        ID_SYMULUJ
+    POPUP "Wizualizacja"
+    BEGIN
+        MENUITEM "Powierzchnia",                ID_WIZUALIZACJA_POWIERZCHNIA
+        MENUITEM "Populacja",                   ID_WIZUALIZACJA_POPULACJA
+        MENUITEM "Ludnoœæ czynna zawodowo",     ID_WIZUALIZACJA_LUDNOCZYNNAZAWODOWO
+
+        MENUITEM "Zaludnienie (na km kwadratowy)", 
+                                                ID_WIZUALIZACJA_ZALUDNIENIE
+        MENUITEM "Przedsiêbiorstwa",            ID_WIZUALIZACJA_PRZEDSIBIORSTWA
+
+        MENUITEM "Przedsiêbiorstw na kilometr kwadratowy", 
+                                                ID_WIZUALIZACJA_PRZEDSIBIORSTWNAKILOMETRKWADRATOWY
+
+        MENUITEM "Przedsiêbiorstw na mieszkañca", 
+                                                ID_WIZUALIZACJA_PRZEDSIBIORSTWNAMIESZKACA
+
+    END
+    POPUP "Pomoc"
+    BEGIN
+        MENUITEM "O aplikacji",                 ID_POMOC_OAPLIKACJI
+        MENUITEM "Opis",                        ID_POMOC_OPIS
+        MENUITEM "ISS UW",                      ID_POMOC_ISSUW
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_DIALOG_ABOUT DIALOGEX 0, 0, 251, 113
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "About EKONET WAS wersja 1.0"
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,102,94,50,14
+    CTEXT           " (c) 2001 Instytut Studiów Spo³ecznych Uniwersytetu Warszawskiego",
+                    IDC_STATIC,73,19,109,24
+    CONTROL         112,IDB_BITMAP_P2,"Static",SS_BITMAP | SS_CENTERIMAGE | 
+                    SS_REALSIZEIMAGE,187,7,58,54,WS_EX_TRANSPARENT
+    CONTROL         110,IDB_BITMAP_P1,"Static",SS_BITMAP | SS_CENTERIMAGE | 
+                    SS_REALSIZEIMAGE,7,7,58,54,WS_EX_TRANSPARENT
+    CTEXT           "Zaprojektowa³ i wykona³ Wojciech Borkowski na podstawie modelu ""Regis 6"" autorstwa prof. Andrzeja Nowaka",
+                    IDC_STATIC,22,70,209,18
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    IDD_DIALOG_ABOUT, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 245
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 108
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_APPNAME             "EKONETWAS"
+    IDS_DESCRIPTION         "EKONET aplikacja dla projektu WAS (application for WAS project)"
+END
+
+#endif    // Polish resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Neutral (Default) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NEUD)
+#ifdef _WIN32
+LANGUAGE LANG_NEUTRAL, SUBLANG_DEFAULT
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_APPICON             ICON    DISCARDABLE     "was.ico"
+IDI_ICON1               ICON    DISCARDABLE     "symshwin.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+SYMSHELLMSC ACCELERATORS MOVEABLE PURE 
+BEGIN
+    "Q",            IDM_EXIT,               VIRTKEY, CONTROL
+END
+
+
+#ifndef _MAC
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 0,9,0,0
+ PRODUCTVERSION 0,9,0,0
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0xbL
+#else
+ FILEFLAGS 0xaL
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "041504e2"
+        BEGIN
+            VALUE "Comments", "\0"
+            VALUE "CompanyName", "Warsaw University\0"
+            VALUE "FileDescription", "SymShell Example Application\0"
+            VALUE "FileVersion", "Version 1.0\0"
+            VALUE "InternalName", "SymShellExp\0"
+            VALUE "LegalCopyright", "Copyright © Wojciech Borkowski 1996,1997,1998\0"
+            VALUE "LegalTrademarks", "Microsoft® is a registered trademark of Microsoft Corporation. Windows(TM) is a trademark of Microsoft Corporation\0"
+            VALUE "OriginalFilename", "\0"
+            VALUE "PrivateBuild", "\0"
+            VALUE "ProductName", "SymShell\0"
+            VALUE "ProductVersion", "Version 1.0 release 03.98\0"
+            VALUE "SpecialBuild", "\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x415, 1250
+    END
+END
+
+#endif    // !_MAC
+
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "ekonet_was_rc.h\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#define APSTUDIO_HIDDEN_SYMBOLS\r\n"
+    "#include ""windows.h""\r\n"
+    "#undef APSTUDIO_HIDDEN_SYMBOLS\r\n"
+    "#include ""symshwin.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+#endif    // Neutral (Default) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_BITMAP1             BITMAP  DISCARDABLE     "orzelek_uw.bmp"
+IDB_BITMAP2             BITMAP  DISCARDABLE     "iss_sign.bmp"
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

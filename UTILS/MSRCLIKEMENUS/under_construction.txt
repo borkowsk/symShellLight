@@ -1,0 +1,7 @@
+#Under construction!
+# @date 2026 (created)
+
+##TODO
+- Parser/decoder for menu definitions from Microsoft "rc" files into a hierarchical structure
+- Implementation of display functionality: a text version, a version using Zenity, and a version rendering directly within the SYMSHELL graphics environment
+- Implementation of a minimal menu-editing interface, mirroring the one already existing in SYMSHELL for native Windows menus.

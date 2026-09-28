@@ -1,6 +1,6 @@
 /** @file symshx11.c
  *  @brief X11 implementation of SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++.
- *  @date 2026-09-23 (last modifications)
+ *  @date 2026-09-28 (last modifications)
  *          SYMSHELL IS A SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++
  *          ==================================================================
  *          Najprostszy interface wizualizacyjny zaimplementowany
@@ -86,17 +86,17 @@ int                    ssh_trace_level = 0;
 
 /** Main window handler for check and external use. */
 UNUSED_ATTR_
-XID                    _ssh_window=0;
+unsigned long long     _ssh_window=0;
 
 #ifdef __cplusplus
 }
 #endif
 
 /** \brief Wewnętrzny uchwyt dla głównego okna. */
-static Window          win;
+static Window           win;
 
 /** \brief Dla `close_plot`. Zerowane też gdy "broken-pipe". **/
-static int             opened=0;
+static int              opened=0;
 
 /** \brief Domyślna nazwa programu, okna i ikony */
  static char            prog_name[1024] = "WB SIMULATION NAME NOT SET";

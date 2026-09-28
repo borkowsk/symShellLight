@@ -1,5 +1,5 @@
 #  SymShellLight - basic graphics for Unix/Window simulations
-## @date 2026-05-09 (last change)
+## @date 2026-09-29 (last change)
 
  [//]: # (date is updated automatically by git preprocessing script) 
 

@@ -3,12 +3,19 @@
 
  [//]: # (date is updated automatically by git preprocessing script) 
 
-Light version of __Simulation Shell__. Mostly basic graphic for _X11_,_MS Windows_ & _SVG_ 
-for educational and scientific purposes.
+EN: Light version of __Simulation Shell__. Mostly basic graphic for _X11_,_MS Windows_ & _SVG_, 
+extracted from the full version for educational purposes. But currently all my simulation and 
+utility programs written in C and C++ use this specific library for graphics rendering. 
+It also serves as the graphics foundation for projects automatically translated from Processing.
+More advanced and clearly obsolete functionalities have been separated into distinct libraries.
 
 PL: Lekka wersja grafiki __SYMSHELL__'a dla _X11_, _MS Windows_ & _SVG_ 
-z niektórymi podstawowymi funkcjonalnościami czasu wykonania. 
-Wyodrębnione z pełnej wersji w celach dydaktycznych i naukowych.
+z niektórymi podstawowymi funkcjonalnościami czasu wykonania, wyodrębniona z pełnej wersji 
+dla celów dydaktycznych. Obecnie jednak wszystkie moje programy symulacyjne i użytkowe napisane 
+w C i C++ korzystają do wyświetlania grafiki właśnie z tej biblioteki. Jest też używana jako 
+podstawa graficzna dla projektów automatycznie tłumaczonych z języka Processing.
+Bardziej zaawansowane oraz ewidentnie przestarzałe funkcjonalności zostały wyodrębnione w 
+osobne biblioteki.
 
 >[!NOTE]
 >Header files previously located in the repository's root directory have been moved to the INCL(or INCL_EN)
@@ -18,11 +25,11 @@ Wyodrębnione z pełnej wersji w celach dydaktycznych i naukowych.
 >PL: Pliki nagłówkowe, umieszczone dotychczas w katalogu głównym repozytorium zostały od stycznia 2026 przeniesione 
 >do katalogu INCL (albo INCL_EN). Musicie poprawić tę ścieżkę w waszych projektach!
 
-<img src="./DOC/renovation.gif" width="300" title="Under renovation">
+<img src="./DOC/renovation.gif" width="300" title="Under renovation" />
 
 **HISTORICAL OUTLINE/RYS HISTORYCZNY**
 
-How could a programmer accustomed to "linear" simulation programming become adopted to the event-driven interface 
+EN: How could a programmer accustomed to "linear" simulation programming become adopted to the event-driven interface 
 of _X11_ or __MS Windows__ applications, in which control of the main program thread is transferred to the GUI?
 A library was needed that would hide the complexity of the event interface and its reliance on the main process thread. 
 This was precisely what SymShell was initially intended to accomplish. And then it evolved...
@@ -42,7 +49,7 @@ to C++, which I've been working on for several years. Its graphics translation i
 
 PL: Jak programista przyzwyczajony do "liniowego" programowania symulacji mógł się oswoić z ze zdarzeniowym interfejsem 
 aplikacji _X11_ czy __MS Windows__, w którym sterowanie głównym wątkiem programu oddawane jest GUI?
-Potrzebna byłaby biblioteka, która ukrywała by złożoność interfejsu zdarzeniowego i jego zachłanność na wątek główny 
+Potrzebna była biblioteka, która ukrywała by złożoność interfejsu zdarzeniowego i jego zachłanność na wątek główny 
 procesu. Temu właśnie miał początkowo służyć SymShell. A potem się rozwinął...
 
 Projekt biblioteki _Simulation Shell_ dla C/C++ został rozpoczęty około roku 1995 w celu
@@ -52,17 +59,17 @@ Zawierał podstawową grafikę oraz semigrafikę przenośna pod __unix__, __linu
 __Windows__ oraz __DOS__ (pod _GO32_) oraz moduły do zarządzania wynikami symulacji i ich wizualizacji
 (Aktualnie dostępne w pakiecie [_SymShell2AndRTM_](https://github.com/borkowsk/symShell2andRTM) ).
 
-W taki czy inny sposób służy mi to do dzisiaj i może posłużyć każdemu twórcy symulacji komputerowych, któremu użycie 
+W taki czy inny sposób służy mi do dzisiaj i może posłużyć każdemu twórcy symulacji komputerowych, któremu użycie 
 _Pythona_ czy _Matlaba_ już nie wystarcza, a jednocześnie nie ma czasu wgryzać się w zawiłości Qt, czy, tym bardziej, 
 gołych interfejsów programistycznych systemów okienkowych. Ponadto, jeśli używa Processingu, ale nie wystarcza 
 mu szybkość kodu wykonywanego przez maszynę wirtualną JAVA-y, może go zainteresować translator na C++, nad którym 
 pracuję od kilku lat. Przekład grafiki w nim także opiera się na bibliotece _SymShell_.
 
-<img src="DOC/Just a linking test_16904.svg"/>
+<img src="DOC/Just a linking test_16904.svg" title="Example of a basic usage" />
 
 **Quick start/dla niecierpliwych**
 
-The repository contains the library code and sample programs in the _EXAMPLES/_ directory
+EN: The repository contains the library code and sample programs in the _EXAMPLES/_ directory
 To use, perform the following operations in the selected directory:
 
 PL: Repozytorium zawiera kod biblioteki i przykładowe programy w katalogu _EXAMPLES/_. Aby z nich skorzystać, 
@@ -82,7 +89,7 @@ You can also compile with tests using "true":
   $ make
 ```
 
-It was tested on __UBUNTU 16.04__ with _gcc_, __UBUNTU 18.04__ with _gcc_ & __UBUNTU 20.04__ with _gcc/g++_ and __POP OS 22.04__.
+EN: It was tested on __UBUNTU 16.04__ with _gcc_, __UBUNTU 18.04__ with _gcc_ & __UBUNTU 20.04__ with _gcc/g++_ and __POP OS 22.04__.
 Current version does not work fully under __Windows__, because some functions are missed or cannot be implemented easily!!!
 
 PL: Zostało przetestowane na __UBUNTU 16.04__ z _gcc_, __UBUNTU 18.04__ z _gcc_, __UBUNTU 20.04__ z _gcc/g++_ oraz __POP OS 22.04__.
@@ -98,26 +105,33 @@ Obecna wersja nie działa w pełni w __Windows__, ponieważ niektóre funkcje s�
 * _rofi_ for context menus
 * _Doxygen_, _DoxyWizard_ for creating documentation.
 
+<img src="./DOC/jaskiniowiec.jpg" width="300" title="Bummer is working" />  
+
 **DOC/-kumentacja**
 
-If you can run the _Doxygen_ package in your system, simply run the *_makeDocs.sh* script. Everything
-is ready to generate documentation in Polish or English, or Polish/English (depending on the file).
+EN: If you can run the _Doxygen_ package in your system (It is also available for MS Windows.), simply run the 
+*_makeDocs.sh* script (and _doxywizard_ on Windows). 
+Everything is ready to generate documentation in Polish or English, or Polish/English (depending on the configuration file).
+
 In modern IDEs, the Doxygen documentation should also work well as tooltips. The header files' language will 
 be adjusted to match your system's language, but you can also choose your own language by modifying two
 lines in the *CMakeFiles.txt* file.
 
-PL: Jeśli możesz uruchomić u siebie pakiet _Doxygen_, to wystarczy, że uruchomisz skrypt *_makeDocs.sh*. Wszystko 
-jest przygotowane do wytworzenia dokumentacji w wersji polskiej lub angielskiej, lub polsko/angielskiej (w zależności 
-od pliku). W nowoczesnych IDE dokumentacja doxygen-owa powinna też dobrze działać jako podpowiedzi w trakcie pracy.
+PL: Jeśli możesz uruchomić u siebie pakiet _Doxygen_ (Jest dostępny także pod MS Windows), to wystarczy, że uruchomisz 
+skrypt *_makeDocs.sh* (a pod Windows _doxywizard_).
+Wszystko jest przygotowane do wytworzenia dokumentacji w wersji polskiej lub angielskiej, lub polsko/angielskiej (w zależności 
+od pliku konfiguracyjnego).
+
+W nowoczesnych IDE dokumentacja doxygen'owa powinna też dobrze działać jako podpowiedzi w trakcie pracy.
 Język plików nagłówkowych zostanie dopasowany do języka twojego systemu, ale możesz też wybrać sam modyfikując dwie 
 linie w pliku *CMakeFiles.txt*.
 
 
 **Licencing/Licencja**
 
-I've made every effort to ensure this software works properly, but of course, you use it at your own risk. 
-You can use it free of charge for educational and research purposes, and if you feel it's appropriate to give back 
-in some way, please buy me a large coffee :-)
+EN: I've made every effort to ensure this software works properly, but of course, you use it at your own risk. 
+    You can use it free of charge for educational and research purposes, and if you feel it's appropriate to give back 
+    in some way, please buy me a large coffee :-)
 
 PL: Dołożyłem wszelkich starań, żeby to oprogramowanie działało, jak należy, ale oczywiście używasz na własną 
     odpowiedzialność. Możesz używać go bezpłatnie w celach edukacyjnych i badawczych, a jeśli uznasz, że wypadałoby 

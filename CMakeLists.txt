@@ -331,6 +331,9 @@ if(WITHTESTS) #SVG tests
     add_custom_target(all_SVG_tests DEPENDS ${SVG_EXAMPLES})
 endif()
 
+add_executable("msrcmenutest" "UTILS/MSRCLIKEMENUS/msrcmenu-test.cpp")
+
+
 #KONIEC - THE END
 #********************************************************************/
 #*              SYMSHELLLIGHT  version 2026                         */

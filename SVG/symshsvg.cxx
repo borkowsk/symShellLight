@@ -1,6 +1,6 @@
 /** @file
  *  @brief      SYMSHELL SVG IMPLEMENTATION (cxx extension is used intentionally!)
- *  @date 2026-09-28 (last modification)
+ *  @date 2026-10-06 (last modification)
  *  @details
  *              SYMSHELL IS A SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++
  *              ==================================================================
@@ -69,14 +69,18 @@ using namespace wbrtm;
 
 /// Wewnętrzne śledzenie wywołań.
 #if defined( _MSC_VER )
-//#define STR_HELPER(x) #x
-//#define STR(x) STR_HELPER(x)
-//#define WB_FUNCTION_NAME_  ("SYMSHSVG_" STR( __LINE__ ) )
-#define WB_FUNCTION_NAME_  __FUNCTION__
-#define MAYBE_UNUSED 
+    //#define STR_HELPER(x) #x
+    //#define STR(x) STR_HELPER(x)
+    //#define WB_FUNCTION_NAME_  ("SYMSHSVG_" STR( __LINE__ ) )
+    #define WB_FUNCTION_NAME_  __FUNCTION__
+    #ifndef MAYBE_UNUSED
+        #define MAYBE_UNUSED
+    #endif
 #else
-#define WB_FUNCTION_NAME_  __func__   //C11
-#define MAYBE_UNUSED [[maybe_unused]] //C++17
+    #define WB_FUNCTION_NAME_  __func__   //C11
+    #ifndef MAYBE_UNUSED
+        #define MAYBE_UNUSED [[maybe_unused]] //C++17
+    #endif
 #endif
 
 /** @name Zmienne eksportowane na zewnątrz */

@@ -1,6 +1,6 @@
 /** @file
  *  @brief      SYMSHELL SVG IMPLEMENTATION (cxx extension is used intentionally!)
- *  @date 2026-10-06 (last modification)
+ *  @date 2026-10-26 (last modification)
  *  @details
  *              SYMSHELL IS A SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++
  *              ==================================================================
@@ -138,11 +138,11 @@ namespace {
     static ssh_rgb      GrPenColor = { 255,255,255}; //,255 };
     static ssh_rgb      GrBrushColor = { 205,205,205}; //,255 };
 
-    static ssh_color    curr_background = 0;
-    static unsigned     GrScreenHi = 0;
-    static unsigned     GrScreenWi = 0;
-    static unsigned     GrFontHi = 14;
-    static unsigned     GrFontWi = 6;
+    static ssh_color      curr_background = 0;
+    static unsigned short GrScreenHi = 0;
+    static unsigned short GrScreenWi = 0;
+    static unsigned short GrFontHi = 14;
+    static unsigned short GrFontWi = 6;
 
     static ssh_rgb      palette[512];
 
@@ -923,7 +923,7 @@ ssh_color get_brush()
 // Aktualne rozmiary pionowe okna z init_plot po przeliczeniach...
 // Oraz ewentualnych zmianach uczynionych "ręcznie" przez operatora.
 MAYBE_UNUSED
-ssh_natural screen_height()
+ssh_snatural screen_height()
 {
     if(ssh_trace_level>2) cout << "SVG: " << WB_FUNCTION_NAME_ << SEP << "return " << GrScreenHi; //screen_height
     if(ssh_trace_level>2) cout << endl;
@@ -933,7 +933,7 @@ ssh_natural screen_height()
 // Aktualne rozmiary poziome okna z init_plot po przeliczeniach...
 // Oraz ewentualnych zmianach uczynionych "ręcznie" przez operatora.
 MAYBE_UNUSED
-ssh_natural screen_width()
+ssh_snatural screen_width()
 {
     if(ssh_trace_level>2) cout << "SVG: " << WB_FUNCTION_NAME_ << SEP << "return " << GrScreenWi; //screen_width
     if(ssh_trace_level>2) cout << endl;
@@ -943,7 +943,7 @@ ssh_natural screen_width()
 // Aktualne rozmiary znaku — wysokość.
 // Potrzebne do pozycjonowania tekstu.
 MAYBE_UNUSED
-ssh_natural char_height(char znak)
+ssh_snatural char_height(char znak)
 {
     if(ssh_trace_level>2) cout << "SVG: " << WB_FUNCTION_NAME_ << SEP << znak << SEP << "return " << GrFontHi; //char_height
     if(ssh_trace_level>2) cout << endl;
@@ -953,7 +953,7 @@ ssh_natural char_height(char znak)
 // Aktualne rozmiary znaku — szerokość.
 // Potrzebne do pozycjonowania tekstu.
 MAYBE_UNUSED
-ssh_natural char_width(char znak)
+ssh_snatural char_width(char znak)
 {
     if(ssh_trace_level>2) cout << "SVG: " << WB_FUNCTION_NAME_ << SEP << znak << SEP << "return " << GrFontWi; //char_width
     if(ssh_trace_level>2) cout << endl;
@@ -963,7 +963,7 @@ ssh_natural char_width(char znak)
 // Aktualne rozmiary wyświetlania całego łańcucha znaków — wysokość.
 // Tu zazwyczaj może być to samo co `char_height`.
 MAYBE_UNUSED
-ssh_natural string_height(const char* str)
+ssh_snatural string_height(const char* str)
 {
     if(ssh_trace_level>2) cout << "SVG: " << WB_FUNCTION_NAME_ << SEP ; //string_height
     if(ssh_trace_level>2) cout << str <<SEP << "return " << GrFontHi<< endl;

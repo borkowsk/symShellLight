@@ -1,6 +1,6 @@
 /** @file
  * @brief SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++ (EN version).
- * @date 2026-09-28 (translated)
+ * @date 2026-10-26 (translated)
  * @details
  *  - The whole file changed massively: 15.11.2020
  *  - Comments changed massively: 3-4.01.2022 and during winter 2026
@@ -36,6 +36,7 @@ typedef	signed	int			ssh_stat;		/**< \brief Return values used as status for som
 typedef	signed	int			ssh_coordinate;	/**< \brief Any screen coordinates. */
 typedef unsigned	int		ssh_length;		/**< \brief Situations where 0 is allowed, but not negative values, e.g., array lengths. */
 typedef	unsigned	int		ssh_natural;	/**< \brief Numbers greater than zero, where zero is an unexpected situation. */
+typedef	unsigned short int	ssh_snatural;	/**< \brief Small numbers greater than zero, where zero is an unexpected situation.  */
 typedef	unsigned	int		ssh_intensity;	/**< \brief Color components etc., values from 0 upwards. */
 typedef	unsigned	int		ssh_color;		/**< \brief Indexed color. TODO change name to ssh_color_index? */
 typedef	float				ssh_radian;		/**< \brief Angles in radians for arcs. */
@@ -259,17 +260,17 @@ ssh_natural  get_line_width();
 
 /** \brief Current window dimensions after init_plot calculations
  * ...and any "manual" changes made by the operator. */
-ssh_natural  screen_width();                                    /**< Total usable window width in pixels. */
-ssh_natural  screen_height();                                   /**< Total usable window height in pixels. */
+ssh_snatural  screen_width();                                    /**< Total usable window width in pixels. */
+ssh_snatural  screen_height();                                   /**< Total usable window height in pixels. */
 
 /* Character and text sizes
    ========================  */
 
 /** \brief Current character dimensions needed for text positioning. */
-ssh_natural  char_height(char sample);         /**< Character height. Best to provide 'X'. */
-ssh_natural  char_width(char sample);          /**< Character width. @note In 99% of situations, we have a monospaced font. */
-ssh_natural  string_height(const char* str);   /**< Height of the text string on the screen. */
-ssh_natural  string_width(const char* str);    /**< Width of the text string on the screen. */
+ssh_snatural  char_height(char sample);         /**< Character height. Best to provide 'X'. */
+ssh_snatural  char_width(char sample);          /**< Character width. @note In 99% of situations, we have a monospaced font. */
+ssh_snatural  string_height(const char* str);   /**< Height of the text string on the screen. */
+ssh_natural   string_width(const char* str);    /**< Width of the text string on the screen. */
 
 /* PRINTING ON SCREEN
  * ================== */

@@ -1,6 +1,6 @@
 /** @file
  * @brief SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++ (PL Doxygen).
- * @date 2026-09-28 (last modification)
+ * @date 2026-10-26 (last modification)
  * @details
  *      - Cały plik został znacząco zmieniony:     15.11.2020
  *      - Komentarze zostały znacząco rozbudowane: 01.03-04.2022
@@ -37,6 +37,7 @@ typedef	signed	int			ssh_stat;		/**< \brief Wartości zwracane jako status niekt
 typedef	signed	int			ssh_coordinate;	/**< \brief Wszelkie współrzędne ekranowe. */
 typedef unsigned	int		ssh_length;		/**< \brief Sytuacje, gdy 0 jest dopuszczalne, ale nie coś ujemnego np. długości tablic */
 typedef	unsigned	int		ssh_natural;	/**< \brief Liczby większe od zera, gdy zero jest sytuacją nieoczekiwaną. */
+typedef	unsigned short int	ssh_snatural;	/**< \brief Niewielkie liczby większe od zera, gdy zero jest sytuacją nieoczekiwaną. */
 typedef	unsigned	int		ssh_intensity;	/**< \brief Składowe kolorów itp. wartości od 0 wzwyż. */
 typedef	unsigned	int		ssh_color;		/**< \brief Kolor indeksowany. TODO change name to ssh_color_index? */
 typedef	float				ssh_radian;		/**< \brief Kąty w radianach dla łuków. */
@@ -260,17 +261,17 @@ ssh_natural  get_line_width();
 
 /** \brief Aktualne rozmiary okna po przeliczeniach z init_plot
  *         ...i ewentualnych zmianach uczynionych "ręcznie" przez operatora. */
-ssh_natural  screen_width();                                    /**< Całkowita użyteczna szerokość okna w pikselach. */
-ssh_natural  screen_height();                                   /**< Całkowita użyteczna wysokość okna w pikselach. */
+ssh_snatural  screen_width();                                    /**< Całkowita użyteczna szerokość okna w pikselach. */
+ssh_snatural  screen_height();                                   /**< Całkowita użyteczna wysokość okna w pikselach. */
 
 /* Wielkości znaków i tekstów 
    ==========================  */
 
 /** \brief Aktualne rozmiary znaku potrzebne do pozycjonowania tekstu. */
-ssh_natural  char_height(char sample);         /**< Wysokość znaku. Najlepiej dać 'X'. */
-ssh_natural  char_width(char sample);          /**< Szerokość znaku. @note W 99% sytuacji mamy font stały (monotyp). */
-ssh_natural  string_height(const char* str);   /**< Wysokość łańcucha tekstowego na ekranie. */
-ssh_natural  string_width(const char* str);    /**< Szerokość łańcucha tekstowego na ekranie. */
+ssh_snatural  char_height(char sample);         /**< Wysokość znaku. Najlepiej dać 'X'. */
+ssh_snatural  char_width(char sample);          /**< Szerokość znaku. @note W 99% sytuacji mamy font stały (monotyp). */
+ssh_snatural  string_height(const char* str);   /**< Wysokość łańcucha tekstowego na ekranie. */
+ssh_natural   string_width(const char* str);    /**< Szerokość łańcucha tekstowego na ekranie. */
 
 /* DRUKOWANIE NA EKRANIE
  * ===================== */

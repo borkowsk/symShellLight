@@ -1,6 +1,6 @@
 /** @file symshx11.c
  *  @brief X11 implementation of SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++.
- *  @date 2026-09-28 (last modifications)
+ *  @date 2026-10-26 (last modifications)
  *          SYMSHELL IS A SIMPLE PORTABLE GRAPHICS & INPUT INTERFACE for C/C++
  *          ==================================================================
  *          Najprostszy interface wizualizacyjny zaimplementowany
@@ -22,7 +22,7 @@
  * \note
  *  `get_char` aktualnie zjada wszystkie nieznakowe komunikaty, jakie
  *   są w kolejce komunikatów, przez co EXPOSE działa jeszcze inaczej...
- *   Czy błędnie to na razie trudno powiedzieć.
+ *   A czy błędnie to na razie trudno powiedzieć.
  *
  ******************************************************************************************************************** */
 
@@ -40,7 +40,7 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/Xos.h>
-#include <X11/Xatom.h>
+//#include <X11/Xatom.h>
 #include <X11/xpm.h>  /*  THIS SHOULD LOOK LIKE WHEN Xpm IS NORMALLY INSTALLED */
 #include <errno.h>
 //#include "SYMSHELL/Xpm/xpm.h"
@@ -78,8 +78,8 @@
 UNUSED_ATTR_
 const char *_ssh_grx_module_name="SVG";
 
-/** Dla \ref close_plot.\brief Czy zamykać okno od razu, czy dawać "enter"? */
-extern int             WB_error_enter_before_clean;
+// /** Dla \ref close_plot.\brief Czy zamykać okno od razu, czy dawać "enter"? */
+//extern int             WB_error_enter_before_clean;
 
 /** Maska poziomów śledzenia 1-msgs 2-grafika 3-grafika detaliczna 4-alokacje/zwalnianie */
 int                    ssh_trace_level = 0;
@@ -136,7 +136,7 @@ static int              opened=0;
 
  static Atom            wmDeleteMessage=0;          /**< \brief ATOM przypisywany przy rejestracji "protokołu" zamknięcia okna */
 
- static unsigned int    width,height;              /**< \brief Window size */
+ static int             width,height;              /**< \brief Window size */
  static int             iniX, iniY;                /**< \brief Window position */
 
  /* For transparencies to work use:
@@ -147,7 +147,7 @@ static int              opened=0;
  static unsigned int    default_depth = 24;         /**< \brief CURRENTLY 24bit deph WORK, BUT 32 NOT (TODO!) */
 #endif
 
- static unsigned int    border_width = 4;           /**< \brief Four pixels margin */
+ static unsigned short  border_width = 4;           /**< \brief Four pixels margin */
  static int             window_size = TOO_SMALL;    /**< \brief BIG_ENOUGH or TOO_SMALL to display contents */
 
 UNUSED_ATTR_
@@ -166,10 +166,10 @@ UNUSED_ATTR_
  static int              ResizeFont=0;              /**< \brief Ustala czy spróbuje zmieniać rozmiar fontu. TODO? */
 
  static XFontStruct     *font_info=NULL;            /**< \brief Current font */
- static unsigned         ori_font_width = 8;
- static unsigned         ori_font_height = 16;
- static unsigned         font_width = 0;
- static unsigned         font_height = 0;
+ static int              ori_font_width = 8;
+ static int              ori_font_height = 16;
+ static int              font_width = 0;
+ static int              font_height = 0;
 
  /* REPAINT DATA */
  static struct XRect {
@@ -449,8 +449,9 @@ UNUSED_ATTR_
             if(!pipe_break)
             {
                 char* kom="(Press ANY KEY to close the graphic window)";
+                ssh_snatural len=strlen(kom);
                 /* width,height of Window at this moment */
-                printbw(screen_width()/2-(strlen(kom)*char_width('X'))/2,screen_height()/2,kom);
+                printbw(screen_width()/2-(len*char_width('X'))/2,screen_height()/2,kom);
                 flush_plot();
                 XSync(display,1/*DISCARD EVENTS*/);
                 fprintf(stderr,"(See at window \"%s\" )\n",window_name);
@@ -560,8 +561,8 @@ UNUSED_ATTR_
     x_offset = 2;
 
     /* Output text, centered on each line */
-    XDrawString(display, h_win, pXgc, x_offset, y_offset, string1,
-                strlen(string1));
+    int len=(int)strlen(string1); assert(len>0);
+    XDrawString(display, h_win, pXgc, x_offset, y_offset, string1,len);
  }
 
  /** Kopiuje fragment mapy okna na okno. */
@@ -735,7 +736,7 @@ UNUSED_ATTR_
                 if(report.xbutton.button==3)
                 {
                     ssh_basic_win_place_context data={(unsigned long long)display, win, -1, -1};
-                    assert(sizeof(data.ScrIdentifier)==sizeof(display));
+                    //assert(sizeof(data.ScrIdentifier)==sizeof(display)); //???
                     data.X=report.xbutton.x_root;
                     data.Y=report.xbutton.y_root;
                     long long context_menu_ret= ssh_context_menu_expected(report.xbutton.x, report.xbutton.y, &data);
@@ -746,7 +747,7 @@ UNUSED_ATTR_
                         break;
                     } else if(context_menu_ret > 0)
                     {
-                        *eventCharsBuf=context_menu_ret;
+                        eventCharsBuf[0]=context_menu_ret;
                         return context_menu_ret;
                     }
                     else if(context_menu_ret == -1)
@@ -905,11 +906,7 @@ UNUSED_ATTR_
     /* Cała część na wyświetlacze o mniejszej głębi wymaga poprawienia i przetestowania,
      * choć kiedyś działała poprawnie na 256 kolorach - ale to było prze 2000 rokiem!
 
-#ifdef __MSDOS__
-    colormap=XDefaultColormap(display,screen_num); * W tej emulacji nie ma map *
-#else
     colormap=XCreateColormap(display,win_h,DefaultVisual(display,screen_num),AllocNone);
-#endif
 
     XSetWindowColormap(display,win_h,colormap);
 
@@ -1206,9 +1203,11 @@ ssh_stat init_plot(ssh_natural a,ssh_natural b,ssh_natural ca,ssh_natural cb) {
         //See-> https://stackoverflow.com/questions/10979412/how-to-add-an-icon-to-an-ubuntu-app
         icon_pixmap = XCreateBitmapFromData(display, win,
                 WB_icon_bitmap_bits,WB_icon_bitmap_width,WB_icon_bitmap_height);
+
         if( ssh_trace_level > 1 )
-        fprintf(stderr, "X11: %s: creation of "
-                         "icon_pixmap return %lu.\n", prog_name, icon_pixmap);
+            fprintf(stderr, "X11: %s: creation of "
+                           "icon_pixmap return %lu.\n", prog_name, icon_pixmap);
+
         if( icon_pixmap==0 )
             fprintf(stderr, "X11: %s: creation of "
                              "icon_pixmap failed.\n", prog_name);
@@ -1320,32 +1319,34 @@ ssh_stat init_plot(ssh_natural a,ssh_natural b,ssh_natural ca,ssh_natural cb) {
 
 /* Wysokość ekranu/okna. */
 UNUSED_ATTR_
-ssh_natural screen_height()
+ssh_snatural screen_height()
 {                                                                   assert(mulY > 0);
    //return ini_b+(ini_cb*font_height)/mulY; /* Window size - OLD STYLE */
-   return height / mulY;
+   int hlp = height / mulY;
+   return hlp;
 }
 
 /* Szerokość ekranu/okna. */
 UNUSED_ATTR_
-ssh_natural screen_width()
+ssh_snatural screen_width()
 {                                                                   assert(mulX > 0);
     //return ini_a+(ini_ca*font_width)/mulX;/* Window size - OLD STYLE */
-    return width / mulX;
+    int hlp = width / mulX;
+    return hlp;
 }
 
 /* Wysokość znaku. */
 UNUSED_ATTR_
-ssh_natural char_height(char znak)
+ssh_snatural char_height(char znak)
 {                                                                   assert(mulY > 0);
     int pom= (font_height + mulY) / mulY;
-    /*if(pom<1)pom=1;*/
+    /*if(pom<1)pom=1;*/assert(pom>0);
     return pom;
 }
 
 /* Szerokość znaku. */
 UNUSED_ATTR_
-ssh_natural  char_width(char znak)
+ssh_snatural  char_width(char znak)
 {
     int calculated_width;
     char pom[2];
@@ -1359,7 +1360,7 @@ ssh_natural  char_width(char znak)
 
 /* Aktualne rozmiary łańcucha znaków na ekranie — wysokość. */
 UNUSED_ATTR_
-ssh_natural  string_height(const char* str)
+ssh_snatural  string_height(const char* str)
 {
     /** \internal Wysokość jest LICZONA BARDZO PRYMITYWNIE, jako wysokość pierwszego znaku. */
     return char_height(*str); /* Tylko pierwszy znak! */
@@ -1491,7 +1492,7 @@ static char mem_guard1=0x77; /**< Strażnik czy nie nastąpiło wyjście przed b
 static char bufor[2048];     /**< Bufor wyjściowy zestawu funkcji "print*". */
 static char mem_guard2=0x77; /**< Strażnik czy nie nastąpiło wyjście za bufor wyjściowy zestawu funkcji "print*". */
 
-static int ox,oy; /* TODO Do czego to miałoby służyć? Jest przypisywane w funkcjach "print*" ale nie używane. */
+//static int ox,oy; /* TODO Do czego to miałoby służyć? Jest przypisywane w funkcjach "print*" ale nie używane. */
 
 /* Wyprowadzenie tekstu na ekran (bw). */
 UNUSED_ATTR_
@@ -1529,7 +1530,7 @@ void printbw(ssh_coordinate x,ssh_coordinate y,const char* format,...)
     x*=mulX; /* Multiplication of coordinates */
     y*=mulY; /* if the window is bigger */
 
-    ox=x;oy=y; /* TODO Do czego to miałoby służyć? */
+    //ox=x;oy=y; /* TODO Do czego to miałoby służyć? */
 
     CurrForeground=-1;
     XSetForeground(display,gc,Scale[0]);
@@ -1589,7 +1590,7 @@ void printc(ssh_coordinate x,ssh_coordinate y,
     x*=mulX; /* Multiplication of coordinates */
     y*=mulY; /* if the window is bigger */
 
-    ox=x;oy=y; /* TODO Do czego to miałoby służyć? */
+    //ox=x;oy=y; /* TODO Do czego to miałoby służyć? */
 
     CurrForeground=-1;
     XSetForeground(display,gc,Scale[fore]);
@@ -1647,7 +1648,7 @@ void print_d(ssh_coordinate x,ssh_coordinate y,const char* format,...)
     x*=mulX; /* Multiplication of coordinates */
     y*=mulY; /* if the window is bigger */
 
-    ox=x;oy=y; /* TODO Do czego to miałoby służyć? */
+    //ox=x;oy=y; /* TODO Do czego to miałoby służyć? */
 
     CurrForeground=-1;
     XSetForeground(display,gc,BrushColor);
@@ -1684,7 +1685,7 @@ unsigned long buildColor(unsigned char red, unsigned char green, unsigned char b
            ( (unsigned long)(blue) ) ;
 }
 
-/** \brief Tworzenie kolorów RBGA w X11.
+/** \brief Tworzenie kolorów RGBA w X11.
  *  \details Funkcja jest inline i tylko dla tego pliku źródłowego.
  *  \see https://www.geeksforgeeks.org/inline-function-in-c/
  * */
@@ -1735,7 +1736,7 @@ void print_rgb(ssh_coordinate x,ssh_coordinate y,
     x*=mulX; /* Multiplication of coordinates */
     y*=mulY; /* if the window is bigger */
 
-    ox=x;oy=y; /* TODO Do czego to miałoby służyć? */
+    //ox=x;oy=y; /* TODO Do czego to miałoby służyć? */
 
     CurrForeground=-1;
     XSetForeground(display,gc,buildColor(r,g,b) );
@@ -2663,7 +2664,7 @@ void fill_poly_d(ssh_coordinate vx, ssh_coordinate vy,
         XFillPolygon(display, cont_pixmap, gc,
                      LocalPoints, length, Complex, CoordModeOrigin);
 
-    if(length > 10) /*Byl duży*/
+    if(length > 10) /*Był duży*/
         free(LocalPoints); /* dealokacja */
 }
 
@@ -3064,7 +3065,7 @@ void set_gray(ssh_color shade,ssh_intensity intensity)
 * ==> http://stackoverflow.com/questions/1157209/is-there-an-alternative-sleep-function-in-c-to-milliseconds */
 void delay_ms(ssh_natural ms)
 {
-    extern int usleep(useconds_t u_sec); /* takes microseconds. */
+    //extern int usleep(useconds_t u_sec); /* takes microseconds (from unistd.h) */
     usleep(ms*1000);// 1 ms = 1 000 μs
 }
 
@@ -3073,7 +3074,7 @@ void delay_ms(ssh_natural ms)
 UNUSED_ATTR_
 void delay_us(ssh_natural us)
 {
-    extern int usleep(useconds_t u_sec); /* takes microseconds. */
+    //extern int usleep(useconds_t u_sec); /* takes microseconds from unistd.h */
     usleep(us);
 }
 
